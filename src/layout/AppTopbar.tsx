@@ -2,9 +2,10 @@ import { Link } from 'react-router-dom';
 import React, { forwardRef, useContext, useImperativeHandle, useRef } from 'react';
 import { classNames } from 'primereact/utils';
 import { LayoutContext } from './context/layoutContext';
+import { AppTopbarRef } from 'types/layout';
 
-const AppTopbar = forwardRef((props:any, ref) => {
-    const { onMenuToggle, showProfileSidebar } = useContext(LayoutContext);
+const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
+    const { layoutConfig, layoutState, onMenuToggle, showProfileSidebar } = useContext(LayoutContext);
     const menubuttonRef = useRef(null);
     const topbarmenuRef = useRef(null);
     const topbarmenubuttonRef = useRef(null);
@@ -18,6 +19,7 @@ const AppTopbar = forwardRef((props:any, ref) => {
     return (
         <div className="layout-topbar">
             <Link to="/" className="layout-topbar-logo">
+                <img src={`/layout/images/logo-${layoutConfig.colorScheme !== 'light' ? 'white' : 'dark'}.svg`} width="47.22px" height={'35px'} alt="logo" />
                 <span>SAKAI</span>
             </Link>
 
@@ -29,7 +31,7 @@ const AppTopbar = forwardRef((props:any, ref) => {
                 <i className="pi pi-ellipsis-v" />
             </button>
 
-            <div ref={topbarmenuRef} className={classNames('layout-topbar-menu')}>
+            <div ref={topbarmenuRef} className={classNames('layout-topbar-menu', { 'layout-topbar-menu-mobile-active': layoutState.profileSidebarVisible })}>
                 <button type="button" className="p-link layout-topbar-button">
                     <i className="pi pi-calendar"></i>
                     <span>Calendar</span>
