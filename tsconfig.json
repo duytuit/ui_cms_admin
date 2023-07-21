@@ -18,9 +18,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "incremental": true,
+    "checkJs": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["/*"]
+    },
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src", "/types/**/*.ts", "**/*.ts", "**/*.tsx", "node_modules/primereact/*"],
+  "exclude": ["node_modules","**/node_modules/*", "node_modules/primereact/*"]
 }
