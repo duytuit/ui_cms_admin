@@ -7,37 +7,22 @@ import { useState, useEffect } from 'react';
 const MenuSidebar = (props:any) => {
     const location = useLocation();
     const [activeMenu, setActiveMenu] = useState('');
-    const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
     const item = props.item;
     const key = props.parentKey ? props.parentKey + '-' + props.index : String(props.index);
     const active = activeMenu === key || (activeMenu && activeMenu.startsWith(key + '-')) || false;
     // const permissionTool = useSelector((state:any) => state.permission).permissionTool;
     const permissionTool = ['/','/page-one','/page-two'];
-    const project = localStorage.getItem("project");
     const itemClick = (event:any) => {
         //avoid processing disabled items
         if (item.disabled) {
             event.preventDefault();
             return;
         }
-        
-      
-        if (project) {
-            const _project = JSON.parse(project);
-            const params = { projectId: _project.projectId };
-            console.log(location.pathname);
-            
-            navigate({
-              pathname: location.pathname,
-              search: `?${createSearchParams(params)}`,
-            });
-          }
         //execute command
         if (item.command) {
             item.command({ originalEvent: event, item: item });
         }
-
         // toggle active state
         if (item.items) setActiveMenu(active ? props.parentKey : key);
         else setActiveMenu(key);
