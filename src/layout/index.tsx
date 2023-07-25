@@ -3,11 +3,11 @@ import AppSidebar from "./AppSidebar";
 import AppFooter from "./AppFooter";
 import { classNames } from "primereact/utils";
 import { useEventListener, useMountEffect, useUnmountEffect } from 'primereact/hooks';
-import React, { useState, useRef, useContext, useEffect } from 'react';
 import { AppTopbarRef, LayoutState } from "types/layout";
 import { LayoutContext } from "./context/layoutContext";
 import { ChildContainerProps } from "types/types";
 import PrimeReact from 'primereact/api';
+import React, { useContext, useRef, useEffect } from "react";
 
 const Layout = ({ children }: ChildContainerProps) => {
     const { layoutConfig, layoutState, setLayoutState } = useContext(LayoutContext);

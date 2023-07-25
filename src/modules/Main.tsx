@@ -3,7 +3,7 @@ import { LayoutProvider } from 'layout/context/layoutContext';
 import React, { Fragment } from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { publicRoutes } from 'routes';
-import { PublicRoutes } from 'routes/PrivateRoute';
+import { PrivateRoutes, PublicRoutes } from 'routes/PrivateRoute';
 
 const Main = () => {
     return (

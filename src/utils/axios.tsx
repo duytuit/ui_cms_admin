@@ -1,4 +1,4 @@
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { clientId } from "./getClinentId";
 import { showToast } from "redux/features/toast";
 import { setUserInfo } from "redux/features/user";

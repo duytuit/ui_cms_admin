@@ -1,12 +1,10 @@
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { Button } from "primereact/button";
 import { Card } from "primereact/card";
-import { InputText } from "primereact/inputtext";
 import { ScrollTop } from "primereact/scrolltop";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { showToast } from "redux/features/toast";
-export default function DashBoard() {
+export default function PageTwo() {
     const { handleParamUrl} = useHandleParamUrl(); 
     const [value, setValue] = useState('');
     const dispatch = useDispatch();
@@ -31,13 +29,9 @@ export default function DashBoard() {
     }
     return (
         <>
-            <InputText value={value} onChange={(e) => setValue(e.target.value)} />
-            <Button label="Submit" />
-            <div className="card flex justify-content-center">
-            <Button label="Submit" onClick={abc} />
-        </div>
+        
         <div className="card">
-             Đây là trang dashboard
+             Đây là trang page two
         </div>
         <ScrollTop />
         <Card/>

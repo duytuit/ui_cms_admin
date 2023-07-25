@@ -1,13 +1,12 @@
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import reportWebVitals from './reportWebVitals';
-
 import 'primereact/resources/themes/lara-light-indigo/theme.css';   // theme
 import 'primereact/resources/primereact.min.css';                       // core css
 import 'primeicons/primeicons.css';                                 // icons
 import 'primeflex/primeflex.css';
 import './styles/layout/layout.scss';
 import './styles/demo/Demos.scss';
+import './index.css';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import App from './App';

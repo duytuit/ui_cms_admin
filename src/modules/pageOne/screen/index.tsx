@@ -1,14 +1,11 @@
-import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { Button } from "primereact/button";
 import { Card } from "primereact/card";
-import { InputText } from "primereact/inputtext";
 import { ScrollTop } from "primereact/scrolltop";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { showToast } from "redux/features/toast";
-export default function DashBoard() {
+import { useHandleParamUrl } from "hooks/useHandleParamUrl";
+export default function PageOne() {
     const { handleParamUrl} = useHandleParamUrl(); 
-    const [value, setValue] = useState('');
     const dispatch = useDispatch();
     useEffect(()=>{
         dispatch(
@@ -29,19 +26,32 @@ export default function DashBoard() {
             })
         );
     }
+    const [query, setQuery] = useState('');
+
+
+    const handleSubmit = (event:any) => {
+      event.preventDefault();
+      const data = new FormData(event.target);
+      const formObject = Object.fromEntries(data);
+      handleParamUrl(formObject)
+    } 
+    const handleChange = (event:any) => {
+      setQuery(event.target.value);
+    };
+  
     return (
         <>
-            <InputText value={value} onChange={(e) => setValue(e.target.value)} />
-            <Button label="Submit" />
-            <div className="card flex justify-content-center">
-            <Button label="Submit" onClick={abc} />
-        </div>
+        
         <div className="card">
-             Đây là trang dashboard
+             Đây là trang page one
         </div>
         <ScrollTop />
         <Card/>
+        <form onSubmit={handleSubmit}>
+      <input type="text" name="a1"/>
+      <input type="text" name="a2" />
+      <button type="submit">Submit</button>
+    </form>
         </>
     )
 }
-        
