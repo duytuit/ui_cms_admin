@@ -3,6 +3,7 @@ import React, { forwardRef, useContext, useImperativeHandle, useRef } from 'reac
 import { classNames } from 'primereact/utils';
 import { LayoutContext } from './context/layoutContext';
 import { AppTopbarRef } from 'types/layout';
+import { Image } from 'primereact/image';
 
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
     const { layoutConfig, layoutState, onMenuToggle, showProfileSidebar } = useContext(LayoutContext);
@@ -25,12 +26,30 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
             <button ref={menubuttonRef} type="button" className="p-link layout-menu-button layout-topbar-button" onClick={onMenuToggle}>
                 <i className="pi pi-bars" />
             </button>
-
-            <button ref={topbarmenubuttonRef} type="button" className="p-link layout-topbar-menu-button layout-topbar-button" onClick={showProfileSidebar}>
+            <div className="layout-topbar-menu">
+                    <span>abc</span>
+                    <div className="p-link layout-topbar-button">
+                    <Image src='/assets/images/avatarIcon.jpg' height='35px' width='35px' />
+                        <div className='menu-topbar'>
+                            <div className="p-link">
+                               abc
+                            </div>
+                            <Link to='/auth/changepassword'>
+                                <div className="p-link" >
+                                    Change password
+                                </div>
+                            </Link>
+                            <div className="p-link flex align-items-center gap-4">
+                                <i className='pi pi-sign-out' style={{ fontSize: '16px' }} /> Logout
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {/* <button ref={topbarmenubuttonRef} type="button" className="p-link layout-topbar-menu-button layout-topbar-button" onClick={showProfileSidebar}>
                 <i className="pi pi-ellipsis-v" />
-            </button>
+            </button> */}
 
-            <div ref={topbarmenuRef} className={classNames('layout-topbar-menu', { 'layout-topbar-menu-mobile-active': layoutState.profileSidebarVisible })}>
+            {/* <div className={classNames('layout-topbar-menu', { 'layout-topbar-menu-mobile-active': true })}>
                 <button type="button" className="p-link layout-topbar-button">
                     <i className="pi pi-calendar"></i>
                     <span>Calendar</span>
@@ -45,7 +64,9 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
                         <span>Settings</span>
                     </button>
                 </Link>
-            </div>
+              
+            </div> */}
+           
         </div>
     );
 });
