@@ -66,4 +66,5 @@
     "react-app-rewired": "^2.2.1",
     "tsconfig-paths-webpack-plugin": "^4.1.0"
   }
+
 }
