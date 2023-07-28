@@ -4,7 +4,7 @@ module.exports = function (app:any) {
   app.use(
     '/api',
     createProxyMiddleware({
-      target: "http://103.237.144.38:8091/",
+      target: process.env.REACT_APP_API_URL,
       changeOrigin: true,
       onProxyReq: function (proxyReq:any) {
         proxyReq.setHeader("Accept", "application/json");
@@ -13,3 +13,4 @@ module.exports = function (app:any) {
     })
   );
 };
+// export {}

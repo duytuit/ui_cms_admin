@@ -9,7 +9,7 @@ import { fetchGetCaptcha, useGetCaptcha } from "../service";
 
 const Login = () => {
     const dispatch = useDispatch();
-    const [filter, setFilter] = useState({ name: '' });
+    const [filter, setFilter] = useState({});
     const [loading, setLoading] = useState(false);
     const [user, setUser] = useState({
         username: "",
