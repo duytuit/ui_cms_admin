@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from 'primereact/button';
 import { useNavigate } from 'react-router-dom';
 
-const DefaultPage = (props) => {
+const DefaultPage = (props:any) => {
     const { title, subTitle, img } = props;
     const navigate = useNavigate();
     const handleGoBack = () => {
