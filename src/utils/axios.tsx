@@ -6,7 +6,7 @@ import store from "redux/store";
 
 export const clientApi = axios.create({
     // axios Cấu hình yêu cầu được cấu hình với tùy chọn BaseURL, cho biết rằng phần công khai URL yêu cầu
-    baseURL: 'http://localhost:3000/api/',
+    baseURL: '/api/',
     // hết giờ
     timeout: 10000,
     headers: {
