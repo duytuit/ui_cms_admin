@@ -1,12 +1,12 @@
 const { createProxyMiddleware } = require("http-proxy-middleware");
 
-module.exports = function (app) {
+module.exports = function (app:any) {
   app.use(
     '/api',
     createProxyMiddleware({
-      target: process.env.REACT_APP_API_URL,
+      target: "http://103.237.144.38:8091/",
       changeOrigin: true,
-      onProxyReq: function (proxyReq) {
+      onProxyReq: function (proxyReq:any) {
         proxyReq.setHeader("Accept", "application/json");
       },
       pathRewrite: {'/api' : '/'}
