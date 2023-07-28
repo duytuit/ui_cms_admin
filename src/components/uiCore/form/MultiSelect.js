@@ -1,6 +1,6 @@
 import { MultiSelect as MultiSelects } from 'primereact/multiselect';  
 
-const MultiSelect = ({...rest}) => {
+const MultiSelectz = ({...rest}) => {
 
     return (
         <MultiSelects {...rest} />
@@ -8,4 +8,4 @@ const MultiSelect = ({...rest}) => {
 
 };
 
-export default MultiSelect;
+export default MultiSelectz;

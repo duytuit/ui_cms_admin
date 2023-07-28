@@ -5,7 +5,13 @@ export const removeNullObj = (arr:any) => {
     return arr.filter((element:any) => element !== null);
 }
 
-
+// export const formatTreeSelect = (array:any) => {
+//     let newObject = [];
+//     array.forEach((a:any, index:any) => {
+//         newObject[a] = { checked: true, partialChecked: true, sort: index };
+//     });
+//     return newObject;
+// }
 
 export const getArrIdFromTreeSelect = (object:any) => {
     let arr = [];
@@ -19,7 +25,15 @@ export const getArrIdFromTreeSelect = (object:any) => {
     };
     return arr.concat(newArr);
 };
-
+export const refreshObject = (object:any) => {
+    for (const key in object) {
+        if (object.hasOwnProperty(key)) {
+            if (typeof object[key] === 'string') object[key] = '';
+            else object[key] = undefined;
+        };
+    };
+    return object;
+};
 
 export const useListCity = () => {
     const [data, setData] = useState([]);

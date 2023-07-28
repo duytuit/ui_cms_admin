@@ -1,34 +1,31 @@
-import { FormInput } from "components/uiCore";
-import { useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { showToast } from "redux/features/toast";
 import { setToken } from "redux/features/token";
-import { setUserInfo } from "redux/features/user";
 import { loginAPI } from "../api";
-import { FormAuth } from "../service";
+import { Button, Checkbox, FormInput, Image } from "components/uiCore";
+import { Link } from "react-router-dom";
+import { fetchGetCaptcha, useGetCaptcha } from "../service";
 
 const Login = () => {
-    const navigate = useNavigate();
     const dispatch = useDispatch();
-
+    const [filter, setFilter] = useState({ name: '' });
     const [loading, setLoading] = useState(false);
     const [user, setUser] = useState({
         username: "",
-        password: ""
+        password: "",
+        code: "",
+        uuid: ""
     });
-
+    const {data,setData} = useGetCaptcha(filter)
+    
     async function fetchData() {
-        // await new Promise((resolve, reject) => setTimeout(() => {resolve()},5000))
         const response = await loginAPI(user,null);
         if (response) setLoading(false);
-        if (response.data.status) {
+        if (response.data.code === 200) {
             const token = response.data.data.token;
-            const userInfo = response.data.data.userInfo;
             dispatch(setToken(token));
-            dispatch(setUserInfo(userInfo));
             localStorage.setItem('token', token)
-            // localStorage.setItem('userInfo', JSON.stringify(userInfo));
             dispatch(
                 showToast({
                     severity: 'success',
@@ -36,14 +33,12 @@ const Login = () => {
                     detail: 'Đăng nhập thành công!',
                 })
             );
-            // Loading();
-            // navigate('/auth/loading');
         } else {
             dispatch(
                 showToast({
                     severity: 'error',
                     summary: 'Failed',
-                    detail: response.data.mess,
+                    detail: response.data.msg,
                 })
             );
         }
@@ -51,22 +46,104 @@ const Login = () => {
 
     const handleSubmit = (e:any) => {
         e.preventDefault();
-        setLoading(true);
         fetchData();
     };
-
+    const resetCaptcha = async()=>{
+       const abc = await fetchGetCaptcha({});
+       setData(abc);
+    }
     return (
-        <FormAuth title='Welcome' subtitle='Sign in to continue' handleSubmit={handleSubmit} lableSubmit='Sign in'
-            titleFooter='Forgot password' linkTitleFooter='/auth/forgotpassword' disabled={!user.username || !user.password} loading={loading}>
+      <FormAuth
+        title="Welcome"
+        subtitle="cms admin"
+        handleSubmit={handleSubmit}
+        lableSubmit="Sign in"
+        titleFooter="Forgot password"
+        linkTitleFooter="/auth/forgotpassword"
+        disabled={!user.username || !user.password}
+        loading={loading}
+      >
+        <FormInput
+          id="username"
+          label="Username"
+          value={user.username}
+          className="p-inputtext-sm"
+          onChange={(e: any) => setUser({ ...user, username: e.target.value })}
+          required
+          placeholder="User Name"
+        />
 
-            <FormInput id='username' label='Username' value={user.username}
-                onChange={(e:any) => setUser({ ...user, username: e.target.value })} />
-
-            <FormInput id='password' label='Password' type='password' value={user.password}
-                onChange={(e:any) => setUser({ ...user, password: e.target.value })} />
-
-        </FormAuth>
+        <FormInput
+          id="password"
+          label="Password"
+          type="password"
+          value={user.password}
+          className="p-inputtext-sm"
+          onChange={(e: any) => setUser({ ...user, password: e.target.value })}
+          required
+          placeholder="Password"
+        />
+        <div className="formgrid grid">
+          <div className="field col">
+            <FormInput
+              id="verify_code"
+              label="Verify Code"
+              value={user.code}
+              className="p-inputtext-sm"
+              onChange={(e: any) =>
+                setUser({ ...user, code: e.target.value ,uuid:data.uuid})
+              }
+              placeholder="Verify Code"
+              required
+            />
+          </div>
+          <div className="field col">
+            <div onClick={resetCaptcha}  dangerouslySetInnerHTML={{ __html:data? data?.img :'' }}></div>
+          </div>
+        </div>
+      </FormAuth>
     );
 };
 
 export default Login;
+
+
+export const FormAuth = (props:any) => {
+    const { title, subtitle, linkSubtitle, handleSubmit, lableSubmit, titleFooter, linkTitleFooter, loading, rememberPassword, disabled } = props;
+
+    return (
+        <div className='surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden'>
+            <div className="flex flex-column align-items-center justify-content-center" style={{width:'600px'}}>
+                    <div className="w-full surface-card py-8 px-5 sm:px-8" style={{ borderRadius: '5px' }}>
+                        <div className="text-center mb-5">
+                            <div className="text-900 text-3xl font-medium mb-3">{title}</div>
+                            {linkSubtitle ? (
+                                <Link to={linkSubtitle}>
+                                    <Button icon="pi pi-arrow-left" label={subtitle} text />
+                                </Link>
+                            ) : <span className="text-600 font-medium">{subtitle}</span>}
+                        </div>
+
+                        <form onSubmit={handleSubmit}>
+                            {props.children}
+
+                            {titleFooter && <div className="flex align-items-center justify-content-between mb-5 gap-5">
+                                <div className="flex align-items-center">
+                                    {rememberPassword && (
+                                        <Fragment>
+                                            <Checkbox checked={false} className="mr-2"></Checkbox>
+                                            <label htmlFor="rememberme">Remember me</label>
+                                        </Fragment>
+                                    )}
+                                </div>
+                                <Link to={linkTitleFooter} className="font-medium no-underline text-right" style={{ color: 'var(--primary-color)' }}>
+                                    {titleFooter}
+                                </Link>
+                            </div>}
+                            <Button disabled={disabled} loading={loading} size="small" label={lableSubmit || 'Submit'} className="w-full" ></Button>
+                        </form>
+                    </div>
+            </div>
+        </div>
+    )
+};

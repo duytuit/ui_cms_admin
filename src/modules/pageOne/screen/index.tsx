@@ -8,14 +8,7 @@ export default function PageOne() {
     const { handleParamUrl} = useHandleParamUrl(); 
     const dispatch = useDispatch();
     useEffect(()=>{
-        dispatch(
-            showToast({
-                severity: 'success',
-                summary: 'Successful',
-                detail: 'Đăng nhập thành công!',
-            })
-        );
-        // setSearchBarParams({myParam: 'bobby_hadz'});
+       
     },[])
     const abc =()=>{
         dispatch(
@@ -41,17 +34,11 @@ export default function PageOne() {
   
     return (
         <>
-        
         <div className="card">
              Đây là trang page one
         </div>
         <ScrollTop />
         <Card/>
-        <form onSubmit={handleSubmit}>
-      <input type="text" name="a1"/>
-      <input type="text" name="a2" />
-      <button type="submit">Submit</button>
-    </form>
         </>
     )
 }

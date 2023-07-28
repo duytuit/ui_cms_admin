@@ -1,11 +1,11 @@
-import { Column as Columns } from 'primereact/column';  
+import { Column } from 'primereact/column';  
 
-const Column = ({...rest}) => {
+const Columnz = ({...rest}) => {
 
     return (
-        <Columns {...rest} />
+        <Column {...rest} />
     )
 
 };
 
-export default Column;
+export default Columnz;

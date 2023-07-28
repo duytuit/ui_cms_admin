@@ -1,22 +1,28 @@
 import { Link } from 'react-router-dom';
 import React, { forwardRef, useContext, useImperativeHandle, useRef } from 'react';
-import { classNames } from 'primereact/utils';
 import { LayoutContext } from './context/layoutContext';
 import { AppTopbarRef } from 'types/layout';
 import { Image } from 'primereact/image';
+import { showToast } from 'redux/features/toast';
+import { listToast } from 'utils';
+import { useDispatch } from 'react-redux';
 
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
-    const { layoutConfig, layoutState, onMenuToggle, showProfileSidebar } = useContext(LayoutContext);
+    const {onMenuToggle } = useContext(LayoutContext);
     const menubuttonRef = useRef(null);
     const topbarmenuRef = useRef(null);
     const topbarmenubuttonRef = useRef(null);
-
+    const dispatch = useDispatch();
     useImperativeHandle(ref, () => ({
         menubutton: menubuttonRef.current,
         topbarmenu: topbarmenuRef.current,
         topbarmenubutton: topbarmenubuttonRef.current
     }));
-
+    const handleLogout = () => {
+        localStorage.removeItem('userInfo');
+        localStorage.removeItem('token');
+        dispatch(showToast({ ...listToast[0], detail: 'Đăng xuất thàng công!' }));
+    };
     return (
         <div className="layout-topbar">
             <Link to="/" className="layout-topbar-logo">
@@ -39,7 +45,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
                                     Change password
                                 </div>
                             </Link>
-                            <div className="p-link flex align-items-center gap-4">
+                            <div className="p-link flex align-items-center gap-4" onClick={handleLogout}>
                                 <i className='pi pi-sign-out' style={{ fontSize: '16px' }} /> Logout
                             </div>
                         </div>

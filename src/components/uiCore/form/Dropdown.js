@@ -1,6 +1,6 @@
 import { Dropdown as Dropdowns } from 'primereact/dropdown';  
 
-const Dropdown = ({...rest}) => {
+const Dropdownz = ({...rest}) => {
 
     return (
         <Dropdowns {...rest} />
@@ -8,4 +8,4 @@ const Dropdown = ({...rest}) => {
 
 };
 
-export default Dropdown;
+export default Dropdownz;

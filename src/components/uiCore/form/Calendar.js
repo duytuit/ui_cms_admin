@@ -1,6 +1,6 @@
 import { Calendar as Calendars } from 'primereact/calendar';  
 
-const Calendar = ({...rest}) => {
+const Calendarz = ({...rest}) => {
 
     return (
         <Calendars {...rest} />
@@ -8,4 +8,4 @@ const Calendar = ({...rest}) => {
 
 };
 
-export default Calendar;
+export default Calendarz;

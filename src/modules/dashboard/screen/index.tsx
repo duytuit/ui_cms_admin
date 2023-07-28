@@ -11,14 +11,6 @@ export default function DashBoard() {
     const [value, setValue] = useState('');
     const dispatch = useDispatch();
     useEffect(()=>{
-        dispatch(
-            showToast({
-                severity: 'success',
-                summary: 'Successful',
-                detail: 'Đăng nhập thành công!',
-            })
-        );
-        // setSearchBarParams({myParam: 'bobby_hadz'});
     },[])
     const abc =()=>{
         dispatch(

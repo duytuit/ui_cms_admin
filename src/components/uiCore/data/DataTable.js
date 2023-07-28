@@ -1,11 +1,11 @@
-import { DataTable as DataTables } from 'primereact/datatable';  
+import { DataTable  } from 'primereact/datatable';  
 
-const DataTable = ({...rest}) => {
+const DataTablez = ({...rest}) => {
 
     return (
-        <DataTables {...rest} />
+        <DataTable {...rest} />
     )
 
 };
 
-export default DataTable;
+export default DataTablez;

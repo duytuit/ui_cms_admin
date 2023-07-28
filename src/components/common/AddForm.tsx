@@ -78,7 +78,7 @@ export const DropdownForm = (props:any) => {
 
 export const AddForm = (props:any) => {
     const navigate = useNavigate();
-    const permissionTool = useSelector((state:any) => state.permission).permissionTool;
+    // const permissionTool = useSelector((state:any) => state.permission).permissionTool;
     const { checkId, title, loading, onSubmit, className, moreOptions, route, ...prop } = props;
     return (
         <div className={classNames("card", className)} {...prop}>
@@ -90,7 +90,7 @@ export const AddForm = (props:any) => {
                 {props.children}
                 <div className="w-full justify-content-end flex">
                     <Button type='button' onClick={() => navigate(-1)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />
-                    {permissionTool.includes(route) && <Button type='submit' loading={loading} label={checkId ? "Cập nhật" : "Thêm mới"}
+                    {<Button type='submit' loading={loading} label={checkId ? "Cập nhật" : "Thêm mới"}
                         className="ml-2" severity="info" size="small" raised />}
                 </div>
             </form>

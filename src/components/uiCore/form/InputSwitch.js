@@ -1,11 +1,11 @@
-import { InputSwitch as InputSwitchs } from 'primereact/inputswitch';  
+import { InputSwitch } from 'primereact/inputswitch';  
 
-const InputSwitch = ({...rest}) => {
+const InputSwitchz = ({...rest}) => {
 
     return (
-        <InputSwitchs {...rest} />
+        <InputSwitch checked={false} {...rest} />
     )
 
 };
 
-export default InputSwitch;
+export default InputSwitchz;
