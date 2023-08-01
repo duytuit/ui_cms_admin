@@ -11,6 +11,11 @@ export const postData = (url:any, data:any, isUpload = false, timeout = 600000) 
 };
 
 export const getData = (url:any, params:any) => {
+    const project=  localStorage.getItem('project')
+    if(project){
+        const _project = JSON.parse(project);
+        params = {projectId:_project.projectId,...params}
+    }
     params = convertData(params)
     return clientApi.get(url, { params })
 };

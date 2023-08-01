@@ -71,9 +71,11 @@ export const GridForm = (props:any) => {
     return (
         <form onSubmit={handleSubmit} className="grid formgrid mb-2 aligin-items-center">
             {props.children}
-            <div className={classNames("mb-2 col-12 md:col-12 lg:col-3 flex justify-content-end", className)}>
-                <Button type="button" label="Làm mới" onClick={handleClear} severity="secondary" style={{ minWidth: '96px', height: '40px' }} size="small" outlined />
-                <Button type="submit" label="Lọc" className="ml-2" severity="info" size="small" raised style={{ minWidth: '96px', height: '40px' }} />
+            <div className="field col">
+                <div className="flex justify-content-end flex-wrap">
+                   <Button type="button" label="Làm mới" onClick={handleClear} severity="secondary" size="small" outlined />
+                   <Button type="submit" label="Lọc" className="ml-2" severity="info" size="small" raised />
+                </div>
             </div>
         </form>
     )

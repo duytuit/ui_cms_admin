@@ -1,15 +1,14 @@
-
-import Columnz from "components/uiCore/data/Column";
-import DataTablez from "components/uiCore/data/DataTable";
-import InputSwitchz from "components/uiCore/form/InputSwitch";
-import moment from "moment";
-import { Button } from "primereact/button";
-import { confirmDialog } from "primereact/confirmdialog";
-import React, { Fragment, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Link, useLocation  } from "react-router-dom";
-import { showToast } from "redux/features/toast";
-import { listToast } from "utils";
+import React, { useState, Fragment } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { confirmDialog } from 'primereact/confirmdialog';
+import moment from "moment"
+import Columnz from 'components/uiCore/data/Column';
+import DataTablez from 'components/uiCore/data/DataTable';
+import { Button } from 'primereact/button';
+import { InputSwitch } from 'primereact/inputswitch';
+import { showToast } from 'redux/features/toast';
+import { listToast } from 'utils';
+import { Link } from 'react-router-dom';
 
 export const RenderHeader = (props:any) => {
     const dispatch = useDispatch();
@@ -27,7 +26,7 @@ export const RenderHeader = (props:any) => {
             downloadLink.href = URL.createObjectURL(response.data);
             downloadLink.download = exports.file || 'data.xlsx';
             downloadLink.click();
-            dispatch(showToast({ ...listToast[0], detail: response.mess }));
+            dispatch(showToast({ ...listToast[0], detail: "Export thành công!" }));
         }
         else dispatch(showToast({ ...listToast[1], detail: response.mess }));
     };
@@ -47,7 +46,7 @@ export const RenderHeader = (props:any) => {
                 </Link>}
                 {imports && <Button label="Import" icon='pi pi-upload'
                     onClick={imports.action} className="ml-3" severity="info" size="small" raised />}
-                {exports  &&
+                {exports &&
                     <Button label="Export" loading={loading} onClick={handleExport} icon='pi pi-download' className="ml-3" severity="warning" size="small" raised />
                 }
             </div>
@@ -83,17 +82,17 @@ export const StatusBody = (rowData:any, actions:any) => {
     const confirm = () => {
         confirmDialog({
             message: 'Bạn có muốn tiếp tục thay đổi trạng thái?',
-            header: 'BO quản trị dự án',
+            header: 'Quản trị dự án',
             icon: 'pi pi-info-circle',
             accept,
         });
     };
 
     const [checked, setChecked] = useState((rowData.status || rowData.cb_status) ? true : false);
-    return <InputSwitchz disabled={!permissionTool.includes(actions.route)} checked={checked} onChange={confirm} />
+    return <InputSwitch disabled={!permissionTool.includes(actions.route)} checked={checked} onChange={confirm} />
 };
 
-export const ActionBody = (rowData:any, editRoute:any, actions:any, paramsPaginator:any, setParamsPaginator:any, duplicated?:any, handleUndo?:any) => {
+export const ActionBody = (rowData:any, editRoute:any, actions:any, paramsPaginator?:any, setParamsPaginator?:any, duplicated?:any, handleUndo?:any) => {
     const dispatch = useDispatch();
     
     async function accept() {
@@ -111,7 +110,7 @@ export const ActionBody = (rowData:any, editRoute:any, actions:any, paramsPagina
     const confirm = () => {
         confirmDialog({
             message: 'Bạn có muốn tiếp tục xóa?',
-            header: 'Quản trị',
+            header: 'Quản trị dự án',
             icon: 'pi pi-info-circle',
             accept,
         });
@@ -141,22 +140,21 @@ export const Column = (props:any) => {
 export const DataTable = (props:any) => {
     const { paramsPaginator, setParamsPaginator, totalRecords, title, key, ...prop } = props;
     const [loading, setLoading] = useState(false);
-    const location = useLocation();
 
     const onPage = (event:any) => {
         setParamsPaginator({
             ...paramsPaginator,
             first: event.first,
-            limit: event.rows,
-            page: event.page !== 0 ? event.page + 1 : 1,
+            pageSize: event.rows,
+            pageNum: event.page !== 0 ? event.page + 1 : 1,
         });
     };
-
-
+    console.log(props);
+    
     return (
-        <DataTablez 
+        <DataTablez lazy
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            paginator first={paramsPaginator.first} rows={paramsPaginator.limit} totalRecords={totalRecords} onPage={onPage}
+            paginator first={paramsPaginator.first} rows={paramsPaginator.pageSize} totalRecords={totalRecords} onPage={onPage}
             rowsPerPageOptions={[20, 50, 100]} dataKey={key ? key : "id"} loading={loading} showGridlines
             emptyMessage={"Không tìm thấy " + title} currentPageReportTemplate="Tổng số: {totalRecords} bản ghi" {...prop} >
             <Column header="#" body={(data:any, options:any) => options.rowIndex + 1} style={{ width: '1rem' }} bodyStyle={{ textAlign: 'center' }} />
@@ -164,5 +162,3 @@ export const DataTable = (props:any) => {
         </DataTablez>
     )
 };
-
-export {}

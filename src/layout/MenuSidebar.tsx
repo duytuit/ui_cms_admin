@@ -1,4 +1,4 @@
-import { Link, createSearchParams, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Ripple } from 'primereact/ripple';
 import { classNames } from 'primereact/utils';
 import { CSSTransition } from 'react-transition-group';
@@ -7,12 +7,11 @@ import { useState, useEffect } from 'react';
 const MenuSidebar = (props:any) => {
     const location = useLocation();
     const [activeMenu, setActiveMenu] = useState('');
-    const navigate = useNavigate();
     const item = props.item;
     const key = props.parentKey ? props.parentKey + '-' + props.index : String(props.index);
     const active = activeMenu === key || (activeMenu && activeMenu.startsWith(key + '-')) || false;
     // const permissionTool = useSelector((state:any) => state.permission).permissionTool;
-    const permissionTool = ['/','/page-one','/page-two','/auth/login'];
+    const permissionTool = ['/','/page-one','/page-two','/auth/login','/categories/list'];
     const itemClick = (event:any) => {
         //avoid processing disabled items
         if (item.disabled) {

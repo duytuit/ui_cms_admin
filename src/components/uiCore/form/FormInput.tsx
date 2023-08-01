@@ -62,7 +62,7 @@ const FormInput = (props:any) => {
     <>
       <span className="p-float-label">
         <InputText
-          className={classNames(className, { 'p-invalid': error })}
+          className={classNames("p-inputtext-sm",className, { 'p-invalid': error })}
           {...inputProps}
           id={id}
           type={type === 'phone' ? 'number' : type}

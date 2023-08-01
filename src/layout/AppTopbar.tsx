@@ -33,12 +33,12 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
                 <i className="pi pi-bars" />
             </button>
             <div className="layout-topbar-menu">
-                    <span>abc</span>
+                    <span>Admin</span>
                     <div className="p-link layout-topbar-button">
                     <Image src='/assets/images/avatarIcon.jpg' height='35px' width='35px' />
                         <div className='menu-topbar'>
                             <div className="p-link">
-                               abc
+                               Admin
                             </div>
                             <Link to='/auth/changepassword'>
                                 <div className="p-link" >
