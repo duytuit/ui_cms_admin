@@ -63,44 +63,58 @@ const Login = () => {
         disabled={!user.username || !user.password}
         loading={loading}
       >
-        <FormInput
-          id="username"
-          label="Username"
-          value={user.username}
-          className="p-inputtext-sm"
-          onChange={(e: any) => setUser({ ...user, username: e.target.value })}
-          required
-          placeholder="User Name"
-        />
-
-        <FormInput
-          id="password"
-          label="Password"
-          type="password"
-          value={user.password}
-          className="p-inputtext-sm"
-          onChange={(e: any) => setUser({ ...user, password: e.target.value })}
-          required
-          placeholder="Password"
-        />
-        <div className="formgrid grid">
+        <div className="p-fluid">
           <div className="field col">
             <FormInput
-              id="verify_code"
-              label="Verify Code"
-              value={user.code}
+              id="username"
+              label="Username"
+              value={user.username}
               className="p-inputtext-sm"
               onChange={(e: any) =>
-                setUser({ ...user, code: e.target.value ,uuid:data.uuid})
+                setUser({ ...user, username: e.target.value })
               }
-              placeholder="Verify Code"
               required
+              placeholder="User Name"
             />
           </div>
+
           <div className="field col">
-            <div onClick={resetCaptcha}  dangerouslySetInnerHTML={{ __html:data? data?.img :'' }}></div>
+            <FormInput
+              id="password"
+              label="Password"
+              type="password"
+              value={user.password}
+              className="p-inputtext-sm"
+              onChange={(e: any) =>
+                setUser({ ...user, password: e.target.value })
+              }
+              required
+              placeholder="Password"
+            />
           </div>
+          
         </div>
+        <div className="formgrid grid" style={{margin:"0"}}>
+            <div className="field col-6">
+              <FormInput
+                id="verify_code"
+                label="Verify Code"
+                value={user.code}
+                className="p-inputtext-sm"
+                onChange={(e: any) =>
+                  setUser({ ...user, code: e.target.value, uuid: data.uuid })
+                }
+                placeholder="Verify Code"
+                required
+              />
+            </div>
+            <div className="field col-6">
+              <div
+                onClick={resetCaptcha}
+                dangerouslySetInnerHTML={{ __html: data ? data?.img : "" }}
+              ></div>
+            </div>
+          </div>
       </FormAuth>
     );
 };

@@ -56,11 +56,15 @@ export const InputSwitchForm = (props:any) => {
 export const InputForm = (props:any) => {
     const { label, id, placeholder, className, ...inputprop } = props;
     return (
-        <div className="flex mb-1 change-disabled">
-            <label htmlFor={id} className="block mt-2 text-900 font-medium w-4 mr-2">{label}</label>
+        // <div className="flex mb-1 change-disabled">
+        //     <label htmlFor={id} className="block mt-2 text-900 font-medium w-4 mr-2">{label}</label>
+        //     <FormInput id={id} label={label} placeholder={placeholder || `Nhập ${label.toLowerCase()}`}
+        //         className={classNames("w-full", className)} {...inputprop} />
+        // </div>
+        <span className="p-float-label">
             <FormInput id={id} label={label} placeholder={placeholder || `Nhập ${label.toLowerCase()}`}
-                className={classNames("w-full", className)} {...inputprop} />
-        </div>
+                className={className} {...inputprop}/>
+        </span>
     )
 };
 

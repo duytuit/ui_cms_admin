@@ -7,6 +7,7 @@ const FormInput = (props:any) => {
   const { label, type, validate, onChange, id, required, className, skip, ...inputProps } = props;
 
   const getValidateType = (type?:any, label?:any) => {
+    
     let validateType = {
       errorMessage: label ? `Vui lòng nhập ${label.toLowerCase()}` : 'Vui lòng nhập đủ thông tin bắt buộc!',
       pattern:'',
@@ -58,10 +59,10 @@ const FormInput = (props:any) => {
   };
 
   return (
-    <div className="w-full mb-2">
-      <div className="w-full">
+    <>
+      <span className="p-float-label">
         <InputText
-          className={classNames("w-full mb-1", className, { 'p-invalid': error })}
+          className={classNames(className, { 'p-invalid': error })}
           {...inputProps}
           id={id}
           type={type === 'phone' ? 'number' : type}
@@ -71,9 +72,10 @@ const FormInput = (props:any) => {
           required={required}
           pattern={ getValidateType(type).patterns !== ''?getValidateType(type).patterns : null}
         />
-      </div>
-      {required && error && <span className="p-error w-full mt-2">{error}</span>}
-    </div>
+       <label htmlFor={id}>{props.label}</label> 
+      </span>
+         {required && error && <span className="p-error w-full mt-2">{error}</span>}
+    </>
   );
 };
 
