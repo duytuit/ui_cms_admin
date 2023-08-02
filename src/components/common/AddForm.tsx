@@ -83,7 +83,7 @@ export const DropdownForm = (props:any) => {
 export const AddForm = (props:any) => {
     const navigate = useNavigate();
     // const permissionTool = useSelector((state:any) => state.permission).permissionTool;
-    const { checkId, title, loading, onSubmit, className, moreOptions, route, ...prop } = props;
+    const { checkId, title, loading, onSubmit, className, moreOptions, route,routeList, ...prop } = props;
     return (
         <div className={classNames("card", className)} {...prop}>
             <div className="flex justify-content-between align-items-center mb-4">
@@ -93,7 +93,7 @@ export const AddForm = (props:any) => {
             <form onSubmit={onSubmit}>
                 {props.children}
                 <div className="w-full justify-content-end flex">
-                    <Button type='button' onClick={() => navigate(-1)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />
+                    <Button type='button' onClick={() => navigate(routeList)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />
                     {<Button type='submit' loading={loading} label={checkId ? "Cập nhật" : "Thêm mới"}
                         className="ml-2" severity="info" size="small" raised />}
                 </div>

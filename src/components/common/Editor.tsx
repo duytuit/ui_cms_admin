@@ -72,7 +72,7 @@ const buttons = [
     {
         name: "insertMergeField",
         tooltip: "Insert Merge Field",
-        iconURL: "images/merge.png",
+        // iconURL: "images/merge.png",
         popup: (editor:any) => {
             function onSelected(e:any) {
                 let mergeField = e.target.value;

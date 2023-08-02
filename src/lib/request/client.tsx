@@ -26,14 +26,13 @@ export const createFormData = (body:any, file:any, files?:any, gallery?:any, ima
         }
     }
     Object.keys(body).forEach(key => {
-        if (typeof body[key] === "object") data.append(key, JSON.stringify(body[key]))
-        else if (body[key] || body[key] === 0 || body[key] === '') data.append(key, body[key])
+        if (body.key && typeof body[key] === "object") data.append(key, body.key)
     })
     return data
 }
 export const convertData = (body:any) => {
     Object.keys(body).forEach(key => {
-        if (typeof body[key] === "object") body[key] = JSON.stringify(body[key])
+        if (body.key && typeof body[key] === "object") body[key] = body.key
     })
     return body
 }

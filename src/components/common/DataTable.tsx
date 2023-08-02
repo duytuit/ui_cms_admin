@@ -147,8 +147,6 @@ export const DataTable = (props:any) => {
             pageNum: event.page !== 0 ? event.page + 1 : 1,
         });
     };
-    console.log(props);
-    
     return (
         <DataTablez lazy
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"

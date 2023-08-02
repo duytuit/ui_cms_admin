@@ -1,5 +1,5 @@
 import { customAlphabet } from 'nanoid';
-import * as crypto from 'crypto';
+// import * as crypto from 'crypto';
 
 export class Helper {
   static convertToSlug(Text:any) {
@@ -83,14 +83,14 @@ export class Helper {
       })
       .join('&');
   }
-  static makeSignature(data:any, hash_key:any) {
-    const hash_data = Helper.convertObjToParam(data);
-    console.log(hash_data);
-    return crypto
-      .createHmac('sha256', hash_key)
-      .update(hash_data)
-      .digest('hex'); // Secret Passphrase
-  }
+  // static makeSignature(data:any, hash_key:any) {
+  //   const hash_data = Helper.convertObjToParam(data);
+  //   console.log(hash_data);
+  //   return crypto
+  //     .createHmac('sha256', hash_key)
+  //     .update(hash_data)
+  //     .digest('hex'); // Secret Passphrase
+  // }
   static createFormData(body:any) {
     const data = new FormData();
     Object.keys(body).forEach((key) => {
@@ -113,4 +113,23 @@ export class Helper {
       return accumulator + object[_column];
     }, 0);
   }
+  static newObjectByPropertyNotNull(body:any) {
+    Object.keys(body).forEach(key => {
+        if (body[key] && typeof body[key] === "object") body[key] = body.key
+    })
+    return body
+}
+static _isString(e:any) {
+  switch (e) {
+      case "":
+      // case 0:
+      // case "0":
+      case null:
+      case false:
+      case undefined:
+          return true;
+      default:
+          return false;
+  }
+}
 }
