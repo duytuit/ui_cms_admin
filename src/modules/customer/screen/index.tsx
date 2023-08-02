@@ -31,12 +31,12 @@ export default function Customer() {
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
             <DataTable value={_Customer.rows} header={RenderHeader({ title: 'Danh sách khách hàng', add: '/customer/add' })}
                 title="khách hàng" totalRecords={_Customer.total} paramsPaginator={paramsPaginator} setParamsPaginator={setParamsPaginator} >
-                <Column header="Danh mục" body={(e:any)=> Body(_categories, e.countryId)}/>
+                <Column header="Danh mục" body={(e:any)=> Body(_categories, e.nationalId)}/>
                 <Column field="full_name" header="Tên" />
                 <Column field="email" header="Email" />
                 <Column header="Ảnh"  body={(e:any)=> BodyImage(e.avatar)}/>
                 <Column header="Hộ chiếu" body={(e:any)=> BodyImage(e.passportImage)}/>
-                <Column field="travelDate" header="Ngày xuất cảnh" style={{ width: '12%' }}/>
+                <Column header="Ngày xuất cảnh" body={(e:any) => TimeBody(e.travelDate)}  bodyStyle={{ textAlign: 'center' }}  style={{ width: '12%' }}/>
                 <Column header="Cập nhật lúc" body={(e:any) => TimeBody(e.updateTime)}  bodyStyle={{ textAlign: 'center' }} style={{ width: '12%' }}/>
                 <Column field="status" header="Hiển thị" body={(e:any) => StatusBody(e,
                     { route: '/customer/update/status', action: updateStatusCustomer })} bodyStyle={{ textAlign: 'center'}} style={{ width: '10%' }}/>
