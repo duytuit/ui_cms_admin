@@ -86,11 +86,18 @@ export const AddForm = (props:any) => {
     const { checkId, title, loading, onSubmit, className, moreOptions, route,routeList, ...prop } = props;
     return (
         <div className={classNames("card", className)} {...prop}>
-            <div className="flex justify-content-between align-items-center mb-4">
-                <h4 className="m-0">{checkId ? 'Cập nhật' : 'Thêm mới'} {title}</h4>
-                {moreOptions && moreOptions.id && <MoreOptions value={moreOptions} />}
-            </div>
-            <form onSubmit={onSubmit}>
+             <form onSubmit={onSubmit}>
+                <div className="flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 className="m-0">{checkId ? 'Cập nhật' : 'Thêm mới'} {title}</h4>
+                        {moreOptions && moreOptions.id && <MoreOptions value={moreOptions} />}
+                    </div>
+                    <div>
+                        <Button type='button' onClick={() => navigate(routeList)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />
+                        {<Button type='submit' loading={loading} label={checkId ? "Cập nhật" : "Thêm mới"}
+                            className="ml-2" severity="info" size="small" raised />}
+                    </div>
+                </div>
                 {props.children}
                 <div className="w-full justify-content-end flex">
                     <Button type='button' onClick={() => navigate(routeList)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />
