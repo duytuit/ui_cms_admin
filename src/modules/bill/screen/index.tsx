@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody } from "components/common/DataTable";
+import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, Body, PriceBody } from "components/common/DataTable";
 import { FormInput } from "components/uiCore";
 import { GridForm } from "components/common/ListForm";
-import { useListCategories } from "../service";
-import { deleteCategories, updateStatusCategories } from "../api";
+import { deleteBill, updateStatusBill } from "../api";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
+import { useListCategories } from "modules/categories/service";
+import { useListBill } from "../service";
 
 const Header = ({ _setParamsPaginator, _paramsPaginator }: {_setParamsPaginator:any,_paramsPaginator:any}) => {
     const [filter, setFilter] = useState({ name: '' });
@@ -17,24 +18,28 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: {_setParamsPaginator:
         </GridForm>
     )
 };
-export default function Categories() {
+export default function Bill() {
     const { handleParamUrl} = useHandleParamUrl(); 
     const [paramsPaginator, setParamsPaginator] = useState({ pageNum: 1, pageSize: 20, first: 0, render: false });
-    const categories:any = useListCategories({ ...paramsPaginator, status: undefined, first: undefined });
+    const _Bill:any = useListBill({ ...paramsPaginator, status: undefined, first: undefined });
+    const _categories:any = useListCategories();
     useEffect(()=>{
         handleParamUrl(paramsPaginator)
     },[paramsPaginator])
     return (
         <div className="card">
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
-            <DataTable value={categories.rows} header={RenderHeader({ title: 'Danh sách Quốc gia', add: '/categories/add' })}
-                title="quốc gia" totalRecords={categories.total} paramsPaginator={paramsPaginator} setParamsPaginator={setParamsPaginator} >
-                <Column field="name" header="Tên Quốc gia" />
-                <Column field="remark" header="Ghi chú" />
+            <DataTable value={_Bill.rows} header={RenderHeader({ title: 'Danh sách hóa đơn', add: '/bill/add' })}
+                title="hóa đơn" totalRecords={_Bill.total} paramsPaginator={paramsPaginator} setParamsPaginator={setParamsPaginator} >
+                <Column field="billCode" header="Mã hóa đơn" />
+                <Column field="cycleName" header="Kỳ hóa đơn" />
+                <Column field="customerName" header="Khách hàng" />
+                <Column field="email" header="Email" />
+                <Column header="Giá" body={(e:any)=> PriceBody(e.cost)}/>
                 <Column header="Cập nhật lúc" body={(e:any) => TimeBody(e.updateTime)}  bodyStyle={{ textAlign: 'center' }} style={{ width: '12%' }}/>
                 <Column field="status" header="Hiển thị" body={(e:any) => StatusBody(e,
-                    { route: '/categories/update/status', action: updateStatusCategories })} bodyStyle={{ textAlign: 'center'}} style={{ width: '10%' }}/>
-                <Column header="Actions" body={(e:any) => ActionBody(e, '/categories/detail',  { route: '/categories/delete', action: deleteCategories },
+                    { route: '/bill/update/status', action: updateStatusBill })} bodyStyle={{ textAlign: 'center'}} style={{ width: '10%' }}/>
+                <Column header="Actions" body={(e:any) => ActionBody(e, '/bill/detail',  { route: '/bill/delete', action: deleteBill },
                     paramsPaginator, setParamsPaginator)} bodyStyle={{ textAlign: 'center'}} style={{ width: '10%' }}/>
             </DataTable>
         </div>

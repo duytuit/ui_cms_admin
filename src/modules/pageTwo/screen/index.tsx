@@ -28,23 +28,10 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: {_setParamsPaginator:
 
 export default function PageTwo() {
     const [paramsPaginator, setParamsPaginator] = useState({ page: 1, limit: 20, first: 0, render: false });
-    const customers = useListCampaign({ ...paramsPaginator, status: undefined, first: undefined, render: undefined });
     const { handleParamUrl} = useHandleParamUrl(); 
     return (
         <div className="card">
-            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
-            <DataTablez value={customers} header={RenderHeader({ title: 'Danh sách chiến dịch', add: '/campaign/add' })}
-                title="chiến dịch" totalRecords={0} paramsPaginator={paramsPaginator} setParamsPaginator={setParamsPaginator} >
-                <Column field="name" header="Tên chiến dịch" />
-                <Column header="Dự án" body={''} />
-                <Column header="Nguồn" body={''} />
-                <Column field="rule_time" header="Thời gian chăm sóc (phút)" bodyStyle={{ textAlign: 'center' }} />
-                <Column field="penalty" header="Quy định phạt (tour)" bodyStyle={{ textAlign: 'center' }} />
-                <Column header="Thời gian tạo" body={e => TimeBody(e.created_at)} bodyStyle={{ textAlign: 'center' }} />
-                <Column header="Thời gian cập nhật" body={e => TimeBody(e.updated_at)} bodyStyle={{ textAlign: 'center' }} />
-                <Column header="Trạng thái" body={e => StatusBody(e,{ route: '/campaign/update', action: updateCampaign })} bodyStyle={{ textAlign: 'center' }} />
-                <Column header="Actions" body={e => ActionBody(e, '/campaign/detail', { route: '/campaign/delete', action: deleteCampaign }, paramsPaginator, setParamsPaginator)} bodyStyle={{ textAlign: 'center' }} />
-            </DataTablez>
+            Đang cập nhật
         </div>
     )
 }

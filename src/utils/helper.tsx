@@ -132,4 +132,8 @@ static _isString(e:any) {
           return false;
   }
 }
+static formatCurrencyV2(value:any){
+  var number = value.replace(/[,.]/g, '');
+  return new Intl.NumberFormat().format(number).replace(/\./g, ',');
+}
 }

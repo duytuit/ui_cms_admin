@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { listProduct } from '../api';
+import { listReceipt } from '../api';
 
-export const useListProduct = (params:any) => {
+export const useListReceipt = (params:any) => {
     const [data, setData] = useState([]);
      function fetchData() {
-         listProduct({ status: 1, ...params }).then(
+         listReceipt({ status: 1, ...params }).then(
             res => {
                 setData(res.data.data);
             }

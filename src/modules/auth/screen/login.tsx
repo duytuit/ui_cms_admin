@@ -46,6 +46,7 @@ const Login = () => {
 
     const handleSubmit = (e:any) => {
         e.preventDefault();
+        setLoading(true)
         fetchData();
     };
     const resetCaptcha = async()=>{

@@ -21,18 +21,15 @@ export default function DashBoard() {
             })
         );
     }
+    const handleSubmit = (e:any) => {
+        e.preventDefault();
+    };
     return (
         <>
-            <InputText value={value} onChange={(e) => setValue(e.target.value)} />
-            <Button label="Submit" />
-            <div className="card flex justify-content-center">
-            <Button label="Submit" onClick={abc} />
-        </div>
         <div className="card">
              Đây là trang dashboard
         </div>
         <ScrollTop />
-        <Card/>
         </>
     )
 }

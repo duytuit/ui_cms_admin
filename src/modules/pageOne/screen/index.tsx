@@ -7,9 +7,6 @@ import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 export default function PageOne() {
     const { handleParamUrl} = useHandleParamUrl(); 
     const dispatch = useDispatch();
-    useEffect(()=>{
-       
-    },[])
     const abc =()=>{
         dispatch(
             showToast({
@@ -35,10 +32,9 @@ export default function PageOne() {
     return (
         <>
         <div className="card">
-             Đây là trang page one
+           Đang cập nhật
         </div>
         <ScrollTop />
-        <Card/>
         </>
     )
 }

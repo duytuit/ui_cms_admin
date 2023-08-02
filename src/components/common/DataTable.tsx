@@ -9,6 +9,8 @@ import { InputSwitch } from 'primereact/inputswitch';
 import { showToast } from 'redux/features/toast';
 import { listToast } from 'utils';
 import { Link } from 'react-router-dom';
+import { Helper } from 'utils/helper';
+import { Image } from 'components/uiCore';
 
 export const RenderHeader = (props:any) => {
     const dispatch = useDispatch();
@@ -55,17 +57,21 @@ export const RenderHeader = (props:any) => {
 };
 
 export const Body = (data:any, value:any) => {
-    let name = '';
-    if (data && data[0] && value) {
-        data.forEach((d:any) => {
-            if (d.id === value) name = d.name || d.title || d.cb_title || d.full_name;
-        });
+    if (data && data?.rows) {
+        const detail:any= data.rows.find((item:any)=>item.id === value);
+       return <Fragment>{detail ? detail.name:''}</Fragment>;
     };
-    return <Fragment>{name}</Fragment>;
 };
 
 export const TimeBody = (value:any) => {
-    if (value) return <Fragment >{moment(value).format("DD/MM/YYYY HH:mm:ss")}</Fragment>
+    if (value) return <Fragment >{moment(value).format("DD/MM/YY HH:mm:ss")}</Fragment>
+};
+
+export const PriceBody = (value:any) => {
+    if (value) return <Fragment><div style={{float: "right"}}>{Helper.formatCurrencyV2(value.toString())}</div></Fragment>
+};
+export const BodyImage = (value:any) => {
+    if (value) return <Fragment><div>  <Image src={process.env.REACT_APP_UPLOAD_CDN+value} alt="Image" width="150" height="120" preview /></div></Fragment>
 };
 
 export const StatusBody = (rowData:any, actions:any) => {
@@ -95,7 +101,7 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
     
     async function accept() {
         const res = await actions.action({ id: rowData.id });
-        if (res.data.status) {
+        if (res.data.code ===200) {
             dispatch(showToast({ ...listToast[0], detail: 'Xóa dữ liệu thành công!' }));
             if (paramsPaginator && setParamsPaginator) {
                 setParamsPaginator({ ...paramsPaginator, render: !paramsPaginator.render });

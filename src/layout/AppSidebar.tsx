@@ -27,7 +27,7 @@ const AppSidebar = () => {
             deleted_at: null,
             updated_at: null,
             icon: 'pi pi-home',
-            route: '/'
+            route: '/product/list'
           },
           {
             id: 5,
@@ -38,7 +38,40 @@ const AppSidebar = () => {
             deleted_at: null,
             updated_at: null,
             icon: 'pi pi-home',
-            route: '/'
+            route: '/service/list'
+          },
+          {
+            id: 5,
+            name: 'Khách hàng',
+            sort: 1,
+            status: 1,
+            created_at: '2023-06-01 10:04:39',
+            deleted_at: null,
+            updated_at: null,
+            icon: 'pi pi-home',
+            route: '/customer/list'
+          },
+          {
+            id: 5,
+            name: 'Hóa đơn',
+            sort: 1,
+            status: 1,
+            created_at: '2023-06-01 10:04:39',
+            deleted_at: null,
+            updated_at: null,
+            icon: 'pi pi-home',
+            route: '/bill/list'
+          },
+          {
+            id: 5,
+            name: 'Phiếu thu',
+            sort: 1,
+            status: 1,
+            created_at: '2023-06-01 10:04:39',
+            deleted_at: null,
+            updated_at: null,
+            icon: 'pi pi-home',
+            route: '/receipt/list'
           },
           {
             id: 5,

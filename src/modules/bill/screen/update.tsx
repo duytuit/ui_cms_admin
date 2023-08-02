@@ -5,14 +5,13 @@ import { useEffect, useState } from "react";
 import Editor from "components/common/Editor";
 import { Accordion } from "components/uiCore/panel/Accordion";
 import { AccordionTab } from "primereact/accordion";
-import { Button, Dropdown, FormInput, InputSwitch, InputTextarea, Panel } from "components/uiCore";
+import { Button, FormInput, InputSwitch, InputTextarea, Panel } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { listToast, scrollToTop, refreshObject } from "utils";
-import { updateProduct, addProduct, listProduct } from "../api";
+import { updateBill, addBill, listBill } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { useListCategories } from "modules/categories/service";
-const UpdateProduct = () => {
+const UpdateBill = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
@@ -24,19 +23,21 @@ const UpdateProduct = () => {
         let info = {
           ...infos, status: infos.status ? 0 : 1,
       };
+      console.log('info',info);
+      
       setLoading(true);
       fetchDataSubmit(info);
     };
      async function fetchDataSubmit(info:any) {
       if (info.id) {
-          const response = await updateProduct(info);
+          const response = await updateBill(info);
           if (response) setLoading(false);
           if (response.data.code === 200) {
-              // navigate('/product');
+              // navigate('/bill');
               dispatch(showToast({ ...listToast[0], detail: 'Cập nhật thành công!' }));
           } else dispatch(showToast({ ...listToast[1], detail: response.data.mess }));
       } else {
-          const response = await addProduct(info);
+          const response = await addBill(info);
           if (response) setLoading(false);
           if (response.data.code === 200) {
               scrollToTop();
@@ -47,14 +48,12 @@ const UpdateProduct = () => {
   };
     useEffect(()=>{
        if(id){
-          listProduct({id:id}).then(res=>{
+          listBill({id:id}).then(res=>{
               const detail = res.data.data?.rows[0]
               if(detail){
                 let info = {
-                  ...detail, status: detail.status === 0 ? true : false
+                  ...detail, status: detail.status === 0 ? true : false,
                 };
-                console.log(info);
-                
                 setInfos(info)
               }
           }).catch(err => {
@@ -62,11 +61,6 @@ const UpdateProduct = () => {
         });
        }
     },[])
-    const _categories:any = useListCategories();
-    const Type = [
-      { name: '1 Lần', type: 1 },
-      { name: 'Nhiều lần', type: 2 },
-     ];
     return (
       <>
         <AddForm
@@ -76,8 +70,8 @@ const UpdateProduct = () => {
           title="Quốc gia"
           loading={loading}
           onSubmit={handleSubmit}
-          routeList="/product/list"
-          route={Number(id) ? "/product/update" : "/product/add"}
+          routeList="/bill/list"
+          route={Number(id) ? "/bill/update" : "/bill/add"}
         >
            <div className="field">
            <Panel header="Thông tin">
@@ -107,46 +101,33 @@ const UpdateProduct = () => {
                 htmlFor="remark"
                 className="col-12 mb-3 md:col-3 md:mb-0"
               >
-                Danh mục
+                Ghi chú
               </label>
               <div className="col-12 md:col-9">
-              <span className="p-float-label">
-                 <Dropdown inputId="dd-city" filter label='Danh mục'className="w-full"  value={infos.categoryId}  options={_categories.rows} optionLabel="name"  optionValue="id" onChange={(e:any) =>  setInfos({ ...infos, categoryId: e.target.value })}  />
-                 <label htmlFor="dd-city">Danh mục</label>
-              </span>
-              </div>
-            </div>
-            <div className="field grid">
-              <label
-                htmlFor="price"
-                className="col-12 mb-3 md:col-3 md:mb-0"
-              >
-               Giá
-              </label>
-              <div className="col-12 md:col-9">
-              <InputForm className="w-full"
-                  id="price"
-                  value={infos.price}
+                <InputForm className="w-full"
+                  id="remark"
+                  value={infos.remark}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, price: e.target.value })
+                    setInfos({ ...infos, remark: e.target.value })
                   }
-                  label="Giá"
-                  required
+                  label="Ghi chú"
                 />
               </div>
             </div>
             <div className="field grid">
               <label
-                htmlFor="remark"
+                htmlFor="desc"
                 className="col-12 mb-3 md:col-3 md:mb-0"
               >
-                Xuất cảnh
+                Mô tả
               </label>
               <div className="col-12 md:col-9">
               <span className="p-float-label">
-                 <Dropdown inputId="type" label='Xuất cảnh' value={infos.type} className="w-full"  options={Type} optionLabel="name" optionValue="type" onChange={(e:any) =>  setInfos({ ...infos, type: e.target.value })}  />
-                 <label htmlFor="type">Xuất cảnh</label>
-              </span>
+                <InputTextarea id="desc" value={infos.desc}  onChange={(e: any) =>
+                    setInfos({ ...infos, desc: e.target.value })
+                  }  rows={5} cols={30} className="w-full"  />
+                <label htmlFor="desc">Mô tả</label>
+            </span>
               </div>
             </div>
             <div className="field grid">
@@ -255,4 +236,4 @@ const UpdateProduct = () => {
     );
 }
 
-export default UpdateProduct;
+export default UpdateBill;
