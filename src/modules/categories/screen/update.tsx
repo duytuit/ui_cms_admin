@@ -7,7 +7,7 @@ import { useState } from "react";
 import Editor from "components/common/Editor";
 import { Accordion } from "components/uiCore/panel/Accordion";
 import { AccordionTab } from "primereact/accordion";
-import { FormInput } from "components/uiCore";
+import { Button, FormInput, Panel } from "components/uiCore";
 const UpdateCategories = () => {
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
@@ -30,15 +30,24 @@ const UpdateCategories = () => {
           className="w-full"
           style={{ margin: "0 auto" }}
           checkId={infos.id}
-          title="chiến dịch"
+          title="Quốc gia"
           loading={loading}
           onSubmit={handleSubmit}
           route={Number(id) ? "/campaign/update" : "/campaign/add"}
         >
-          <div style={{ backgroundColor: "#f8f9fa" }} className="card">
-            <div className="grid formgrid">
-              <div className="col-12 lg:col-12">
-                <InputForm
+           <div className="field">
+           <Panel header="Thông tin">
+            <div className="flex justify-content-center">
+            <div style={{ backgroundColor: "#f8f9fa" }} className="card col-6">
+            <div className="field grid">
+              <label
+                htmlFor="firstname4"
+                className="col-12 mb-2 md:col-2 md:mb-0"
+              >
+                Tên
+              </label>
+              <div className="col-12 md:col-10">
+                <InputForm className="w-full"
                   id="name"
                   value={infos.name}
                   onChange={(e: any) =>
@@ -47,94 +56,45 @@ const UpdateCategories = () => {
                   label="Tên chiến dịch"
                   required
                 />
-                <DropdownForm
-                  label="Công ty"
-                  filter
-                  optionValue="id"
-                  optionLabel="name"
-                  value={infos.company_id}
-                  onChange={(e: any) => {
-                    setInfos({ ...infos, company_id: e.target.value });
-                    setError1(false);
-                  }}
-                  options={[]}
-                  className={classNames({ "p-invalid": error1 })}
-                  disabled={infos.round}
-                />
-                <DropdownForm
-                  label="Dự án"
-                  filter
-                  optionValue="id"
-                  optionLabel="cb_title"
-                  disabled={infos.round}
-                  value={infos.category_id}
-                  onChange={(e: any) => {
-                    setInfos({ ...infos, category_id: e.target.value });
-                    setError1(false);
-                  }}
-                  options={infos.company_id ? [] : []}
-                  className={classNames({ "p-invalid": error1 })}
-                />
-                <DropdownForm
-                  label="Nguồn"
-                  filter
-                  optionValue="id"
-                  value={infos.source_id}
-                  disabled={infos.round}
-                  onChange={(e: any) => {
-                    setInfos({ ...infos, source_id: e.target.value });
-                    setError2(false);
-                  }}
-                  options={infos.company_id ? [] : []}
-                  className={classNames({ "p-invalid": error2 })}
-                />
-                {/* <ListSaleByTree sort={true} selectedNodeKeys={selectedNodeKeys} setSelectedNodeKeys={setSelectedNodeKeys}
-                            company_id={infos.company_id} title="Nhân sự chạy chiến dịch" /> */}
-                <div className="flex align-items-center mb-3">
-                  <label className="block text-900 font-medium w-3 mr-2">
-                    Người quản lý chiến dịch
-                  </label>
-                  <MultiSelect
-                    value={infos.user_id_manager}
-                    filter
-                    options={[]}
-                    onChange={(e) => (
-                      setInfos({ ...infos, user_id_manager: e.target.value }),
-                      setError3(false)
-                    )}
-                    optionLabel="full_name"
-                    optionValue="user_id"
-                    placeholder="Chọn người quản lý chiến dịch"
-                    display="chip"
-                    className={classNames("w-9", { "p-invalid": error3 })}
-                  />
-                </div>
-                <InputForm
-                  id="rule_time"
-                  value={infos.rule_time}
-                  type="number"
-                  label="Thời gian chăm sóc quy định (phút)"
+              </div>
+            </div>
+            <div className="field grid">
+              <label
+                htmlFor="lastname4"
+                className="col-12 mb-2 md:col-2 md:mb-0"
+              >
+                Ghi chú
+              </label>
+              <div className="col-12 md:col-10">
+                <InputForm className="w-full"
+                  id="name"
+                  value={infos.name}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, rule_time: e.target.value })
+                    setInfos({ ...infos, name: e.target.value })
                   }
-                  required
-                />
-                <InputForm
-                  id="penalty"
-                  value={infos.penalty}
-                  type="number"
-                  label="Quy định phạt (tour)"
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, penalty: e.target.value })
-                  }
+                  label="Tên chiến dịch"
                   required
                 />
               </div>
             </div>
           </div>
+            </div>
+      
+          </Panel>
+           </div>
+          
+    
+          <div className="field">
+            <Button
+              type="button"
+              label="Thêm Section"
+              severity="secondary"
+              size="small"
+              outlined
+            />
+          </div>
           <Accordion activeIndex={0}>
-            <AccordionTab header="Thông tin bắt buộc"></AccordionTab>
-            <AccordionTab header="Thông tin chi tiết">
+            <AccordionTab header="Section 1">
               <div
                 style={{ backgroundColor: "#f8f9fa" }}
                 className="card p-fluid"

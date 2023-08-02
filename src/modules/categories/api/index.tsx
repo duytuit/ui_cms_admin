@@ -5,3 +5,4 @@ export const deleteCategories = (params:any) => postData("web/categories/deleteC
 // export const detailCategories = (params:any) => getData("web/categories/getDetailCategories", params);
 export const addCategories = (params:any) => postData("system/categories/create", params);
 export const updateCategories = (params:any) => postData("system/categories/update", params);
+export const updateStatusCategories = (params:any) => postData("system/categories/update/status", params);

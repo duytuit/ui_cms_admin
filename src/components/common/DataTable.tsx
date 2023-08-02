@@ -1,5 +1,5 @@
 import React, { useState, Fragment } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { confirmDialog } from 'primereact/confirmdialog';
 import moment from "moment"
 import Columnz from 'components/uiCore/data/Column';
@@ -70,10 +70,8 @@ export const TimeBody = (value:any) => {
 
 export const StatusBody = (rowData:any, actions:any) => {
     const dispatch = useDispatch();
-    const permissionTool = useSelector((state:any) => state.permission).permissionTool;
-
     const accept = () => {
-        const params = { id: rowData.id, status: checked ? 0 : 1, cb_status: checked ? 0 : 1 };
+        const params = { id: rowData.id, status: checked ? 1 : 0, cb_status: checked ? 1 : 0 };
         actions.action(params);
         setChecked(!checked);
         dispatch(showToast({ ...listToast[0], detail: 'Đổi trạng thái thành công!' }));
@@ -88,11 +86,11 @@ export const StatusBody = (rowData:any, actions:any) => {
         });
     };
 
-    const [checked, setChecked] = useState((rowData.status || rowData.cb_status) ? true : false);
-    return <InputSwitch disabled={!permissionTool.includes(actions.route)} checked={checked} onChange={confirm} />
+    const [checked, setChecked] = useState((rowData.status===0 || rowData.cb_status===0) ? true : false);
+    return <InputSwitch checked={checked} onChange={confirm} />
 };
 
-export const ActionBody = (rowData:any, editRoute:any, actions:any, paramsPaginator?:any, setParamsPaginator?:any, duplicated?:any, handleUndo?:any) => {
+export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, duplicated?:any, handleUndo?:any) => {
     const dispatch = useDispatch();
     
     async function accept() {

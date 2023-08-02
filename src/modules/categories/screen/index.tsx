@@ -3,7 +3,7 @@ import { RenderHeader, StatusBody, ActionBody, DataTable, Column } from "compone
 import { FormInput } from "components/uiCore";
 import { GridForm } from "components/common/ListForm";
 import { useListCategories } from "../service";
-import { deleteCategories, updateCategories } from "../api";
+import { deleteCategories, updateCategories, updateStatusCategories } from "../api";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 
 const Header = ({ _setParamsPaginator, _paramsPaginator }: {_setParamsPaginator:any,_paramsPaginator:any}) => {
@@ -35,8 +35,8 @@ export default function Categories() {
                 <Column field="name" header="Tên Quốc gia" />
                 <Column field="remark" header="Ghi chú" />
                 <Column field="status" header="Hiển thị" body={(e:any) => StatusBody(e,
-                    { route: '/categories/update', action: updateCategories })} bodyStyle={{ textAlign: 'center' }} />
-                <Column header="Actions" body={(e:any) => ActionBody(e, '/categories/detail', { route: '/categories/delete', action: deleteCategories },
+                    { route: '/categories/update/status', action: updateStatusCategories })} bodyStyle={{ textAlign: 'center' }} />
+                <Column header="Actions" body={(e:any) => ActionBody(e, '/categories/detail', null,
                     paramsPaginator, setParamsPaginator)} bodyStyle={{ textAlign: 'center' }} />
             </DataTable>
         </div>
