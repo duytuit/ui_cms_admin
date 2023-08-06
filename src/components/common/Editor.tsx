@@ -132,7 +132,6 @@ const editorConfig:DeepPartial<any> = {
 
 function Editor(props:any) {
     const { data, setData } = props;
-
     return (
         <>
          <div className="App" style={{ margin: "0 auto" }}>
@@ -142,15 +141,6 @@ function Editor(props:any) {
                 // onChange={value => setData ? setData(value) : () => {}}
             />
         </div>
-        {/* <JoditEditor
-                ref={this.editor}
-                value={'this.state.content'}
-                config={{
-                  language: 'zh_cn',
-                  toolbarButtonSize: 'large',
-                
-                }}
-              /> */}
         </>
     );
 }
