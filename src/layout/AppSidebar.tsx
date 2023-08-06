@@ -31,6 +31,17 @@ const AppSidebar = () => {
           },
           {
             id: 5,
+            name: 'Bài viết',
+            sort: 1,
+            status: 1,
+            created_at: '2023-06-01 10:04:39',
+            deleted_at: null,
+            updated_at: null,
+            icon: 'pi pi-home',
+            route: '/post/list'
+          },
+          {
+            id: 5,
             name: 'Dịch vụ',
             sort: 1,
             status: 1,
@@ -139,6 +150,10 @@ const AppSidebar = () => {
          if(project){
            const _project =JSON.parse(project) 
           setSelectedCity(_project);
+         }else{
+          setSelectedCity({ name: 'Visa', projectId: '2' });
+          localStorage.setItem('project',JSON.stringify({ name: 'Visa', projectId: '2' })) 
+          setSearchParams({"projectId":"2"}) 
          }
     },[]);
     const cities = [

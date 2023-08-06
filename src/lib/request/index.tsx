@@ -38,3 +38,13 @@ export const postDataV3 = (url:any, data:any, isUpload = false, timeout = 600000
 export const getDataV3 = (url:any, params:any, timeout = 600000) => {
     return clientApi.get(url + '?' + params, { timeout, responseType: 'blob', headers: { 'Content-Type': 'multipart/form-data' } })
 };
+
+export const uploadFile = (url:any, files:any, timeout = 600000) => {
+    const data = new FormData()
+    if (files) {
+        Object.keys(files).forEach((value) => {
+            data.append('files',files[value])
+        })
+    }
+    return clientApi.post(url, data, { timeout, headers: { 'Content-Type': 'multipart/form-data' } } )
+};

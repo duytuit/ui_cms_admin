@@ -131,17 +131,10 @@ const editorConfig:DeepPartial<any> = {
 };
 
 function Editor(props:any) {
-    const { data, setData } = props;
     return (
-        <>
-         <div className="App" style={{ margin: "0 auto" }}>
-            <JoditEditor
-                value={data ? data : ''}
-                config={editorConfig}
-                // onChange={value => setData ? setData(value) : () => {}}
-            />
-        </div>
-        </>
+          <JoditEditor
+             config={editorConfig} {...props}
+         />
     );
 }
 

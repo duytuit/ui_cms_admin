@@ -11,6 +11,8 @@ import DashBoard from "modules/dashboard/screen";
 import PageOne from "modules/pageOne/screen";
 import PageTwo from "modules/pageTwo/screen";
 import UpdateCampaign from "modules/pageTwo/screen/update";
+import Post from "modules/post/screen";
+import Updatepost from "modules/post/screen/update";
 import Product from "modules/product/screen";
 import UpdateProduct from "modules/product/screen/update";
 import Receipt from "modules/receipt/screen";
@@ -54,6 +56,11 @@ const publicRoutes = [
       { path: "/receipt/list", component:Receipt ,layout:'ListReceipt'},
       { path: "/receipt/add", component:UpdateReceipt ,layout:'UpdateReceipt'},
       { path: "/receipt/detail/:id", component:UpdateReceipt ,layout:'DetailReceipt'},
+
+       // post 
+       { path: "/post/list", component:Post ,layout:'ListPost'},
+       { path: "/post/add", component:Updatepost ,layout:'AddPost'},
+       { path: "/post/detail/:id", component:Updatepost ,layout:'DetailPost'},
 
 
     // { path: "/auth/forgotpassword", component: ForgotPassword, layout: null, public: true },
