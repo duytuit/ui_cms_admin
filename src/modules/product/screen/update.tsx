@@ -5,15 +5,17 @@ import { useEffect, useState } from "react";
 import Editor from "components/common/Editor";
 import { Accordion } from "components/uiCore/panel/Accordion";
 import { AccordionTab } from "primereact/accordion";
-import { Button, Dropdown, FormInput, InputSwitch, InputTextarea, Panel } from "components/uiCore";
+import { Button, Dialog, Dropdown, FormInput, InputSwitch, InputTextarea, Panel } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { listToast, scrollToTop, refreshObject } from "utils";
 import { updateProduct, addProduct, listProduct } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { useListCategories } from "modules/categories/service";
+import { ListUpload } from "components/common/ListUpload";
 const UpdateProduct = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
+  const [visible, setVisible] = useState(false);
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
     const [infos, setInfos] = useState<any>({});
@@ -247,6 +249,22 @@ const UpdateProduct = () => {
                   </div>
                 </div>
               </div>
+              <div className="field">
+            <Button
+              type="button"
+              label="Thêm Ảnh"
+              severity="secondary"
+              size="small"
+              outlined
+              onClick={() => setVisible(true)}
+            />
+          </div>
+          <Dialog header="Danh sách" visible={visible} onHide={() => setVisible(false)}
+                style={{ width: '78vw' }}>
+                <p className="m-0">
+                <ListUpload></ListUpload>
+                </p>
+            </Dialog>
               <Editor data={""} setData={""} className="w-full" />
             </AccordionTab>
           </Accordion>
