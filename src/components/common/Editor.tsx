@@ -3,33 +3,6 @@ import "jodit/build/jodit.min.css";
 import JoditEditor from "jodit-react";
 import { DeepPartial } from "@reduxjs/toolkit";
 import "../../styles/demo/code.scss"
-const facilityMergeFields = [
-    "FacilityNumber",
-    "FacilityName",
-    "Address",
-    "MapCategory",
-    "Latitude",
-    "Longitude",
-    "ReceivingPlant",
-    "TrunkLine",
-    "SiteElevation"
-];
-const inspectionMergeFields = [
-    "InspectionCompleteDate",
-    "InspectionEventType"
-];
-const createOptionGroupElement = (mergeFields:any, optionGrouplabel:any) => {
-    let optionGroupElement = document.createElement("optgroup");
-    optionGroupElement.setAttribute("label", optionGrouplabel);
-    for (let index = 0; index < mergeFields.length; index++) {
-        let optionElement = document.createElement("option");
-        optionElement.setAttribute("class", "merge-field-select-option");
-        optionElement.setAttribute("value", mergeFields[index]);
-        optionElement.text = mergeFields[index];
-        optionGroupElement.appendChild(optionElement);
-    }
-    return optionGroupElement;
-}
 const buttons = [
     "undo",
     "redo",
@@ -68,46 +41,7 @@ const buttons = [
     "print",
     "|",
     "source",
-    "|",
-    {
-        name: "insertMergeField",
-        tooltip: "Insert Merge Field",
-        // iconURL: "images/merge.png",
-        popup: (editor:any) => {
-            function onSelected(e:any) {
-                let mergeField = e.target.value;
-                if (mergeField) {
-                    editor.selection.insertNode(
-                        editor.create.inside.fromHTML("{{" + mergeField + "}}")
-                    );
-                }
-            }
-            let divElement = editor.create.div("merge-field-popup");
-
-            let labelElement:any = document.createElement("label");
-            labelElement.setAttribute("class", "merge-field-label");
-            labelElement.text = 'Merge field: ';
-            divElement.appendChild(labelElement);
-
-            let selectElement = document.createElement("select");
-            selectElement.setAttribute("class", "merge-field-select");
-            selectElement.appendChild(createOptionGroupElement(facilityMergeFields, "Facility"));
-            selectElement.appendChild(createOptionGroupElement(inspectionMergeFields, "Inspection"));
-            selectElement.onchange = onSelected;
-            divElement.appendChild(selectElement);
-
-            return divElement;
-        }
-    },
-    // {
-    //     name: "copyContent",
-    //     tooltip: "Copy HTML to Clipboard",
-    //     iconURL: "images/copy.png",
-    //     exec: function (editor) {
-    //         let html = editor.value;
-    //         copyStringToClipboard(html);
-    //     }
-    // }
+    "|"
 ];
 
 const editorConfig:DeepPartial<any> = {
@@ -124,22 +58,100 @@ const editorConfig:DeepPartial<any> = {
     askBeforePasteFromWord: true,
     //defaultActionOnPaste: "insert_clear_html",
     buttons: buttons,
+    // width: 800,
+    height: 842,
     uploader: {
-        insertImageAsBase64URI: true
-    },
+        url: '/api/system/upload/create',  //your upload api url
+        insertImageAsBase64URI: false,
+        imagesExtensions: ['jpg', 'png', 'jpeg', 'gif'],
+        //headers: {"token":`${db.token}`},
+        filesVariableName: function (t:any) {
+          return 'files';
+        }, //"files",
+        withCredentials: false,
+        pathVariableName: 'path',
+        format: 'json',
+        method: 'POST',
+        prepareData: function (formdata:any) {
+          return formdata;
+        },
+        isSuccess: function (data:any) {
+          if (data.data && data.data.length) {
+            const tagName = 'img';
+            data.data.forEach((item: any, index: number) => { //edetor insertimg function
+              const elm = this.jodit.createInside.element(tagName);
+              const externalLink = item.externalLink.replace("public", "")
+              elm.setAttribute('src',process.env.REACT_APP_UPLOAD_CDN+externalLink);
+              this.jodit.s.insertImage(elm as HTMLImageElement, null, this.o.imageDefaultWidth);
+            });
+          }
+        },
+        getMessage: function (e:any) {
+          return void 0 !== e.data.messages && Array.isArray(e.data.messages)
+            ? e.data.messages.join('')
+            : '';
+        },
+        process: function (resp: any) { //success callback transfrom data to defaultHandlerSuccess use.it's up to you.
+            console.log('sdfdsfsfd',resp);
+            
+            let files = [];
+          files.unshift(resp.data);
+          return {
+            files: resp.data,
+            error: resp.msg,
+            msg: resp.msg,
+          };
+        },
+        error: function (this: any, e: Error) { 
+          this.j.e.fire('errorMessage', e.message, 'error', 4000);
+        },
+        defaultHandlerSuccess: function (this: any, resp: any) { // `this` is the editor.
+          const j = this;
+          console.log(resp);
+          
+          if (resp.files && resp.files.length) {
+            const tagName = 'img';
+            resp.files.forEach((externalLink: string, index: number) => { //edetor insertimg function
+              const elm = j.createInside.element(tagName);
+              elm.setAttribute('src', externalLink);
+              j.s.insertImage(elm as HTMLImageElement, null, j.o.imageDefaultWidth);
+            });
+          }
+        },
+        defaultHandlerError: function (this: any, e:any) {
+          this.j.e.fire('errorMessage', e.message);
+        },
+        contentType: function (e:any) {
+          return (
+            (void 0 === this.jodit.ownerWindow.FormData || 'string' == typeof e) &&
+            'application/x-www-form-urlencoded; charset=UTF-8'
+          );
+        },
+      },
 };
 
 function Editor(props:any) {
     const { data, setData } = props;
 
     return (
-        <div className="App" style={{ margin: "0 auto" }}>
+        <>
+         <div className="App" style={{ margin: "0 auto" }}>
             <JoditEditor
                 value={data ? data : ''}
                 config={editorConfig}
                 // onChange={value => setData ? setData(value) : () => {}}
             />
         </div>
+        {/* <JoditEditor
+                ref={this.editor}
+                value={'this.state.content'}
+                config={{
+                  language: 'zh_cn',
+                  toolbarButtonSize: 'large',
+                
+                }}
+              /> */}
+        </>
     );
 }
 
