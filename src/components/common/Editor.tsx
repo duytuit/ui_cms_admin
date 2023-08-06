@@ -73,7 +73,12 @@ const editorConfig:DeepPartial<any> = {
         format: 'json',
         method: 'POST',
         prepareData: function (formdata:any) {
-          return formdata;
+            const project = localStorage.getItem("project");
+            if (project) {
+              const _project = JSON.parse(project);
+              formdata.append("projectId", _project.projectId);
+            }
+            return formdata;
         },
         isSuccess: function (data:any) {
           if (data.data && data.data.length) {

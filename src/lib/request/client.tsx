@@ -11,20 +11,20 @@ export const createFormData = (body:any, file:any, files?:any, gallery?:any, ima
             data.append(value, files[value])
         })
     }
-    if (gallery) {
-        gallery.forEach((g:any) => {
-            data.append('gallery', g)
-        })
-    }
-    if (image) {
-        if (Array.isArray(image) && image[0]) {
-            image.forEach(g => {
-                data.append('image', g)
-            })
-        } else {
-            data.append("image", image)
-        }
-    }
+    // if (gallery) {
+    //     gallery.forEach((g:any) => {
+    //         data.append('gallery', g)
+    //     })
+    // }
+    // if (image) {
+    //     if (Array.isArray(image) && image[0]) {
+    //         image.forEach(g => {
+    //             data.append('image', g)
+    //         })
+    //     } else {
+    //         data.append("image", image)
+    //     }
+    // }
     Object.keys(body).forEach(key => {
         if (body.key && typeof body[key] === "object") data.append(key, body.key)
     })

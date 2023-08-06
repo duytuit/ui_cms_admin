@@ -3,31 +3,28 @@ import { AddForm, InputForm } from "components/common/AddForm";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Editor from "components/common/Editor";
-import {  Dropdown, FileUpload, InputSwitch, InputText, Panel } from "components/uiCore";
+import {  Button, Dropdown, FileUpload, Image, InputSwitch, InputText, Panel } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { listToast, scrollToTop, refreshObject } from "utils";
-import { updatePost, addPost, listPost } from "../api";
+import { updatePost, addPost, listPost, updateStatusPost, updateSlugPost } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { useListCategories } from "modules/categories/service";
 import { uploadFile } from "lib/request";
 const UpdatePost = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
-  const [visible, setVisible] = useState(false);
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
-    const [infos, setInfos] = useState<any>({});
+    const [infos, setInfos] = useState<any>({imagefdgfd:'sdf'});
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const handleSubmit = (e:any) => {
         e.preventDefault();
         let info = {
-          ...infos, status: infos.status ? 0 : 1,
+          ...infos, status: infos.status ? 0 : 1,need_auth: infos.need_auth ? 0 : 1,is_picked: infos.is_picked ? 0 : 1,postSort: parseInt( infos.postSort)
       };
-      console.log(info);
-      
-      // setLoading(true);
-      // fetchDataSubmit(info);
+     setLoading(true);
+     fetchDataSubmit(info);
     };
      async function fetchDataSubmit(info:any) {
       if (info.id) {
@@ -53,7 +50,7 @@ const UpdatePost = () => {
               const detail = res.data.data?.rows[0]
               if(detail){
                 let info = {
-                  ...detail, status: detail.status === 0 ? true : false
+                  ...detail, status: detail.status === 0 ? true : false,need_auth: detail.need_auth === 0 ? true : false,is_picked: detail.is_picked === 0 ? true : false
                 };
                 console.log(info);
                 
@@ -64,22 +61,30 @@ const UpdatePost = () => {
         });
        }
     },[])
-    const _categories:any = useListCategories();
-    const Type = [
-      { name: '1 Lần', type: 1 },
-      { name: 'Nhiều lần', type: 2 },
-     ];
-     const uploadImage= async (event:any)=>{
-      const files = event.target.files
-       const rs_upload = await uploadFile('system/upload/create',files)
+    const _categories: any = useListCategories();
+    const uploadImage = async (event: any) => {
+      const files = event.target.files;
+      const rs_upload = await uploadFile("system/upload/create", files);
       console.log(rs_upload);
-       if(rs_upload.data.code === 200){
-        const externalLink = rs_upload.data.data[0].externalLink.replace("public", "")
-           document.getElementsByClassName("btn-select-image-inner")[0].innerHTML = `<img src="${process.env.REACT_APP_UPLOAD_CDN+externalLink}" style="width: 100%;
-           height: 240px;
-           object-fit: contain;">`;
-       }
-     }
+      if (rs_upload.data.code === 200) {
+        const externalLink = rs_upload.data.data[0].externalLink.replace(
+          "public",
+          ""
+        );
+        //  document.getElementsByClassName("btn-select-image-inner")[0].innerHTML = `<img src="${process.env.REACT_APP_UPLOAD_CDN+externalLink}" style="width: 100%;
+        //  height: 240px;
+        //  object-fit: contain;">`;
+        setInfos({
+          ...infos,
+          image: JSON.stringify({ src: externalLink, alt: "" }),
+        });
+      }
+    };
+    const updateSlug=async ()=>{
+      if(infos?.id){
+        await updateSlugPost({id:infos.id,slug:infos.slug})
+      }
+    }
     return (
       <>
         <AddForm
@@ -124,7 +129,7 @@ const UpdatePost = () => {
                       >
                         Slug
                       </label>
-                      <div className="col-12 md:col-9">
+                      <div className="col-12 md:col-6">
                         <InputForm
                           className="w-full"
                           id="slug"
@@ -135,6 +140,16 @@ const UpdatePost = () => {
                           label="Nếu bạn để trống, nó sẽ được tạo tự động"
                         />
                       </div>
+                      <div className="col-12 md:col-3">
+                      <Button className="w-full"
+                        type="button"
+                        label="Update Slug"
+                        severity="secondary"
+                        size="small"
+                        outlined
+                        onClick={updateSlug}
+                      />
+                    </div>
                     </div>
                     <div className="field grid">
                       <label
@@ -224,6 +239,27 @@ const UpdatePost = () => {
                     </div>
                     <div className="field grid">
                       <label
+                        htmlFor="post_sort"
+                        className="col-12 mb-2 md:col-3 md:mb-0"
+                      >
+                        Thứ tự
+                      </label>
+                      <div className="col-12 md:col-9">
+                        <InputForm
+                        type="number"
+                        min='1'
+                          className="w-full"
+                          id="postSort"
+                          value={infos.postSort}
+                          onChange={(e: any) =>
+                            setInfos({ ...infos, postSort: e.target.value })
+                          }
+                          label="Thứ tự"
+                        />
+                      </div>
+                    </div>
+                    <div className="field grid">
+                      <label
                         htmlFor="is_picked"
                         className="col-12 mb-2 md:col-3 md:mb-0"
                       >
@@ -284,9 +320,14 @@ const UpdatePost = () => {
                       className="post-select-image-container"
                     >
                       <div className="btn-select-image-inner">
-                          <i className="fa fa-image"></i>
+                        {infos && infos.image?(<>
+                          <img src={process.env.REACT_APP_UPLOAD_CDN+JSON.parse(infos.image).src} style={{width: "100%",height: "240px",objectFit: "contain"}}/>
+                        </>):(<>
+                         <i className="fa fa-image"></i>
                           <div className="btn">Chọn ảnh</div>
-                        </div>
+                        </>)}
+                         
+                      </div>
                      <InputText type="file" name="post_image_id" onChange={uploadImage} style={{display:'none'}} id="post_image_id" value=""></InputText>
                     </label>
                   </div>

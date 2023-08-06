@@ -2,14 +2,14 @@ import { clientApi } from "../../utils/axios";
 import { createFormData, convertData } from "./client";
 
 export const postData = (url:any, data:any, isUpload = false, timeout = 600000) => {
-    const { file, files, gallery, image, avatar, ...params } = data
+    const { file, files, gallery, avatar, ...params } = data
     const project=  localStorage.getItem('project')
     if(project){
         const _project = JSON.parse(project);
         data = {projectId:parseInt(_project.projectId),...params}
     }
     if (isUpload) {
-        data = createFormData(params, file, files, gallery, image, avatar)
+        data = createFormData(params, file, files, gallery, null, avatar)
     } else{
         data = convertData(data)
     } 
@@ -45,6 +45,11 @@ export const uploadFile = (url:any, files:any, timeout = 600000) => {
         Object.keys(files).forEach((value) => {
             data.append('files',files[value])
         })
+    }
+    const project=  localStorage.getItem('project')
+    if(project){
+        const _project = JSON.parse(project);
+        data.append('projectId',_project.projectId)
     }
     return clientApi.post(url, data, { timeout, headers: { 'Content-Type': 'multipart/form-data' } } )
 };
