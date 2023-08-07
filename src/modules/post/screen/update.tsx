@@ -1,12 +1,12 @@
 
 import { AddForm, InputForm } from "components/common/AddForm";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Editor from "components/common/Editor";
-import {  Button, Dropdown, FileUpload, Image, InputSwitch, InputText, Panel } from "components/uiCore";
+import {  Button, Dropdown, InputSwitch, InputText, Panel } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { listToast, scrollToTop, refreshObject } from "utils";
-import { updatePost, addPost, listPost, updateStatusPost, updateSlugPost } from "../api";
+import { updatePost, addPost, listPost, updateSlugPost } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { useListCategories } from "modules/categories/service";
@@ -16,7 +16,7 @@ const UpdatePost = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
-    const [infos, setInfos] = useState<any>();
+    const [infos, setInfos] = useState<any>({});
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const handleSubmit = (e:any) => {
