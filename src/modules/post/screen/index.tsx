@@ -6,6 +6,7 @@ import { deletePost, updateStatusPost } from "../api";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { useListCategories } from "modules/categories/service";
 import { useListPost } from "../service";
+import { CategoryEnum } from "utils/type.enum";
 
 const Header = ({ _setParamsPaginator, _paramsPaginator }: {_setParamsPaginator:any,_paramsPaginator:any}) => {
     const [filter, setFilter] = useState({ name: '' });
@@ -22,7 +23,7 @@ export default function Post() {
     const { handleParamUrl} = useHandleParamUrl(); 
     const [paramsPaginator, setParamsPaginator] = useState({ pageNum: 1, pageSize: 20, first: 0, render: false });
     const _Post:any = useListPost({ ...paramsPaginator, status: undefined, first: undefined });
-    const _categories:any = useListCategories();
+    const _categories:any = useListCategories({type:CategoryEnum.post});
     useEffect(()=>{
         handleParamUrl(paramsPaginator)
     },[paramsPaginator])

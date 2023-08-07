@@ -12,6 +12,7 @@ import { updateService, addService, listService } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { useListCategories } from "modules/categories/service";
+import { CategoryEnum } from "utils/type.enum";
 const UpdateService = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
     const { id } = useParams();
@@ -19,7 +20,7 @@ const UpdateService = () => {
     const [infos, setInfos] = useState<any>({});
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const _categories:any = useListCategories();
+    const _categories:any = useListCategories({type:CategoryEnum.country});
     const handleSubmit = (e:any) => {
         e.preventDefault();
         let info = {

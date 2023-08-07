@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { useListCategories } from "modules/categories/service";
 import { ListUpload } from "components/common/ListUpload";
+import { CategoryEnum } from "utils/type.enum";
 const UpdateProduct = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
   const [visible, setVisible] = useState(false);
@@ -64,7 +65,7 @@ const UpdateProduct = () => {
         });
        }
     },[])
-    const _categories:any = useListCategories();
+    const _categories:any = useListCategories({type:CategoryEnum.country});
     const Type = [
       { name: '1 Lần', type: 1 },
       { name: 'Nhiều lần', type: 2 },

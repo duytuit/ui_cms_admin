@@ -6,6 +6,7 @@ import { deleteCustomer, updateStatusCustomer } from "../api";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { useListCategories } from "modules/categories/service";
 import { useListCustomer } from "../service";
+import { CategoryEnum } from "utils/type.enum";
 
 const Header = ({ _setParamsPaginator, _paramsPaginator }: {_setParamsPaginator:any,_paramsPaginator:any}) => {
     const [filter, setFilter] = useState({ name: '' });
@@ -22,7 +23,7 @@ export default function Customer() {
     const { handleParamUrl} = useHandleParamUrl(); 
     const [paramsPaginator, setParamsPaginator] = useState({ pageNum: 1, pageSize: 20, first: 0, render: false });
     const _Customer:any = useListCustomer({ ...paramsPaginator, status: undefined, first: undefined });
-    const _categories:any = useListCategories();
+    const _categories:any = useListCategories({type:CategoryEnum.country});
     useEffect(()=>{
         handleParamUrl(paramsPaginator)
     },[paramsPaginator])

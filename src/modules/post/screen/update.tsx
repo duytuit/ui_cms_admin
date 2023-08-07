@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { useListCategories } from "modules/categories/service";
 import { uploadFile } from "lib/request";
+import { CategoryEnum } from "utils/type.enum";
 const UpdatePost = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
     const { id } = useParams();
@@ -61,7 +62,7 @@ const UpdatePost = () => {
         });
        }
     },[])
-    const _categories: any = useListCategories();
+    const _categories: any = useListCategories({type:CategoryEnum.post});
     const uploadImage = async (event: any) => {
       const files = event.target.files;
       const rs_upload = await uploadFile("system/upload/create", files);

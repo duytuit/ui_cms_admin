@@ -5,6 +5,7 @@ import { GridForm } from "components/common/ListForm";
 import { useListCategories } from "../service";
 import { deleteCategories, updateStatusCategories } from "../api";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
+import { CategoryEnum } from "utils/type.enum";
 
 const Header = ({ _setParamsPaginator, _paramsPaginator }: {_setParamsPaginator:any,_paramsPaginator:any}) => {
     const [filter, setFilter] = useState({ name: '' });
@@ -19,7 +20,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: {_setParamsPaginator:
 };
 export default function Categories() {
     const { handleParamUrl} = useHandleParamUrl(); 
-    const [paramsPaginator, setParamsPaginator] = useState({ pageNum: 1, pageSize: 20, first: 0, render: false,type:1 });
+    const [paramsPaginator, setParamsPaginator] = useState({ pageNum: 1, pageSize: 20, first: 0, render: false,type:CategoryEnum.country });
     const categories:any = useListCategories({ ...paramsPaginator, status: undefined, first: undefined });
     useEffect(()=>{
         handleParamUrl(paramsPaginator)

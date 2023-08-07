@@ -11,11 +11,12 @@ import { listToast, scrollToTop, refreshObject } from "utils";
 import { updateCategories, addCategories, listCategories } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
+import { CategoryEnum } from "utils/type.enum";
 const UpdateCategories = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
-    const [infos, setInfos] = useState<any>({type:1});
+    const [infos, setInfos] = useState<any>({type:CategoryEnum.country});
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const handleSubmit = (e:any) => {
