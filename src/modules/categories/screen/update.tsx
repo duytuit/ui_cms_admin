@@ -15,7 +15,7 @@ const UpdateCategories = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
-    const [infos, setInfos] = useState<any>({});
+    const [infos, setInfos] = useState<any>({type:1});
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const handleSubmit = (e:any) => {

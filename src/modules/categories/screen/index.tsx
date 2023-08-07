@@ -19,7 +19,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: {_setParamsPaginator:
 };
 export default function Categories() {
     const { handleParamUrl} = useHandleParamUrl(); 
-    const [paramsPaginator, setParamsPaginator] = useState({ pageNum: 1, pageSize: 20, first: 0, render: false });
+    const [paramsPaginator, setParamsPaginator] = useState({ pageNum: 1, pageSize: 20, first: 0, render: false,type:1 });
     const categories:any = useListCategories({ ...paramsPaginator, status: undefined, first: undefined });
     useEffect(()=>{
         handleParamUrl(paramsPaginator)
