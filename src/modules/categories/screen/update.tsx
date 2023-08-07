@@ -49,7 +49,7 @@ const UpdateCategories = () => {
   };
     useEffect(()=>{
        if(id){
-          listCategories({id:id}).then(res=>{
+          listCategories({id:id,type:CategoryEnum.country}).then(res=>{
               const detail = res.data.data?.rows[0]
               if(detail){
                 let info = {
