@@ -16,7 +16,7 @@ const UpdatePost = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
-    const [infos, setInfos] = useState<any>({imagefdgfd:'sdf'});
+    const [infos, setInfos] = useState<any>();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const handleSubmit = (e:any) => {

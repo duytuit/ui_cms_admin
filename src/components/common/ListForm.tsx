@@ -2,7 +2,7 @@
 // import { InputText } from 'primereact/inputtext';
 // import { classNames } from 'primereact/utils';
 
-import { Button, InputText } from "components/uiCore";
+import { Button, FormInput, InputText } from "components/uiCore";
 import Calendarz from "components/uiCore/form/Calendar";
 import Dropdownz from "components/uiCore/form/Dropdown";
 import MultiSelectz from "components/uiCore/form/MultiSelect";
@@ -50,13 +50,10 @@ export const Dropdown = (props:any) => {
 };
 
 export const GridForm = (props:any) => {
-    const { className, paramsPaginator, setParamsPaginator, filter, setFilter, handleFilter } = props;
-    const handleClear = () => {
-        setFilter(refreshObject(filter));
-        setParamsPaginator({
-            page: paramsPaginator.page, limit: paramsPaginator.limit,
-            first: paramsPaginator.first, render: paramsPaginator.render
-        });
+    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam } = props;
+    const handleClear = (e:any) => {
+        setParamsPaginator(defaultParam);
+        refreshObject(filter)
     };
 
     const handleSubmit = (e:any) => {
@@ -69,7 +66,7 @@ export const GridForm = (props:any) => {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="grid formgrid mb-2 aligin-items-center">
+       <form  id="form_search" onSubmit={handleSubmit} className="grid formgrid mb-2 aligin-items-center">
             {props.children}
             <div className="field col">
                 <div className="flex justify-content-end flex-wrap">

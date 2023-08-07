@@ -11,7 +11,7 @@ const MenuSidebar = (props:any) => {
     const key = props.parentKey ? props.parentKey + '-' + props.index : String(props.index);
     const active = activeMenu === key || (activeMenu && activeMenu.startsWith(key + '-')) || false;
     // const permissionTool = useSelector((state:any) => state.permission).permissionTool;
-    const permissionTool = ['/','/page-one','/page-two','/auth/login','/categories/list','/bill/list','/customer/list',"/receipt/list",'/service/list','/product/list','/post/list'];
+    const permissionTool = ['/','/page-one','/page-two','/auth/login','/categories/list','/bill/list','/customer/list',"/receipt/list",'/service/list','/product/list','/post/list','/category/post/list'];
     const itemClick = (event:any) => {
         //avoid processing disabled items
         if (item.disabled) {

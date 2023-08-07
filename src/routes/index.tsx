@@ -11,6 +11,8 @@ import DashBoard from "modules/dashboard/screen";
 import PageOne from "modules/pageOne/screen";
 import PageTwo from "modules/pageTwo/screen";
 import UpdateCampaign from "modules/pageTwo/screen/update";
+import CatePost from "modules/post/category/screen";
+import UpdateCatePost from "modules/post/category/screen/update";
 import Post from "modules/post/screen";
 import Updatepost from "modules/post/screen/update";
 import Product from "modules/product/screen";
@@ -25,7 +27,6 @@ const publicRoutes = [
     { path: "/page-one", component:PageOne ,layout:'PageOne'},
     { path: "/page-two", component:PageTwo ,layout:'PageTwo'},
     { path: "/campaign/add", component:UpdateCampaign ,layout:'UpdateCampaign'},
-
 
      // categories 
      { path: "/categories/list", component:Categories ,layout:'ListCategories'},
@@ -43,9 +44,9 @@ const publicRoutes = [
      { path: "/service/detail/:id", component:UpdateService ,layout:'UpdateService'},
 
       // customer 
-      { path: "/customer/list", component:Customer ,layout:'ListCustomer'},
-      { path: "/customer/add", component:UpdateCustomer ,layout:'UpdateCustomer'},
-      { path: "/customer/detail/:id", component:UpdateCustomer ,layout:'DetailCustomer'},
+     { path: "/customer/list", component:Customer ,layout:'ListCustomer'},
+     { path: "/customer/add", component:UpdateCustomer ,layout:'UpdateCustomer'},
+     { path: "/customer/detail/:id", component:UpdateCustomer ,layout:'DetailCustomer'},
 
        // bill 
      { path: "/bill/list", component:Bill ,layout:'ListBill'},
@@ -61,6 +62,11 @@ const publicRoutes = [
        { path: "/post/list", component:Post ,layout:'ListPost'},
        { path: "/post/add", component:Updatepost ,layout:'AddPost'},
        { path: "/post/detail/:id", component:Updatepost ,layout:'DetailPost'},
+
+         // post category
+         { path: "/category/post/list", component:CatePost ,layout:'ListCatePost'},
+         { path: "/category/post/add", component:UpdateCatePost ,layout:'AddCatePost'},
+         { path: "/category/post/detail/:id", component:UpdateCatePost ,layout:'DetailCatePost'},
 
 
     // { path: "/auth/forgotpassword", component: ForgotPassword, layout: null, public: true },

@@ -38,7 +38,32 @@ const AppSidebar = () => {
             deleted_at: null,
             updated_at: null,
             icon: 'pi pi-home',
-            route: '/post/list'
+            items: [
+              {
+                id: 1,
+                name: 'Danh mục',
+                route: '/category/post/list',
+                created_at: '2023-05-29 14:14:02',
+                updated_at: null,
+                deleted_at: null,
+                status: 1,
+                category_id: 1,
+                sort: 1,
+                actions: '[{"action":"import"},{"action":"export"},{"action":"delete"},{"action":"update"},{"action":"add"},{"action":"detail"},{"action":"view"}]'
+              },
+              {
+                id: 1,
+                name: 'Danh Sách',
+                route: '/post/list',
+                created_at: '2023-05-29 14:14:02',
+                updated_at: null,
+                deleted_at: null,
+                status: 1,
+                category_id: 1,
+                sort: 1,
+                actions: '[{"action":"import"},{"action":"export"},{"action":"delete"},{"action":"update"},{"action":"add"},{"action":"detail"},{"action":"view"}]'
+              }
+            ]
           },
           {
             id: 5,

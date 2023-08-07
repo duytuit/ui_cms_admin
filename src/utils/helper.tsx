@@ -136,4 +136,13 @@ static formatCurrencyV2(value:any){
   var number = value.replace(/[,.]/g, '');
   return new Intl.NumberFormat().format(number).replace(/\./g, ',');
 }
+static refreshObject(object:any){
+  for (const key in object) {
+      if (object.hasOwnProperty(key)) {
+          if (typeof object[key] === 'string') object[key] = '';
+          else object[key] = undefined;
+      };
+  };
+  return object;
+};
 }
