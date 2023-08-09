@@ -77,7 +77,7 @@ export const BodyImage = (value:any) => {
 export const StatusBody = (rowData:any, actions:any) => {
     const dispatch = useDispatch();
     const accept = () => {
-        const params = { id: rowData.id, status: checked ? 1 : 0, cb_status: checked ? 1 : 0 };
+        const params = { id: rowData?.postId || rowData?.id, status: checked ? 1 : 0, cb_status: checked ? 1 : 0 };
         actions.action(params);
         setChecked(!checked);
         dispatch(showToast({ ...listToast[0], detail: 'Đổi trạng thái thành công!' }));
@@ -100,7 +100,7 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
     const dispatch = useDispatch();
     
     async function accept() {
-        const res = await actions.action({ id: rowData.id });
+        const res = await actions.action({ id: rowData?.postId || rowData?.id });
         if (res.data.code ===200) {
             dispatch(showToast({ ...listToast[0], detail: 'Xóa dữ liệu thành công!' }));
             if (paramsPaginator && setParamsPaginator) {
@@ -122,10 +122,10 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
 
     return (
         <React.Fragment>
-            {editRoute && <Link to={editRoute + '/' + rowData.id}>
+            {editRoute && <Link to={editRoute + '/' + rowData?.postId || rowData?.id}>
                 <Button icon="pi pi-eye" rounded outlined className="mr-2" />
             </Link>}
-            {duplicated && <Button onClick={e => duplicated(rowData.id)}
+            {duplicated && <Button onClick={e => duplicated(rowData?.postId || rowData?.id)}
                 icon="pi pi-clone" rounded outlined className="mr-2" />}
             {actions && <Button className="mr-2" type='button' icon="pi pi-trash"
                 onClick={actions.options ? actions.options : confirm} rounded outlined severity="danger" />}
