@@ -5,13 +5,14 @@ import { useEffect, useState } from "react";
 import Editor from "components/common/Editor";
 import { Accordion } from "components/uiCore/panel/Accordion";
 import { AccordionTab } from "primereact/accordion";
-import { Button, FormInput, InputSwitch, InputTextarea, Panel } from "components/uiCore";
+import { Button, FormInput, InputSwitch, InputText, InputTextarea, Panel } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { listToast, scrollToTop, refreshObject } from "utils";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
 import { updateCategories, addCategories, listCategories } from "modules/categories/api";
+import { uploadFile } from "lib/request";
 const UpdateCatePost = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
     const { id } = useParams();
@@ -62,6 +63,24 @@ const UpdateCatePost = () => {
         });
        }
     },[])
+    const uploadImage = async (event: any) => {
+      const files = event.target.files;
+      const rs_upload = await uploadFile("system/upload/create", files);
+      console.log(rs_upload);
+      if (rs_upload.data.code === 200) {
+        const externalLink = rs_upload.data.data[0].externalLink.replace(
+          "public",
+          ""
+        );
+        //  document.getElementsByClassName("btn-select-image-inner")[0].innerHTML = `<img src="${process.env.REACT_APP_UPLOAD_CDN+externalLink}" style="width: 100%;
+        //  height: 240px;
+        //  object-fit: contain;">`;
+        setInfos({
+          ...infos,
+          image: JSON.stringify({ src: externalLink, alt: "" }),
+        });
+      }
+    };
     return (
       <>
         <AddForm
@@ -74,78 +93,144 @@ const UpdateCatePost = () => {
           routeList="/category/post/list"
           route={Number(id) ? "/categories/update" : "/category/post/add"}
         >
-           <div className="field">
-           <Panel header="Thông tin">
-            <div className="flex justify-content-center">
-            <div style={{ backgroundColor: "#f8f9fa" }} className="card col-6">
-            <div className="field grid">
-              <label
-                htmlFor="name"
-                className="col-12 mb-2 md:col-3 md:mb-0"
-              >
-                Tên
-              </label>
-              <div className="col-12 md:col-9">
-                <InputForm className="w-full"
-                  id="name"
-                  value={infos.name}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, name: e.target.value })
-                  }
-                  label="Tên"
-                  required
-                />
+          <div className="field">
+            <Panel header="Thông tin">
+              <div className="flex justify-content-center">
+                <div
+                  style={{ backgroundColor: "#f8f9fa" }}
+                  className="card col-6"
+                >
+                  <div className="field grid">
+                    <label
+                      htmlFor="name"
+                      className="col-12 mb-2 md:col-3 md:mb-0"
+                    >
+                      Tên
+                    </label>
+                    <div className="col-12 md:col-9">
+                      <InputForm
+                        className="w-full"
+                        id="name"
+                        value={infos.name}
+                        onChange={(e: any) =>
+                          setInfos({ ...infos, name: e.target.value })
+                        }
+                        label="Tên"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="field grid">
+                    <label
+                      htmlFor="remark"
+                      className="col-12 mb-3 md:col-3 md:mb-0"
+                    >
+                      Ghi chú
+                    </label>
+                    <div className="col-12 md:col-9">
+                      <InputForm
+                        className="w-full"
+                        id="remark"
+                        value={infos.remark}
+                        onChange={(e: any) =>
+                          setInfos({ ...infos, remark: e.target.value })
+                        }
+                        label="Ghi chú"
+                      />
+                    </div>
+                  </div>
+                  <div className="field grid">
+                    <label
+                      htmlFor="desc"
+                      className="col-12 mb-3 md:col-3 md:mb-0"
+                    >
+                      Mô tả
+                    </label>
+                    <div className="col-12 md:col-9">
+                      <span className="p-float-label">
+                        <InputTextarea
+                          id="desc"
+                          value={infos.desc}
+                          onChange={(e: any) =>
+                            setInfos({ ...infos, desc: e.target.value })
+                          }
+                          rows={5}
+                          cols={30}
+                          className="w-full"
+                        />
+                        <label htmlFor="desc">Mô tả</label>
+                      </span>
+                    </div>
+                  </div>
+                  <div className="field grid">
+                  <label
+                      htmlFor="desc"
+                      className="col-12 mb-3 md:col-3 md:mb-0"
+                    >
+                      Ảnh
+                    </label>
+                    <div className="col-12 md:col-9">
+                    <div className="flex justify-content-center">
+                      <label
+                        htmlFor="post_image_id"
+                        id="post_select_image_container"
+                        className="post-select-image-container"
+                      >
+                        <div className="btn-select-image-inner">
+                          {infos && infos.image ? (
+                            <>
+                              <img
+                                src={
+                                  process.env.REACT_APP_UPLOAD_CDN +
+                                  JSON.parse(infos.image).src
+                                }
+                                style={{
+                                  width: "100%",
+                                  height: "240px",
+                                  objectFit: "contain",
+                                }}
+                              />
+                            </>
+                          ) : (
+                            <>
+                              <i className="fa fa-image"></i>
+                              <div className="btn">Chọn ảnh</div>
+                            </>
+                          )}
+                        </div>
+                        <InputText
+                          type="file"
+                          name="post_image_id"
+                          onChange={uploadImage}
+                          style={{ display: "none" }}
+                          id="post_image_id"
+                          value=""
+                        ></InputText>
+                      </label>
+                    </div>
+                    </div>
+               
+                  </div>
+                  <div className="field grid">
+                    <label
+                      htmlFor="status"
+                      className="col-12 mb-2 md:col-3 md:mb-0"
+                    >
+                      Trạng thái
+                    </label>
+                    <div className="col-12 md:col-9">
+                      <InputSwitch
+                        checked={infos.status}
+                        onChange={(e: any) =>
+                          setInfos({ ...infos, status: e.target.value })
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="field grid">
-              <label
-                htmlFor="remark"
-                className="col-12 mb-3 md:col-3 md:mb-0"
-              >
-                Ghi chú
-              </label>
-              <div className="col-12 md:col-9">
-                <InputForm className="w-full"
-                  id="remark"
-                  value={infos.remark}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, remark: e.target.value })
-                  }
-                  label="Ghi chú"
-                />
-              </div>
-            </div>
-            <div className="field grid">
-              <label
-                htmlFor="desc"
-                className="col-12 mb-3 md:col-3 md:mb-0"
-              >
-                Mô tả
-              </label>
-              <div className="col-12 md:col-9">
-              <span className="p-float-label">
-                <InputTextarea id="desc" value={infos.desc}  onChange={(e: any) =>
-                    setInfos({ ...infos, desc: e.target.value })
-                  }  rows={5} cols={30} className="w-full"  />
-                <label htmlFor="desc">Mô tả</label>
-            </span>
-              </div>
-            </div>
-            <div className="field grid">
-              <label
-                htmlFor="status"
-                className="col-12 mb-2 md:col-3 md:mb-0"
-              >
-                Trạng thái
-              </label>
-              <div className="col-12 md:col-9">
-              <InputSwitch checked={infos.status}  onChange={(e: any) => setInfos({ ...infos, status: e.target.value })}/>
-              </div>
-            </div>
+            </Panel>
           </div>
-            </div>
-          </Panel>
-           </div>
           <div className="field">
             <Button
               type="button"
@@ -165,67 +250,35 @@ const UpdateCatePost = () => {
                 <div className="formgrid grid">
                   <div className="field col-3">
                     <label htmlFor="email2">Email</label>
-                    <FormInput
-                      id="email2"
-                      type="text"
-                      label="email2"
-                    />
+                    <FormInput id="email2" type="text" label="email2" />
                   </div>
                   <div className="field col-3">
                     <label htmlFor="email2">Email</label>
-                    <FormInput
-                      id="email2"
-                      type="text"
-                      label="email2"
-                    />
+                    <FormInput id="email2" type="text" label="email2" />
                   </div>
                   <div className="field col-3">
                     <label htmlFor="email2">Email</label>
-                    <FormInput
-                      id="email2"
-                      type="text"
-                      label="email2"
-                    />
+                    <FormInput id="email2" type="text" label="email2" />
                   </div>
                   <div className="field col-3">
                     <label htmlFor="email2">Email</label>
-                    <FormInput
-                      id="email2"
-                      type="text"
-                      label="email2"
-                    />
+                    <FormInput id="email2" type="text" label="email2" />
                   </div>
                   <div className="field col-3">
                     <label htmlFor="email2">Email</label>
-                    <FormInput
-                      id="email2"
-                      type="text"
-                      label="email2"
-                    />
+                    <FormInput id="email2" type="text" label="email2" />
                   </div>
                   <div className="field col-3">
                     <label htmlFor="email2">Email</label>
-                    <FormInput
-                      id="email2"
-                      type="text"
-                      label="email2"
-                    />
+                    <FormInput id="email2" type="text" label="email2" />
                   </div>
                   <div className="field col-3">
                     <label htmlFor="email2">Email</label>
-                    <FormInput
-                      id="email2"
-                      type="text"
-                      label="email2"
-                    />
+                    <FormInput id="email2" type="text" label="email2" />
                   </div>
                   <div className="field col-3">
                     <label htmlFor="email2">Email</label>
-                    <FormInput
-                      id="email2"
-                      type="text"
-                      label="email2"
-                    />
+                    <FormInput id="email2" type="text" label="email2" />
                   </div>
                 </div>
               </div>
