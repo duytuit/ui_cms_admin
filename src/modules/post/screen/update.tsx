@@ -28,7 +28,7 @@ const UpdatePost = () => {
      fetchDataSubmit(info);
     };
      async function fetchDataSubmit(info:any) {
-      if (info.id) {
+      if (info.id || info.postId) {
           const response = await updatePost(info);
           if (response) setLoading(false);
           if (response.data.code === 200) {
