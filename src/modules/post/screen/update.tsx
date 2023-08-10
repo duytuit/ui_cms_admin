@@ -82,8 +82,8 @@ const UpdatePost = () => {
       }
     };
     const updateSlug=async ()=>{
-      if(infos?.id){
-        await updateSlugPost({id:infos.id,slug:infos.slug})
+      if(infos?.id || infos?. postId){
+        await updateSlugPost({id:infos.id || infos.postId,slug:infos.slug})
       }
     }
     return (
@@ -91,7 +91,7 @@ const UpdatePost = () => {
         <AddForm
           className="w-full"
           style={{ margin: "0 auto" }}
-          checkId={infos.id}
+          checkId={infos.id || infos.postId}
           title="bài viết"
           loading={loading}
           onSubmit={handleSubmit}
