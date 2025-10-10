@@ -31,7 +31,7 @@ export default function PageTwo() {
     const { handleParamUrl} = useHandleParamUrl(); 
     return (
         <div className="card">
-            Đang cập nhật
+            Đang cập nhật 123
         </div>
     )
 }
