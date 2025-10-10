@@ -17,7 +17,7 @@ const Login = () => {
         code: "",
         uuid: ""
     });
-    const {data,setData} = useGetCaptcha(filter)
+    //const {data,setData} = useGetCaptcha(filter)
     
     async function fetchData() {
         const response = await loginAPI(user,null);
@@ -51,7 +51,7 @@ const Login = () => {
     };
     const resetCaptcha = async()=>{
        const abc = await fetchGetCaptcha({});
-       setData(abc);
+      //  setData(abc);
     }
     return (
       <FormAuth
@@ -102,9 +102,9 @@ const Login = () => {
                 label="Verify Code"
                 value={user.code}
                 className="p-inputtext-sm"
-                onChange={(e: any) =>
-                  setUser({ ...user, code: e.target.value, uuid: data.uuid })
-                }
+                // onChange={(e: any) =>
+                //   setUser({ ...user, code: e.target.value, uuid: data.uuid })
+                // }
                 placeholder="Verify Code"
                 required
               />
@@ -112,7 +112,7 @@ const Login = () => {
             <div className="field col-6">
               <div
                 onClick={resetCaptcha}
-                dangerouslySetInnerHTML={{ __html: data ? data?.img : "" }}
+                // dangerouslySetInnerHTML={{ __html: data ? data?.img : "" }}
               ></div>
             </div>
           </div>

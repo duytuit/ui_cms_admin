@@ -14,30 +14,30 @@ const Main = () => {
               const DefaultLayout = route.layout === null ? Fragment : Layout;
               const Page = route.component;
               if (route.public)
-              return (
-                <Route key={index} element={<PublicRoutes />}>
-                  <Route
-                    path={route.path}
-                    element={
-                        <Page />
-                    }
-                  />
-                </Route>
-              );
-              return (
-                <Route key={index} element={<PrivateRoutes />}>
-                  <Route
-                    path={route.path}
-                    element={
-                      <LayoutProvider>
-                        <DefaultLayout>
+                return (
+                  <Route key={index} element={<PublicRoutes />}>
+                    <Route
+                      path={route.path}
+                      element={
                           <Page />
-                        </DefaultLayout>
-                      </LayoutProvider>
-                    }
-                  />
-                </Route>
-              );
+                      }
+                    />
+                  </Route>
+                );
+                return (
+                  <Route key={index} element={<PrivateRoutes />}>
+                    <Route
+                      path={route.path}
+                      element={
+                        <LayoutProvider>
+                          <DefaultLayout>
+                            <Page />
+                          </DefaultLayout>
+                        </LayoutProvider>
+                      }
+                    />
+                  </Route>
+                );
             })}
             <Route path={errorPage.path} element={<errorPage.component />} />
           </Routes>
