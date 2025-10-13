@@ -4,28 +4,28 @@ import { showToast } from "redux/features/toast";
 import { setToken } from "redux/features/token";
 import { loginAPI } from "../api";
 import { Button, Checkbox, FormInput, Image } from "components/uiCore";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { fetchGetCaptcha, useGetCaptcha } from "../service";
-
+import { clientId } from "utils/getClinentId";
 const Login = () => {
     const dispatch = useDispatch();
-    const [filter, setFilter] = useState({});
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
     const [user, setUser] = useState({
-        username: "",
-        password: "",
+        Username: "",
+        Password: "",
         code: "",
-        uuid: ""
+        uuid: "",
+        DeviceId:clientId
     });
     //const {data,setData} = useGetCaptcha(filter)
-    
     async function fetchData() {
         const response = await loginAPI(user,null);
         if (response) setLoading(false);
-        if (response.data.code === 200) {
-            const token = response.data.data.token;
+         console.log(response.data);
+        if (response.status === 200 && response.data.status) {
+          const token = response.data.data.accessToken;
             dispatch(setToken(token));
-            localStorage.setItem('token', token)
             dispatch(
                 showToast({
                     severity: 'success',
@@ -33,6 +33,7 @@ const Login = () => {
                     detail: 'Đăng nhập thành công!',
                 })
             );
+            navigate('/'); // Chuyển hướng đến trang chính sau khi đăng nhập thành công
         } else {
             dispatch(
                 showToast({
@@ -49,73 +50,46 @@ const Login = () => {
         setLoading(true)
         fetchData();
     };
-    const resetCaptcha = async()=>{
-       const abc = await fetchGetCaptcha({});
-      //  setData(abc);
-    }
     return (
       <FormAuth
-        title="Welcome"
-        subtitle="cms admin"
+        title="Hệ thống quản trị"
+        subtitle=" "
         handleSubmit={handleSubmit}
-        lableSubmit="Sign in"
-        titleFooter="Forgot password"
+        lableSubmit="Đăng nhập"
+        titleFooter="Quên mật khẩu?"
         linkTitleFooter="/auth/forgotpassword"
-        disabled={!user.username || !user.password}
+        disabled={!user.Username || !user.Password}
         loading={loading}
       >
         <div className="p-fluid">
           <div className="field col">
             <FormInput
-              id="username"
-              label="Username"
-              value={user.username}
+              id="Username"
+              label="Tài khoản"
+              value={user.Username}
               className="p-inputtext-sm"
               onChange={(e: any) =>
-                setUser({ ...user, username: e.target.value })
+                setUser({ ...user, Username: e.target.value })
               }
               required
-              placeholder="User Name"
+              placeholder="Tài khoản"
             />
           </div>
 
           <div className="field col">
             <FormInput
-              id="password"
-              label="Password"
+              id="Password"
+              label="Mật khẩu"
               type="password"
-              value={user.password}
+              value={user.Password}
               className="p-inputtext-sm"
               onChange={(e: any) =>
-                setUser({ ...user, password: e.target.value })
+                setUser({ ...user, Password: e.target.value })
               }
-              required
-              placeholder="Password"
+              placeholder="Mật khẩu"
             />
           </div>
-          
         </div>
-        <div className="formgrid grid" style={{margin:"0"}}>
-            <div className="field col-6">
-              <FormInput
-                id="verify_code"
-                label="Verify Code"
-                value={user.code}
-                className="p-inputtext-sm"
-                // onChange={(e: any) =>
-                //   setUser({ ...user, code: e.target.value, uuid: data.uuid })
-                // }
-                placeholder="Verify Code"
-                required
-              />
-            </div>
-            <div className="field col-6">
-              <div
-                onClick={resetCaptcha}
-                // dangerouslySetInnerHTML={{ __html: data ? data?.img : "" }}
-              ></div>
-            </div>
-          </div>
       </FormAuth>
     );
 };
@@ -147,13 +121,13 @@ export const FormAuth = (props:any) => {
                                     {rememberPassword && (
                                         <Fragment>
                                             <Checkbox checked={false} className="mr-2"></Checkbox>
-                                            <label htmlFor="rememberme">Remember me</label>
+                                            <label htmlFor="rememberme">Nhớ mật khẩu</label>
                                         </Fragment>
                                     )}
                                 </div>
-                                <Link to={linkTitleFooter} className="font-medium no-underline text-right" style={{ color: 'var(--primary-color)' }}>
+                                {/* <Link to={linkTitleFooter} className="font-medium no-underline text-right" style={{ color: 'var(--primary-color)' }}>
                                     {titleFooter}
-                                </Link>
+                                </Link> */}
                             </div>}
                             <Button disabled={disabled} loading={loading} size="small" label={lableSubmit || 'Submit'} className="w-full" ></Button>
                         </form>

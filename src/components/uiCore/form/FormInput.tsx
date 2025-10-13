@@ -25,8 +25,8 @@ const FormInput = (props:any) => {
         validateType.pattern = "/(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b/";
         return validateType;
       case "password":
-        validateType.minLength = 6;
-        validateType.patterns = "^[a-zA-Z0-9!@#$%^&*]{6,20}$";
+        validateType.minLength = 3;
+        // validateType.patterns = "^[a-zA-Z0-9!@#$%^&*]{6,20}$";
         return validateType;
       default:
         return validateType;

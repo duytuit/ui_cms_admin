@@ -9,7 +9,7 @@ const getClientId = () => {
         counter += 1;
     }
     if (!clientId) {
-        clientId = `bo_app_${result}_${(new Date()).getTime()}`
+        clientId = `vudaco_web_${result}_${(new Date()).getTime()}`
         localStorage.setItem("clientId", clientId);
     }
     return clientId;

@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import React, { forwardRef, useContext, useImperativeHandle, useRef } from 'react';
 import { LayoutContext } from './context/layoutContext';
 import { AppTopbarRef } from 'types/layout';
@@ -13,15 +13,16 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
     const topbarmenuRef = useRef(null);
     const topbarmenubuttonRef = useRef(null);
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     useImperativeHandle(ref, () => ({
         menubutton: menubuttonRef.current,
         topbarmenu: topbarmenuRef.current,
         topbarmenubutton: topbarmenubuttonRef.current
     }));
     const handleLogout = () => {
-        localStorage.removeItem('userInfo');
         localStorage.removeItem('token');
         dispatch(showToast({ ...listToast[0], detail: 'Đăng xuất thàng công!' }));
+        //navigate('/auth/login');
     };
     return (
         <div className="layout-topbar">

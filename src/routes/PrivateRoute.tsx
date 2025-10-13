@@ -2,15 +2,16 @@ import { Outlet, Navigate } from 'react-router-dom';
 
 const PrivateRoutes = () => {
     const token = localStorage.getItem('token');
-    return (
-       <Outlet />
-    )
+     if(token){
+        return (
+            <Outlet  />
+        )
+     }  
+    return <Navigate to="/auth/login" />;
 };
 const PublicRoutes = () => {
-    const userInfo = localStorage.getItem('token');
-    let auth = { user: !userInfo }
     return (
-        auth.user ? <Outlet /> : <Navigate to="/" />
+       <Outlet /> 
     )
 };
-export { PrivateRoutes,PublicRoutes }
+export { PrivateRoutes, PublicRoutes }

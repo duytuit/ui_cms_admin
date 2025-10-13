@@ -6,7 +6,7 @@ import store from "redux/store";
 
 export const clientApi = axios.create({
     // axios Cấu hình yêu cầu được cấu hình với tùy chọn BaseURL, cho biết rằng phần công khai URL yêu cầu
-    baseURL:  process.env.REACT_APP_API_URL+'api/',
+    baseURL: 'https://localhost:5001/api/',
     // hết giờ
     timeout: 10000,
     headers: {
@@ -17,13 +17,15 @@ export const clientApi = axios.create({
 // Add a request interceptor
 clientApi.interceptors.request.use(
 
-    config => {
-        const token = store.getState().token.token || localStorage.getItem('token');
-
-        config.headers['Authorization'] = `Bearer ${token}`;
-        config.headers['info'] = JSON.stringify({ "client_id": `${clientId}`, "build": 1, "device_name": "remix", "js_ver": "v1", "native_ver": "201", "os": "android", "os_ver": "111", "bundle_id": "123", "type": "user" })
-        return config;
-    },
+     config => {
+         const token = store.getState().token.token || localStorage.getItem('token');
+         if(token){
+            console.log(token);
+            config.headers['Authorization'] = `Bearer ${token}`;
+            config.headers['info'] = JSON.stringify({ "client_id": `${clientId}`, "build": 1, "device_name": "remix", "js_ver": "v1", "native_ver": "201", "os": "android", "os_ver": "111", "bundle_id": "123", "type": "user" })
+            return config;
+         }
+         return config;},
     error => {
         return Promise.reject(error);
     });
@@ -34,7 +36,7 @@ clientApi.interceptors.response.use(
         if (res.data.code === 401) {
             // localStorage.removeItem('userInfo');
             localStorage.removeItem('token');
-            store.dispatch(setUserInfo('token-expired'));
+           // store.dispatch(setUserInfo('token-expired'));
         };
         // if (res.data.status === false) ShowToast('error', res.data.mess)
         // if (res.data.message === "token-expired")
@@ -54,6 +56,8 @@ clientApi.interceptors.response.use(
         //     ShowToast('error', message)
         // return { status: false, mess: message, no_connect: true }
         // return Promise.reject(error);
+        console.log(error);
+        
         store.dispatch(showToast({ severity: 'error', summary: 'Error', detail: 'Đường truyền không ổn định, vui lòng thử lại sau!' },));
         return { data: {}, status: false, mess: 'Đường truyền không ổn định, vui lòng thử lại sau!' }
     },
