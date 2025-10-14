@@ -21,6 +21,7 @@ import Receipt from "modules/receipt/screen";
 import UpdateReceipt from "modules/receipt/screen/update";
 import Service from "modules/service/screen";
 import UpdateService from "modules/service/screen/update";
+import User from "modules/user/screen";
 const publicRoutes = [
     { path: "/", component: DashBoard  ,layout:'DashBoard'},
     { path: "/auth/login", component: Login, layout: null, public: true },
@@ -67,6 +68,8 @@ const publicRoutes = [
          { path: "/category/post/list", component:CatePost ,layout:'ListCatePost'},
          { path: "/category/post/add", component:UpdateCatePost ,layout:'AddCatePost'},
          { path: "/category/post/detail/:id", component:UpdateCatePost ,layout:'DetailCatePost'},
+    // post category
+    { path: "/user/list", component:User ,layout:'ListUser'}
 
 
     // { path: "/auth/forgotpassword", component: ForgotPassword, layout: null, public: true },

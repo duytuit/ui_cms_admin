@@ -10,7 +10,6 @@ const MenuSidebar = (props:any) => {
     const item = props.item;
     const key = props.parentKey ? props.parentKey + '-' + props.index : String(props.index);
     const active = activeMenu === key || (activeMenu && activeMenu.startsWith(key + '-')) || false;
-    // const permissionTool = useSelector((state:any) => state.permission).permissionTool;
     const permissionTool = ['/','/page-one','/page-two','/auth/login','/categories/list','/bill/list','/customer/list',"/receipt/list",'/service/list','/product/list','/post/list','/category/post/list'];
     const itemClick = (event:any) => {
         //avoid processing disabled items
@@ -45,10 +44,13 @@ const MenuSidebar = (props:any) => {
             if (item.route && permissionTool.includes(item.route)) {
                 isDisabled = false;
             }
+            // if (item.route) {
+            //     isDisabled = false;
+            // }
         });
         if (isDisabled) return <li key={props.index}></li>;
     };
-    if (item.route && !permissionTool.includes(item.route)) return <li key={props.index}></li>;
+    //if (item.route && !permissionTool.includes(item.route)) return <li key={props.index}></li>;
     const subMenu = item.items && item.visible !== false && (
         <CSSTransition timeout={{ enter: 1000, exit: 450 }} classNames="layout-submenu" in={props.root ? true : active} key={item.name}>
             <ul>

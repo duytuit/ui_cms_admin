@@ -155,6 +155,7 @@ export const DataTable = (props:any) => {
     };
     return (
         <DataTablez lazy
+            paginatorClassName="custom-paginator"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             paginator first={paramsPaginator.first} rows={paramsPaginator.pageSize} totalRecords={totalRecords} onPage={onPage}
             rowsPerPageOptions={[20, 50, 100]} dataKey={key ? key : "id"} loading={loading} showGridlines

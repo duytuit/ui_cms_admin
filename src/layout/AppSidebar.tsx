@@ -133,7 +133,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Người dùng',
-                route: '/page-one',
+                route: '/user/list',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,

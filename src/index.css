@@ -23,28 +23,38 @@ code {
   padding-left: 3px;
   padding-right: 3px;
 }
+.p-inputswitch {
+  margin-top: 0.2rem;
+}
 .card {
-  padding: 1rem;
+  padding: 0.5rem;
+}
+.input-sm {
+    font-size: 0.875rem !important;
+    padding: 0.35625rem 0.35625rem !important;
+}
+.label-sm {
+    font-size: 0.875rem!important;
 }
 .p-datatable .p-datatable-header {
   padding: 0.5rem 1rem;
 }
 .p-button.p-button-sm {
   font-size: 0.875rem;
-  padding: 0.55rem 1.09375rem;
+  padding: 0.35rem 0.45rem;
 }
 .p-datatable .p-datatable-thead > tr > th {
-  padding: 0.8rem 1rem;
+  padding: 0.5rem 1rem;
 }
 .p-datatable .p-datatable-tbody > tr > td {
-  padding: 0.5rem 0.5rem;
+  padding: 0 0.3rem;
 }
 .p-button.p-button-icon-only.p-button-rounded {
-  height: 2rem;
+  height: 1.8rem;
 }
 
 .p-button.p-button-icon-only {
-  width: 2rem;
+  width: 1.8rem;
 }
 .post-select-image-container {
   position: relative;
@@ -63,4 +73,24 @@ code {
 .btn-select-image-inner{
   position: relative;
 }
-
+.custom-paginator .p-inputtext {
+  padding: 0.35625rem 0.35625rem !important;
+  font-size: 0.875rem !important;
+}
+.custom-paginator .p-dropdown {
+    height: 2rem;
+}
+.custom-paginator .p-paginator-pages .p-paginator-page {
+    min-width: 2rem;
+    height: 2rem;
+}
+.p-paginator .p-paginator-first, .p-paginator .p-paginator-prev, .p-paginator .p-paginator-next, .p-paginator .p-paginator-last,.p-paginator .p-paginator-current {
+    min-width: 2rem;
+    height: 2rem;
+}
+.custom-paginator .p-paginator {
+    padding: 0.1rem 1rem;
+}
+.custom-paginator .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
+    padding: 0.3rem 1.25rem;
+}

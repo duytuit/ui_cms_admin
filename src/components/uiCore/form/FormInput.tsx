@@ -72,7 +72,7 @@ const FormInput = (props:any) => {
           required={required}
           pattern={ getValidateType(type).patterns !== ''?getValidateType(type).patterns : null}
         />
-       <label htmlFor={id}>{props.label}</label> 
+       <label className={classNames("label-sm")} htmlFor={id}>{props.label}</label> 
       </span>
          {required && error && <span className="p-error w-full mt-2">{error}</span>}
     </>

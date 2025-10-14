@@ -68,7 +68,7 @@ export const GridForm = (props:any) => {
     return (
        <form  id="form_search" onSubmit={handleSubmit} className="grid formgrid mb-2 aligin-items-center">
             {props.children}
-            <div className="field col">
+            <div className="col">
                 <div className="flex justify-content-end flex-wrap">
                    <Button type="button" label="Làm mới" onClick={handleClear} severity="secondary" size="small" outlined />
                    <Button type="submit" label="Lọc" className="ml-2" severity="info" size="small" raised />

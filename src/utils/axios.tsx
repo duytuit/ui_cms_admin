@@ -6,7 +6,7 @@ import store from "redux/store";
 
 export const clientApi = axios.create({
     // axios Cấu hình yêu cầu được cấu hình với tùy chọn BaseURL, cho biết rằng phần công khai URL yêu cầu
-    baseURL: 'https://localhost:5001/api/',
+    baseURL: process.env.REACT_APP_API_URL+'api/',
     // hết giờ
     timeout: 10000,
     headers: {
@@ -33,6 +33,8 @@ clientApi.interceptors.request.use(
 //Add a response interceptor
 clientApi.interceptors.response.use(
     async function (res) {
+       // console.log(res.data);
+        
         if (res.data.code === 401) {
             // localStorage.removeItem('userInfo');
             localStorage.removeItem('token');
@@ -43,7 +45,7 @@ clientApi.interceptors.response.use(
         //     return ShowToast('error', res.data.mess)
         return res
     },
-    async function (error) {
+    async function (res) {
         // let { name, message, ...e } = error
         // if (name === 'AxiosError' && message === 'Network Error') {
         //     message = 'lỗi kết nối AxiosNetworkError';
@@ -56,8 +58,9 @@ clientApi.interceptors.response.use(
         //     ShowToast('error', message)
         // return { status: false, mess: message, no_connect: true }
         // return Promise.reject(error);
-        console.log(error);
-        
+        if(res?.response?.status == 401){
+            localStorage.removeItem('token');
+        }
         store.dispatch(showToast({ severity: 'error', summary: 'Error', detail: 'Đường truyền không ổn định, vui lòng thử lại sau!' },));
         return { data: {}, status: false, mess: 'Đường truyền không ổn định, vui lòng thử lại sau!' }
     },
