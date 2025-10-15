@@ -46,7 +46,7 @@ code {
 .p-datatable .p-datatable-thead > tr > th {
   padding: 0.5rem 1rem;
 }
-.p-datatable .p-datatable-tbody > tr > td {
+.p-datatable .p-datatable-tbody > tr > td,.p-datatable .p-datatable-tfoot > tr > td {
   padding: 0 0.3rem;
 }
 .p-button.p-button-icon-only.p-button-rounded {
@@ -93,4 +93,24 @@ code {
 }
 .custom-paginator .p-dropdown-panel .p-dropdown-items .p-dropdown-item {
     padding: 0.3rem 1.25rem;
+}
+.p-paginator {
+  padding: 0.2rem 1rem;
+}
+/* Căn giữa checkbox trong DataTable */
+.p-datatable .p-selection-column {
+    text-align: center !important;
+    vertical-align: middle !important;
+}
+
+/* Nếu bạn muốn checkbox ở giữa hoàn toàn theo chiều ngang và dọc */
+.p-datatable .p-selection-column .p-checkbox {
+    align-items: center;
+}
+.button-icon-sm>.p-button.p-button-icon-only,.button-icon-sm>.p-inputtext{
+    font-size: 0.875rem;
+    padding: 0.35625rem 0
+}
+.calendar-hidden-popup{
+display: none !important;
 }
