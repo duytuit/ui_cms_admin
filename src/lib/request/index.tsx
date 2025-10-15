@@ -26,8 +26,7 @@ export const getData = async (url: string, params: any) => {
     params = convertData(params);
 
     try {
-        const res = await clientApi.get(url, { params });
-        return res.data; // trả về data trực tiếp
+        return await clientApi.get(url, { params });
     } catch (err) {
         console.error("API GET lỗi:", err);
         throw err; // để hook hoặc component xử lý
