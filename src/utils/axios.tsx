@@ -1,7 +1,6 @@
 import axios from "axios";
 import { clientId } from "./getClinentId";
 import { showToast } from "redux/features/toast";
-import { setUserInfo } from "redux/features/user";
 import store from "redux/store";
 
 export const clientApi = axios.create({

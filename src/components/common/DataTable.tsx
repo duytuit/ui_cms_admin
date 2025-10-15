@@ -141,27 +141,41 @@ export const Column = (props:any) => {
     )
 };
 
-export const DataTable = (props:any) => {
+export const DataTable = (props: any) => {
     const { paramsPaginator, setParamsPaginator, totalRecords, title, key, ...prop } = props;
-    const [loading, setLoading] = useState(false);
 
-    const onPage = (event:any) => {
-        setParamsPaginator({
-            ...paramsPaginator,
-            first: event.first,
-            pageSize: event.rows,
-            pageNum: event.page !== 0 ? event.page + 1 : 1,
-        });
+    const [loading, setLoading] = useState(false);
+    const isServerSide = paramsPaginator && setParamsPaginator;
+
+    const onPage = (event: any) => {
+        if (isServerSide) {
+            setParamsPaginator({
+                ...paramsPaginator,
+                first: event.first??1,
+                pageSize: event.rows??20,
+                pageNum: event.page + 1,
+            });
+        }
     };
+
     return (
-        <DataTablez lazy
+        <DataTablez
+            lazy={isServerSide}
+            paginator
+            loading={loading}
             paginatorClassName="custom-paginator"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            paginator first={paramsPaginator.first} rows={paramsPaginator.pageSize} totalRecords={totalRecords} onPage={onPage}
-            rowsPerPageOptions={[20, 50, 100]} dataKey={key ? key : "id"} loading={loading} showGridlines
-            emptyMessage={"Không tìm thấy " + title} currentPageReportTemplate="Tổng số: {totalRecords} bản ghi" {...prop} >
-            <Column header="#" body={(data:any, options:any) => options.rowIndex + 1} style={{ width: '1rem' }} bodyStyle={{ textAlign: 'center' }} />
+            first={paramsPaginator.first} rows={paramsPaginator.pageSize} totalRecords={totalRecords}
+            showGridlines
+            rowsPerPageOptions={[20, 50, 100]} 
+            dataKey={key ? key : "id"} 
+            emptyMessage={`Không tìm thấy ${title}`}
+            currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
+            onPage={onPage} 
+            {...prop}
+        >
+             <Column header="#" body={(data:any, options:any) => options.rowIndex + 1} style={{ width: '1rem' }} bodyStyle={{ textAlign: 'center' }} />
             {props.children}
         </DataTablez>
-    )
+    );
 };

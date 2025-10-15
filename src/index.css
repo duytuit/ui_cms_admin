@@ -114,3 +114,7 @@ code {
 .calendar-hidden-popup{
 display: none !important;
 }
+/* Ẩn nút xóa filter row */
+.p-column-filter-clear-button {
+    display: none !important;
+}

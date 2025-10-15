@@ -16,14 +16,22 @@ export const postData = (url:any, data:any, isUpload = false, timeout = 600000) 
     return clientApi.post(url, data, isUpload ? { timeout, headers: { 'Content-Type': 'multipart/form-data' } } : { timeout })
 };
 
-export const getData = (url:any, params:any) => {
-    const project=  localStorage.getItem('project')
-    if(project){
+// GET data
+export const getData = async (url: string, params: any) => {
+    const project = localStorage.getItem("project");
+    if (project) {
         const _project = JSON.parse(project);
-        params = {projectId:parseInt(_project.projectId),...params}
+        params = { projectId: parseInt(_project.projectId), ...params };
     }
-    params = convertData(params)
-    return clientApi.get(url, { params })
+    params = convertData(params);
+
+    try {
+        const res = await clientApi.get(url, { params });
+        return res.data; // trả về data trực tiếp
+    } catch (err) {
+        console.error("API GET lỗi:", err);
+        throw err; // để hook hoặc component xử lý
+    }
 };
 
 export const postDataV3 = (url:any, data:any, isUpload = false, timeout = 600000) => {
