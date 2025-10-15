@@ -15,7 +15,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: {_setParamsPaginator:
         <GridForm paramsPaginator={_paramsPaginator} setParamsPaginator={_setParamsPaginator}
             filter={filter} setFilter={setFilter} className="lg:col-9">
             <div className="col-3">
-                <Input label="Tìm kiếm" size="small" className={classNames("input-sm")}/>
+                <Input value={filter.name} onChange={(e:any) => setFilter({ ...filter, name: e.target.value })} label="Tìm kiếm" size="small" className={classNames("input-sm")}/>
             </div>
             <div className="col-3">
                 <Calendar dateFormat="dd/mm/yy" id="FromDate" label="Từ ngày" size="small" className={classNames("button-icon-sm")}/>
