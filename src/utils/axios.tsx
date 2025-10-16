@@ -57,7 +57,7 @@ clientApi.interceptors.response.use(
         //     ShowToast('error', message)
         // return { status: false, mess: message, no_connect: true }
         // return Promise.reject(error);
-        if(res?.response?.status == 401){
+        if(res?.response?.status === 401){
             localStorage.removeItem('token');
         }
         store.dispatch(showToast({ severity: 'error', summary: 'Error', detail: 'Đường truyền không ổn định, vui lòng thử lại sau!' },));

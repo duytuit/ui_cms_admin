@@ -1,27 +1,33 @@
 import { useState, useEffect } from 'react';
 import { listUser } from '../api';
 
-export const useListUsers = (params?: any) => {
+export const useListUsers = ({ params, debounce = 500 }: any) => {
     const [data, setData] = useState<any[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
+    const fetchData = async () => {
+        try {
             setLoading(true);
             setError(null);
-            try {
-                const res = await listUser({ status: 1, ...params });
-                setData(res.data.data);
-            } catch (err) {
-                setError(err);
-            } finally {
-                setLoading(false);
-            }
-        };
+            const res = await listUser({ ...params });
+            console.log(res?.data?.data);
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        fetchData();
-    }, [JSON.stringify(params)]); // nếu params thay đổi sẽ refetch
+    useEffect(() => {
+        if (!params || Object.keys(params).length === 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
 
-    return { data, loading, error };
+    return { data, loading, error, refresh: fetchData };
 };

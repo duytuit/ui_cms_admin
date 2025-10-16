@@ -179,3 +179,20 @@ export const DataTable = (props: any) => {
         </DataTablez>
     );
 };
+export const DataTableClient = (props: any) => {
+    const { title, key, ...prop } = props;
+    return (
+        <DataTablez
+            paginatorClassName="custom-paginator"
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            showGridlines
+            rowsPerPageOptions={[20, 50, 100]} 
+            dataKey={key ? key : "id"} 
+            emptyMessage={`Không tìm thấy ${title}`}
+            {...prop}
+        >
+             <Column header="#" body={(data:any, options:any) => options.rowIndex + 1} style={{ width: '1rem' }} bodyStyle={{ textAlign: 'center' }} />
+            {props.children}
+        </DataTablez>
+    );
+};
