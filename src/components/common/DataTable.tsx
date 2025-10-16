@@ -188,7 +188,7 @@ export const DataTableClient = (props: any) => {
             showGridlines
             rowsPerPageOptions={[20, 50, 100]} 
             dataKey={key ? key : "id"} 
-            emptyMessage={`Không tìm thấy ${title}`}
+            emptyMessage={`Không tìm thấy dữ liệu`}
             {...prop}
         >
              <Column header="#" body={(data:any, options:any) => options.rowIndex + 1} style={{ width: '1rem' }} bodyStyle={{ textAlign: 'center' }} />

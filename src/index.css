@@ -118,3 +118,19 @@ display: none !important;
 .p-column-filter-clear-button {
     display: none !important;
 }
+.p-column-filter-row .p-column-filter-element{
+    font-size: 0.875rem;
+    padding: 0.35625rem 0 !important
+}
+.p-column-filter-row .p-inputtext {
+      font-size: 0.875rem;
+    padding: 0.35625rem 0 !important
+}
+.p-datatable.p-datatable-gridlines .p-datatable-thead > tr > th {
+    padding: 0.015625rem 0.35625rem;
+    text-align: center;
+}
+.dropdown-input-sm, .dropdown-input-sm span {
+  font-size: 0.575rem !important;
+    padding: 0.28rem 0.35625rem !important;
+}

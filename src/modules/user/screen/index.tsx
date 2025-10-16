@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, DataTableClient } from "components/common/DataTable";
 import { FormInput } from "components/uiCore";
-import { Calendar, GridForm, Input } from "components/common/ListForm";
+import { Calendar, Dropdown, GridForm, Input } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
 import { deleteUser, listUser, updateStatusUser } from "../api";
 import { useListUsers } from "../service";
 import { classNames } from "primereact/utils";
+import { MyCalendar } from "components/common/MyCalendar";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -38,10 +39,17 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
                 />
             </div>
             <div className="col-3">
-                <Calendar dateFormat="dd/mm/yy" id="FromDate" label="Từ ngày" size="small" />
+                <MyCalendar dateFormat="dd/mm/yy" />
             </div>
             <div className="col-3">
-                <Calendar dateFormat="dd/mm/yy" id="ToDate" label="Đến ngày" size="small" />
+                <MyCalendar dateFormat="dd/mm/yy" />
+            </div>
+            <div className="col-3">
+                <Dropdown
+                   size="small"
+                   label="Danh mục"
+                   className={classNames("dropdown-input-sm")}
+                />
             </div>
         </GridForm>
     );
@@ -113,6 +121,7 @@ export default function User() {
                 dataKey="id"
                 title="Tài khoản"
                 filterDisplay="row"
+                className={classNames("Custom-DataTableClient")}
             >
                 <Column selectionMode="multiple" headerStyle={{ width: "3em" }}></Column>
                 <Column field="username" header="Tên đăng nhập" filter showFilterMenu={false}     // 👈 Bỏ menu filter

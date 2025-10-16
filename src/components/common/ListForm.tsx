@@ -44,8 +44,12 @@ export const Input = (props:any) => {
 export const Dropdown = (props:any) => {
     const { optionLabel, optionValue, className, ...prop } = props;
     return (
-        <Dropdownz optionLabel={optionLabel ? optionLabel : 'name'} filter appendTo="self"
-            optionValue={optionValue ? optionValue : 'id'} className='w-full' {...prop} />
+        <>
+          <span className="p-float-label">
+           <Dropdownz filter  className={classNames("w-full", className)}  {...prop} />
+              <label className={classNames("label-sm")} >{props.label}</label> 
+            </span>
+        </>
     )
 };
 
@@ -74,9 +78,9 @@ export const GridForm = (props:any) => {
             </div>
             <div className="col">
                 <div className="flex justify-content-end flex-wrap">
-                   <Button type="button" label="Thêm mới" severity="success" size="small" outlined />
-                   <Button type="button" label="Làm mới" className="ml-2" onClick={handleClear} severity="secondary" size="small" outlined />
-                   <Button type="submit" label="Lọc" className="ml-2" severity="info" size="small" raised />
+                   {/* <Button type="button" label="Làm mới" className="ml-2" onClick={handleClear} severity="secondary" size="small" outlined /> */}
+                   <Button type="submit" label="Xem" severity="info" size="small" raised />
+                   <Button type="button" label="Thêm mới" className="ml-2" severity="success" size="small" outlined />
                 </div>
             </div>
         </form>
