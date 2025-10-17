@@ -134,3 +134,9 @@ display: none !important;
     font-size: 0.575rem !important;
     padding: 0.28rem 0.35625rem !important;
 }
+.custom-calendar{
+    border: 1px solid #ced4da;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    appearance: none;
+    border-radius: 6px;
+}

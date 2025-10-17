@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface CalendarProps {
   value?: Date | null;
@@ -34,7 +35,7 @@ export const MyCalendar = ({
   };
 
   return (
-    <div className={`custom-calendar`} style={{ position: "relative", display: "inline-block" }}>
+    <div className={`custom-calendar`} style={{ position: "relative", display: "inline-block",width:"100%" }}>
       <div style={{ display: "block", position: "relative" }}>
         <input
           ref={inputRef}
@@ -68,7 +69,8 @@ interface CalendarPopupProps {
   selectedDate: Date | null;
   onSelectDate: (date: Date | null) => void;
   showButtonBar?: boolean;
-  className?: string; // thêm prop
+  className?: string;
+  targetRef?: React.RefObject<HTMLInputElement>;
 }
 
 export const CalendarPopup = ({
@@ -76,13 +78,27 @@ export const CalendarPopup = ({
   onSelectDate,
   showButtonBar = true,
   className = "",
+  targetRef,
 }: CalendarPopupProps) => {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+
+  // 👉 canh vị trí popup ngay dưới input
+  useEffect(() => {
+    if (targetRef?.current) {
+      const rect = targetRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + window.scrollY + 4, // thêm 4px khoảng cách
+        left: rect.left + window.scrollX,
+      });
+    }
+  }, [targetRef]);
 
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const years = Array.from({ length: 201 }, (_, i) => 1900 + i);
 
   const prevMonth = () => {
     if (currentMonth === 0) {
@@ -98,10 +114,7 @@ export const CalendarPopup = ({
     } else setCurrentMonth(currentMonth + 1);
   };
 
-  const years = Array.from({ length: 201 }, (_, i) => 1900 + i);
-
   const handleToday = () => onSelectDate(today);
-  const handleClear = () => onSelectDate(null);
   const handleClose = () => onSelectDate(selectedDate);
 
   return (
@@ -109,16 +122,18 @@ export const CalendarPopup = ({
       className={`calendar-popup ${className}`}
       style={{
         position: "absolute",
-        top: "100%",
-        left: 0,
-        border: "1px solid #ccc",
+        top: position.top,
+        left: position.left,
         background: "#fff",
+        border: "1px solid #ccc",
+        borderRadius: 4,
         padding: 10,
-        zIndex: 1000,
-        boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
+        zIndex: 9999,
+        minWidth: 220,
+        boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
       }}
     >
-      {/* Header: chọn tháng + năm */}
+      {/* Header */}
       <div
         style={{
           display: "flex",
@@ -155,7 +170,7 @@ export const CalendarPopup = ({
         <button onClick={nextMonth}>{">"}</button>
       </div>
 
-      {/* Days grid */}
+      {/* Days */}
       <div
         style={{
           display: "grid",
@@ -195,11 +210,15 @@ export const CalendarPopup = ({
         })}
       </div>
 
-      {/* Button bar */}
       {showButtonBar && (
-        <div style={{ marginTop: 5, display: "flex", justifyContent: "space-between" }}>
+        <div
+          style={{
+            marginTop: 6,
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
           <button onClick={handleToday}>Today</button>
-          {/* <button onClick={handleClear}>Clear</button> */}
           <button onClick={handleClose}>Close</button>
         </div>
       )}
