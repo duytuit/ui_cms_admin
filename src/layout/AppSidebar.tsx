@@ -202,7 +202,7 @@ const AppSidebar = () => {
             placeholder="Select a City"
             className="w-full md:w-14rem p-inputtext-sm"
           />
-          <label htmlFor="dropdown">Dự án</label>
+          <label htmlFor="dropdown">Dữ liệu</label>
         </span>
         <ul className="layout-menu">
           {model.map((item: any, i) => {
