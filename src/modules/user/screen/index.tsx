@@ -39,16 +39,16 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
                 />
             </div>
             <div className="col-3">
-                <MyCalendar dateFormat="dd/mm/yy" />
+                <MyCalendar dateFormat="dd/mm/yy" className={classNames("w-full",".p-inputtext","input-sm")}/>
             </div>
             <div className="col-3">
-                <MyCalendar dateFormat="dd/mm/yy" />
+                <MyCalendar dateFormat="dd/mm/yy" className={classNames("w-full",".p-inputtext","input-sm")}/>
             </div>
             <div className="col-3">
                 <Dropdown
                    size="small"
                    label="Danh mục"
-                   className={classNames("dropdown-input-sm")}
+                   className={classNames("dropdown-input-sm","p-dropdown-sm")}
                 />
             </div>
         </GridForm>

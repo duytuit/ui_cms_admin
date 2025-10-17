@@ -34,16 +34,16 @@ export const MyCalendar = ({
   };
 
   return (
-    <div className={`custom-calendar ${className}`} style={{ position: "relative", display: "inline-block" }}>
-      <div style={{ display: "flex", alignItems: "center" }}>
+    <div className={`custom-calendar`} style={{ position: "relative", display: "inline-block" }}>
+      <div style={{ display: "block", position: "relative" }}>
         <input
           ref={inputRef}
           type="text"
           value={formatDate(selectedDate)}
           readOnly
           onClick={() => setShowPopup(!showPopup)}
-          className="calendar-input"
-          style={{ padding: "5px", width: 120, cursor: "pointer" }}
+          className={`calendar-input ${className}`}
+          style={{ cursor: "pointer" }}
         />
         <span
           style={{ marginLeft: -25, cursor: "pointer" }}
@@ -58,7 +58,7 @@ export const MyCalendar = ({
           selectedDate={selectedDate}
           onSelectDate={handleDateSelect}
           showButtonBar={showButtonBar}
-          className={className} // truyền xuống popup
+          className={`${className}-popup`}
         />
       )}
     </div>
@@ -199,7 +199,7 @@ export const CalendarPopup = ({
       {showButtonBar && (
         <div style={{ marginTop: 5, display: "flex", justifyContent: "space-between" }}>
           <button onClick={handleToday}>Today</button>
-          <button onClick={handleClear}>Clear</button>
+          {/* <button onClick={handleClear}>Clear</button> */}
           <button onClick={handleClose}>Close</button>
         </div>
       )}

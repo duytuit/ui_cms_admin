@@ -131,6 +131,6 @@ display: none !important;
     text-align: center;
 }
 .dropdown-input-sm, .dropdown-input-sm span {
-  font-size: 0.575rem !important;
+    font-size: 0.575rem !important;
     padding: 0.28rem 0.35625rem !important;
 }

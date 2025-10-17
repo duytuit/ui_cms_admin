@@ -46,7 +46,7 @@ export const Dropdown = (props:any) => {
     return (
         <>
           <span className="p-float-label">
-           <Dropdownz filter  className={classNames("w-full", className)}  {...prop} />
+           <Dropdownz filter className={classNames("w-full", className)}  {...prop} />
               <label className={classNames("label-sm")} >{props.label}</label> 
             </span>
         </>
