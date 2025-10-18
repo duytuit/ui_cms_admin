@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, DataTableClient } from "components/common/DataTable";
 import { FormInput } from "components/uiCore";
-import { Calendar, Dropdown, GridForm, Input } from "components/common/ListForm";
+import { Calendar, CalendarY, Dropdown, GridForm, Input } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
 import { deleteUser, listUser, updateStatusUser } from "../api";
@@ -39,10 +39,10 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
                 />
             </div>
             <div className="col-3">
-                <MyCalendar dateFormat="dd/mm/yy" className={classNames("w-full",".p-inputtext","input-sm")}/>
+                <MyCalendar dateFormat="dd/mm/yy" className={classNames("w-full","p-inputtext","input-sm")}/>
             </div>
             <div className="col-3">
-                <MyCalendar dateFormat="dd/mm/yy" className={classNames("w-full",".p-inputtext","input-sm")}/>
+                <MyCalendar dateFormat="dd/mm/yy" className={classNames("w-full","p-inputtext","input-sm")}/>
             </div>
             <div className="col-3">
                 <Dropdown

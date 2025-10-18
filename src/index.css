@@ -30,8 +30,8 @@ code {
   padding: 0.5rem;
 }
 .input-sm {
-    font-size: 0.875rem !important;
-    padding: 0.35625rem 0.35625rem !important;
+    font-size: 0.875rem;
+    padding: 0.35625rem 0.35625rem;
 }
 .label-sm {
     font-size: 0.875rem!important;

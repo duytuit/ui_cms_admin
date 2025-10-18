@@ -28,7 +28,17 @@ export const MultiSelect = (props:any) => {
             optionValue={optionValue ? optionValue : 'id'} className='w-full' {...prop} />
     )
 };
-
+export const CalendarY = (props:any) => {
+    const { id, placeholder, className, ...prop } = props;
+    return (
+        <>
+            <span className="p-float-label">
+                <MyCalendar dateFormat="dd/mm/yy" className={classNames("w-full","p-inputtext","input-sm",className)}  {...prop} />
+                <label className={classNames("label-sm")} >{props.label}</label> 
+            </span>
+        </>
+    )
+};
 export const Input = (props:any) => {
     const { id, placeholder, className, ...prop } = props;
     return (

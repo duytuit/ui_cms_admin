@@ -46,7 +46,7 @@ export const MyCalendar = ({
           readOnly
           onClick={() => setShowPopup(!showPopup)}
           className={`calendar-input ${className}`}
-          style={{ cursor: "pointer" }}
+          style={{ cursor: "pointer",  border: "1px" }}
         />
         <span
           style={{ marginLeft: -25, cursor: "pointer" }}
