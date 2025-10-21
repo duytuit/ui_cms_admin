@@ -28,7 +28,7 @@ export default function Categories() {
     return (
         <div className="card">
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
-            <DataTable value={categories.rows} header={RenderHeader({ title: 'Danh sách Quốc gia', add: '/categories/add' })}
+            <DataTable value={categories.rows}
                 title="quốc gia" totalRecords={categories.total} paramsPaginator={paramsPaginator} setParamsPaginator={setParamsPaginator} >
                 <Column field="name" header="Tên Quốc gia" />
                 <Column field="remark" header="Ghi chú" />

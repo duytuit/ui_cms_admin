@@ -588,6 +588,30 @@ const AppSidebar = () => {
       },
       {
         id: 1,
+        name: 'Quản lý dữ liệu',
+        sort: 2,
+        status: 1,
+        created_at: '2023-05-29 14:13:14',
+        deleted_at: null,
+        updated_at: null,
+        route: '/storage/list',
+        icon: 'pi pi-home',
+        items: [
+          {
+            id: 1,
+            name: 'Người dùng',
+            route: '/storage/list',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+        ]
+      },
+      {
+        id: 1,
         name: 'Hệ thống',
         sort: 2,
         status: 1,
@@ -633,7 +657,7 @@ const AppSidebar = () => {
             actions: '[{"action":"delete"},{"action":"update"},{"action":"add"},{"action":"detail"},{"action":"view"}]'
           }
         ]
-      },
+      }
     ]
   }];
   const [selectedCity, setSelectedCity] = useState<any>();

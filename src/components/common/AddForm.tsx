@@ -63,7 +63,7 @@ export const InputForm = (props:any) => {
         // </div>
         <span className="p-float-label">
             <FormInput id={id} label={label} placeholder={placeholder || `Nhập ${label.toLowerCase()}`}
-                className={className} {...inputprop}/>
+                className={classNames(className)} {...inputprop}/>
         </span>
     )
 };

@@ -122,7 +122,7 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
 
     return (
         <React.Fragment>
-            {editRoute && <Link to={editRoute + '/' + rowData?.postId || rowData?.id}>
+            {editRoute && <Link to={editRoute + '/' + rowData?.id}>
                 <Button icon="pi pi-eye" rounded outlined className="mr-2" />
             </Link>}
             {duplicated && <Button onClick={e => duplicated(rowData?.postId || rowData?.id)}

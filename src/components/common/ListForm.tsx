@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import { refreshObject } from "utils";
 import { MyCalendar } from "./MyCalendar";
 import Calendarz from "components/uiCore/form/Calendar";
+import { Link } from "react-router-dom";
 
 export const Calendar = (props:any) => {
     const { id,className, ...prop } = props;
@@ -64,7 +65,7 @@ export const Dropdown = (props:any) => {
 };
 
 export const GridForm = (props:any) => {
-    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam } = props;
+    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam,add } = props;
     const handleClear = (e:any) => {
         setParamsPaginator(defaultParam);
         refreshObject(filter)
@@ -89,8 +90,10 @@ export const GridForm = (props:any) => {
             <div className="col">
                 <div className="flex justify-content-end flex-wrap">
                    {/* <Button type="button" label="Làm mới" className="ml-2" onClick={handleClear} severity="secondary" size="small" outlined /> */}
-                   <Button type="submit" label="Xem" severity="info" size="small" raised />
-                   <Button type="button" label="Thêm mới" className="ml-2" severity="success" size="small" outlined />
+                   {/* <Button type="submit" label="Xem" severity="info" size="small" raised /> */}
+                    {add && <Link to={add} >
+                        <Button icon='pi pi-plus' label="Thêm mới" className="ml-3" severity="success" size="small" raised />
+                    </Link>}
                 </div>
             </div>
         </form>

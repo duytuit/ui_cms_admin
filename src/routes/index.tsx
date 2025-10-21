@@ -21,62 +21,67 @@ import Receipt from "modules/receipt/screen";
 import UpdateReceipt from "modules/receipt/screen/update";
 import Service from "modules/service/screen";
 import UpdateService from "modules/service/screen/update";
+import ListStorage from "modules/storage/screen";
+import UpdateStorages from "modules/storage/screen/update";
 import User from "modules/user/screen";
 const publicRoutes = [
-    { path: "/", component: DashBoard  ,layout:'DashBoard'},
-    { path: "/auth/login", component: Login, layout: null, public: true },
-    { path: "/page-one", component:PageOne ,layout:'PageOne'},
-    { path: "/page-two", component:PageTwo ,layout:'PageTwo'},
-    { path: "/campaign/add", component:UpdateCampaign ,layout:'UpdateCampaign'},
+  { path: "/", component: DashBoard, layout: 'DashBoard' },
+  { path: "/auth/login", component: Login, layout: null, public: true },
+  { path: "/page-one", component: PageOne, layout: 'PageOne' },
+  { path: "/page-two", component: PageTwo, layout: 'PageTwo' },
+  { path: "/campaign/add", component: UpdateCampaign, layout: 'UpdateCampaign' },
 
-     // categories 
-     { path: "/categories/list", component:Categories ,layout:'ListCategories'},
-     { path: "/categories/add", component:UpdateCategories ,layout:'AddCategories'},
-     { path: "/categories/detail/:id", component:UpdateCategories ,layout:'UpdateCategories'},
+  // categories 
+  { path: "/categories/list", component: Categories, layout: 'ListCategories' },
+  { path: "/categories/add", component: UpdateCategories, layout: 'AddCategories' },
+  { path: "/categories/detail/:id", component: UpdateCategories, layout: 'UpdateCategories' },
 
-     // product 
-     { path: "/product/list", component:Product ,layout:'ListProduct'},
-     { path: "/product/add", component:UpdateProduct ,layout:'UpdateProduct'},
-     { path: "/product/detail/:id", component:UpdateProduct ,layout:'DetailProduct'},
+  // product 
+  { path: "/product/list", component: Product, layout: 'ListProduct' },
+  { path: "/product/add", component: UpdateProduct, layout: 'UpdateProduct' },
+  { path: "/product/detail/:id", component: UpdateProduct, layout: 'DetailProduct' },
 
-     // service 
-     { path: "/service/list", component:Service ,layout:'ListService'},
-     { path: "/service/add", component:UpdateService ,layout:'UpdateService'},
-     { path: "/service/detail/:id", component:UpdateService ,layout:'UpdateService'},
+  // service 
+  { path: "/service/list", component: Service, layout: 'ListService' },
+  { path: "/service/add", component: UpdateService, layout: 'UpdateService' },
+  { path: "/service/detail/:id", component: UpdateService, layout: 'UpdateService' },
 
-      // customer 
-     { path: "/customer/list", component:Customer ,layout:'ListCustomer'},
-     { path: "/customer/add", component:UpdateCustomer ,layout:'UpdateCustomer'},
-     { path: "/customer/detail/:id", component:UpdateCustomer ,layout:'DetailCustomer'},
+  // customer 
+  { path: "/customer/list", component: Customer, layout: 'ListCustomer' },
+  { path: "/customer/add", component: UpdateCustomer, layout: 'UpdateCustomer' },
+  { path: "/customer/detail/:id", component: UpdateCustomer, layout: 'DetailCustomer' },
 
-       // bill 
-     { path: "/bill/list", component:Bill ,layout:'ListBill'},
-     { path: "/bill/add", component:UpdateBill ,layout:'UpdateBill'},
-     { path: "/bill/detail/:id", component:UpdateBill ,layout:'DetailBill'},
+  // bill 
+  { path: "/bill/list", component: Bill, layout: 'ListBill' },
+  { path: "/bill/add", component: UpdateBill, layout: 'UpdateBill' },
+  { path: "/bill/detail/:id", component: UpdateBill, layout: 'DetailBill' },
 
-      // receipt 
-      { path: "/receipt/list", component:Receipt ,layout:'ListReceipt'},
-      { path: "/receipt/add", component:UpdateReceipt ,layout:'UpdateReceipt'},
-      { path: "/receipt/detail/:id", component:UpdateReceipt ,layout:'DetailReceipt'},
+  // receipt 
+  { path: "/receipt/list", component: Receipt, layout: 'ListReceipt' },
+  { path: "/receipt/add", component: UpdateReceipt, layout: 'UpdateReceipt' },
+  { path: "/receipt/detail/:id", component: UpdateReceipt, layout: 'DetailReceipt' },
 
-       // post 
-       { path: "/post/list", component:Post ,layout:'ListPost'},
-       { path: "/post/add", component:Updatepost ,layout:'AddPost'},
-       { path: "/post/detail/:id", component:Updatepost ,layout:'DetailPost'},
+  // post 
+  { path: "/post/list", component: Post, layout: 'ListPost' },
+  { path: "/post/add", component: Updatepost, layout: 'AddPost' },
+  { path: "/post/detail/:id", component: Updatepost, layout: 'DetailPost' },
 
-         // post category
-         { path: "/category/post/list", component:CatePost ,layout:'ListCatePost'},
-         { path: "/category/post/add", component:UpdateCatePost ,layout:'AddCatePost'},
-         { path: "/category/post/detail/:id", component:UpdateCatePost ,layout:'DetailCatePost'},
-    // post category
-    { path: "/user/list", component:User ,layout:'ListUser'}
+  // post category
+  { path: "/category/post/list", component: CatePost, layout: 'ListCatePost' },
+  { path: "/category/post/add", component: UpdateCatePost, layout: 'AddCatePost' },
+  { path: "/category/post/detail/:id", component: UpdateCatePost, layout: 'DetailCatePost' },
+  // post category
+  { path: "/user/list", component: User, layout: 'ListUser' },
 
-
-    // { path: "/auth/forgotpassword", component: ForgotPassword, layout: null, public: true },
-    // { path: "/auth/verifyaccount", component: VerifyAccount, layout: null, public: true },
-    // { path: "/auth/changepassword", component: ChangePassword, layout: null },
-    // { path: "/auth/setpassword", component: SetPassword, layout: null, public: true },
-    // { path: "/import_failed", component: ImportFailed, layout: null },
+  // storage 
+  { path: "/storage/list", component: ListStorage, layout: 'ListStorage' },
+  { path: "/storage/add", component: UpdateStorages, layout: 'UpdateStorage' },
+  { path: "/storage/detail/:id", component: UpdateStorages, layout: 'DetailStorage' },
+  // { path: "/auth/forgotpassword", component: ForgotPassword, layout: null, public: true },
+  // { path: "/auth/verifyaccount", component: VerifyAccount, layout: null, public: true },
+  // { path: "/auth/changepassword", component: ChangePassword, layout: null },
+  // { path: "/auth/setpassword", component: SetPassword, layout: null, public: true },
+  // { path: "/import_failed", component: ImportFailed, layout: null },
 ];
 
 const errorPage = { path: "*", component: ErrorPage, layout: null, public: true };
@@ -84,8 +89,8 @@ const accessDeniedPage = { path: "*", component: AccessDeniedPage, layout: null,
 const loadingPage = { path: "*", component: Loading, layout: null, public: true };
 
 export {
-    publicRoutes,
-    accessDeniedPage,
-    errorPage,
-    loadingPage
+  publicRoutes,
+  accessDeniedPage,
+  errorPage,
+  loadingPage
 }
