@@ -31,8 +31,12 @@ const UpdateStorages = () => {
           const response = await updateStorage(info);
           if (response) setLoading(false);
           if (response.status === 200) {
-              // navigate('/categories');
-              dispatch(showToast({ ...listToast[0], detail: response.data.message }));
+              if(response.data.status){
+                dispatch(showToast({ ...listToast[0], detail: response.data.message }));
+                navigate('/storage/list');
+              }else{
+                dispatch(showToast({ ...listToast[2], detail: response.data.message }))
+              }
           } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
       } else {
           const response = await addStorage(info);
@@ -51,7 +55,7 @@ const UpdateStorages = () => {
     useEffect(()=>{
        if(id){
           showStorage({id:id,type:CategoryEnum.country}).then(res=>{
-              const detail = res.data.data?.rows[0]
+              const detail = res.data.data
               if(detail){
                 let info = {
                   ...detail, status: detail.status === 0 ? true : false,

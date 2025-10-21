@@ -11,6 +11,7 @@ import { listToast } from 'utils';
 import { Link } from 'react-router-dom';
 import { Helper } from 'utils/helper';
 import { Image } from 'components/uiCore';
+import { log } from 'node:util';
 
 export const RenderHeader = (props:any) => {
     const dispatch = useDispatch();
@@ -100,14 +101,14 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
     const dispatch = useDispatch();
     
     async function accept() {
-        const res = await actions.action({ id: rowData?.postId || rowData?.id });
-        if (res.data.code ===200) {
-            dispatch(showToast({ ...listToast[0], detail: 'Xóa dữ liệu thành công!' }));
+        const res = await actions.action({ id: rowData.id });
+        if (res.status === 200) {
+            dispatch(showToast({ ...listToast[0], detail: res.data.message  }));
             if (paramsPaginator && setParamsPaginator) {
                 setParamsPaginator({ ...paramsPaginator, render: !paramsPaginator.render });
             };
         } else {
-            dispatch(showToast({ ...listToast[1], detail: res.data.mess }));
+            dispatch(showToast({ ...listToast[1], detail: res.data.message  }));
         }
     };
 
@@ -125,7 +126,7 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
             {editRoute && <Link to={editRoute + '/' + rowData?.id}>
                 <Button icon="pi pi-eye" rounded outlined className="mr-2" />
             </Link>}
-            {duplicated && <Button onClick={e => duplicated(rowData?.postId || rowData?.id)}
+            {duplicated && <Button onClick={e => duplicated(rowData?.id)}
                 icon="pi pi-clone" rounded outlined className="mr-2" />}
             {actions && <Button className="mr-2" type='button' icon="pi pi-trash"
                 onClick={actions.options ? actions.options : confirm} rounded outlined severity="danger" />}
