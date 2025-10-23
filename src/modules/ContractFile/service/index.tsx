@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { listUser } from '../api';
+import { listContractFile } from '../api';
 
-export const useListUsers = ({ params, debounce = 500 }: any) => {
-    const [data, setData] = useState<any[]>([]);
+export const useListContractFile = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
 
@@ -10,8 +10,7 @@ export const useListUsers = ({ params, debounce = 500 }: any) => {
         try {
             setLoading(true);
             setError(null);
-            const res = await listUser({ ...params });
-            console.log(res?.data?.data);
+            const res = await listContractFile({ ...params });
             setData(res?.data?.data || []);
         } catch (err) {
             setError(err);

@@ -87,7 +87,7 @@ export default function ListStorage() {
                 <Column field="updated_by" header="Người cập nhật" />
                 <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
                 <Column
-                   header="Actions"
+                   header="Thao tác"
                    body={(row: any) => {
                         return ActionBody(
                             row,

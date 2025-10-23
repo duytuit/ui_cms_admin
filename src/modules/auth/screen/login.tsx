@@ -35,11 +35,12 @@ const Login = () => {
             );
             navigate('/'); // Chuyển hướng đến trang chính sau khi đăng nhập thành công
         } else {
+            console.log(response.data);
             dispatch(
                 showToast({
                     severity: 'error',
                     summary: 'Failed',
-                    detail: response.data.msg,
+                    detail: response.data.message,
                 })
             );
         }

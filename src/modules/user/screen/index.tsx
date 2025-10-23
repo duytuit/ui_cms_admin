@@ -62,7 +62,7 @@ export default function User() {
     const [data, setData] = useState<any>();
     const [loading, setLoading] = useState(false);
     const [first, setFirst] = useState(0);
-    const [rows, setRows] = useState(2);
+    const [rows, setRows] = useState(20);
 
     const [paramsPaginator, setParamsPaginator] = useState({
         pageNum: 1,
@@ -127,16 +127,9 @@ export default function User() {
                 <Column field="username" header="Tên đăng nhập" filter showFilterMenu={false}     // 👈 Bỏ menu filter
     filterMatchMode="contains"/>
                 <Column field="email" header="Email" />
-                <Column field="first_name" header="Tên Quốc gia" />
-                <Column field="last_name" header="Ghi chú" />
+                <Column field="first_name" header="Tên đầu" />
+                <Column field="last_name" header="Tên cuối" />
                 <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updateTime)} />
-                <Column
-                    field="status"
-                    header="Hiển thị"
-                    body={(e: any) =>
-                        StatusBody(e, { route: "/categories/update/status", action: updateStatusUser })
-                    }
-                />
                 <Column
                     header="Actions"
                     body={(e: any) =>

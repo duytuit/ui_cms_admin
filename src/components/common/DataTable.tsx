@@ -78,7 +78,7 @@ export const BodyImage = (value:any) => {
 export const StatusBody = (rowData:any, actions:any) => {
     const dispatch = useDispatch();
     const accept = () => {
-        const params = { id: rowData?.postId || rowData?.id, status: checked ? 1 : 0, cb_status: checked ? 1 : 0 };
+        const params = { id: rowData?.id, status: checked ? 1 : 0, cb_status: checked ? 1 : 0 };
         actions.action(params);
         setChecked(!checked);
         dispatch(showToast({ ...listToast[0], detail: 'Đổi trạng thái thành công!' }));
@@ -87,13 +87,35 @@ export const StatusBody = (rowData:any, actions:any) => {
     const confirm = () => {
         confirmDialog({
             message: 'Bạn có muốn tiếp tục thay đổi trạng thái?',
-            header: 'Quản trị dự án',
+            header: 'Thông báo',
             icon: 'pi pi-info-circle',
             accept,
         });
     };
 
-    const [checked, setChecked] = useState((rowData.status===0 || rowData.cb_status===0) ? true : false);
+    const [checked, setChecked] = useState((rowData.status===0 || rowData.cb_status===0) ? false : true);
+    return <InputSwitch checked={checked} onChange={confirm} />
+};
+
+export const StatusPartnerBody = (rowData:any, actions:any ,_status:number) => {
+    const dispatch = useDispatch();
+    const accept = () => {
+        const params = { id: rowData?.id, status: checked ? 0 : _status, cb_status: checked ? 1 : 0 };
+        actions.action(params);
+        setChecked(!checked);
+        dispatch(showToast({ ...listToast[0], detail: 'Đổi trạng thái thành công!' }));
+    };
+
+    const confirm = () => {
+        confirmDialog({
+            message: 'Bạn có muốn tiếp tục thay đổi trạng thái?',
+            header: 'Thông báo',
+            icon: 'pi pi-info-circle',
+            accept,
+        });
+    };
+
+    const [checked, setChecked] = useState((rowData.status===0 || rowData.cb_status===0) ? false : true);
     return <InputSwitch checked={checked} onChange={confirm} />
 };
 

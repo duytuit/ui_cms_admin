@@ -5,12 +5,18 @@ import Bill from "modules/bill/screen";
 import UpdateBill from "modules/bill/screen/update";
 import Categories from "modules/categories/screen";
 import UpdateCategories from "modules/categories/screen/update";
+import ListContractFile from "modules/ContractFile/screen";
+import UpdateContractFile from "modules/ContractFile/screen/update";
 import Customer from "modules/customer/screen";
 import UpdateCustomer from "modules/customer/screen/update";
 import DashBoard from "modules/dashboard/screen";
+import ListEmployee from "modules/employee/screen";
+import UpdateEmployee from "modules/employee/screen/update";
 import PageOne from "modules/pageOne/screen";
 import PageTwo from "modules/pageTwo/screen";
 import UpdateCampaign from "modules/pageTwo/screen/update";
+import ListPartner from "modules/partner/screen";
+import UpdatePartner from "modules/partner/screen/update";
 import CatePost from "modules/post/category/screen";
 import UpdateCatePost from "modules/post/category/screen/update";
 import Post from "modules/post/screen";
@@ -77,6 +83,18 @@ const publicRoutes = [
   { path: "/storage/list", component: ListStorage, layout: 'ListStorage' },
   { path: "/storage/add", component: UpdateStorages, layout: 'UpdateStorage' },
   { path: "/storage/detail/:id", component: UpdateStorages, layout: 'DetailStorage' },
+   // employee 
+  { path: "/employee/list", component: ListEmployee, layout: 'ListEmployee' },
+  { path: "/employee/add", component: UpdateEmployee, layout: 'UpdateEmployee' },
+  { path: "/employee/detail/:id", component: UpdateEmployee, layout: 'UpdateEmployee' },
+   // partner 
+  { path: "/partner/list", component: ListPartner, layout: 'ListPartner' },
+  { path: "/partner/add", component: UpdatePartner, layout: 'UpdatePartner' },
+  { path: "/partner/detail/:id", component: UpdatePartner, layout: 'UpdatePartner' },
+  // ContractFile 
+  { path: "/ContractFile/list", component: ListContractFile, layout: 'ListContractFile' },
+  { path: "/ContractFile/add", component: UpdateContractFile, layout: 'UpdateContractFile' },
+  { path: "/ContractFile/detail/:id", component: UpdateContractFile, layout: 'UpdateContractFile' },
   // { path: "/auth/forgotpassword", component: ForgotPassword, layout: null, public: true },
   // { path: "/auth/verifyaccount", component: VerifyAccount, layout: null, public: true },
   // { path: "/auth/changepassword", component: ChangePassword, layout: null },

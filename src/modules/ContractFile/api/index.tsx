@@ -1,7 +1,7 @@
 import { getData, postData } from "lib/request";
 
-export const listUser = async (params: any) => await getData("user", params);
-export const deleteUser = async (params: any) => await postData("system/categories/delete", params);
-export const addUser = async (params: any) => await postData("system/categories/create", params);
-export const updateUser = async (params: any) => await postData("system/categories/update", params);
-export const updateStatusUser = async (params: any) => await postData("system/categories/update/status", params);
+export const listContractFile = async (params: any) => await getData("ContractFile", params);
+export const deleteContractFile = async (params: any) => await postData("ContractFile/delete", params);
+export const addContractFile = async (params: any) => await postData("ContractFile/create", params);
+export const updateContractFile = async (params: any) => await postData("ContractFile/update", params);
+export const updateStatusContractFile = async (params: any) => await postData("ContractFile/update/status", params);

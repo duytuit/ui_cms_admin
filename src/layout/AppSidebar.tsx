@@ -3,6 +3,7 @@ import MenuSidebar from './MenuSidebar';
 import { MenuProvider } from './context/menuContext';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { listStorage } from 'modules/storage/api';
 
 const AppSidebar = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -28,12 +29,12 @@ const AppSidebar = () => {
         deleted_at: null,
         updated_at: null,
         icon: 'pi pi-home',
-        route: '/product/list',
+        route: '/page-two',
         items: [
           {
             id: 1,
             name: 'Theo dõi số file',
-            route: '/category/post/list',
+            route: '/ContractFile/list',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -44,7 +45,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Theo dõi file nâng hạ',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -55,7 +56,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Theo dõi file giá',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -66,7 +67,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Debit khách hàng',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -77,7 +78,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Debit KH các lô hàng không lập file',
-                route: '/category/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -88,7 +89,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Debit KH các lô hàng có lập file',
-                route: '/category/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -101,7 +102,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Debit nhà cung cấp',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -112,7 +113,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Debit NCC các lô hàng không lập file',
-                route: '/category/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -123,7 +124,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Debit NCC các lô hàng có lập file',
-                route: '/category/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -136,7 +137,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Số dư đầu kỳ',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -147,7 +148,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Số dư đầu kỳ KH',
-                route: '/category/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -158,7 +159,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Số dư đầu kỳ NCC',
-                route: '/category/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -173,7 +174,7 @@ const AppSidebar = () => {
       {
         id: 1,
         name: 'Giao nhận',
-        route: '/category/post/list',
+        route: '/page-two',
         created_at: '2023-05-29 14:14:02',
         updated_at: null,
         deleted_at: null,
@@ -185,7 +186,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Bảng liệt kê chi phí',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -196,7 +197,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Danh sách cược',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -207,7 +208,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Bảng tạm thu',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -220,7 +221,7 @@ const AppSidebar = () => {
       {
         id: 1,
         name: 'Bảng điều xe',
-        route: '/category/post/list',
+        route: '/page-two',
         created_at: '2023-05-29 14:14:02',
         updated_at: null,
         deleted_at: null,
@@ -232,7 +233,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Nhật ký hàng ngày',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -243,7 +244,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Bảng tổng hợp điều xe',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -256,7 +257,7 @@ const AppSidebar = () => {
       {
         id: 1,
         name: 'Công nợ',
-        route: '/category/post/list',
+        route: '/page-two',
         created_at: '2023-05-29 14:14:02',
         updated_at: null,
         deleted_at: null,
@@ -268,7 +269,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Công nợ khách hàng',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -279,7 +280,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Công nợ nhà cung cấp',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -290,7 +291,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Bù trừ công nợ',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -313,7 +314,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Danh mục thu',
-            route: '/category/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -324,7 +325,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Phiếu thu',
-                route: '/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -335,7 +336,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Thu tiền hoàn cước giao nhận',
-                route: '/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -346,7 +347,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Thu hoàn ứng lái xe',
-                route: '/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -357,7 +358,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Thu nội bộ',
-                route: '/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -368,7 +369,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Thu tạm ứng bảng phơi',
-                route: '/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -381,7 +382,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Danh mục chi',
-            route: '/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -392,7 +393,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Phiếu chi',
-                route: '/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -403,7 +404,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Trả tiền nhà cung cấp',
-                route: '/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -414,7 +415,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Chi tạm ứng lái xe',
-                route: '/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -425,7 +426,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Chi nội bộ',
-                route: '/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -446,23 +447,12 @@ const AppSidebar = () => {
         deleted_at: null,
         updated_at: null,
         icon: 'pi pi-home',
-        route: '/service/list',
+        route: '/page-two',
         items: [
           {
             id: 1,
-            name: 'Khách hàng',
-            route: '/post/list',
-            created_at: '2023-05-29 14:14:02',
-            updated_at: null,
-            deleted_at: null,
-            status: 1,
-            category_id: 1,
-            sort: 1,
-          },
-          {
-            id: 1,
-            name: 'Nhà cung cấp',
-            route: '/post/list',
+            name: 'Đối tác',
+            route: '/partner/list',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -473,7 +463,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Danh mục thu chi',
-            route: '/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -484,7 +474,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Thu',
-                route: '/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -495,7 +485,7 @@ const AppSidebar = () => {
               {
                 id: 1,
                 name: 'Chi',
-                route: '/post/list',
+                route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -508,7 +498,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Danh sách tài khoản NH',
-            route: '/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -519,7 +509,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Danh sách quỹ',
-            route: '/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -530,7 +520,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Danh sách xe công trình',
-            route: '/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -541,7 +531,18 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Bộ phận',
-            route: '/post/list',
+            route: '/page-two',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
+            id: 1,
+            name: 'Nhân viên',
+            route: '/employee/list',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -560,12 +561,12 @@ const AppSidebar = () => {
         deleted_at: null,
         updated_at: null,
         icon: 'pi pi-home',
-        route: '/service/list',
+        route: '/page-two',
         items: [
           {
             id: 1,
             name: 'Duyệt bảng kê chi phí',
-            route: '/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -576,7 +577,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Duyệt file giá',
-            route: '/post/list',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -599,7 +600,7 @@ const AppSidebar = () => {
         items: [
           {
             id: 1,
-            name: 'Người dùng',
+            name: 'Danh sách dữ liệu',
             route: '/storage/list',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
@@ -634,18 +635,6 @@ const AppSidebar = () => {
           },
           {
             id: 2,
-            name: 'Page two',
-            route: '/page-two',
-            created_at: '2023-05-29 14:14:02',
-            updated_at: null,
-            deleted_at: null,
-            status: 1,
-            category_id: 1,
-            sort: 2,
-            actions: '[{"action":"delete"},{"action":"update"},{"action":"add"},{"action":"detail"},{"action":"view"}]'
-          },
-          {
-            id: 2,
             name: 'Cấu hình email',
             route: '/page-two',
             created_at: '2023-05-29 14:14:02',
@@ -662,20 +651,27 @@ const AppSidebar = () => {
   }];
   const [selectedCity, setSelectedCity] = useState<any>();
   const project = localStorage.getItem('project');
+  const [data, setData] = useState<any>([]);
+  const fetchProject = async () => {
+          try {
+              const res = await listStorage({ });
+               if(res?.data?.data?.data){
+                   let  _data =  res.data.data.data.map((item:any)=>({ name: item.name, projectId: item.id }))
+                   setData(_data);
+               }
+          } catch (err) {
+          } finally {
+          }
+      };
   useEffect(() => {
+    fetchProject();
     if (project) {
       const _project = JSON.parse(project)
       setSelectedCity(_project);
     } else {
-      setSelectedCity({ name: 'Vudaco', projectId: '2' });
-      localStorage.setItem('project', JSON.stringify({ name: 'Vudaco', projectId: '2' }))
-      setSearchParams({ "projectId": "2" })
+      setSelectedCity(null);
     }
   }, []);
-  const cities = [
-    { name: 'Vudaco', projectId: '2' },
-    { name: 'Vudaco1', projectId: '3' },
-  ];
   const onChange = (event: any) => {
     setSelectedCity(event.value);
     localStorage.setItem('project', JSON.stringify(event.value))
@@ -688,9 +684,9 @@ const AppSidebar = () => {
         <Dropdown
           value={selectedCity}
           onChange={onChange}
-          options={cities}
+          options={data}
           optionLabel="name"
-          placeholder="Select a City"
+          placeholder="Chọn dữ liệu"
           className="w-full md:w-14rem p-inputtext-sm"
         />
         <label htmlFor="dropdown">Dữ liệu</label>

@@ -6,7 +6,7 @@ export const postData = (url:any, data:any, isUpload = false, timeout = 600000) 
     const project=  localStorage.getItem('project')
     if(project){
         const _project = JSON.parse(project);
-        data = {projectId:parseInt(_project.projectId),...params}
+        data = {StorageId:parseInt(_project.projectId),...params}
     }
     if (isUpload) {
         data = createFormData(params, file, files, gallery, null, avatar)
@@ -21,7 +21,7 @@ export const getData = async (url: string, params: any) => {
     const project = localStorage.getItem("project");
     if (project) {
         const _project = JSON.parse(project);
-        params = { projectId: parseInt(_project.projectId), ...params };
+        params = { StorageId: parseInt(_project.projectId), ...params };
     }
     params = convertData(params);
 
@@ -56,7 +56,7 @@ export const uploadFile = (url:any, files:any, timeout = 600000) => {
     const project=  localStorage.getItem('project')
     if(project){
         const _project = JSON.parse(project);
-        data.append('projectId',_project.projectId)
+        data.append('StorageId',_project.projectId)
     }
     return clientApi.post(url, data, { timeout, headers: { 'Content-Type': 'multipart/form-data' } } )
 };

@@ -73,7 +73,7 @@ const UpdateStorages = () => {
           className="w-full"
           style={{ margin: "0 auto" }}
           checkId={infos.id}
-          title="Dữ liệu"
+          title="dữ liệu"
           loading={loading}
           onSubmit={handleSubmit}
           routeList="/storage/list"

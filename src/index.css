@@ -33,6 +33,10 @@ code {
     font-size: 0.875rem;
     padding: 0.35625rem 0.35625rem;
 }
+.input-form-sm {
+    font-size: 0.875rem;
+    padding: 0.65625rem 0.65625rem;;
+}
 .label-sm {
     font-size: 0.875rem!important;
 }
@@ -131,8 +135,8 @@ display: none !important;
     text-align: center;
 }
 .dropdown-input-sm, .dropdown-input-sm span {
-    font-size: 0.575rem !important;
-    padding: 0.28rem 0.35625rem !important;
+    font-size: 1.2rem !important;
+    padding: 0.07rem 0.35625rem !important;
 }
 .custom-calendar{
     border: 1px solid #ced4da;

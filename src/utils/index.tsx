@@ -78,3 +78,69 @@ export const listToast = [
     { severity: 'warn', summary: 'Warning' },
     { severity: 'info', summary: 'Info' },
 ];
+export const tinhChat = [
+   {
+       feature:0,
+       name:"Hàng nhập"
+   },
+    {
+        feature:1,
+        name:"Hàng Xuất"
+   }
+];
+export const loaiHang = [
+   {
+     type:0,
+     name:"Hàng lẻ"
+   },
+    {
+     type:1,
+     name:"Hàng cont"
+   }
+];
+export const loaiToKhai = [
+   {
+     declaration_type:0,
+     name:"Luồng xanh"
+   },
+    {
+     declaration_type:1,
+     name:"Luồng vàng"
+   },
+   {
+     declaration_type:2,
+     name:"Luồng đỏ"
+   }
+];
+export const phatSinh = [
+   {
+     occurrence:0,
+     name:"Không"
+   },
+    {
+     occurrence:1,
+     name:"Nhiều tờ khai"
+   }
+];
+export const nghiepVu = [
+   {
+     business:0,
+     name:"Thông quan"
+   },
+    {
+     business:1,
+     name:"Đổi lệnh dưới kho"
+   },
+   {
+     business:2,
+     name:"Rút ruột"
+   },
+   {
+     business:3,
+     name:"Thông quan kèm kiểm định/KTCL"
+   },
+   {
+     business:4,
+     name:"Không có trucking"
+   }
+];

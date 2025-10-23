@@ -15,18 +15,24 @@ export const Calendar = (props:any) => {
     return (
         <>
             <span className="p-float-label">
-                <Calendarz id={id} dateFormat="dd/mm/yy" readOnlyInput 
+                <Calendarz dateFormat="dd/mm/yy" readOnlyInput 
                  showIcon className={classNames("w-full", className)} {...prop} />
+                <label className={classNames("label-sm")} >{props.label}</label> 
             </span>
         </>
     )
 };
 
 export const MultiSelect = (props:any) => {
-    const { optionLabel, optionValue, className, ...prop } = props;
+    const { className, ...prop } = props;
     return (
-        <MultiSelectz optionLabel={optionLabel ? optionLabel : 'name'} filter display="chip"
-            optionValue={optionValue ? optionValue : 'id'} className='w-full' {...prop} />
+         <>
+            <span className="p-float-label">
+                <MultiSelectz  filter display="chip"
+                  className={classNames("w-full", className)} {...prop} />
+                <label className={classNames("label-sm")} >{props.label}</label> 
+            </span>
+        </>
     )
 };
 export const CalendarY = (props:any) => {
@@ -53,11 +59,11 @@ export const Input = (props:any) => {
 };
 
 export const Dropdown = (props:any) => {
-    const { optionLabel, optionValue, className, ...prop } = props;
+    const {className, ...prop } = props;
     return (
         <>
           <span className="p-float-label">
-           <Dropdownz filter className={classNames("w-full", className)}  {...prop} />
+              <Dropdownz className={classNames("w-full", className)}  {...prop} />
               <label className={classNames("label-sm")} >{props.label}</label> 
             </span>
         </>
@@ -82,12 +88,12 @@ export const GridForm = (props:any) => {
 
     return (
        <form  id="form_search" onSubmit={handleSubmit} className="grid formgrid mb-2 aligin-items-center">
-            <div className="col">
+            <div className="col-8">
                  <div className="formgrid grid">
                     {props.children}
                  </div>
             </div>
-            <div className="col">
+            <div className="col-4">
                 <div className="flex justify-content-end flex-wrap">
                    {/* <Button type="button" label="Làm mới" className="ml-2" onClick={handleClear} severity="secondary" size="small" outlined /> */}
                    {/* <Button type="submit" label="Xem" severity="info" size="small" raised /> */}
