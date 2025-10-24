@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 interface CalendarProps {
-  value?: Date | null;
-  onChange?: (date: Date | null) => void;
+  value?: string | null; // trả về string
+  onChange?: (date: string | null) => void;
   dateFormat?: string;
   showButtonBar?: boolean;
   className?: string;
@@ -14,7 +14,9 @@ export const MyCalendar = ({
   showButtonBar = true,
   className = "",
 }: CalendarProps) => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(value || null);
+const [selectedDate, setSelectedDate] = useState<Date | null>(
+  value ? new Date(value) : null  // ✅ convert string -> Date
+);
   const [showPopup, setShowPopup] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -28,7 +30,14 @@ export const MyCalendar = ({
 
   const handleDateSelect = (date: Date | null) => {
     setSelectedDate(date);
-    onChange?.(date);
+    if (date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      onChange?.(`${y}-${m}-${d}`);   // ✅ trả string luôn
+    } else {
+      onChange?.(null);
+    }
     setShowPopup(false); // 🟢 đóng popup khi chọn ngày
   };
 

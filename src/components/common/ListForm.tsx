@@ -71,7 +71,7 @@ export const Dropdown = (props:any) => {
 };
 
 export const GridForm = (props:any) => {
-    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam,add } = props;
+    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam, add } = props;
     const handleClear = (e:any) => {
         setParamsPaginator(defaultParam);
         refreshObject(filter)

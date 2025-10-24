@@ -1,5 +1,5 @@
 import React, { useState, Fragment } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { confirmDialog } from 'primereact/confirmdialog';
 import moment from "moment"
 import Columnz from 'components/uiCore/data/Column';
@@ -11,7 +11,6 @@ import { listToast } from 'utils';
 import { Link } from 'react-router-dom';
 import { Helper } from 'utils/helper';
 import { Image } from 'components/uiCore';
-import { log } from 'node:util';
 
 export const RenderHeader = (props:any) => {
     const dispatch = useDispatch();
@@ -63,7 +62,9 @@ export const Body = (data:any, value:any) => {
        return <Fragment>{detail ? detail.name:''}</Fragment>;
     };
 };
-
+export const DateBody = (value:any) => {
+    if (value) return <Fragment >{moment(value).format("DD/MM/YY")}</Fragment>
+};
 export const TimeBody = (value:any) => {
     if (value) return <Fragment >{moment(value).format("DD/MM/YY HH:mm:ss")}</Fragment>
 };

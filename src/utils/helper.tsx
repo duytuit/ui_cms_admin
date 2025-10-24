@@ -2,17 +2,17 @@ import { customAlphabet } from 'nanoid';
 // import * as crypto from 'crypto';
 
 export class Helper {
-  static convertToSlug(Text:any) {
+  static convertToSlug(Text: any) {
     return Text.toLowerCase()
       .replace(/ /g, '-')
       .replace(/[^\w-]+/g, '');
   }
-  static convertToUnderlined(Text:any) {
+  static convertToUnderlined(Text: any) {
     return Text.toLowerCase()
       .replace(/ /g, '_')
       .replace(/[^\w-]+/g, '');
   }
-  static generateRamdomByLength(length:any) {
+  static generateRamdomByLength(length: any) {
     let result = '';
     const characters =
       'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -75,7 +75,7 @@ export class Helper {
       (today.getMonth() + 1).toString().padStart(2, '0');
     return all_time;
   }
-  static convertObjToParam(body:any) {
+  static convertObjToParam(body: any) {
     return Object.keys(body)
       .sort()
       .map(function (key) {
@@ -91,7 +91,7 @@ export class Helper {
   //     .update(hash_data)
   //     .digest('hex'); // Secret Passphrase
   // }
-  static createFormData(body:any) {
+  static createFormData(body: any) {
     const data = new FormData();
     Object.keys(body).forEach((key) => {
       if (typeof body[key] === 'object')
@@ -101,48 +101,57 @@ export class Helper {
     });
     return data;
   }
-  static isJSON(str:any) {
+  static isJSON(str: any) {
     try {
       return JSON.parse(str) && !!str;
     } catch (e) {
       return false;
     }
   }
-  static sumColumnOfArray(arr:any, _column:any) {
-    return arr.reduce((accumulator:any, object:any) => {
+  static sumColumnOfArray(arr: any, _column: any) {
+    return arr.reduce((accumulator: any, object: any) => {
       return accumulator + object[_column];
     }, 0);
   }
-  static newObjectByPropertyNotNull(body:any) {
+  static newObjectByPropertyNotNull(body: any) {
     Object.keys(body).forEach(key => {
-        if (body[key] && typeof body[key] === "object") body[key] = body.key
+      if (body[key] && typeof body[key] === "object") body[key] = body.key
     })
     return body
-}
-static _isString(e:any) {
-  switch (e) {
+  }
+  static _isString(e: any) {
+    switch (e) {
       case "":
       // case 0:
       // case "0":
       case null:
       case false:
       case undefined:
-          return true;
+        return true;
       default:
-          return false;
+        return false;
+    }
   }
-}
-static formatCurrencyV2(value:any){
-  var number = value.replace(/[,.]/g, '');
-  return new Intl.NumberFormat().format(number).replace(/\./g, ',');
-}
-static refreshObject(object:any){
-  for (const key in object) {
+  static formatCurrencyV2(value: any) {
+    var number = value.replace(/[,.]/g, '');
+    return new Intl.NumberFormat().format(number).replace(/\./g, ',');
+  }
+  static refreshObject(object: any) {
+    for (const key in object) {
       if (object.hasOwnProperty(key)) {
-          if (typeof object[key] === 'string') object[key] = '';
-          else object[key] = undefined;
+        if (typeof object[key] === 'string') object[key] = '';
+        else object[key] = undefined;
       };
+    };
+    return object;
   };
-  return object;
-};
+  static formatYMDLocal (d: Date) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+  static formatDMYLocal(date: string) {
+     return date.split("T")[0]
+  };
 }

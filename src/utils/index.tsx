@@ -100,15 +100,15 @@ export const loaiHang = [
 ];
 export const loaiToKhai = [
    {
-     declaration_type:0,
+     DeclarationType:0,
      name:"Luồng xanh"
    },
     {
-     declaration_type:1,
+     DeclarationType:1,
      name:"Luồng vàng"
    },
    {
-     declaration_type:2,
+     DeclarationType:2,
      name:"Luồng đỏ"
    }
 ];

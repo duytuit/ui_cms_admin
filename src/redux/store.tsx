@@ -5,6 +5,8 @@ import userSlice from './features/user';
 import toastSlice from './features/toast';
 import rolesSlice from './features/role';
 import permissionSlice from './features/permission';
+import partnerSlice  from './features/partner';
+import employeeSlice  from './features/employee';
 
 const store = configureStore({
   reducer: {
@@ -14,6 +16,8 @@ const store = configureStore({
     toast: toastSlice,
     roles: rolesSlice,
     permission: permissionSlice,
+    partner : partnerSlice,
+    employee : employeeSlice
   },
 })
 export default store;
