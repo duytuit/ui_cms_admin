@@ -151,6 +151,23 @@ export class Helper {
     const day = String(d.getDate()).padStart(2, "0");
     return `${y}-${m}-${day}`;
   };
+   static toDayString() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  // Lấy ngày cách đây 7 ngày dạng yyyy-MM-dd
+  static lastWeekString() {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
   static formatDMYLocal(date: string) {
      return date.split("T")[0]
   };

@@ -31,36 +31,34 @@ clientApi.interceptors.request.use(
 
 //Add a response interceptor
 clientApi.interceptors.response.use(
+    // ===== SUCCESS =====
     async function (res) {
-       // console.log(res.data);
-        
-        if (res.data.code === 401) {
-            // localStorage.removeItem('userInfo');
-            localStorage.removeItem('token');
-           // store.dispatch(setUserInfo('token-expired'));
-        };
-        // if (res.data.status === false) ShowToast('error', res.data.mess)
-        // if (res.data.message === "token-expired")
-        //     return ShowToast('error', res.data.mess)
-        return res
-    },
-    async function (res) {
-        // let { name, message, ...e } = error
-        // if (name === 'AxiosError' && message === 'Network Error') {
-        //     message = 'lỗi kết nối AxiosNetworkError';
-        // } else if (error.response) {
-        //     if (error.response.status >= 500) message = 'server error '
-        //     if (error.response.status >= 400) message = 'client error'
-        // } else if (error?.message.startsWith('timeout of'))
-        //     message = 'Server timeout';
-
-        //     ShowToast('error', message)
-        // return { status: false, mess: message, no_connect: true }
-        // return Promise.reject(error);
-        if(res?.response?.status === 401){
+        if (res.data?.code === 401) {
             localStorage.removeItem('token');
         }
-        store.dispatch(showToast({ severity: 'error', summary: 'Error', detail: 'Đường truyền không ổn định, vui lòng thử lại sau!' },));
-        return { data: {}, status: false, mess: 'Đường truyền không ổn định, vui lòng thử lại sau!' }
+        return res;
+    },
+
+    // ===== ERROR =====
+    async function (error) {
+        // Mất kết nối backend — CHẶN VÒNG LẶP Ở ĐÂY
+        if (error.code === "ERR_NETWORK") {
+            // Không retry — trả lỗi để UI xử lý
+            return Promise.reject(error);
+        }
+
+        // Trường hợp 401 từ server
+        if (error?.response?.status === 401) {
+            localStorage.removeItem('token');
+        }
+
+        store.dispatch(showToast({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Đường truyền không ổn định, vui lòng thử lại sau!'
+        }));
+
+        // Nên reject để UI biết là request failed
+        return Promise.reject(error);
     },
 );

@@ -30,6 +30,8 @@ import UpdateService from "modules/service/screen/update";
 import ListStorage from "modules/storage/screen";
 import UpdateStorages from "modules/storage/screen/update";
 import User from "modules/user/screen";
+import ListVehicle from "modules/VehicleDispatch/screen";
+import UpdateVehicle from "modules/VehicleDispatch/screen/update";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -95,6 +97,10 @@ const publicRoutes = [
   { path: "/ContractFile/list", component: ListContractFile, layout: 'ListContractFile' },
   { path: "/ContractFile/add", component: UpdateContractFile, layout: 'UpdateContractFile' },
   { path: "/ContractFile/detail/:id", component: UpdateContractFile, layout: 'UpdateContractFile' },
+  // Vehicle 
+  { path: "/vehicle/list", component: ListVehicle, layout: 'ListVehicle' },
+  { path: "/vehicle/add", component: UpdateVehicle, layout: 'UpdateVehicle' },
+  { path: "/vehicle/detail/:id", component: UpdateVehicle, layout: 'UpdateVehicle' },
   // { path: "/auth/forgotpassword", component: ForgotPassword, layout: null, public: true },
   // { path: "/auth/verifyaccount", component: VerifyAccount, layout: null, public: true },
   // { path: "/auth/changepassword", component: ChangePassword, layout: null },

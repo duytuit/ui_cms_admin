@@ -120,16 +120,20 @@ export const StatusPartnerBody = (rowData:any, actions:any ,_status:number) => {
     return <InputSwitch checked={checked} onChange={confirm} />
 };
 
-export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, duplicated?:any, handleUndo?:any) => {
+export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, openDialogAdd?:any,duplicated?:any, handleUndo?:any) => {
     const dispatch = useDispatch();
     
     async function accept() {
         const res = await actions.action({ id: rowData.id });
         if (res.status === 200) {
-            dispatch(showToast({ ...listToast[0], detail: res.data.message  }));
-            if (paramsPaginator && setParamsPaginator) {
-                setParamsPaginator({ ...paramsPaginator, render: !paramsPaginator.render });
-            };
+            if(res.data.status){
+                dispatch(showToast({ ...listToast[0], detail: res.data.message  }));
+                if (paramsPaginator && setParamsPaginator) {
+                    setParamsPaginator({ ...paramsPaginator, render: !paramsPaginator.render });
+                };
+            }else{
+                dispatch(showToast({ ...listToast[2], detail: res.data.message  }));
+            }
         } else {
             dispatch(showToast({ ...listToast[1], detail: res.data.message  }));
         }
@@ -154,6 +158,16 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
             {actions && <Button className="mr-2" type='button' icon="pi pi-trash"
                 onClick={actions.options ? actions.options : confirm} rounded outlined severity="danger" />}
             {handleUndo && <Button type='button' icon="pi pi-undo" onClick={e => handleUndo(e)} rounded outlined />}
+            {openDialogAdd &&
+                <Button
+                    type="button"
+                    icon="pi pi-plus"
+                    rounded
+                    outlined
+                    severity="success"
+                    onClick={() => openDialogAdd()}   // <<< thêm dòng này
+                />
+            }
         </React.Fragment>
     );
 };

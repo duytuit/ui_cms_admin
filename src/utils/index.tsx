@@ -144,3 +144,13 @@ export const nghiepVu = [
      name:"Không có trucking"
    }
 ];
+export const typeVehicle = [
+   {
+     isExternalDriver:0,
+     name:"Xe trong"
+   },
+    {
+     isExternalDriver:1,
+     name:"Xe ngoài"
+   }
+];

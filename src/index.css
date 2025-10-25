@@ -144,3 +144,9 @@ display: none !important;
     appearance: none;
     border-radius: 6px;
 }
+.p-dialog .p-dialog-header {
+    padding: 0.5rem 1rem;
+}
+.p-dialog .p-dialog-content {
+    padding: 0 1rem 0.5rem 1rem;
+}
