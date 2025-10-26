@@ -6,6 +6,7 @@ import UpdateBill from "modules/bill/screen/update";
 import Categories from "modules/categories/screen";
 import UpdateCategories from "modules/categories/screen/update";
 import ListContractFile from "modules/ContractFile/screen";
+import ListCreateDispatch from "modules/ContractFile/screen/index_create_dispatch";
 import UpdateContractFile from "modules/ContractFile/screen/update";
 import Customer from "modules/customer/screen";
 import UpdateCustomer from "modules/customer/screen/update";
@@ -95,12 +96,17 @@ const publicRoutes = [
   { path: "/partner/detail/:id", component: UpdatePartner, layout: 'UpdatePartner' },
   // ContractFile 
   { path: "/ContractFile/list", component: ListContractFile, layout: 'ListContractFile' },
+  { path: "/ContractFile/list-create-dispatch", component: ListCreateDispatch, layout: 'ListCreateDispatch' },
   { path: "/ContractFile/add", component: UpdateContractFile, layout: 'UpdateContractFile' },
   { path: "/ContractFile/detail/:id", component: UpdateContractFile, layout: 'UpdateContractFile' },
   // Vehicle 
   { path: "/vehicle/list", component: ListVehicle, layout: 'ListVehicle' },
   { path: "/vehicle/add", component: UpdateVehicle, layout: 'UpdateVehicle' },
   { path: "/vehicle/detail/:id", component: UpdateVehicle, layout: 'UpdateVehicle' },
+  // Debit 
+  // { path: "/debit/list", component: ListDebit, layout: 'ListDebit' },
+  // { path: "/debit/add", component: UpdateDebit, layout: 'UpdateDebit' },
+  // { path: "/debit/detail/:id", component: UpdateDebit, layout: 'UpdateDebit' },
   // { path: "/auth/forgotpassword", component: ForgotPassword, layout: null, public: true },
   // { path: "/auth/verifyaccount", component: VerifyAccount, layout: null, public: true },
   // { path: "/auth/changepassword", component: ChangePassword, layout: null },

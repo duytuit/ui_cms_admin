@@ -154,3 +154,23 @@ export const typeVehicle = [
      name:"Xe ngoài"
    }
 ];
+export const typeDebit = [
+   {
+     type:0,
+     name:"Phí dịch vụ"
+   },
+   {
+     type:1,
+     name:"Phí chi hộ"
+   }
+];
+export const statusDebit = [
+   {
+     status:0,
+     name:"Chưa duyệt"
+   },
+    {
+     status:1,
+     name:"Đã duyệt"
+   }
+];

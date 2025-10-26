@@ -232,6 +232,17 @@ const AppSidebar = () => {
         items: [
           {
             id: 1,
+            name: 'Số file chưa tạo điều xe',
+            route: '/ContractFile/list-create-dispatch',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
+            id: 1,
             name: 'Nhật ký hàng ngày',
             route: '/page-two',
             created_at: '2023-05-29 14:14:02',

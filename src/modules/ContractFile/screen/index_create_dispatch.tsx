@@ -1,17 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  RenderHeader,
-  StatusBody,
   ActionBody,
-  DataTable,
   Column,
   TimeBody,
   DataTableClient,
   DateBody,
 } from "components/common/DataTable";
 import {
-  Calendar,
-  CalendarY,
   Dropdown,
   GridForm,
   Input,
@@ -19,11 +14,6 @@ import {
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
-import {
-  deleteContractFile,
-  listContractFile,
-  updateContractFile,
-} from "../api";
 import { useListContractFile } from "../service";
 import { setCustomer, setVendor } from "redux/features/partner";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,6 +25,7 @@ import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import UpdateDebit from "modules/Debit/screen/update";
 import UpdateDebitChiPhi from "modules/Debit/screen/update";
+import UpdateDebitDispatchFile from "modules/Debit/screen/update_dispatch_file";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -117,7 +108,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   );
 };
 
-export default function ListContractFile() {
+export default function ListCreateDispatch() {
   const { handleParamUrl } = useHandleParamUrl();
   const [visible, setVisible] = useState(false);
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
@@ -263,11 +254,11 @@ export default function ListContractFile() {
             header="Thao tác"
             body={(e: any) =>
               ActionBody(
-                e,
-                "/ContractFile/detail",
-                { route: "/ContractFile/delete", action: deleteContractFile },
-                paramsPaginator,
-                setParamsPaginator,
+                 e,
+                 null,
+                 null,
+                 null,
+                 null,
                 () => openDialogAdd(e.id) 
               )
             }
@@ -409,13 +400,13 @@ export default function ListContractFile() {
       <Dialog
         position="top"
         dismissableMask
-        header="Tạo bảng kê chi phí"
+        header="Tạo điều xe theo số file"
         visible={visible}
         onHide={() => setVisible(false)}
         style={{ width: "78vw" }}
       >
         <p className="m-0">
-          {selectedId && <UpdateDebitChiPhi id={selectedId}></UpdateDebitChiPhi>}
+          {selectedId && <UpdateDebitDispatchFile id={selectedId}></UpdateDebitDispatchFile>}
         </p>
       </Dialog>
     </>

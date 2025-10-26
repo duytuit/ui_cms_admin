@@ -130,7 +130,7 @@ export default function User() {
                 <Column field="first_name" header="Tên đầu" />
                 <Column field="last_name" header="Tên cuối" />
                 <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updateTime)} />
-                <Column
+                {/* <Column
                     header="Actions"
                     body={(e: any) =>
                         ActionBody(
@@ -141,7 +141,7 @@ export default function User() {
                             setParamsPaginator
                         )
                     }
-                />
+                /> */}
             </DataTableClient>
         </div>
     );

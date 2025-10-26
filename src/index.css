@@ -150,3 +150,9 @@ display: none !important;
 .p-dialog .p-dialog-content {
     padding: 0 1rem 0.5rem 1rem;
 }
+.child-table .p-datatable>.p-datatable-wrapper {
+    overflow: initial;
+}
+.p-button-normal {
+   padding: 0.55rem 0.5rem;
+}
