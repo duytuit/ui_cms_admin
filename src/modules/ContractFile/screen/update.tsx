@@ -192,7 +192,7 @@ export default function UpdateContractFile() {
                   value={infos.partnerDetailId}
                   options={partnerOptions}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, PartnerDetailId: e.target.value })
+                    setInfos({ ...infos, partnerDetailId: e.target.value })
                   }
                   label="Khách hàng"
                   className="w-full"

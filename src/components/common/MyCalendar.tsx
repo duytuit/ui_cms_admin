@@ -14,9 +14,16 @@ export const MyCalendar = ({
   showButtonBar = true,
   className = "",
 }: CalendarProps) => {
-const [selectedDate, setSelectedDate] = useState<Date | null>(
-  value ? new Date(value) : null  // ✅ convert string -> Date
-);
+
+  const [selectedDate, setSelectedDate] = useState<Date | null>(
+    value ? new Date(value) : null
+  );
+
+  useEffect(() => {
+    // Sync lại khi parent đổi value
+    setSelectedDate(value ? new Date(value) : null);
+  }, [value]);
+
   const [showPopup, setShowPopup] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -34,15 +41,11 @@ const [selectedDate, setSelectedDate] = useState<Date | null>(
       const y = date.getFullYear();
       const m = String(date.getMonth() + 1).padStart(2, "0");
       const d = String(date.getDate()).padStart(2, "0");
-      onChange?.(`${y}-${m}-${d}`);   // ✅ trả string luôn
+      onChange?.(`${y}-${m}-${d}`);   // trả string yyyy-MM-dd
     } else {
       onChange?.(null);
     }
-    setShowPopup(false); // 🟢 đóng popup khi chọn ngày
-  };
-
-  const handleClose = () => {
-    setShowPopup(false); // 🟢 đóng khi click ra ngoài
+    setShowPopup(false);
   };
 
   return (
@@ -55,7 +58,7 @@ const [selectedDate, setSelectedDate] = useState<Date | null>(
           readOnly
           onClick={() => setShowPopup(!showPopup)}
           className={`calendar-input ${className}`}
-          style={{ cursor: "pointer",  border: "1px" }}
+          style={{ cursor: "pointer", border: "1px" }}
         />
         <span
           style={{ marginLeft: -25, cursor: "pointer" }}
@@ -69,10 +72,10 @@ const [selectedDate, setSelectedDate] = useState<Date | null>(
         <CalendarPopup
           selectedDate={selectedDate}
           onSelectDate={handleDateSelect}
-          onClose={handleClose}          
+          onClose={() => setShowPopup(false)}
           showButtonBar={showButtonBar}
           className={`${className}-popup`}
-          targetRef={inputRef}        
+          targetRef={inputRef}
         />
       )}
     </div>

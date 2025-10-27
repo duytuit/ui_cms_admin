@@ -1,13 +1,15 @@
 
 import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, scrollToTop, refreshObject } from "utils";
 import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { Panel } from "primereact/panel";
 import { addEmployee, showEmployee, updateEmployee } from "../api";
+import { Dropdown } from "components/common/ListForm";
+import { useListDepartment } from "modules/department/service";
 const UpdateEmployee = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
@@ -20,8 +22,8 @@ const UpdateEmployee = () => {
       ...infos, status: infos.status ? 0 : 1,
     };
     console.log('info', info);
-    setLoading(true);
-    fetchDataSubmit(info);
+   setLoading(true);
+   fetchDataSubmit(info);
   };
   async function fetchDataSubmit(info: any) {
     if (info.id) {
@@ -49,6 +51,14 @@ const UpdateEmployee = () => {
       } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
     }
   };
+  const { data: departments } = useListDepartment({ params: { keyword: "abc" }, debounce: 500 });
+    const departmentOptions = useMemo(() => {
+      if (!Array.isArray(departments?.data)) return [];
+      return departments.data.map((x: any,index:number) => ({
+        label: x.name,
+        value: x.id,
+      }));
+    }, [departments]);
   useEffect(() => {
     if (id) {
       showEmployee({ id: id, type: CategoryEnum.country }).then(res => {
@@ -64,6 +74,8 @@ const UpdateEmployee = () => {
       });
     }
   }, [])
+    // ===== LOADING SCREEN =====
+  if (loading) return (<></>);
   return (
     <>
       <AddForm
@@ -136,6 +148,33 @@ const UpdateEmployee = () => {
                       required
                     />
                   </div>
+                </div>
+                <div className="field grid">
+                   <label
+                    htmlFor="email"
+                    className="col-12 mb-2 md:col-3 md:mb-0"
+                  >
+                    Bộ phận
+                  </label>
+                  <div className="col-12 md:col-9">
+                       <Dropdown
+                        value={infos?.employeeDepartment?.departmentId}
+                        options={departmentOptions}
+                        label="Bộ phận"
+                        className="p-inputtext-sm"
+                        onChange={(e:any) =>
+                          setInfos({
+                            ...infos,
+                            employeeDepartment: {
+                              ...infos.employeeDepartment,
+                              departmentId: e.value,     // đúng với PrimeReact
+                            },
+                          })
+                        }
+                        required
+                      />
+                  </div>
+                 
                 </div>
                 <div className="field grid">
                   <label

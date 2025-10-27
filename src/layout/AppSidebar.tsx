@@ -553,7 +553,7 @@ const AppSidebar = () => {
           {
             id: 1,
             name: 'Bộ phận',
-            route: '/page-two',
+            route: '/department/list',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,

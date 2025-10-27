@@ -1,7 +1,7 @@
 
 import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, loaiToKhai, refreshObject, typeDebit } from "utils";
 import { useDispatch } from "react-redux";
@@ -15,6 +15,7 @@ import { classNames } from "primereact/utils";
 import { Button } from "primereact/button";
 import React from "react";
 import { showContractFile } from "modules/ContractFile/api";
+import { useListPartnerDetail } from "modules/partner/service";
 export default function UpdateDebitChiPhi({ id }: { id: any }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
@@ -67,13 +68,25 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
       } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
     }
   };
+  const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
+  const partnerOptions = useMemo(() => {
+    if (!Array.isArray(partnerDetails?.data)) return [];
+    return partnerDetails.data.map((x: any) => ({
+      label: x?.partners?.abbreviation ?? "(không tên)",
+      value: x.id,
+    }));
+  }, [partnerDetails]);
   useEffect(() => {
+    if (!id) return;
+    if (partnerOptions.length === 0) return;  // ✅ quan trọng
     if (id) {
       setLoading(true);
       showContractFile({ id: id, type: CategoryEnum.country }).then(res => {
         const detail = res.data.data
         if (detail) {
           const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
+           const partner = partnerOptions.find((x:any)=>x.value == detail.partnerDetailId)
+           detail.partnerName = partner?.label
           let info = {
             ...detail, status: detail.status === 0 ? true : false,
              loaiToKhai:_loaiToKhai?.name
@@ -84,8 +97,7 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
         //setHasError(true)
       }).finally(() => setLoading(false));
     }
-  }, [id])
-   if (loading) return (<></>);
+  }, [id,partnerOptions.length])
   return (
     <>
       <AddForm
@@ -106,7 +118,7 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
                   <td className="pr-4 align-top">
                     <div className="mb-2">
                       <label className="font-medium mr-2">Khách hàng:</label>
-                      <span>{infos.fileNumber}</span>
+                      <span>{infos.partnerName}</span>
                     </div>
                   </td>
                   <td className="pr-4 align-top">
@@ -158,10 +170,9 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
                   </td>
                   <td className="pr-4">
                     <MyCalendar
-                      value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')}
+                      value={infos.accountingDate ? Helper.formatDMYLocal(infos.accountingDate) : ""}
                       dateFormat="dd/mm/yy"
-                      onChange={(e: any) =>
-                      setInfos({ ...infos, accountingDate: e })}
+                      onChange={(e: any) => setInfos({ ...infos, accountingDate: e })}
                       className={classNames("w-full", "p-inputtext", "input-form-sm")}
                     />
                   </td>

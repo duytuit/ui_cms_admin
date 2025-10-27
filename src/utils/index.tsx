@@ -174,3 +174,23 @@ export const statusDebit = [
      name:"Đã duyệt"
    }
 ];
+export const typeService = [
+   {
+     status:0,
+     name:"Chi phí"
+   },
+    {
+     status:1,
+     name:"Chi hộ"
+   }
+];
+export const typeReceipt = [
+   {
+     status:0,
+     name:"Chi phí"
+   },
+    {
+     status:1,
+     name:"Chi hộ"
+   }
+];

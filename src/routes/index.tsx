@@ -11,6 +11,8 @@ import UpdateContractFile from "modules/ContractFile/screen/update";
 import Customer from "modules/customer/screen";
 import UpdateCustomer from "modules/customer/screen/update";
 import DashBoard from "modules/dashboard/screen";
+import ListDepartment from "modules/department/screen";
+import UpdateDepartment from "modules/department/screen/update";
 import ListEmployee from "modules/employee/screen";
 import UpdateEmployee from "modules/employee/screen/update";
 import PageOne from "modules/pageOne/screen";
@@ -103,6 +105,10 @@ const publicRoutes = [
   { path: "/vehicle/list", component: ListVehicle, layout: 'ListVehicle' },
   { path: "/vehicle/add", component: UpdateVehicle, layout: 'UpdateVehicle' },
   { path: "/vehicle/detail/:id", component: UpdateVehicle, layout: 'UpdateVehicle' },
+   // Vehicle 
+  { path: "/department/list", component: ListDepartment, layout: 'ListDepartment' },
+  { path: "/department/add", component: UpdateDepartment, layout: 'UpdateDepartment' },
+  { path: "/department/detail/:id", component: UpdateDepartment, layout: 'UpdateDepartment' },
   // Debit 
   // { path: "/debit/list", component: ListDebit, layout: 'ListDebit' },
   // { path: "/debit/add", component: UpdateDebit, layout: 'UpdateDebit' },
