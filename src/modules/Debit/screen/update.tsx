@@ -3,7 +3,7 @@ import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { showToast } from "redux/features/toast";
-import { listToast, refreshObject, typeDebit } from "utils";
+import { listToast, loaiToKhai, refreshObject, typeDebit } from "utils";
 import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { addDebit, showDebit, updateDebit } from "../api";
@@ -73,8 +73,10 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
       showContractFile({ id: id, type: CategoryEnum.country }).then(res => {
         const detail = res.data.data
         if (detail) {
+          const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
           let info = {
             ...detail, status: detail.status === 0 ? true : false,
+             loaiToKhai:_loaiToKhai?.name
           };
           setInfos(info)
         }
@@ -152,7 +154,7 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
                   </td>
                   <td className="pr-4">
                     <label className="font-medium mr-2">Loại tờ khai:</label>
-                    <span>abc</span>
+                    <span>{infos.loaiToKhai}</span>
                   </td>
                   <td className="pr-4">
                     <MyCalendar

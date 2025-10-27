@@ -1,9 +1,9 @@
 
 import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
-import { listToast, refreshObject, typeDebit } from "utils";
+import { listToast, loaiToKhai, refreshObject, typeDebit, typeVehicle } from "utils";
 import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { addDebit, showDebit, updateDebit } from "../api";
@@ -13,19 +13,56 @@ import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { classNames } from "primereact/utils";
 import { Dropdown } from "components/common/ListForm";
+import { useListEmployee } from "modules/employee/service";
+import { useListPartnerDetail } from "modules/partner/service";
+import { useListVehicle } from "modules/VehicleDispatch/service";
 export default function UpdateDebitDispatchFile({ id }: { id: any }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
   const [debitVehicle, setdebitVehicle] = useState<any[]>([]);
   const [newDebitVehicle, setNewDebitVehicle] = useState<any>({ name: "", price: "", note: "", bill: "", link_bill: "", code_bill: "" });
-  // format tiền VN
-  const formatCurrency = (value: string) => {
-    const numeric = value.replace(/\D/g, "");
-    return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
   const dispatch = useDispatch();
   const navigate = useNavigate();
+     // ===== LIST PARTNER & EMPLOYEE =====
+    const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
+    const { data: partnerVenderDetails } = useListPartnerDetail({ params: { status: 2 }, debounce: 500 });
+    const { data: vehicles } = useListVehicle({ params: { status: 2 }, debounce: 500 });
+    const { data: employees } = useListEmployee({ params: { keyword: "abc" }, debounce: 500 });
+  
+    const vehiclesOptions = useMemo(() => {
+      if (!Array.isArray(vehicles?.data)) return [];
+      return vehicles.data.map((x: any) => ({
+        label: `${x?.number_code ?? "(không tên)"}-${getTypeVehicleLabel(x?.is_external_driver)}`,
+        value: x.id,
+      }));
+    }, [vehicles]);
+    const partnerOptions = useMemo(() => {
+      if (!Array.isArray(partnerDetails?.data)) return [];
+      return partnerDetails.data.map((x: any) => ({
+        label: x?.partners?.abbreviation ?? "(không tên)",
+        value: x.id,
+      }));
+    }, [partnerDetails]);
 
+    const partnerVenderOptions = useMemo(() => {
+      if (!Array.isArray(partnerVenderDetails?.data)) return [];
+      return partnerVenderDetails.data.map((x: any) => ({
+        label: x?.partners?.abbreviation ?? "(không tên)",
+        value: x.id,
+      }));
+    }, [partnerVenderDetails]);
+  
+    const employeeOptions = useMemo(() => {
+      if (!Array.isArray(employees?.data)) return [];
+      return employees.data.map((x: any,index:number) => ({
+        label: `${index+1}.${x.last_name ?? ""} ${x.first_name ?? ""}`.trim(),
+        value: x.id,
+      }));
+    }, [employees]);
+ function getTypeVehicleLabel(type: number){
+  const item = typeVehicle.find((x: any) => x.isExternalDriver === type);
+  return item?.name ?? "";
+};
   const handleSubmit = (e: any) => {
     e.preventDefault();
     let info = {
@@ -68,10 +105,14 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
       showContractFile({ id: id, type: CategoryEnum.country }).then(res => {
         const detail = res.data.data
         if (detail) {
+           const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
           let info = {
             ...detail, status: detail.status === 0 ? true : false,
+            loaiToKhai:_loaiToKhai?.name
           };
           setInfos(info)
+          console.log(info);
+          
         }
       }).catch(err => {
         //setHasError(true)
@@ -142,7 +183,7 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
                   </td>
                   <td className="pr-4">
                     <label className="font-medium mr-2">Loại tờ khai:</label>
-                    <span>abc</span>
+                    <span>{infos.loaiToKhai}</span>
                   </td>
                   <td className="pr-4">
                   </td>
@@ -152,19 +193,19 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
           </Panel>
           <Panel header="Thông tin điều xe">
             <div className="formgrid grid">
-              <div className="field col-2">
+              <div className="field col-3">
                 <MyCalendar dateFormat="dd/mm/yy"
                   value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
                   onChange={(e: any) =>
                     setInfos({ ...infos, accountingDate: e })}
                   className={classNames("w-full", "p-inputtext", "input-form-sm")} />
               </div>
-               <div className="field col-10">
+               <div className="field col-9">
                 <InputForm className="w-full"
                   id="route"
                   value={''}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, route: e.target.value })
+                    setNewDebitVehicle({ ...newDebitVehicle, route: e.target.value })
                   }
                   label="Tuyến vận chuyển"
                   required
@@ -174,36 +215,36 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
                 <Dropdown
                   filter
                   value={infos.partnerDetailId}
-                  options={[]}
+                  options={partnerOptions}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, PartnerDetailId: e.target.value })
+                    setInfos({ ...infos, partnerDetailId: e.target.value })
                   }
                   label="Khách hàng"
                   className="w-full"
                   required
                 />
               </div>
-               <div className="field col-2">
+               <div className="field col-3">
                 <InputForm className="w-full"
                   id="customer_vehicle_type"
                   value={infos.customer_vehicle_type}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, customer_vehicle_type: e.target.value })
+                     setNewDebitVehicle({ ...newDebitVehicle, customer_vehicle_type: e.target.value })
                   }
                   label="Loại xe KH"
                 />
               </div>
-              <div className="field col-10">
+              <div className="field col-9">
                 <InputForm className="w-full"
                   id="supplier_vehicle_type"
                   value={infos.supplier_vehicle_type}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, supplier_vehicle_type: e.target.value })
+                    setNewDebitVehicle({ ...newDebitVehicle, supplier_vehicle_type: e.target.value })
                   }
                   label="Loại xe NCC"
                 />
               </div>
-               <div className="field col-2">
+               <div className="field col-3">
                 <InputForm className="w-full"
                   id="selling_price"
                   value={infos.selling_price}
@@ -223,7 +264,7 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
                   label="Lái xe thu cước"
                 />
               </div>
-               <div className="field col-5">
+               <div className="field col-4">
                 <InputForm className="w-full"
                   id="customs_status"
                   value={infos.customs_status}
@@ -233,7 +274,7 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
                   label="TTHQ"
                 />
               </div>
-               <div className="field col-2">
+               <div className="field col-3">
                 <InputForm className="w-full"
                   id="purchase_price"
                   value={infos.purchase_price}
@@ -243,24 +284,24 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
                   label="Cước mua"
                 />
               </div>
-               <div className="field col-10">
+               <div className="field col-9">
                 <Dropdown
                   filter
-                  value={infos.partnerDetailId}
-                  options={[]}
+                  value={infos.supplierPartnerDetailId}
+                  options={partnerVenderOptions}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, PartnerDetailId: e.target.value })
+                    setInfos({ ...infos, supplierPartnerDetailId: e.target.value })
                   }
                   label="Nhà cung cấp"
                   className="w-full"
                   required
                 />
               </div>
-               <div className="field col-2">
+               <div className="field col-3">
                 <Dropdown
                   filter
                   value={infos.vehicle_number}
-                  options={[]}
+                  options={vehiclesOptions}
                   onChange={(e: any) =>
                     setInfos({ ...infos, vehicle_number: e.target.value })
                   }
@@ -270,7 +311,7 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
                 />
               </div>
               
-              <div className="field col-10">
+              <div className="field col-9">
                 <Dropdown
                   value={infos.driver_name}
                   optionValue="feature"
@@ -279,12 +320,12 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
                   label="lái xe"
                   className="p-inputtext-sm"
                   onChange={(e: any) =>
-                    setInfos({ ...infos, driver_name: e.target.value })
+                    setNewDebitVehicle({ ...newDebitVehicle, driver_name: e.target.value })
                   }
                   required
                 />
               </div>
-              <div className="field col-2">
+              <div className="field col-3">
                 <InputForm className="w-full"
                   id="meal_fee"
                   value={infos.meal_fee}
@@ -294,7 +335,7 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
                   label="Tiền ăn"
                 />
               </div>
-              <div className="field col-5">
+              <div className="field col-4">
                 <InputForm className="w-full"
                   id="ticket_fee"
                   value={infos.ticket_fee}
@@ -324,7 +365,7 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
                   label="Tiền luật"
                 />
               </div>
-              <div className="field col-2">
+              <div className="field col-3">
                 <InputForm className="w-full"
                   id="goods_fee"
                   value={infos.goods_fee}
@@ -334,10 +375,9 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
                   label="Lượng hàng về"
                 />
               </div>
-              <div className="field col-10">
+              <div className="field col-9">
                 <InputForm className="w-full"
                   id="note"
-                  value={infos.note}
                   onChange={(e: any) =>
                     setInfos({ ...infos, note: e.target.value })
                   }

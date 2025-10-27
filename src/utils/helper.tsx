@@ -171,4 +171,9 @@ export class Helper {
   static formatDMYLocal(date: string) {
      return date.split("T")[0]
   };
+    // format tiền VN
+  static formatCurrency(value: string) {
+    const numeric = value.replace(/\D/g, "");
+    return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  };
 }
