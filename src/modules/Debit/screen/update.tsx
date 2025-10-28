@@ -6,7 +6,7 @@ import { showToast } from "redux/features/toast";
 import { listToast, loaiToKhai, refreshObject, typeDebit } from "utils";
 import { useDispatch, useSelector } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
-import { addDebit, showDebit, updateDebit } from "../api";
+import { addDebit, addDebitService, showDebit, updateDebit } from "../api";
 import { Dropdown, MultiSelect } from "components/common/ListForm";
 import { Column, DataTable, Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
@@ -17,7 +17,7 @@ import React from "react";
 import { showContractFile } from "modules/ContractFile/api";
 import { useListPartnerDetail } from "modules/partner/service";
 import { useListIncomeExpenseWithState, useListServiceCategoryWithState } from "modules/categories/service";
-export default function UpdateDebitChiPhi({ id }: { id: any }) {
+export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
   const [productHaiquan, setProductHaiquan] = useState<any[]>([]);
@@ -56,6 +56,7 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
       ...infos, status: infos.status ? 0 : 1,
       productHaiquan: productHaiquan,
       productChiho: productChiho,
+      data:JSON.stringify(infos)
     };
     console.log('info', info);
     setLoading(true);
@@ -63,24 +64,14 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
   };
   async function fetchDataSubmit(info: any) {
     if (info.id) {
-      const response = await updateDebit(info);
-      if (response) setLoading(false);
-      if (response.status === 200) {
-        if (response.data.status) {
-          dispatch(showToast({ ...listToast[0], detail: response.data.message }));
-          navigate('/debit/list');
-        } else {
-          dispatch(showToast({ ...listToast[2], detail: response.data.message }))
-        }
-      } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
-    } else {
-      const response = await addDebit(info);
+       const response = await addDebitService(info);
       if (response) setLoading(false);
       if (response.status === 200) {
         if (response.data.status) {
           setInfos({ ...refreshObject(infos), status: true })
           dispatch(showToast({ ...listToast[0], detail: response.data.message }));
-          navigate('/debit/list');
+          onClose();
+          navigate('/ContractFile/list');
         } else {
           dispatch(showToast({ ...listToast[2], detail: response.data.message }))
         }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setIncomeExpense, setServiceCategory } from 'redux/features/category';
+import { setIncomeExpense, setServiceCategory, setServiceCategoryChiHo } from 'redux/features/category';
 import { listIncomeExpense, listServiceCategory } from '../api';
 
 export const useListServiceCategory = ({ params, debounce = 500 }: any) => {
@@ -34,7 +34,7 @@ export const useListServiceCategory = ({ params, debounce = 500 }: any) => {
 };
 export const useListServiceCategoryWithState = (params : any)  => {
     const dispatch = useDispatch();
-    const ServiceCategorys = useSelector((state: any) => state.category.ServiceCategory);
+    const ServiceCategorys =  useSelector((state: any) => params.type === 1? state.category.ServiceCategoryChiHo : state.category.ServiceCategory);
 
     const [data, setData] = useState<any>([]);
     const [loading, setLoading] = useState(false);
@@ -48,7 +48,7 @@ export const useListServiceCategoryWithState = (params : any)  => {
             setError(null);
             const res = await listServiceCategory({...params});
             const arr = res?.data?.data?.data || [];
-            dispatch(setServiceCategory(arr)); // đẩy redux luôn
+             dispatch(params.type === 1? setServiceCategoryChiHo(arr) :setServiceCategory(arr)); // đẩy redux luôn
             setData(arr);               // set local luôn
         } catch (err) {
             setError(err);

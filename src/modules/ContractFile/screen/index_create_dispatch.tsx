@@ -406,7 +406,7 @@ export default function ListCreateDispatch() {
         style={{ width: "78vw" }}
       >
         <p className="m-0">
-          {selectedId && <UpdateDebitDispatchFile id={selectedId}></UpdateDebitDispatchFile>}
+          {selectedId && <UpdateDebitDispatchFile id={selectedId}  onClose={() => setVisible(false)} ></UpdateDebitDispatchFile>}
         </p>
       </Dialog>
     </>

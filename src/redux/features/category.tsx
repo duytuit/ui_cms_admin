@@ -4,6 +4,7 @@ export const categorySlice = createSlice({
   name: 'category',
   initialState: {
     ServiceCategory: null,
+    ServiceCategoryChiHo: null,
     IncomeExpense: null
   },
   reducers: {
@@ -12,6 +13,12 @@ export const categorySlice = createSlice({
     },
     clearServiceCategory: (state) => {
       state.ServiceCategory = null
+    },
+    setServiceCategoryChiHo: (state, action) => {
+      state.ServiceCategoryChiHo = action.payload;
+    },
+    clearServiceCategoryChiHo: (state) => {
+      state.ServiceCategoryChiHo = null
     },
     setIncomeExpense: (state, action) => {
       state.IncomeExpense = action.payload;
@@ -26,6 +33,9 @@ export const categorySlice = createSlice({
 export const {setServiceCategory,
   clearServiceCategory,
   setIncomeExpense,
-  clearIncomeExpense} = categorySlice.actions
+  clearIncomeExpense,
+  setServiceCategoryChiHo,
+  clearServiceCategoryChiHo
+} = categorySlice.actions
 
 export default categorySlice.reducer;

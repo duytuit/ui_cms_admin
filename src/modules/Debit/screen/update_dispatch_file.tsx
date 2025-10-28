@@ -17,7 +17,7 @@ import { useListEmployee } from "modules/employee/service";
 import { useListPartnerDetail } from "modules/partner/service";
 import { useListVehicle } from "modules/VehicleDispatch/service";
 import { json } from "stream/consumers";
-export default function UpdateDebitDispatchFile({ id }: { id: any }) {
+export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
   const dispatch = useDispatch();
@@ -82,6 +82,7 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
     infos.customsStatus = infos.customsStatus ? parseInt(infos.customsStatus.replace(/\D/g, ""), 10) : 0;
     infos.purchasePrice = infos.purchasePrice ? parseInt(infos.purchasePrice.replace(/\D/g, ""), 10) : 0;
     infos.sellingPrice = infos.sellingPrice ? parseInt(infos.sellingPrice.replace(/\D/g, ""), 10) : 0;
+    infos.price = infos.sellingPrice ? parseInt(infos.sellingPrice.replace(/\D/g, ""), 10) : 0;
     infos.mealFee = infos.mealFee ? parseInt(infos.mealFee.replace(/\D/g, ""), 10) : 0;
     infos.ticketFee = infos.ticketFee ? parseInt(infos.ticketFee.replace(/\D/g, ""), 10) : 0;
     infos.overnightFee = infos.overnightFee ? parseInt(infos.overnightFee.replace(/\D/g, ""), 10) : 0;
@@ -104,7 +105,7 @@ export default function UpdateDebitDispatchFile({ id }: { id: any }) {
         if (response.data.status) {
           setInfos({ ...refreshObject(infos), status: true })
           dispatch(showToast({ ...listToast[0], detail: response.data.message }));
-
+          onClose();
           navigate('/ContractFile/list-create-dispatch');
         } else {
           dispatch(showToast({ ...listToast[2], detail: response.data.message }))

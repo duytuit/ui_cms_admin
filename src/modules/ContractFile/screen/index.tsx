@@ -415,7 +415,7 @@ export default function ListContractFile() {
         style={{ width: "78vw" }}
       >
         <p className="m-0">
-          {selectedId && <UpdateDebitChiPhi id={selectedId}></UpdateDebitChiPhi>}
+          {selectedId && <UpdateDebitChiPhi id={selectedId}  onClose={() => setVisible(false)} ></UpdateDebitChiPhi>}
         </p>
       </Dialog>
     </>
