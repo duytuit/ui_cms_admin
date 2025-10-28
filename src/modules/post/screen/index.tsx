@@ -4,7 +4,6 @@ import { FormInput } from "components/uiCore";
 import { GridForm } from "components/common/ListForm";
 import { deletePost, updateStatusPost } from "../api";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { useListCategories } from "modules/categories/service";
 import { useListPost } from "../service";
 import { CategoryEnum } from "utils/type.enum";
 
@@ -24,7 +23,6 @@ export default function Post() {
     const defaultParam={ pageNum: 1, pageSize: 20, first: 0, render: false };
     const [paramsPaginator, setParamsPaginator] = useState(defaultParam);
     const _Post:any = useListPost({ ...paramsPaginator, status: undefined, first: undefined });
-    const _categories:any = useListCategories({type:CategoryEnum.post});
     useEffect(()=>{
         handleParamUrl(paramsPaginator)
     },[paramsPaginator])

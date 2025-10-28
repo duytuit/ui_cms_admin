@@ -8,11 +8,11 @@ import { AccordionTab } from "primereact/accordion";
 import { Button, FormInput, InputSwitch, InputTextarea, Panel } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { listToast, scrollToTop, refreshObject } from "utils";
-import { updateCategories, addCategories, listCategories } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
-const UpdateCategories = () => {
+import { addServiceCategory, listServiceCategory, updateServiceCategory } from "../api";
+const UpdateServiceCategory = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
@@ -31,14 +31,14 @@ const UpdateCategories = () => {
     };
      async function fetchDataSubmit(info:any) {
       if (info.id) {
-          const response = await updateCategories(info);
+          const response = await updateServiceCategory(info);
           if (response) setLoading(false);
           if (response.data.code === 200) {
-              // navigate('/categories');
+              // navigate('/ServiceCategory');
               dispatch(showToast({ ...listToast[0], detail: 'Cập nhật thành công!' }));
           } else dispatch(showToast({ ...listToast[1], detail: response.data.mess }));
       } else {
-          const response = await addCategories(info);
+          const response = await addServiceCategory(info);
           if (response) setLoading(false);
           if (response.data.code === 200) {
               scrollToTop();
@@ -49,7 +49,7 @@ const UpdateCategories = () => {
   };
     useEffect(()=>{
        if(id){
-          listCategories({id:id,type:CategoryEnum.country}).then(res=>{
+          listServiceCategory({id:id,type:CategoryEnum.country}).then(res=>{
               const detail = res.data.data?.rows[0]
               if(detail){
                 let info = {
@@ -71,8 +71,8 @@ const UpdateCategories = () => {
           title="Quốc gia"
           loading={loading}
           onSubmit={handleSubmit}
-          routeList="/categories/list"
-          route={Number(id) ? "/categories/update" : "/categories/add"}
+          routeList="/ServiceCategory/list"
+          route={Number(id) ? "/ServiceCategory/update" : "/ServiceCategory/add"}
         >
            <div className="field">
            <Panel header="Thông tin">
@@ -237,4 +237,4 @@ const UpdateCategories = () => {
     );
 }
 
-export default UpdateCategories;
+export default UpdateServiceCategory;

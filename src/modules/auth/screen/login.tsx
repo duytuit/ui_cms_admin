@@ -5,8 +5,8 @@ import { setToken } from "redux/features/token";
 import { loginAPI } from "../api";
 import { Button, Checkbox, FormInput, Image } from "components/uiCore";
 import { Link, useNavigate } from "react-router-dom";
-import { fetchGetCaptcha, useGetCaptcha } from "../service";
 import { clientId } from "utils/getClinentId";
+import { setEmployeeInfo } from "redux/features/user";
 const Login = () => {
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
@@ -26,6 +26,7 @@ const Login = () => {
         if (response.status === 200 && response.data.status) {
           const token = response.data.data.accessToken;
             dispatch(setToken(token));
+            dispatch(setEmployeeInfo(response.data.data.employee));
             dispatch(
                 showToast({
                     severity: 'success',

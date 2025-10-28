@@ -5,7 +5,6 @@ import { GridForm } from "components/common/ListForm";
 import { useListService } from "../service";
 import { deleteService, updateStatusService } from "../api";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { useListCategories } from "modules/categories/service";
 import { CategoryEnum } from "utils/type.enum";
 
 const Header = ({ _setParamsPaginator, _paramsPaginator }: {_setParamsPaginator:any,_paramsPaginator:any}) => {
@@ -23,7 +22,6 @@ export default function Service() {
     const { handleParamUrl} = useHandleParamUrl(); 
     const [paramsPaginator, setParamsPaginator] = useState({ pageNum: 1, pageSize: 20, first: 0, render: false });
     const _service:any = useListService({ ...paramsPaginator, status: undefined, first: undefined });
-    const _categories:any = useListCategories({type:CategoryEnum.country});
     useEffect(()=>{
         handleParamUrl(paramsPaginator)
     },[paramsPaginator])
@@ -32,7 +30,7 @@ export default function Service() {
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
             <DataTable value={_service.rows} header={RenderHeader({ title: 'Danh sách dịch vụ', add: '/service/add' })}
                 title="quốc gia" totalRecords={_service.total} paramsPaginator={paramsPaginator} setParamsPaginator={setParamsPaginator} >
-                <Column header="Danh mục" body={(e:any)=> Body(_categories, e.categoryId)}/>
+                <Column header="Danh mục" />
                 <Column field="name" header="Tên" />
                 <Column header="Giá" body={(e:any)=> PriceBody(e.price)}/>
                 <Column field="desc_detail" header="Mô tả" />

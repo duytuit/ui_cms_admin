@@ -9,7 +9,6 @@ import { listToast, scrollToTop, refreshObject } from "utils";
 import { updatePost, addPost, listPost, updateSlugPost } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { useListCategories } from "modules/categories/service";
 import { uploadFile } from "lib/request";
 import { CategoryEnum } from "utils/type.enum";
 const UpdatePost = () => {
@@ -62,7 +61,6 @@ const UpdatePost = () => {
         });
        }
     },[])
-    const _categories: any = useListCategories({type:CategoryEnum.post});
     const uploadImage = async (event: any) => {
       const files = event.target.files;
       const rs_upload = await uploadFile("system/upload/create", files);
@@ -205,7 +203,7 @@ const UpdatePost = () => {
                             label="Danh mục"
                             className="w-full"
                             value={infos.categoryId}
-                            options={_categories.rows}
+                            options={[]}
                             optionLabel="name"
                             optionValue="id"
                             onChange={(e: any) =>

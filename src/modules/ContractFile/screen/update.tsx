@@ -234,7 +234,7 @@ export default function UpdateContractFile() {
                   label="Loại tờ khai"
                   className="p-inputtext-sm"
                   onChange={(e: any) =>
-                    setInfos({ ...infos, DeclarationType: e.target.value })
+                    setInfos({ ...infos, declarationType: e.target.value })
                   }
                   required
                 />

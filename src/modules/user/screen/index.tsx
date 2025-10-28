@@ -124,8 +124,7 @@ export default function User() {
                 className={classNames("Custom-DataTableClient")}
             >
                 <Column selectionMode="multiple" headerStyle={{ width: "3em" }}></Column>
-                <Column field="username" header="Tên đăng nhập" filter showFilterMenu={false}     // 👈 Bỏ menu filter
-    filterMatchMode="contains"/>
+                <Column field="username" header="Tên đăng nhập" filter showFilterMenu={false} filterMatchMode="contains"/>
                 <Column field="email" header="Email" />
                 <Column field="first_name" header="Tên đầu" />
                 <Column field="last_name" header="Tên cuối" />

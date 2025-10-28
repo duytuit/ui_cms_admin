@@ -177,7 +177,7 @@ export const statusDebit = [
 export const typeService = [
    {
      status:0,
-     name:"Chi phí"
+     name:"Chi phí hải quan"
    },
     {
      status:1,

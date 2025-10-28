@@ -4,7 +4,6 @@ import { FormInput } from "components/uiCore";
 import { GridForm } from "components/common/ListForm";
 import { deleteProduct, updateStatusProduct } from "../api";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { useListCategories } from "modules/categories/service";
 import { useListProduct } from "../service";
 import { CategoryEnum } from "utils/type.enum";
 
@@ -23,7 +22,6 @@ export default function Product() {
     const { handleParamUrl} = useHandleParamUrl(); 
     const [paramsPaginator, setParamsPaginator] = useState({ pageNum: 1, pageSize: 20, first: 0, render: false });
     const _Product:any = useListProduct({ ...paramsPaginator, status: undefined, first: undefined });
-    const _categories:any = useListCategories({type:CategoryEnum.country});
     useEffect(()=>{
         handleParamUrl(paramsPaginator)
     },[paramsPaginator])
@@ -32,7 +30,7 @@ export default function Product() {
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
             <DataTable value={_Product.rows} header={RenderHeader({ title: 'Danh sách sản phẩm', add: '/product/add' })}
                 title="sản phẩm" totalRecords={_Product.total} paramsPaginator={paramsPaginator} setParamsPaginator={setParamsPaginator} >
-                <Column header="Danh mục" body={(e:any)=> Body(_categories, e.categoryId)}/>
+                <Column header="Danh mục" />
                 <Column field="name" header="Tên" />
                 <Column header="Giá" body={(e:any)=> PriceBody(e.price)}/>
                 <Column header="Xuất cảnh" body={(e:any)=> (e.type === 1?'1 Lần':'Nhiều lần')}/>

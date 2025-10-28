@@ -4,7 +4,6 @@ import { FormInput } from "components/uiCore";
 import { GridForm } from "components/common/ListForm";
 import { deleteCustomer, updateStatusCustomer } from "../api";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { useListCategories } from "modules/categories/service";
 import { useListCustomer } from "../service";
 import { CategoryEnum } from "utils/type.enum";
 
@@ -23,7 +22,6 @@ export default function Customer() {
     const { handleParamUrl} = useHandleParamUrl(); 
     const [paramsPaginator, setParamsPaginator] = useState({ pageNum: 1, pageSize: 20, first: 0, render: false });
     const _Customer:any = useListCustomer({ ...paramsPaginator, status: undefined, first: undefined });
-    const _categories:any = useListCategories({type:CategoryEnum.country});
     useEffect(()=>{
         handleParamUrl(paramsPaginator)
     },[paramsPaginator])
@@ -32,7 +30,7 @@ export default function Customer() {
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
             <DataTable value={_Customer.rows} header={RenderHeader({ title: 'Danh sách khách hàng', add: '/customer/add' })}
                 title="khách hàng" totalRecords={_Customer.total} paramsPaginator={paramsPaginator} setParamsPaginator={setParamsPaginator} >
-                <Column header="Danh mục" body={(e:any)=> Body(_categories, e.nationalId)}/>
+                <Column header="Danh mục"/>
                 <Column field="full_name" header="Tên" />
                 <Column field="email" header="Email" />
                 <Column header="Ảnh"  body={(e:any)=> BodyImage(e.avatar)}/>

@@ -11,7 +11,6 @@ import { listToast, scrollToTop, refreshObject } from "utils";
 import { updateProduct, addProduct, listProduct } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { useListCategories } from "modules/categories/service";
 import { ListUpload } from "components/common/ListUpload";
 import { CategoryEnum } from "utils/type.enum";
 const UpdateProduct = () => {
@@ -65,7 +64,6 @@ const UpdateProduct = () => {
         });
        }
     },[])
-    const _categories:any = useListCategories({type:CategoryEnum.country});
     const Type = [
       { name: '1 Lần', type: 1 },
       { name: 'Nhiều lần', type: 2 },
@@ -114,7 +112,7 @@ const UpdateProduct = () => {
               </label>
               <div className="col-12 md:col-9">
               <span className="p-float-label">
-                 <Dropdown inputId="dd-city" filter label='Danh mục'className="w-full"  value={infos.categoryId}  options={_categories.rows} optionLabel="name"  optionValue="id" onChange={(e:any) =>  setInfos({ ...infos, categoryId: e.target.value })}  />
+                 <Dropdown inputId="dd-city" filter label='Danh mục'className="w-full"  value={infos.categoryId}  options={[]} optionLabel="name"  optionValue="id" onChange={(e:any) =>  setInfos({ ...infos, categoryId: e.target.value })}  />
                  <label htmlFor="dd-city">Danh mục</label>
               </span>
               </div>

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, loaiToKhai, refreshObject, typeDebit } from "utils";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { addDebit, showDebit, updateDebit } from "../api";
 import { Dropdown, MultiSelect } from "components/common/ListForm";
@@ -16,6 +16,7 @@ import { Button } from "primereact/button";
 import React from "react";
 import { showContractFile } from "modules/ContractFile/api";
 import { useListPartnerDetail } from "modules/partner/service";
+import { useListIncomeExpenseWithState, useListServiceCategoryWithState } from "modules/categories/service";
 export default function UpdateDebitChiPhi({ id }: { id: any }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
@@ -30,7 +31,25 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
   };
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  
+  
+  const { data: ChiPhis } = useListServiceCategoryWithState({type:0});
+  const { data: ChiHos } = useListServiceCategoryWithState({type:1});
+    // --- chuyển sang options bằng useMemo ---
+  const ChiPhiOptions = useMemo(() => {
+    if (!Array.isArray(ChiPhis)) return [];
+    return ChiPhis.map((x: any) => ({
+      label: x?.name ?? "(không tên)",
+      value: x.id,
+    }));
+  }, [ChiPhis]);
+    const ChiHoOptions = useMemo(() => {
+    if (!Array.isArray(ChiHos)) return [];
+    return ChiHos.map((x: any) => ({
+      label: x?.name ?? "(không tên)",
+      value: x.id,
+    }));
+  }, [ChiHos]);
   const handleSubmit = (e: any) => {
     e.preventDefault();
     let info = {
@@ -39,8 +58,8 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
       productChiho: productChiho,
     };
     console.log('info', info);
-    // setLoading(true);
-    // fetchDataSubmit(info);
+    setLoading(true);
+    fetchDataSubmit(info);
   };
   async function fetchDataSubmit(info: any) {
     if (info.id) {
@@ -84,20 +103,33 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
       showContractFile({ id: id, type: CategoryEnum.country }).then(res => {
         const detail = res.data.data
         if (detail) {
+          const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
           const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
-           const partner = partnerOptions.find((x:any)=>x.value == detail.partnerDetailId)
+          const partner = partnerOptions.find((x:any)=>x.value == detail.partnerDetailId)
            detail.partnerName = partner?.label
+          if(detail.fileInfoDetails && employeeInfo){
+             const EmployeeStaffInfo = detail.fileInfoDetails.find((x:any) => x.employeeId == employeeInfo.id);
+             if(EmployeeStaffInfo){
+                detail.employeeStaffId = employeeInfo.id;
+                detail.confirm_price = EmployeeStaffInfo.price;
+                detail.EmployeeStaffInfo = employeeInfo;
+             }
+            
+          }
           let info = {
             ...detail, status: detail.status === 0 ? true : false,
              loaiToKhai:_loaiToKhai?.name
           };
+          console.log('info',info);
+          console.log('employeeInfo',employeeInfo);
+          
           setInfos(info)
         }
       }).catch(err => {
         //setHasError(true)
       }).finally(() => setLoading(false));
     }
-  }, [id,partnerOptions.length])
+  }, [id,partnerOptions.length,ChiPhiOptions.length,ChiHoOptions.length])
   return (
     <>
       <AddForm
@@ -150,11 +182,8 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
                   </td>
                   <td className="pr-4 align-top">
                     <div className="mb-2">
-                      <InputForm
-                        className="w-full"
-                        id="employee_name"
-                        label="Người giao nhận"
-                      />
+                        <div><label className="font-medium">Nhân viên:</label> {`${infos?.EmployeeStaffInfo?.lastName ?? ""} ${infos?.EmployeeStaffInfo?.firstName ?? ""}`.trim()}</div>
+                        <div><label className="font-medium">Được duyệt:</label> {infos?.confirm_price ? Helper.formatCurrency(infos?.confirm_price.toString()) : 0}</div>
                     </div>
                   </td>
                 </tr>
@@ -183,14 +212,22 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
           <Panel header="Chi phí hải quan">
             <div className="formgrid grid">
               <div className="field col-3">
-                <InputForm
-                  className="w-full"
-                  id="name"
-                  value={newHaiquan.name}
+                 <Dropdown
+                  filter
+                   value={newHaiquan.name}
+                  options={ChiPhiOptions}
                   onChange={(e: any) =>
-                    setNewHaiquan({ ...newHaiquan, name: e.target.value })
+                     {
+                        const selected = e.value; // Đây là value (ví dụ: 123)
+                        const option = ChiPhiOptions.find((x: any) => x.value === selected);
+                         setNewHaiquan({ ...newHaiquan, name: selected, haiquan_info: {
+                          id: selected,
+                          name: option ? option.label : ''
+                        } })  
+                     }
                   }
                   label="Phí hải quan"
+                  className="w-full"
                 />
               </div>
               <div className="field col-3">
@@ -227,14 +264,14 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
                   raised
                   onClick={() => {
                     if (!newHaiquan.name || !newHaiquan.price)
-                      return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin" }));
+                      return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin hải quan" }));
 
                     // convert price về số khi push
                     const numericPrice = parseInt(newHaiquan.price.replace(/\D/g, ""), 10);
 
                     setProductHaiquan([
                       ...productHaiquan,
-                      { ...newHaiquan, price: numericPrice },
+                      { ...newHaiquan, price: numericPrice,name: newHaiquan.haiquan_info.name },
                     ]);
 
                     // reset input
@@ -247,11 +284,17 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
             <div className="child-table">
               <DataTable rowHover value={productHaiquan}>
                 <Column field="name" header="Phí hải quan" />
-                <Column
-                  field="price"
-                  header="Số tiền"
-                  body={(row: any) => formatCurrency(row.price.toString())}
-                />
+                   <Column
+                      field="price"
+                      header="Số tiền"
+                      body={(row: any) => formatCurrency(row.price.toString())}
+                      footer={formatCurrency(
+                        productHaiquan
+                          .reduce((sum, item) => sum + (item.price || 0), 0)
+                          .toString()
+                      )}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
                 <Column field="note" header="Ghi chú" />
                 <Column
                   header="Thao tác"
@@ -271,18 +314,26 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
           </Panel>
           <Panel header="Chi phí chi hộ">
             <div className="formgrid grid">
-              <div className="field col-3">
-                <InputForm
-                  className="w-full"
-                  id="chiho_name"
-                  value={newChiho.name}
+              <div className="field col-2">
+                 <Dropdown
+                  filter
+                   value={newChiho.name}
+                  options={ChiHoOptions}
                   onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, name: e.target.value })
+                    {
+                        const selected = e.value; // Đây là value (ví dụ: 123)
+                        const option = ChiHoOptions.find((x: any) => x.value === selected);
+                          setNewChiho({ ...newChiho, name: selected, chiho_info: {
+                            id: selected,
+                            name: option ? option.label : ''
+                          } })
+                    }
                   }
                   label="Phí chi hộ"
+                  className="w-full"
                 />
               </div>
-              <div className="field col-3">
+              <div className="field col-2">
                 <InputForm
                   className="w-full"
                   id="chiho_price"
@@ -296,7 +347,40 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
                   label="Số tiền"
                 />
               </div>
-              <div className="field col-3">
+               <div className="field col-2">
+                <InputForm
+                  className="w-full"
+                  id="chiho_bill"
+                  value={newChiho.bill}
+                  onChange={(e: any) =>
+                    setNewChiho({ ...newChiho, bill: e.target.value })
+                  }
+                  label="Hóa đơn"
+                />
+              </div>
+                <div className="field col-2">
+                <InputForm
+                  className="w-full"
+                  id="chiho_link_bill"
+                  value={newChiho.link_bill}
+                  onChange={(e: any) =>
+                    setNewChiho({ ...newChiho, link_bill: e.target.value })
+                  }
+                  label="Link hóa đơn"
+                />
+              </div>
+               <div className="field col-2">
+                <InputForm
+                  className="w-full"
+                  id="chiho_code_bill"
+                  value={newChiho.code_bill}
+                  onChange={(e: any) =>
+                    setNewChiho({ ...newChiho, code_bill: e.target.value })
+                  }
+                  label="Mã hóa đơn"
+                />
+              </div>
+              <div className="field col-1">
                 <InputForm
                   className="w-full"
                   id="chiho_note"
@@ -307,7 +391,7 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
                   label="Ghi chú"
                 />
               </div>
-              <div className="field col-3">
+              <div className="field col-1">
                 <Button
                   type="button"
                   className="w-full p-button-normal"
@@ -316,16 +400,16 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
                   raised
                   onClick={() => {
                     if (!newChiho.name || !newChiho.price)
-                      return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin" }));
+                      return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin chi hộ" }));
 
                     const numericPrice = parseInt(newChiho.price.replace(/\D/g, ""), 10);
 
                     setProductChiho([
                       ...productChiho,
-                      { ...newChiho, price: numericPrice },
+                      { ...newChiho, price: numericPrice, name: newChiho.chiho_info.name },
                     ]);
 
-                    setNewChiho({ name: "", price: "", note: "" });
+                    setNewChiho({ name: "", price: "", note: "" , bill: "", link_bill: "", code_bill: ""});
                   }}
                 />
               </div>
@@ -338,6 +422,12 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
                   field="price"
                   header="Số tiền"
                   body={(row: any) => formatCurrency(row.price.toString())}
+                  footer={formatCurrency(
+                    productChiho
+                      .reduce((sum, item) => sum + (item.price || 0), 0)
+                      .toString()
+                  )}
+                  footerStyle={{ fontWeight: "bold" }}  
                 />
                 <Column field="note" header="Ghi chú" />
                 <Column
@@ -356,6 +446,22 @@ export default function UpdateDebitChiPhi({ id }: { id: any }) {
               </DataTable>
             </div>
           </Panel>
+          {/* thêm dòng tổng cộng nằm bên phải */}
+          <div className="field mt-4">
+            <InputForm
+              className="w-64"
+              id="total_price"
+              value={formatCurrency((
+                productHaiquan.reduce((sum, item) => sum + (item.price || 0), 0) +
+                productChiho.reduce((sum, item) => sum + (item.price || 0), 0)
+              ).toString())}
+              onChange={(e: any) =>
+              // không cho sửa tổng
+              { }
+              }
+              label="Tổng cộng"
+            />
+          </div>
         </div>
       </AddForm>
     </>

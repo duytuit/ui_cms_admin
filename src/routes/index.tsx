@@ -21,7 +21,6 @@ import UpdateCampaign from "modules/pageTwo/screen/update";
 import ListPartner from "modules/partner/screen";
 import UpdatePartner from "modules/partner/screen/update";
 import CatePost from "modules/post/category/screen";
-import UpdateCatePost from "modules/post/category/screen/update";
 import Post from "modules/post/screen";
 import Updatepost from "modules/post/screen/update";
 import Product from "modules/product/screen";
@@ -76,11 +75,6 @@ const publicRoutes = [
   { path: "/post/list", component: Post, layout: 'ListPost' },
   { path: "/post/add", component: Updatepost, layout: 'AddPost' },
   { path: "/post/detail/:id", component: Updatepost, layout: 'DetailPost' },
-
-  // post category
-  { path: "/category/post/list", component: CatePost, layout: 'ListCatePost' },
-  { path: "/category/post/add", component: UpdateCatePost, layout: 'AddCatePost' },
-  { path: "/category/post/detail/:id", component: UpdateCatePost, layout: 'DetailCatePost' },
   // post category
   { path: "/user/list", component: User, layout: 'ListUser' },
 

@@ -4,7 +4,6 @@ import { FormInput } from "components/uiCore";
 import { GridForm } from "components/common/ListForm";
 import { deleteBill, updateStatusBill } from "../api";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { useListCategories } from "modules/categories/service";
 import { useListBill } from "../service";
 import { CategoryEnum } from "utils/type.enum";
 
@@ -23,7 +22,6 @@ export default function Bill() {
     const { handleParamUrl} = useHandleParamUrl(); 
     const [paramsPaginator, setParamsPaginator] = useState({ pageNum: 1, pageSize: 20, first: 0, render: false });
     const _Bill:any = useListBill({ ...paramsPaginator, status: undefined, first: undefined });
-    const _categories:any = useListCategories({type:CategoryEnum.country});
     useEffect(()=>{
         handleParamUrl(paramsPaginator)
     },[paramsPaginator])

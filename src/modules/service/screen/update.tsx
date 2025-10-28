@@ -11,7 +11,6 @@ import { listToast, scrollToTop, refreshObject } from "utils";
 import { updateService, addService, listService } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { useListCategories } from "modules/categories/service";
 import { CategoryEnum } from "utils/type.enum";
 const UpdateService = () => {
   const { handleParamUrl} = useHandleParamUrl(); 
@@ -20,7 +19,7 @@ const UpdateService = () => {
     const [infos, setInfos] = useState<any>({});
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const _categories:any = useListCategories({type:CategoryEnum.country});
+    //const _categories:any = useListCategories({type:CategoryEnum.country});
     const handleSubmit = (e:any) => {
         e.preventDefault();
         let info = {
@@ -108,7 +107,7 @@ const UpdateService = () => {
               </label>
               <div className="col-12 md:col-9">
               <span className="p-float-label">
-                 <Dropdown inputId="dd-city" filter label='Danh mục'className="w-full"  value={infos.categoryId}  options={_categories.rows} optionLabel="name"  optionValue="id" onChange={(e:any) =>  setInfos({ ...infos, categoryId: e.target.value })}  />
+                 <Dropdown inputId="dd-city" filter label='Danh mục'className="w-full"  value={infos.categoryId}  options={[]} optionLabel="name"  optionValue="id" onChange={(e:any) =>  setInfos({ ...infos, categoryId: e.target.value })}  />
                  <label htmlFor="dd-city">Danh mục</label>
               </span>
               </div>
