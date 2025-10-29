@@ -52,6 +52,7 @@ export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: (
   }, [ChiHos]);
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    infos.fileInfoId= infos.id;
     let info = {
       ...infos, status: infos.status ? 0 : 1,
       productHaiquan: productHaiquan,

@@ -77,26 +77,33 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
 };
   const handleSubmit = (e: any) => {
     e.preventDefault();
+     console.log('info', infos);
     // lưu lại thông thông label của tất cả các dropdown
-    infos.driverFee = infos.driverFee ? parseInt(infos.driverFee.replace(/\D/g, ""), 10) : 0;
-    infos.customsStatus = infos.customsStatus ? parseInt(infos.customsStatus.replace(/\D/g, ""), 10) : 0;
-    infos.purchasePrice = infos.purchasePrice ? parseInt(infos.purchasePrice.replace(/\D/g, ""), 10) : 0;
-    infos.sellingPrice = infos.sellingPrice ? parseInt(infos.sellingPrice.replace(/\D/g, ""), 10) : 0;
-    infos.price = infos.sellingPrice ? parseInt(infos.sellingPrice.replace(/\D/g, ""), 10) : 0;
-    infos.mealFee = infos.mealFee ? parseInt(infos.mealFee.replace(/\D/g, ""), 10) : 0;
-    infos.ticketFee = infos.ticketFee ? parseInt(infos.ticketFee.replace(/\D/g, ""), 10) : 0;
-    infos.overnightFee = infos.overnightFee ? parseInt(infos.overnightFee.replace(/\D/g, ""), 10) : 0;
-    infos.penaltyFee = infos.penaltyFee ? parseInt(infos.penaltyFee.replace(/\D/g, ""), 10) : 0;
-    infos.goodsFee = infos.goodsFee ? parseInt(infos.goodsFee.replace(/\D/g, ""), 10) : 0;
+    infos.driverFee      = toInt(infos.driverFee);
+    infos.customsStatus  = toInt(infos.customsStatus);
+    infos.purchasePrice  = toInt(infos.purchasePrice);
+    infos.sellingPrice   = toInt(infos.sellingPrice);
+    infos.price          = toInt(infos.sellingPrice);
+    infos.mealFee        = toInt(infos.mealFee);
+    infos.ticketFee      = toInt(infos.ticketFee);
+    infos.overnightFee   = toInt(infos.overnightFee);
+    infos.penaltyFee     = toInt(infos.penaltyFee);
+    infos.goodsFee       = toInt(infos.goodsFee);
     infos.fileInfoId= infos.id;
     infos.data = JSON.stringify(infos);
     let info = {
       ...infos, status: infos.status ? 0 : 1,
     };
-    console.log('info', info);
+   
     setLoading(true);
     fetchDataSubmit(info);
   };
+  const toInt = (v: any) =>
+  v == null
+    ? 0
+    : typeof v === "number"
+    ? v
+    : parseInt(String(v).replace(/\D/g, ""), 10) || 0;
   async function fetchDataSubmit(info: any) {
     if (info.id) {
       const response = await addDebit(info);
