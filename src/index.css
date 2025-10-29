@@ -156,3 +156,10 @@ display: none !important;
 .p-button-normal {
    padding: 0.55rem 0.5rem;
 }
+.layout-main-container {
+    padding-bottom: 0;
+}
+
+.Custom-DataTableClient {
+  display: grid;
+}
