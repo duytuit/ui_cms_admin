@@ -55,6 +55,17 @@ const AppSidebar = () => {
           },
           {
             id: 1,
+            name: 'Danh sách cần tạo file giá',
+            route: '/page-two',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
+            id: 1,
             name: 'Theo dõi file giá',
             route: '/page-two',
             created_at: '2023-05-29 14:14:02',
@@ -185,6 +196,17 @@ const AppSidebar = () => {
         items: [
           {
             id: 1,
+            name: 'Số file cần tạo bảng kê',
+            route: '/page-two',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
+            id: 1,
             name: 'Bảng liệt kê chi phí',
             route: '/page-two',
             created_at: '2023-05-29 14:14:02',
@@ -232,7 +254,7 @@ const AppSidebar = () => {
         items: [
           {
             id: 1,
-            name: 'Số file chưa tạo điều xe',
+            name: 'Số file cần tạo điều xe',
             route: '/ContractFile/list-create-dispatch',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
