@@ -159,7 +159,3 @@ display: none !important;
 .layout-main-container {
     padding-bottom: 0;
 }
-
-.Custom-DataTableClient {
-  display: grid;
-}
