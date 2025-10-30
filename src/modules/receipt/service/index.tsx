@@ -1,18 +1,32 @@
-import { useState, useEffect } from 'react';
-import { listReceipt } from '../api';
+import { useEffect, useState } from "react";
+import { listReceipt } from "../api";
 
-export const useListReceipt = (params:any) => {
-    const [data, setData] = useState([]);
-     function fetchData() {
-         listReceipt({ status: 1, ...params }).then(
-            res => {
-                setData(res.data.data);
-            }
-        ).catch(err => {
-            //setHasError(true)
-        });
-       
+export const useListReceipt = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listReceipt({ ...params });
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
     };
-    useEffect(() => { fetchData() }, [JSON.stringify(params)]);
-    return data;
+
+    useEffect(() => {
+        if (!params || Object.keys(params).length === 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
+
+    return { data, loading, error, refresh: fetchData };
 };

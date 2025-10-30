@@ -25,8 +25,11 @@ import Post from "modules/post/screen";
 import Updatepost from "modules/post/screen/update";
 import Product from "modules/product/screen";
 import UpdateProduct from "modules/product/screen/update";
-import Receipt from "modules/receipt/screen";
+import ListReceiptChi from "modules/receipt/screen/index_chi";
+import ListReceipt from "modules/receipt/screen/index_chi";
+import Receipt from "modules/receipt/screen/index_chi_tam_ung";
 import UpdateReceipt from "modules/receipt/screen/update";
+import UpdateReceiptChi from "modules/receipt/screen/update_chi";
 import Service from "modules/service/screen";
 import UpdateService from "modules/service/screen/update";
 import ListStorage from "modules/storage/screen";
@@ -103,6 +106,12 @@ const publicRoutes = [
   { path: "/department/list", component: ListDepartment, layout: 'ListDepartment' },
   { path: "/department/add", component: UpdateDepartment, layout: 'UpdateDepartment' },
   { path: "/department/detail/:id", component: UpdateDepartment, layout: 'UpdateDepartment' },
+  // Receipt 
+  { path: "/receipt/list", component: ListReceipt, layout: 'ListReceipt' },
+  { path: "/receipt/listReceiptChi", component: ListReceiptChi, layout: 'ListReceiptChi' },
+  { path: "/receipt/add", component: UpdateReceipt, layout: 'UpdateReceipt' },
+  { path: "/receipt/updateChi", component: UpdateReceiptChi, layout: 'UpdateReceiptChi' },
+  { path: "/receipt/detail/:id", component: UpdateReceipt, layout: 'DetailReceipt' },
   // Debit 
   // { path: "/debit/list", component: ListDebit, layout: 'ListDebit' },
   // { path: "/debit/add", component: UpdateDebit, layout: 'UpdateDebit' },
