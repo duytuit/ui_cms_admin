@@ -120,6 +120,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
 export default function ListContractFile() {
   const { handleParamUrl } = useHandleParamUrl();
   const [visible, setVisible] = useState(false);
+  const [visibleDebit, setVisibleDebit] = useState(false);
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [displayData, setDisplayData] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<any>();
@@ -197,7 +198,7 @@ export default function ListContractFile() {
     // Hàm mở dialog thêm mới
     const openDialogAdd = (id:number) => {
         setSelectedId(id);
-        setVisible(true);
+        setVisibleDebit(true);
     };
 
   return (
@@ -416,6 +417,18 @@ export default function ListContractFile() {
       >
         <p className="m-0">
           {selectedId && <UpdateDebitChiPhi id={selectedId}  onClose={() => setVisible(false)} ></UpdateDebitChiPhi>}
+        </p>
+      </Dialog>
+      <Dialog
+        position="top"
+        dismissableMask
+        header="Tạo debit khách hàng"
+        visible={visibleDebit}
+        onHide={() => setVisibleDebit(false)}
+        style={{ width: "78vw" }}
+      >
+        <p className="m-0">
+          {selectedId && <UpdateDebit id={selectedId}  onClose={() => setVisibleDebit(false)} ></UpdateDebit>}
         </p>
       </Dialog>
     </>

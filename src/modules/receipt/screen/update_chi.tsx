@@ -2,7 +2,7 @@
 import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Button, Dropdown, FormInput, InputSwitch, InputTextarea, Panel } from "components/uiCore";
+import { Button, Dropdown, FormInput, InputSwitch, InputTextarea, Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { listToast, scrollToTop, refreshObject, tinhChat } from "utils";
 import { updateReceipt, addReceipt, listReceipt, showReceipt } from "../api";
@@ -83,117 +83,205 @@ export default function UpdateReceiptChi() {
       >
         <div className="field">
           <Panel header="Thông tin">
-            <div className="formgrid grid">
-              <div className="field col-12">
-                <InputForm className="w-full"
-                  id="fileNumber"
-                  value={infos.fileNumber}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, fileNumber: e.target.value })
-                  }
-                  label="Số file"
-                  required
-                />
+            <div className="grid">
+              <div className="col-8">
+                <div className="formgrid grid">
+                  <div className="field col-6">
+                    <MyCalendar dateFormat="dd/mm/yy"
+                      value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
+                      onChange={(e: any) =>
+                      setInfos({ ...infos, accountingDate: e })}
+                      className={classNames("w-full", "p-inputtext", "input-form-sm")} />
+                  </div>
+                  <div className="field col-6">
+                      <InputForm className="w-full"
+                      id="fileNumber"
+                      value={infos.fileNumber}
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, fileNumber: e.target.value })
+                      }
+                      label="Loại quỹ"
+                      required
+                    />
+                  </div>
+                  <div className="field col-12">
+                    <label htmlFor="">Hình thức thanh toán</label>
+                   <div className="flex flex-wrap gap-3">
+                      <div className="flex align-items-center">
+                          <RadioButton inputId="ingredient1" name="paymentMethod" value="1" onChange={(e: any) => setInfos({ ...infos, paymentMethod: e.value })} checked={infos.paymentMethod === '1'} />
+                          <label htmlFor="ingredient1" className="ml-2">Tiền mặt</label>
+                      </div>
+                      <div className="flex align-items-center">
+                          <RadioButton inputId="ingredient2" name="paymentMethod" value="2" onChange={(e: any) => setInfos({ ...infos, paymentMethod: e.value })} checked={infos.paymentMethod === '2'} />
+                          <label htmlFor="ingredient2" className="ml-2">Chuyển khoản</label>
+                      </div>
+                  </div>
+                  </div>
+                  <div className="field col-6">
+                    <Dropdown
+                      value={infos.feature}
+                      optionValue="feature"
+                      optionLabel="name"
+                      options={tinhChat}
+                      label="Đối tượng"
+                      className="w-full p-inputtext-sm"
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, feature: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="field col-6">
+                     <Dropdown
+                      value={infos.feature}
+                      optionValue="feature"
+                      optionLabel="name"
+                      options={tinhChat}
+                      label="Đối tượng"
+                      className="w-full p-inputtext-sm"
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, feature: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="field col-6">
+                    <Dropdown
+                      value={infos.feature}
+                      optionValue="feature"
+                      optionLabel="name"
+                      options={tinhChat}
+                      label="Số file"
+                      className="w-full p-inputtext-sm"
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, feature: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="field col-6">
+                    <Dropdown
+                      value={infos.feature}
+                      optionValue="feature"
+                      optionLabel="name"
+                      options={tinhChat}
+                      label="Người giao nhận"
+                      className="w-full p-inputtext-sm"
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, feature: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="field col-12">
+                    <InputForm
+                      id="sales"
+                      value={infos.sales}
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, sales: e.target.value })
+                      }
+                      className="w-full"
+                      label="Người nhận"
+                    />
+                  </div>
+                  <div className="field col-12">
+                    <InputForm className="w-full"
+                      id="declarationQuantity"
+                      type="number"
+                      min={1}
+                      value={infos.declarationQuantity}
+                      onChange={(e: any) => {
+                        let v = Number(e.target.value);
+                        if (v < 0) v = 1;
+                        setInfos({ ...infos, declarationQuantity: v });
+                      }}
+                      label="Địa chỉ"
+                      required
+                    />
+                  </div>
+                  <div className="field col-12">
+                    <Dropdown
+                      value={infos.feature}
+                      optionValue="feature"
+                      optionLabel="name"
+                      options={tinhChat}
+                      label="Lý do chi"
+                      className="w-full p-inputtext-sm"
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, feature: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                   <div className="field col-4">
+                    <InputForm className="w-full"
+                      id="note"
+                      value={infos.note}
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, note: e.target.value })
+                      }
+                      label="Số tiền"
+                    />
+                  </div>
+                  <div className="field col-4">
+                   <Dropdown
+                      value={infos.feature}
+                      optionValue="feature"
+                      optionLabel="name"
+                      options={tinhChat}
+                      label="VAT"
+                      className="w-full p-inputtext-sm"
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, feature: e.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                   <div className="field col-4">
+                    <InputForm className="w-full"
+                      id="note"
+                      value={infos.note}
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, note: e.target.value })
+                      }
+                      label="Thành tiền"
+                    />
+                  </div>
+                   <div className="field col-12">
+                    <InputForm className="w-full"
+                      id="note"
+                      value={infos.note}
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, note: e.target.value })
+                      }
+                      label="Số hóa đơn"
+                    />
+                  </div>
+                   <div className="field col-12">
+                    <InputForm className="w-full"
+                      id="note"
+                      value={infos.note}
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, note: e.target.value })
+                      }
+                      label="Diễn giải"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="field col-2">
-                <MyCalendar dateFormat="dd/mm/yy"
-                  value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, accountingDate: e })}
-                  className={classNames("w-full", "p-inputtext", "input-form-sm")} />
-              </div>
-              <div className="field col-2">
-                <InputForm className="w-full"
-                  id="declaration"
-                  value={infos.declaration}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, declaration: e.target.value })
-                  }
-                  label="Số tờ khai"
-                  required
-                />
-              </div>
-              <div className="field col-2">
-                <Dropdown
-                  value={infos.feature}
-                  optionValue="feature"
-                  optionLabel="name"
-                  options={tinhChat}
-                  label="Chọn tính chất"
-                  className="p-inputtext-sm"
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, feature: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className="field col-2">
-                <InputForm className="w-full"
-                  id="bill"
-                  value={infos.bill}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, bill: e.target.value })
-                  }
-                  label="Số bill"
-                  required
-                />
-              </div>
-              <div className="field col-2">
-                <InputForm className="w-full"
-                  id="quantity"
-                  value={infos.quantity}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, quantity: e.target.value })
-                  }
-                  label="Số lượng"
-                  required
-                />
-              </div>
-              <div className="field col-2">
-                <InputForm className="w-full"
-                  id="containerCode"
-                  value={infos.containerCode}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, containerCode: e.target.value })
-                  }
-                  label="Số cont"
-                />
-              </div>
-              <div className="field col-2">
-                <InputForm
-                  id="sales"
-                  value={infos.sales}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, sales: e.target.value })
-                  }
-                  className="w-full"
-                  label="Tên sales"
-                />
-              </div>
-              <div className="field col-2">
-                <InputForm className="w-full"
-                  id="declarationQuantity"
-                  type="number"
-                  min={1}
-                  value={infos.declarationQuantity}
-                  onChange={(e: any) => {
-                    let v = Number(e.target.value);
-                    if (v < 0) v = 1;
-                    setInfos({ ...infos, declarationQuantity: v });
-                  }}
-                  label="Số lượng tờ khai"
-                  required
-                />
-              </div>
-              <div className="field col-12">
-                <InputForm className="w-full"
-                  id="note"
-                  value={infos.note}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, note: e.target.value })
-                  }
-                  label="Ghi chú"
-                />
+              <div className="col-4">
+                 <div className="formgrid grid">
+                    <div className="col-12">
+                      <Dropdown
+                          className="w-full p-inputtext-sm"
+                      />
+                    </div>
+                    <div className="col-12">
+                        <div className="mt-4"><b>Số tài khoản:</b>123423453252</div>
+                        <div className="mt-4"><b>Chủ tài khoản:</b>123423453252</div>
+                        <div className="mt-4"><b>Chi nhánh:</b>123423453252</div>
+                    </div>
+                 </div>
               </div>
             </div>
           </Panel>
