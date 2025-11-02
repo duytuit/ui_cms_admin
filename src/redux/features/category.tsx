@@ -5,7 +5,9 @@ export const categorySlice = createSlice({
   initialState: {
     ServiceCategory: null,
     ServiceCategoryChiHo: null,
-    IncomeExpense: null
+    IncomeExpense: null,
+    Bank:null,
+    FundCategory:null
   },
   reducers: {
     setServiceCategory: (state, action) => {
@@ -25,7 +27,19 @@ export const categorySlice = createSlice({
     },
     clearIncomeExpense: (state) => {
       state.IncomeExpense = null
-    }
+    },
+    setBank: (state, action) => {
+      state.Bank = action.payload;
+    },
+    clearBank: (state) => {
+      state.Bank = null
+    },
+    setFundCategory: (state, action) => {
+      state.FundCategory = action.payload;
+    },
+    clearFundCategory: (state) => {
+      state.FundCategory = null
+    },
   },
 })
 
@@ -35,7 +49,11 @@ export const {setServiceCategory,
   setIncomeExpense,
   clearIncomeExpense,
   setServiceCategoryChiHo,
-  clearServiceCategoryChiHo
+  clearServiceCategoryChiHo,
+  setBank,
+  clearBank,
+  setFundCategory,
+  clearFundCategory
 } = categorySlice.actions
 
 export default categorySlice.reducer;

@@ -198,3 +198,35 @@ export const typeReceipt = [
      name:"Chi hộ"
    }
 ];
+export const VatDebit = [
+   {
+     vat:0,
+     name:"0"
+   },
+    {
+     vat:5,
+     name:"5"
+   },
+    {
+     vat:8,
+     name:"8"
+   },
+    {
+     vat:10,
+     name:"10"
+   }
+];
+export const TypeDoiTuong = [
+   {
+     value:0,
+     name:"Khách hàng"
+   },
+    {
+     value:1,
+     name:"Nhà cung cấp"
+   },
+    {
+     value:2,
+     name:"Nhân viên"
+   }
+];

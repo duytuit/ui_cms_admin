@@ -33,7 +33,7 @@ import { useListUserWithState } from "modules/user/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import UpdateDebit from "modules/Debit/screen/update";
+import UpdateDebit from "modules/Debit/screen/update_debit";
 import UpdateDebitChiPhi from "modules/Debit/screen/update";
 
 // ✅ Component Header lọc dữ liệu
