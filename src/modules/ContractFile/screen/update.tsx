@@ -7,7 +7,7 @@ import { showToast } from "redux/features/toast";
 import { listToast, scrollToTop, refreshObject, tinhChat, loaiToKhai, loaiHang, nghiepVu, phatSinh } from "utils";
 import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
-import { addContractFile, listContractFile, showContractFile, updateContractFile } from "../api";
+import { addContractFile, getCodeContractFile, listContractFile, showContractFile, updateContractFile } from "../api";
 import { Calendar, Dropdown, MultiSelect } from "components/common/ListForm";
 import { MyCalendar } from "components/common/MyCalendar";
 import { classNames } from "primereact/utils";
@@ -20,7 +20,7 @@ export default function UpdateContractFile() {
   const [infos, setInfos] = useState<any>({
     feature: 0, DeclarationType: 0, type: 0,
     business: 0, occurrence: 0, DeclarationQuantity: 1,
-    sales:"",employeeIds:[]
+    sales:"",employeeIds:[],accountingDate:Helper.toDayString()
   });
 
   const dispatch = useDispatch();
@@ -46,6 +46,7 @@ export default function UpdateContractFile() {
   }, [employees]);
   // ===== FETCH DETAIL LÚC EDIT =====
   useEffect(() => {
+    getCode(0);
     if (!id) return;
     setLoading(true);
     showContractFile({ id: id, type: CategoryEnum.country })
@@ -60,8 +61,9 @@ export default function UpdateContractFile() {
           });
         }
       })
-      .finally(() => setLoading(false));
-  }, [id]);
+    .finally(() => setLoading(false));
+
+  }, []);
 
   // ===== SUBMIT =====
   const handleSubmit = (e: any) => {
@@ -92,7 +94,17 @@ export default function UpdateContractFile() {
     }
   }
 
-
+  async function getCode(value:number) {
+    if (!id){
+      getCodeContractFile({type: value == 0 ? "IS":"ES"}).then(res => {
+          const detail = res.data.data;
+          if (detail) {
+            setInfos({ ...infos, fileNumber:detail.extra.code,feature:value});
+          }
+        })
+    }
+     
+  }
 
   // ===== LOADING SCREEN =====
   if (loading) return (<></>);
@@ -115,10 +127,8 @@ export default function UpdateContractFile() {
                 <InputForm className="w-full"
                   id="fileNumber"
                   value={infos.fileNumber}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, fileNumber: e.target.value })
-                  }
                   label="Số file"
+                  disabled
                   required
                 />
               </div>
@@ -149,8 +159,12 @@ export default function UpdateContractFile() {
                   label="Chọn tính chất"
                   className="p-inputtext-sm"
                   onChange={(e: any) =>
-                    setInfos({ ...infos, feature: e.target.value })
+                    {
+                      getCode(e.value);
+                     // setInfos({ ...infos, feature: e.target.value });
+                    }
                   }
+                  disabled={id ? true : false}
                   required
                 />
               </div>
