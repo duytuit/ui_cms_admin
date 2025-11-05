@@ -198,7 +198,7 @@ export default function ListCreateDispatch() {
               }}
             >
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                <b>Danh sách file chưa tạo chi phí</b>
+                <b>File chưa tạo chi phí đi đường</b>
                 <DataTableClient
                   rowHover
                   value={displayData}
@@ -410,7 +410,7 @@ export default function ListCreateDispatch() {
                   style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                 >
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                     <b>Danh sách bảng kê chi phí</b>
+                     <b>Bảng nhật ký hàng ngày</b>
                     <DataTableClient
                       rowHover
                       value={displayData}

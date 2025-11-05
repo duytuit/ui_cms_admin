@@ -14,6 +14,7 @@ import { useListUserWithState } from "modules/user/service";
 import { Checkbox } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
+import { Splitter, SplitterPanel } from "primereact/splitter";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -85,7 +86,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
     );
 };
 
-export default function ListContractFile() {
+export default function ListContractFileBangKe() {
     const { handleParamUrl } = useHandleParamUrl();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [displayData, setDisplayData] = useState<any[]>([]);
@@ -155,85 +156,138 @@ export default function ListContractFile() {
     return (
         <div className="card">
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
+              <div style={{ height: 'calc(100vh - 8rem)' }}>
+                      <Splitter style={{ height: '100%', width: '100%' }}>
+                        {/* Panel 1 */}
+                        <SplitterPanel
+                          size={35}
+                          minSize={10}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                            <b>File chưa tạo bảng kê</b>
+                                <DataTableClient
+                                rowHover
+                                value={displayData}
+                                paginator
+                                rows={rows}
+                                first={first}
+                                totalRecords={data?.total}
+                                currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
+                                onPage={(e: any) => {
+                                    setFirst(e.first);
+                                    setRows(e.rows);
+                                }}
+                                loading={loading}
+                                dataKey="id"
+                                title="Tài khoản"
+                                filterDisplay="row"
+                                className={classNames("Custom-DataTableClient")}
+                                scrollable
+                                tableStyle={{ minWidth: "2900px" }} // ép bảng rộng hơn để có scroll ngang
+                                >
+                                {/* Custom checkbox column */}
+                                <Column
+                                    header={
+                                    <Checkbox
+                                        checked={selectedRows.length === displayData.length && displayData.length > 0}
+                                        onChange={(e:any) => {
+                                            if (e.checked) setSelectedRows(displayData.map(d => d.id));
+                                            else setSelectedRows([]);
+                                        }}
+                                    />
+                                    }
+                                    body={(rowData:any) => (
+                                    <Checkbox
+                                        className="p-checkbox-sm"
+                                        checked={selectedRows.includes(rowData.id)}
+                                        onChange={(e:any) => {
+                                            if (e.checked) setSelectedRows(prev => [...prev, rowData.id]);
+                                            else setSelectedRows(prev => prev.filter(id => id !== rowData.id));
+                                        }}
+                                        onClick={(e:any) => e.stopPropagation()} // ⚡ chặn row click
+                                    />
+                                    )}
+                                    style={{ width: "3em" }}
+                                />
+                                <Column
+                                    header="Thao tác"
+                                    body={(e: any) =>
+                                        ActionBody(
+                                            e,
+                                            "/ContractFile/detail",
+                                            { route: "/ContractFile/delete", action: deleteContractFile },
+                                            paramsPaginator,
+                                            setParamsPaginator
+                                        )
+                                    }
+                                    style={{ width: "6em" }}
+                                />
+                                <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="declaration" header="Số tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="sales" header="Tên sales" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="listEmployee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="sumTongPrice" header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="feature" header="Tính chất" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="type" header="Loại hàng" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="declaration_quantity" header="Số lượng tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="declaration_type" header="Loại tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="business" header="Nghiệp vụ" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="occurrence" header="Phát sinh" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="userName" header="Người thực hiện" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
+                                
+                            </DataTableClient>
+                          </div>
+                        </SplitterPanel>
+            
+                        {/* Panel 2 */}
+                        <SplitterPanel
+                          size={65}
+                          minSize={20}
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          <Splitter layout="vertical" style={{ height: '100%' }}>
+                            {/* Panel 2.1 */}
+                            <SplitterPanel
+                              size={75}
+                              minSize={10}
+                              style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+                            >
+                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                 <b>Bảng kê chi phí đã tạo</b>
+                              </div>
+                            </SplitterPanel>
+            
+                            {/* Panel 2.2 */}
+                            <SplitterPanel
+                              size={25}
+                              minSize={10}
+                              style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+                            >
+                              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                <b>Chi tiết bảng kê chi phí</b>
 
-            <DataTableClient
-                rowHover
-                value={displayData}
-                paginator
-                rows={rows}
-                first={first}
-                totalRecords={data?.total}
-                currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
-                onPage={(e: any) => {
-                    setFirst(e.first);
-                    setRows(e.rows);
-                }}
-                loading={loading}
-                dataKey="id"
-                title="Tài khoản"
-                filterDisplay="row"
-                className={classNames("Custom-DataTableClient")}
-                scrollable
-                tableStyle={{ minWidth: "2900px" }} // ép bảng rộng hơn để có scroll ngang
-            >
-                  {/* Custom checkbox column */}
-                <Column
-                    header={
-                    <Checkbox
-                        checked={selectedRows.length === displayData.length && displayData.length > 0}
-                        onChange={(e:any) => {
-                            if (e.checked) setSelectedRows(displayData.map(d => d.id));
-                            else setSelectedRows([]);
-                        }}
-                    />
-                    }
-                    body={(rowData:any) => (
-                    <Checkbox
-                        className="p-checkbox-sm"
-                        checked={selectedRows.includes(rowData.id)}
-                        onChange={(e:any) => {
-                            if (e.checked) setSelectedRows(prev => [...prev, rowData.id]);
-                            else setSelectedRows(prev => prev.filter(id => id !== rowData.id));
-                        }}
-                        onClick={(e:any) => e.stopPropagation()} // ⚡ chặn row click
-                    />
-                    )}
-                    style={{ width: "3em" }}
-                />
-                <Column
-                    header="Thao tác"
-                    body={(e: any) =>
-                        ActionBody(
-                            e,
-                            "/ContractFile/detail",
-                            { route: "/ContractFile/delete", action: deleteContractFile },
-                            paramsPaginator,
-                            setParamsPaginator
-                        )
-                    }
-                    style={{ width: "6em" }}
-                />
-                <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="declaration" header="Số tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="sales" header="Tên sales" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="listEmployee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="sumTongPrice" header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="feature" header="Tính chất" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="type" header="Loại hàng" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="declaration_quantity" header="Số lượng tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="declaration_type" header="Loại tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="business" header="Nghiệp vụ" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="occurrence" header="Phát sinh" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="userName" header="Người thực hiện" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
-                
-            </DataTableClient>
+                              </div>
+                            </SplitterPanel>
+                          </Splitter>
+                        </SplitterPanel>
+                      </Splitter>
+                    </div>
         </div>
     );
 }

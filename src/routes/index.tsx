@@ -6,6 +6,7 @@ import UpdateBill from "modules/bill/screen/update";
 import Categories from "modules/categories/screen";
 import UpdateCategories from "modules/categories/screen/update";
 import ListContractFile from "modules/ContractFile/screen";
+import ListContractFileBangKe from "modules/ContractFile/screen/file_chuataophi";
 import ListCreateDispatch from "modules/ContractFile/screen/index_create_dispatch";
 import UpdateContractFile from "modules/ContractFile/screen/update";
 import Customer from "modules/customer/screen";
@@ -95,6 +96,7 @@ const publicRoutes = [
   { path: "/partner/detail/:id", component: UpdatePartner, layout: 'UpdatePartner' },
   // ContractFile 
   { path: "/ContractFile/list", component: ListContractFile, layout: 'ListContractFile' },
+  { path: "/ContractFile/list-create-bangke", component: ListContractFileBangKe, layout: 'ListContractFileBangKe' },
   { path: "/ContractFile/list-create-dispatch", component: ListCreateDispatch, layout: 'ListCreateDispatch' },
   { path: "/ContractFile/add", component: UpdateContractFile, layout: 'UpdateContractFile' },
   { path: "/ContractFile/detail/:id", component: UpdateContractFile, layout: 'UpdateContractFile' },
