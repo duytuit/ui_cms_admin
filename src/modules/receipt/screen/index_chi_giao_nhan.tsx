@@ -26,13 +26,13 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             filter={filter}
             setFilter={setFilter}
             className="lg:col-9"
-            add="/receipt/updateChi"
+            add="/receipt/updateReceiptChiGiaoNhan"
         >
         </GridForm>
     );
 };
 
-export default function ListReceiptChi() {
+export default function ListReceiptChiGiaoNhan() {
     const { handleParamUrl } = useHandleParamUrl();
     const [selectedRows, setSelectedRows] = useState<any>([]);
     const [displayData, setDisplayData] = useState<any>();

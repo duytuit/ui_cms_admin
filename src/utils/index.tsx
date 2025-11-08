@@ -190,12 +190,12 @@ export const typeService = [
 ];
 export const typeReceipt = [
    {
-     status:0,
-     name:"Chi phí"
+     typeReceipt:0,
+     name:"Thu"
    },
     {
-     status:1,
-     name:"Chi hộ"
+     typeReceipt:1,
+     name:"Chi"
    }
 ];
 export const VatDebit = [
@@ -228,5 +228,15 @@ export const TypeDoiTuong = [
     {
      value:2,
      name:"Nhân viên"
+   }
+];
+export const formOfPayment = [
+    {
+     value:1,
+     name:"Tiền mặt"
+   },
+    {
+     value:2,
+     name:"Chuyển khoản"
    }
 ];

@@ -21,16 +21,15 @@ import PageTwo from "modules/pageTwo/screen";
 import UpdateCampaign from "modules/pageTwo/screen/update";
 import ListPartner from "modules/partner/screen";
 import UpdatePartner from "modules/partner/screen/update";
-import CatePost from "modules/post/category/screen";
 import Post from "modules/post/screen";
 import Updatepost from "modules/post/screen/update";
 import Product from "modules/product/screen";
 import UpdateProduct from "modules/product/screen/update";
-import ListReceiptChi from "modules/receipt/screen/index_chi";
-import ListReceipt from "modules/receipt/screen/index_chi";
+import ListReceiptChiGiaoNhan from "modules/receipt/screen/index_chi_giao_nhan";
+import ListReceipt from "modules/receipt/screen/index_chi_giao_nhan";
 import Receipt from "modules/receipt/screen/index_chi_tam_ung";
 import UpdateReceipt from "modules/receipt/screen/update";
-import UpdateReceiptChi from "modules/receipt/screen/update_chi";
+import UpdateReceiptChiGiaoNhan from "modules/receipt/screen/update_chi_giao_nhan";
 import Service from "modules/service/screen";
 import UpdateService from "modules/service/screen/update";
 import ListStorage from "modules/storage/screen";
@@ -110,9 +109,9 @@ const publicRoutes = [
   { path: "/department/detail/:id", component: UpdateDepartment, layout: 'UpdateDepartment' },
   // Receipt 
   { path: "/receipt/list", component: ListReceipt, layout: 'ListReceipt' },
-  { path: "/receipt/listReceiptChi", component: ListReceiptChi, layout: 'ListReceiptChi' },
+  { path: "/receipt/listReceiptChiGiaoNhan", component: ListReceiptChiGiaoNhan, layout: 'ListReceiptChiGiaoNhan' },
   { path: "/receipt/add", component: UpdateReceipt, layout: 'UpdateReceipt' },
-  { path: "/receipt/updateChi", component: UpdateReceiptChi, layout: 'UpdateReceiptChi' },
+  { path: "/receipt/updateReceiptChiGiaoNhan", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
   { path: "/receipt/detail/:id", component: UpdateReceipt, layout: 'DetailReceipt' },
   // Debit 
   // { path: "/debit/list", component: ListDebit, layout: 'ListDebit' },

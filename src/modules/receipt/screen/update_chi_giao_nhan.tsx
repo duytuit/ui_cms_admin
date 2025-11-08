@@ -2,10 +2,10 @@
 import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import { Button, FormInput, InputSwitch, InputTextarea, Panel, RadioButton } from "components/uiCore";
+import { Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
-import { listToast, scrollToTop, refreshObject, tinhChat, TypeDoiTuong, typeDebit, VatDebit } from "utils";
-import { updateReceipt, addReceipt, listReceipt, showReceipt } from "../api";
+import { formOfPayment, listToast, refreshObject, VatDebit } from "utils";
+import { updateReceipt, addReceipt, showReceipt, addReceiptChiGiaoNhan } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
@@ -15,61 +15,70 @@ import { Helper } from "utils/helper";
 import { Dropdown, Input } from "components/common/ListForm";
 import { useListEmployee } from "modules/employee/service";
 import { useListPartnerDetail } from "modules/partner/service";
-import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState, useListServiceCategoryWithState } from "modules/categories/service";
-import { useListContractFileWithState } from "modules/ContractFile/service";
-export default function UpdateReceiptChi() {
+import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
+import { useListContractFile } from "modules/ContractFile/service";
+export default function UpdateReceiptChiGiaoNhan() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [doiTuongOptions, setDoiTuongOptions] = useState<any>([]);
   const [employeeInfo, setEmployeeInfo] = useState<any>({});
   const [bankSelect, setBankSelect] = useState<any>({});
-  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0, isExternalDriver: 0,accountingDate:Helper.toDayString(),paymentMethod:1 });
+  const [ContractFileOptions, setContractFileOptions] = useState<any[]>([]);
+  const [nhanVienGiaoNhanOptions, setNhanVienGiaoNhanOptions] = useState<any[]>([]);
+  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1 });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSubmit = (e: any) => {
     e.preventDefault();
     let info = {
-      ...infos, status: infos.status ? 0 : 1,
+      ...infos, Amount: parseInt(infos.Amount.replace(/\D/g, ""), 10),thanhtien: parseInt(infos.thanhtien.replace(/\D/g, ""), 10), status: infos.status ? 0 : 1,
+     data:JSON.stringify(infos)
     };
     console.log('info', info);
-
     setLoading(true);
     fetchDataSubmit(info);
   };
   async function fetchDataSubmit(info: any) {
-    if (info.id) {
-      const response = await updateReceipt(info);
-      if (response) setLoading(false);
-      if (response.status === 200) {
-        if (response.data.status) {
-          dispatch(showToast({ ...listToast[0], detail: response.data.message }));
-          navigate('/Receipt/list');
-        } else {
-          dispatch(showToast({ ...listToast[2], detail: response.data.message }))
-        }
-      } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
-    } else {
-      const response = await addReceipt(info);
-      if (response) setLoading(false);
-      if (response.status === 200) {
-        if (response.data.status) {
-          setInfos({ ...refreshObject(infos), status: true })
-          dispatch(showToast({ ...listToast[0], detail: response.data.message }));
-          navigate('/Receipt/list');
-        } else {
-          dispatch(showToast({ ...listToast[2], detail: response.data.message }))
-        }
-      } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
-    }
+   
+     if (info.id) {
+     } else {
+       const response = await addReceiptChiGiaoNhan(info);
+       if (response) setLoading(false);
+       if (response.status === 200) {
+         if (response.data.status) {
+           setInfos({ ...refreshObject(infos), status: true });
+           dispatch(
+             showToast({ ...listToast[0], detail: response.data.message })
+           );
+           navigate("/receipt/listReceiptChiGiaoNhan");
+         } else {
+           dispatch(
+             showToast({ ...listToast[2], detail: response.data.message })
+           );
+         }
+       } else
+         dispatch(
+           showToast({ ...listToast[1], detail: response.data.message })
+         );
+     }
   };
-   const { data: ContractFile } = useListContractFileWithState({});
-   const ContractFileptions = useMemo(() => {
-       if (!Array.isArray(ContractFile)) return [];
-       return ContractFile.map((x: any) => ({
-         label: x?.fileNumber ?? "(không tên)",
-         value: x.id,
-       }));
-     }, [ContractFile]);
+ const { data: ContractFile } = useListContractFile({
+     params: {f:"abc"},
+     debounce: 500,
+ }); 
+ useEffect(() => {
+  const list = ContractFile.data;
+  if (Array.isArray(list) && list.length > 0) {
+    console.log(ContractFile);
+    
+    const opts = list.map((x: any) => ({
+      label: x?.file_number ?? "(không tên)",
+      value: x.id,
+    }));
+    setContractFileOptions(opts);
+  }
+}, [ContractFile]);
+
    const { data: DMQuy } = useListFundCategoryWithState({type:1});
    const DMQuyOptions = useMemo(() => {
        if (!Array.isArray(DMQuy)) return [];
@@ -78,6 +87,14 @@ export default function UpdateReceiptChi() {
          value: x.id,
        }));
      }, [DMQuy]);
+   const { data: DMExpense } = useListIncomeExpenseWithState({type:1}); // danh mục chi phí
+   const DMExpenseOptions = useMemo(() => {
+       if (!Array.isArray(DMExpense)) return [];
+       return DMExpense.map((x: any) => ({
+         label: x?.name ?? "(không tên)",
+         value: x.id,
+       }));
+     }, [DMExpense]);
    const { data: DMBank } = useListBankWithState({type:1});
    const DMBankOptions = useMemo(() => {
        if (!Array.isArray(DMBank)) return [];
@@ -123,7 +140,7 @@ export default function UpdateReceiptChi() {
         value: x.id,
       }));
     }, [partnerDetails]);
-
+    
     const partnerVenderOptions = useMemo(() => {
       if (!Array.isArray(partnerVenderDetails?.data)) return [];
       return partnerVenderDetails.data.map((x: any) => ({
@@ -131,8 +148,32 @@ export default function UpdateReceiptChi() {
         value: x.id,
       }));
     }, [partnerVenderDetails]);
+  function GetNhanVienGiaoNhan(fileId:Number){
+        setNhanVienGiaoNhanOptions([]);
+        setInfos({ ...infos, FileInfoId: fileId })
+        if (!Array.isArray(ContractFile?.data) || !Array.isArray(employees?.data)) return setNhanVienGiaoNhanOptions([]);
 
+        // 1️⃣ Lấy file theo id
+        const file = ContractFile.data.find((x: any) => x.id === fileId);
+        if (!file || !Array.isArray(file.file_info_details)) return setNhanVienGiaoNhanOptions([]);
+
+        // 2️⃣ Lấy danh sách employee_id từ file_info_details
+        const employeeIds = file.file_info_details.map((x: any) => x.employee_id);
+
+        // 3️⃣ Lọc các nhân viên tương ứng
+        const nhanVienGiaoNhan = employees.data.filter((e: any) => employeeIds.includes(e.id));
+
+        // 4️⃣ Map ra option {label, value} nếu cần
+        const _nhanVienGiaoNhan = nhanVienGiaoNhan.map((e: any, i: number) => ({
+          label: `${i + 1}. ${e.last_name ?? ""} ${e.first_name ?? ""}`.trim(),
+          value: e.id,
+        }));
+        if(_nhanVienGiaoNhan.length > 0){
+            setNhanVienGiaoNhanOptions(_nhanVienGiaoNhan);
+        }
+  }
   useEffect(() => {
+   
     if (id) {
       showReceipt({ id: id, type: CategoryEnum.country }).then(res => {
         const detail = res.data.data
@@ -148,13 +189,14 @@ export default function UpdateReceiptChi() {
         //setHasError(true)
       });
     }
+
       // initialize with default mapped partner options
       setDoiTuongOptions(partnerOptions)
       const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
       setEmployeeInfo(employeeInfo);
       console.log(employeeInfo);
       
-    }, [ContractFileptions,DMQuyOptions,DMBankOptions,partnerOptions, partnerVenderOptions, nhanviengiaonhanOptions, id])
+    }, [DMExpenseOptions,DMQuyOptions,DMBankOptions,partnerOptions, partnerVenderOptions, nhanviengiaonhanOptions, id])
   return (
     <>
       <AddForm
@@ -164,7 +206,7 @@ export default function UpdateReceiptChi() {
         title="phiếu chi"
         loading={loading}
         onSubmit={handleSubmit}
-        routeList="/receipt/listReceiptChi"
+        routeList="/receipt/listReceiptChiGiaoNhan"
         route={Number(id) ? "/receipt/update" : "/receipt/create"}
       >
         <div className="field">
@@ -181,95 +223,62 @@ export default function UpdateReceiptChi() {
                   </div>
                   <div className="field col-6">
                       <Dropdown
-                      value={infos.loai_quy}
+                      value={infos.fundId}
                       optionValue="value"
                       optionLabel="label"
                       options={DMQuyOptions}
                       label="Loại quỹ"
                       className="w-full p-inputtext-sm"
                       onChange={(e: any) =>
-                        setInfos({ ...infos, loai_quy: e.value })
+                        setInfos({ ...infos, fundId: e.value })
                       }
                       required
                     />
                   </div>
-                  <div className="field col-12">
+                 <div className="field col-12">
                     <label htmlFor="">Hình thức thanh toán</label>
-                   <div className="flex flex-wrap gap-3">
-                      <div className="flex align-items-center">
-                          <RadioButton inputId="ingredient1" name="paymentMethod" value="1" onChange={(e: any) => setInfos({ ...infos, paymentMethod: e.value })} checked={infos.paymentMethod == 1} />
-                          <label htmlFor="ingredient1" className="ml-2">Tiền mặt</label>
-                      </div>
-                      <div className="flex align-items-center">
-                          <RadioButton inputId="ingredient2" name="paymentMethod" value="2" onChange={(e: any) => setInfos({ ...infos, paymentMethod: e.value })} checked={infos.paymentMethod == 2} />
-                          <label htmlFor="ingredient2" className="ml-2">Chuyển khoản</label>
-                      </div>
-                  </div>
-                  </div>
-                  <div className="field col-6">
-                    <Dropdown
-                      value={infos.type_doi_tuong}
-                      optionValue="value"
-                      optionLabel="name"
-                      options={TypeDoiTuong}
-                      label="Đối tượng"
-                      className="w-full p-inputtext-sm"
-                      onChange={(e: any) =>
-                        {
-                          const v = e.value;
-                          // reset dependent selected id when type changes
-                          setInfos({ ...infos, type_doi_tuong: v, ma_doi_tuong: undefined })
-                          if(v === 0){
-                            setDoiTuongOptions(partnerOptions)
-                          }else if(v === 1){
-                            setDoiTuongOptions(partnerVenderOptions)
-                          }else{
-                            setDoiTuongOptions(nhanviengiaonhanOptions)
-                          }
-                        }
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="field col-6">
-                     <Dropdown
-                      value={infos.ma_doi_tuong}
-                      optionValue="value"
-                      optionLabel="label"
-                      options={doiTuongOptions}
-                      label="Đối tượng"
-                      className="w-full p-inputtext-sm"
-                      onChange={(e: any) =>
-                        setInfos({ ...infos, ma_doi_tuong: e.value })
-                      }
-                      required
-                    />
+                    <div className="flex flex-wrap gap-3">
+                      {formOfPayment.map((item) => (
+                        <div key={item.value} className="flex align-items-center">
+                          <RadioButton
+                            inputId={`payment_${item.value}`}
+                            name="formOfPayment"
+                            value={item.value}
+                            onChange={(e: any) => setInfos({ ...infos, formOfPayment: e.value })}
+                            checked={infos.formOfPayment == item.value}
+                          />
+                          <label htmlFor={`payment_${item.value}`} className="ml-2">
+                            {item.name}
+                          </label>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                   <div className="field col-6">
                     <Dropdown
                       filter
-                      value={infos.file_number}
+                      value={infos.FileInfoId}
                       optionValue="value"
                       optionLabel="label"
-                      options={ContractFileptions}
+                      options={ContractFileOptions}
                       label="Số file"
                       className="w-full p-inputtext-sm"
                       onChange={(e: any) =>
-                        setInfos({ ...infos, file_number: e.value })
+                        GetNhanVienGiaoNhan(e.value)
                       }
                       required
                     />
                   </div>
                   <div className="field col-6">
                     <Dropdown
-                      value={infos.feature}
-                      optionValue="feature"
-                      optionLabel="name"
-                      options={tinhChat}
+                      value={infos.employeeId}
+                      optionValue="value"
+                      optionLabel="label"
+                      options={nhanVienGiaoNhanOptions}
                       label="Người giao nhận"
                       className="w-full p-inputtext-sm"
                       onChange={(e: any) =>
-                        setInfos({ ...infos, feature: e.value })
+                        setInfos({ ...infos, employeeId: e.value })
                       }
                       required
                     />
@@ -282,40 +291,34 @@ export default function UpdateReceiptChi() {
                         setInfos({ ...infos, sales: e.target.value })
                       }
                       className="w-full"
-                      label="Người nhận"
+                      label="Người tạo phiếu"
                       disabled
                     />
                   </div>
                   <div className="field col-12">
-                    <InputForm className="w-full"
-                      id="declarationQuantity"
-                      value={infos.declarationQuantity}
-                      onChange={(e: any) => {
-                        setInfos({ ...infos, declarationQuantity: e.value });
-                      }}
-                      label="Địa chỉ"
-                      required
-                    />
-                  </div>
-                  <div className="field col-12">
-                     <InputForm className="w-full"
-                      id="lydochi"
-                      value={infos.note}
-                      onChange={(e: any) =>
-                        setInfos({ ...infos, lydochi: e.target.value })
-                      }
+                     <Dropdown
+                      filter
+                      value={infos.incomeExpenseCategoryId}
+                      optionValue="value"
+                      optionLabel="label"
+                      options={DMExpenseOptions}
                       label="Lý do chi"
+                      className="w-full p-inputtext-sm"
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, incomeExpenseCategoryId: e.value })
+                      }
+                      required
                     />
                   </div>
                    <div className="field col-4">
                     <InputForm className="w-full"
-                      id="sotien"
-                      value={infos.sotien}
+                      id="Amount"
+                      value={infos.Amount}
                       onChange={(e: any) =>
                          {
-                           setInfos({ ...infos, sotien: Helper.formatCurrency(e.target.value )})
+                           setInfos({ ...infos, Amount: Helper.formatCurrency(e.target.value )})
                            const thanhtien  = parseInt(e.target.value.replace(/\D/g, ""),10) + ( infos.vat ? ( parseInt(e.target.value.replace(/\D/g, ""),10) * infos.vat ) / 100 : 0  );
-                           setInfos({ ...infos, sotien: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
+                           setInfos({ ...infos, Amount: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                          }
                       }
                       label="Số tiền"
@@ -350,10 +353,10 @@ export default function UpdateReceiptChi() {
                   </div>
                    <div className="field col-12">
                     <InputForm className="w-full"
-                      id="note"
-                      value={infos.note}
+                      id="bill"
+                      value={infos.bill}
                       onChange={(e: any) =>
-                        setInfos({ ...infos, note: e.target.value })
+                        setInfos({ ...infos, bill: e.target.value })
                       }
                       label="Số hóa đơn"
                     />
@@ -371,10 +374,10 @@ export default function UpdateReceiptChi() {
                 </div>
               </div>
               <div className="col-4">
-                 { infos.paymentMethod == 2 && <div className="formgrid grid">
+                 { infos.formOfPayment == 2 && <div className="formgrid grid">
                     <div className="col-12">
                       <Dropdown
-                      value={infos.bank_id}
+                      value={infos.bankId}
                       optionValue="value"
                       optionLabel="label"
                       options={DMBankOptions}
@@ -382,7 +385,7 @@ export default function UpdateReceiptChi() {
                       className="w-full p-inputtext-sm"
                       onChange={(e: any) =>
                         {
-                          setInfos({ ...infos, bank_id: e.value })
+                          setInfos({ ...infos, bankId: e.value })
                           const selected = DMBank.find((x: any) => x.id === e.value);
                           setBankSelect(selected || {});
                         }
