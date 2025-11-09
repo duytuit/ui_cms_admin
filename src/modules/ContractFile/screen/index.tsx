@@ -124,7 +124,7 @@ export default function ListContractFile() {
   const [selectedId, setSelectedId] = useState<any>();
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(20);
-  const customers = useSelector((state: any) => state.partner.customer);
+  const { data: customers } = useListPartnerDetailWithState({status: 1});
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
     pageSize: 20,

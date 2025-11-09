@@ -23,6 +23,7 @@ import UpdateDebitChiPhi from "modules/Debit/screen/update_service";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useListContractFile } from "modules/ContractFile/service";
 import UpdateDebitDispatchFile from "./update_dispatch";
+import { useListDebitDispatch } from "../service";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -104,7 +105,7 @@ export default function ListCreateDispatch() {
   const [selectedId, setSelectedId] = useState<any>();
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(20);
-  const customers = useSelector((state: any) => state.partner.customer);
+  const { data: customers } = useListPartnerDetailWithState({status: 1});
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
     pageSize: 20,
@@ -116,6 +117,10 @@ export default function ListCreateDispatch() {
     params: paramsPaginator,
     debounce: 500,
   });
+  const { data:debitDispatch } = useListDebitDispatch({
+          params: {...paramsPaginator},
+          debounce: 500,
+      });
   const { data: userInfos } = useListUserWithState({});
   const userInfosOptions = useMemo(() => {
     return userInfos;

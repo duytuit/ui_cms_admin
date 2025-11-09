@@ -16,6 +16,7 @@ import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useListContractFile } from "modules/ContractFile/service";
 import { deleteContractFile } from "modules/ContractFile/api";
 import UpdateDebitChiPhi from "./update_service";
+import { useListDebit, useListDebitService } from "../service";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -95,7 +96,7 @@ export default function ListContractFileBangKe() {
     const [visible, setVisible] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
-    const customers = useSelector((state: any) => state.partner.customer);
+    const { data: customers } = useListPartnerDetailWithState({status: 1});
     const [paramsPaginator, setParamsPaginator] = useState({
         pageNum: 1,
         pageSize: 20,
@@ -105,6 +106,10 @@ export default function ListContractFileBangKe() {
     });
     const { data, loading, error, refresh } = useListContractFile({
         params: paramsPaginator,
+        debounce: 500,
+    });
+    const { data:debitService } = useListDebitService({
+        params: {...paramsPaginator,},
         debounce: 500,
     });
     const { data: userInfos } = useListUserWithState({});
@@ -180,11 +185,6 @@ export default function ListContractFileBangKe() {
                                 <DataTableClient
                                 rowHover
                                 value={displayData}
-                                paginator
-                                rows={rows}
-                                first={first}
-                                totalRecords={data?.total}
-                                currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
                                 onPage={(e: any) => {
                                     setFirst(e.first);
                                     setRows(e.rows);
@@ -195,7 +195,9 @@ export default function ListContractFileBangKe() {
                                 filterDisplay="row"
                                 className={classNames("Custom-DataTableClient")}
                                 scrollable
-                                tableStyle={{ minWidth: "2900px" }} // ép bảng rộng hơn để có scroll ngang
+                                scrollHeight="flex"
+                                style={{ flex: 1 }}
+                                tableStyle={{ minWidth: "2900px" }}// ép bảng rộng hơn để có scroll ngang
                                 >
                                 {/* Custom checkbox column */}
                                 <Column
@@ -273,6 +275,8 @@ export default function ListContractFileBangKe() {
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                                  <b>Bảng kê chi phí đã tạo</b>
+
+                                 
                               </div>
                             </SplitterPanel>
             
