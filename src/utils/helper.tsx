@@ -176,4 +176,16 @@ export class Helper {
     const numeric = value.replace(/\D/g, "");
     return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   };
+  static camelToSnake(obj: any): any {
+    if (Array.isArray(obj)) {
+      return obj.map(v => this.camelToSnake(v));
+    } else if (obj !== null && typeof obj === 'object') {
+      return Object.keys(obj).reduce((acc, key) => {
+        const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
+        acc[snakeKey] = this.camelToSnake(obj[key]);
+        return acc;
+      }, {} as any);
+    }
+    return obj;
+  }
 }

@@ -6,12 +6,12 @@ import UpdateBill from "modules/bill/screen/update";
 import Categories from "modules/categories/screen";
 import UpdateCategories from "modules/categories/screen/update";
 import ListContractFile from "modules/ContractFile/screen";
-import ListContractFileBangKe from "modules/ContractFile/screen/file_chuataophi";
-import ListCreateDispatch from "modules/ContractFile/screen/index_create_dispatch";
 import UpdateContractFile from "modules/ContractFile/screen/update";
 import Customer from "modules/customer/screen";
 import UpdateCustomer from "modules/customer/screen/update";
 import DashBoard from "modules/dashboard/screen";
+import ListCreateDispatch from "modules/Debit/screen/index_debit_dispatch";
+import ListContractFileBangKe from "modules/Debit/screen/index_debit_service";
 import ListDepartment from "modules/department/screen";
 import UpdateDepartment from "modules/department/screen/update";
 import ListEmployee from "modules/employee/screen";
@@ -109,9 +109,10 @@ const publicRoutes = [
   { path: "/department/detail/:id", component: UpdateDepartment, layout: 'UpdateDepartment' },
   // Receipt 
   { path: "/receipt/list", component: ListReceipt, layout: 'ListReceipt' },
-  { path: "/receipt/listReceiptChiGiaoNhan", component: ListReceiptChiGiaoNhan, layout: 'ListReceiptChiGiaoNhan' },
   { path: "/receipt/add", component: UpdateReceipt, layout: 'UpdateReceipt' },
+  { path: "/receipt/listReceiptChiGiaoNhan", component: ListReceiptChiGiaoNhan, layout: 'ListReceiptChiGiaoNhan' },
   { path: "/receipt/updateReceiptChiGiaoNhan", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
+  { path: "/receipt/detail/chigiaonhan/:id", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
   { path: "/receipt/detail/:id", component: UpdateReceipt, layout: 'DetailReceipt' },
   // Debit 
   // { path: "/debit/list", component: ListDebit, layout: 'ListDebit' },

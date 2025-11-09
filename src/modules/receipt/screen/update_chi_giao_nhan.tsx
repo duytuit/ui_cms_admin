@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { formOfPayment, listToast, refreshObject, VatDebit } from "utils";
-import { updateReceipt, addReceipt, showReceipt, addReceiptChiGiaoNhan } from "../api";
+import { updateReceipt, addReceipt, showReceipt, addReceiptChiGiaoNhan, updateReceiptChiGiaoNhan } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
@@ -13,7 +13,7 @@ import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { Dropdown, Input } from "components/common/ListForm";
-import { useListEmployee } from "modules/employee/service";
+import { useListEmployee, useListEmployeeWithState } from "modules/employee/service";
 import { useListPartnerDetail } from "modules/partner/service";
 import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { useListContractFile } from "modules/ContractFile/service";
@@ -31,16 +31,33 @@ export default function UpdateReceiptChiGiaoNhan() {
   const handleSubmit = (e: any) => {
     e.preventDefault();
     let info = {
-      ...infos, Amount: parseInt(infos.Amount.replace(/\D/g, ""), 10),thanhtien: parseInt(infos.thanhtien.replace(/\D/g, ""), 10), status: infos.status ? 0 : 1,
+      ...infos, amount: parseInt(infos.amount.replace(/\D/g, ""), 10),thanhtien: parseInt(infos.thanhtien.replace(/\D/g, ""), 10), status: infos.status ? 0 : 1,
      data:JSON.stringify(infos)
     };
-    console.log('info', info);
     setLoading(true);
     fetchDataSubmit(info);
   };
   async function fetchDataSubmit(info: any) {
    
      if (info.id) {
+         const response = await updateReceiptChiGiaoNhan(info);
+       if (response) setLoading(false);
+       if (response.status === 200) {
+         if (response.data.status) {
+           setInfos({ ...refreshObject(infos), status: true });
+           dispatch(
+             showToast({ ...listToast[0], detail: response.data.message })
+           );
+           navigate("/receipt/listReceiptChiGiaoNhan");
+         } else {
+           dispatch(
+             showToast({ ...listToast[2], detail: response.data.message })
+           );
+         }
+       } else
+         dispatch(
+           showToast({ ...listToast[1], detail: response.data.message })
+         );
      } else {
        const response = await addReceiptChiGiaoNhan(info);
        if (response) setLoading(false);
@@ -69,8 +86,6 @@ export default function UpdateReceiptChiGiaoNhan() {
  useEffect(() => {
   const list = ContractFile.data;
   if (Array.isArray(list) && list.length > 0) {
-    console.log(ContractFile);
-    
     const opts = list.map((x: any) => ({
       label: x?.file_number ?? "(không tên)",
       value: x.id,
@@ -103,55 +118,18 @@ export default function UpdateReceiptChiGiaoNhan() {
          value: x.id,
        }));
      }, [DMBank]);
-   const { data: employees } = useListEmployee({
+   const { data: employees } = useListEmployeeWithState({
      params: { keyword: "abc" },
      debounce: 500,
    });
-   // lấy ra nhân viên giao nhận
-   const nhanviengiaonhanOptions = useMemo(() => {
-     if (!Array.isArray(employees?.data)) return [];
-
-     return employees.data
-       .filter(
-         (x: any) =>
-           Array.isArray(x.employee_departments) &&
-           x.employee_departments[0]?.department_id === 3
-       )
-       .map((x: any, index: number) => ({
-         label: `${index + 1}. ${x.last_name ?? ""} ${
-           x.first_name ?? ""
-         }`.trim(),
-         value: x.id,
-       }));
-   }, [employees]);
-   const { data: partnerDetails } = useListPartnerDetail({
-     params: { status: 1 },
-     debounce: 500,
-   });
-   const { data: partnerVenderDetails } = useListPartnerDetail({
-     params: { status: 2 },
-     debounce: 500,
-   });
-
-    const partnerOptions = useMemo(() => {
-      if (!Array.isArray(partnerDetails?.data)) return [];
-      return partnerDetails.data.map((x: any) => ({
-        label: x?.partners?.abbreviation ?? "(không tên)",
-        value: x.id,
-      }));
-    }, [partnerDetails]);
-    
-    const partnerVenderOptions = useMemo(() => {
-      if (!Array.isArray(partnerVenderDetails?.data)) return [];
-      return partnerVenderDetails.data.map((x: any) => ({
-        label: x?.partners?.abbreviation ?? "(không tên)",
-        value: x.id,
-      }));
-    }, [partnerVenderDetails]);
+  function GetBank(id:Number){
+     const selected = DMBank.find((x: any) => x.id === id);
+     setBankSelect(selected || {});
+  }
   function GetNhanVienGiaoNhan(fileId:Number){
         setNhanVienGiaoNhanOptions([]);
-        setInfos({ ...infos, FileInfoId: fileId })
-        if (!Array.isArray(ContractFile?.data) || !Array.isArray(employees?.data)) return setNhanVienGiaoNhanOptions([]);
+        setInfos({ ...infos, fileInfoId: fileId })
+        if (!Array.isArray(ContractFile?.data) || !Array.isArray(employees)) return setNhanVienGiaoNhanOptions([]);
 
         // 1️⃣ Lấy file theo id
         const file = ContractFile.data.find((x: any) => x.id === fileId);
@@ -159,10 +137,10 @@ export default function UpdateReceiptChiGiaoNhan() {
 
         // 2️⃣ Lấy danh sách employee_id từ file_info_details
         const employeeIds = file.file_info_details.map((x: any) => x.employee_id);
-
+        
         // 3️⃣ Lọc các nhân viên tương ứng
-        const nhanVienGiaoNhan = employees.data.filter((e: any) => employeeIds.includes(e.id));
-
+        const nhanVienGiaoNhan = employees.filter((e: any) => employeeIds.includes(e.id));
+        
         // 4️⃣ Map ra option {label, value} nếu cần
         const _nhanVienGiaoNhan = nhanVienGiaoNhan.map((e: any, i: number) => ({
           label: `${i + 1}. ${e.last_name ?? ""} ${e.first_name ?? ""}`.trim(),
@@ -173,30 +151,31 @@ export default function UpdateReceiptChiGiaoNhan() {
         }
   }
   useEffect(() => {
-   
-    if (id) {
-      showReceipt({ id: id, type: CategoryEnum.country }).then(res => {
-        const detail = res.data.data
-        if (detail) {
-          let info = {
-            ...detail, status: detail.status === 0 ? true : false,
-          };
-          setInfos(info)
-          // set doiTuongOptions according to returned type_doi_tuong
-       
-        }
-      }).catch(err => {
-        //setHasError(true)
-      });
-    }
-
-      // initialize with default mapped partner options
-      setDoiTuongOptions(partnerOptions)
       const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
       setEmployeeInfo(employeeInfo);
-      console.log(employeeInfo);
+      if (id) {
+        showReceipt({ id: id, type: CategoryEnum.country }).then(res => {
+          const detail = res.data.data
+          if (detail) {
+            GetNhanVienGiaoNhan(detail.fileInfoId)
+            GetBank(detail.bankId)
+            const _nguoitao = employees.find((x: any) => x.user_id === detail.updatedBy);
+            setEmployeeInfo(_nguoitao);
+            detail.amount = Helper.formatCurrency(detail.receiptDetails[0].amount.toString())
+            detail.vat = detail.receiptDetails[0].vat
+            detail.thanhtien =Helper.formatCurrency((detail.receiptDetails[0].amount + (detail.receiptDetails[0].amount * detail.receiptDetails[0].vat/100)).toString())
+            let info = {
+              ...detail, status: detail.status === 0 ? true : false,
+            };
+            setInfos(info)
+            
+          }
+        }).catch(err => {
+          //setHasError(true)
+        });
+      }
       
-    }, [DMExpenseOptions,DMQuyOptions,DMBankOptions,partnerOptions, partnerVenderOptions, nhanviengiaonhanOptions, id])
+    }, [ContractFile,id])
   return (
     <>
       <AddForm
@@ -257,7 +236,7 @@ export default function UpdateReceiptChiGiaoNhan() {
                   <div className="field col-6">
                     <Dropdown
                       filter
-                      value={infos.FileInfoId}
+                      value={infos.fileInfoId}
                       optionValue="value"
                       optionLabel="label"
                       options={ContractFileOptions}
@@ -286,7 +265,7 @@ export default function UpdateReceiptChiGiaoNhan() {
                   <div className="field col-12">
                     <Input
                       id="sales"
-                      value={employeeInfo ? `${employeeInfo.lastName ?? ''} ${employeeInfo.firstName ?? ''}`.trim() : ''}
+                      value={employeeInfo ? `${employeeInfo.last_name ?? ''} ${employeeInfo.first_name ?? ''}`.trim() : ''}
                       onChange={(e: any) =>
                         setInfos({ ...infos, sales: e.target.value })
                       }
@@ -313,12 +292,12 @@ export default function UpdateReceiptChiGiaoNhan() {
                    <div className="field col-4">
                     <InputForm className="w-full"
                       id="Amount"
-                      value={infos.Amount}
+                      value={infos.amount}
                       onChange={(e: any) =>
                          {
-                           setInfos({ ...infos, Amount: Helper.formatCurrency(e.target.value )})
+                           setInfos({ ...infos, amount: Helper.formatCurrency(e.target.value )})
                            const thanhtien  = parseInt(e.target.value.replace(/\D/g, ""),10) + ( infos.vat ? ( parseInt(e.target.value.replace(/\D/g, ""),10) * infos.vat ) / 100 : 0  );
-                           setInfos({ ...infos, Amount: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
+                           setInfos({ ...infos, amount: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                          }
                       }
                       label="Số tiền"
@@ -336,7 +315,7 @@ export default function UpdateReceiptChiGiaoNhan() {
                       onChange={(e: any) =>
                           {
                              setInfos({ ...infos, vat: e.value })
-                             const thanhtien  = parseInt( infos.sotien.replace(/\D/g, ""),10) + ( e.value ? ( parseInt( infos.sotien.replace(/\D/g, ""),10) * e.value ) / 100 : 0  );
+                             const thanhtien  = parseInt( infos.amount.replace(/\D/g, ""),10) + ( e.value ? ( parseInt( infos.amount.replace(/\D/g, ""),10) * e.value ) / 100 : 0  );
                              setInfos({ ...infos, vat: e.value, thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                           }
                       }
@@ -386,8 +365,7 @@ export default function UpdateReceiptChiGiaoNhan() {
                       onChange={(e: any) =>
                         {
                           setInfos({ ...infos, bankId: e.value })
-                          const selected = DMBank.find((x: any) => x.id === e.value);
-                          setBankSelect(selected || {});
+                          GetBank(e.value)
                         }
                       }
                       required

@@ -96,7 +96,7 @@ export default function UpdateContractFile() {
 
   async function getCode(value:number) {
     if (!id){
-      getCodeContractFile({type: value == 0 ? "IS":"ES"}).then(res => {
+      getCodeContractFile({yearMonth:infos.accountingDate,type: value == 0 ? "IS":"ES"}).then(res => {
           const detail = res.data.data;
           if (detail) {
             setInfos({ ...infos, fileNumber:detail.extra.code,feature:value});
@@ -123,32 +123,12 @@ export default function UpdateContractFile() {
         <div className="field">
           <Panel header="Thông tin">
             <div className="formgrid grid">
-              <div className="field col-12">
-                <InputForm className="w-full"
-                  id="fileNumber"
-                  value={infos.fileNumber}
-                  label="Số file"
-                  disabled
-                  required
-                />
-              </div>
               <div className="field col-2">
                 <MyCalendar dateFormat="dd/mm/yy"
                   value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
                   onChange={(e: any) =>
                     setInfos({ ...infos, accountingDate: e })}
                   className={classNames("w-full", "p-inputtext", "input-form-sm")} />
-              </div>
-              <div className="field col-2">
-                <InputForm className="w-full"
-                  id="declaration"
-                  value={infos.declaration}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, declaration: e.target.value })
-                  }
-                  label="Số tờ khai"
-                  required
-                />
               </div>
               <div className="field col-2">
                 <Dropdown
@@ -168,7 +148,69 @@ export default function UpdateContractFile() {
                   required
                 />
               </div>
-              <div className="field col-2">
+               <div className="field col-8">
+                <InputForm className="w-full"
+                  id="fileNumber"
+                  value={infos.fileNumber}
+                  label="Số file"
+                  disabled
+                  required
+                />
+              </div>
+               <div className="field col-12">
+                <Dropdown
+                  filter
+                  value={infos.partnerDetailId}
+                  options={partnerOptions}
+                  onChange={(e: any) =>
+                    setInfos({ ...infos, partnerDetailId: e.target.value })
+                  }
+                  label="Khách hàng"
+                  className="w-full"
+                  required
+                />
+              </div>
+               <div className="field col-3">
+                <InputForm className="w-full"
+                  id="declaration"
+                  value={infos.declaration}
+                  onChange={(e: any) =>
+                    setInfos({ ...infos, declaration: e.target.value })
+                  }
+                  label="Số tờ khai"
+                  required
+                />
+              </div>
+               <div className="field col-3">
+                <InputForm className="w-full"
+                  id="declarationQuantity"
+                  type="number"
+                  min={1}
+                  value={infos.declarationQuantity}
+                  onChange={(e: any) => {
+                    let v = Number(e.target.value);
+                    if (v < 0) v = 1;
+                    setInfos({ ...infos, declarationQuantity: v });
+                  }}
+                  label="Số lượng tờ khai"
+                  required
+                />
+              </div>
+              <div className="field col-3">
+                <Dropdown
+                  value={infos.declarationType}
+                  optionValue="DeclarationType"
+                  optionLabel="name"
+                  options={loaiToKhai}
+                  label="Loại tờ khai"
+                  className="p-inputtext-sm"
+                  onChange={(e: any) =>
+                    setInfos({ ...infos, declarationType: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="field col-3">
                 <InputForm className="w-full"
                   id="bill"
                   value={infos.bill}
@@ -200,19 +242,7 @@ export default function UpdateContractFile() {
                   label="Số cont"
                 />
               </div>
-              <div className="field col-12">
-                <Dropdown
-                  filter
-                  value={infos.partnerDetailId}
-                  options={partnerOptions}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, partnerDetailId: e.target.value })
-                  }
-                  label="Khách hàng"
-                  className="w-full"
-                  required
-                />
-              </div>
+             
               <div className="field col-2">
                 <InputForm 
                   id="sales"
@@ -224,35 +254,8 @@ export default function UpdateContractFile() {
                   label="Tên sales"
                 />
               </div>
-              <div className="field col-2">
-                <InputForm className="w-full"
-                  id="declarationQuantity"
-                  type="number"
-                  min={1}
-                  value={infos.declarationQuantity}
-                  onChange={(e: any) => {
-                    let v = Number(e.target.value);
-                    if (v < 0) v = 1;
-                    setInfos({ ...infos, declarationQuantity: v });
-                  }}
-                  label="Số lượng tờ khai"
-                  required
-                />
-              </div>
-              <div className="field col-2">
-                <Dropdown
-                  value={infos.declarationType}
-                  optionValue="DeclarationType"
-                  optionLabel="name"
-                  options={loaiToKhai}
-                  label="Loại tờ khai"
-                  className="p-inputtext-sm"
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, declarationType: e.target.value })
-                  }
-                  required
-                />
-              </div>
+             
+              
               <div className="field col-2">
                 <Dropdown
                   value={infos.type}

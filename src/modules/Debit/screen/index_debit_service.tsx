@@ -4,17 +4,18 @@ import { Calendar, CalendarY, Dropdown, GridForm, Input } from "components/commo
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
-import { deleteContractFile, listContractFile, updateContractFile } from "../api";
-import { useListContractFile } from "../service";
 import { setCustomer, setVendor } from "redux/features/partner";
 import { useDispatch, useSelector } from "react-redux";
 import { loaiHang, loaiToKhai, nghiepVu, phatSinh, tinhChat } from "utils";
 import { useListPartnerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
-import { Checkbox } from "components/uiCore";
+import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
+import { useListContractFile } from "modules/ContractFile/service";
+import { deleteContractFile } from "modules/ContractFile/api";
+import UpdateDebitChiPhi from "./update_service";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -90,6 +91,8 @@ export default function ListContractFileBangKe() {
     const { handleParamUrl } = useHandleParamUrl();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [displayData, setDisplayData] = useState<any[]>([]);
+    const [selectedId, setSelectedId] = useState<any>();
+    const [visible, setVisible] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
     const customers = useSelector((state: any) => state.partner.customer);
@@ -152,8 +155,12 @@ export default function ListContractFileBangKe() {
         });
         setDisplayData(mapped);
     }, [first, rows, data, paramsPaginator,customers]);
-
+    const openDialogAdd = (id:number) => {
+        setSelectedId(id);
+        setVisible(true);
+    };
     return (
+      <>
         <div className="card">
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
               <div style={{ height: 'calc(100vh - 8rem)' }}>
@@ -214,18 +221,14 @@ export default function ListContractFileBangKe() {
                                     )}
                                     style={{ width: "3em" }}
                                 />
-                                <Column
-                                    header="Thao tác"
-                                    body={(e: any) =>
-                                        ActionBody(
-                                            e,
-                                            "/ContractFile/detail",
-                                            { route: "/ContractFile/delete", action: deleteContractFile },
-                                            paramsPaginator,
-                                            setParamsPaginator
-                                        )
-                                    }
-                                    style={{ width: "6em" }}
+                               <Column
+                                  header="Thao tác"
+                                  body={(e: any) =>
+                                    ActionBody(e, null, null, null, null, () =>
+                                      openDialogAdd(e.id)
+                                    )
+                                  }
+                                  style={{ width: "6em" }}
                                 />
                                 <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -289,5 +292,18 @@ export default function ListContractFileBangKe() {
                       </Splitter>
                     </div>
         </div>
+         <Dialog
+            position="top"
+            dismissableMask
+            header="Tạo bảng kê chi phí"
+            visible={visible}
+            onHide={() => setVisible(false)}
+            style={{ width: "78vw" }}
+          >
+            <p className="m-0">
+              {selectedId && <UpdateDebitChiPhi id={selectedId}  onClose={() => setVisible(false)} ></UpdateDebitChiPhi>}
+            </p>
+          </Dialog>
+      </>
     );
 }

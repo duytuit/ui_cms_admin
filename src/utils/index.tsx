@@ -195,7 +195,7 @@ export const typeReceipt = [
    },
     {
      typeReceipt:1,
-     name:"Chi"
+     name:"Chi giao nhận"
    }
 ];
 export const VatDebit = [

@@ -48,7 +48,7 @@ export const useListContractFileWithState = (params : any)  => {
         try {
             setLoading(true);
             setError(null);
-            const res = await listSelectContractFile({...params});
+            const res = await listContractFile({...params});
             const arr = res?.data?.data?.data || [];
             dispatch(setFileContract(arr)); // đẩy redux luôn
             setData(arr);               // set local luôn

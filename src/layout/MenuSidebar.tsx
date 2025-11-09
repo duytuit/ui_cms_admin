@@ -2,9 +2,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { Ripple } from 'primereact/ripple';
 import { classNames } from 'primereact/utils';
 import { CSSTransition } from 'react-transition-group';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-const MenuSidebar = (props:any) => {
+export default function MenuSidebar(props: any){
     const location = useLocation();
     const [activeMenu, setActiveMenu] = useState('');
     const item = props.item;
@@ -88,5 +88,3 @@ const MenuSidebar = (props:any) => {
         </li>
     );
 };
-
-export default MenuSidebar;

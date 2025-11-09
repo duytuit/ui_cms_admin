@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { Helper } from 'utils/helper';
 
 export const userSlice = createSlice({
   name: 'user',
@@ -14,8 +15,9 @@ export const userSlice = createSlice({
       state.userInfo = null;
     },
     setEmployeeInfo: (state, action) => {
-      state.employeeInfo = action.payload;
-      localStorage.setItem('employeeInfo', JSON.stringify(action.payload))
+      const _employeeInfo = Helper.camelToSnake(action.payload);
+      state.employeeInfo = _employeeInfo;
+      localStorage.setItem('employeeInfo', JSON.stringify(_employeeInfo))
     },
     clearEmployeeInfo: (state) => {
       state.employeeInfo = null;

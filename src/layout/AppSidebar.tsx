@@ -4,10 +4,7 @@ import { MenuProvider } from './context/menuContext';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { listStorage } from 'modules/storage/api';
-
-const AppSidebar = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const model = [{
+const model = [{
     items: [
       {
         id: 5,
@@ -681,10 +678,13 @@ const AppSidebar = () => {
         ]
       }
     ]
-  }];
+}];
+export default function AppSidebar(){
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCity, setSelectedCity] = useState<any>();
-  const project = localStorage.getItem('project');
+  const [activeMenu, setActiveMenu] = useState('');
   const [data, setData] = useState<any>([]);
+  const project = localStorage.getItem('project');
   const fetchProject = async () => {
           try {
               const res = await listStorage({ });
@@ -711,7 +711,7 @@ const AppSidebar = () => {
     setSearchParams({ "projectId": event.value.projectId })
     window.location.reload()
   }
-  return (
+ return (
     <MenuProvider>
       <span className="p-float-label">
         <Dropdown
@@ -733,5 +733,3 @@ const AppSidebar = () => {
   );
 
 };
-
-export default AppSidebar;

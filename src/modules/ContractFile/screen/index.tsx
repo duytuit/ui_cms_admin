@@ -33,8 +33,8 @@ import { useListUserWithState } from "modules/user/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
+import UpdateDebitChiPhi from "modules/Debit/screen/update_service";
 import UpdateDebit from "modules/Debit/screen/update_debit";
-import UpdateDebitChiPhi from "modules/Debit/screen/update";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -119,8 +119,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
 
 export default function ListContractFile() {
   const { handleParamUrl } = useHandleParamUrl();
-  const [visible, setVisible] = useState(false);
-  const [visibleDebit, setVisibleDebit] = useState(false);
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [displayData, setDisplayData] = useState<any[]>([]);
   const [selectedId, setSelectedId] = useState<any>();
@@ -161,7 +159,7 @@ export default function ListContractFile() {
         (x: any) => x.occurrence === row.occurrence
       );
       const _nghiepVu = nghiepVu.find((x: any) => x.business === row.business);
-      const _user = userInfosOptions.find((x: any) => x.id === row.updated_by);
+      const _user = employeeOptions.find((x: any) => x.user_id === row.updated_by);
       let _sumTongPrice = 0;
       let _listEmployee = "";
       if (row?.file_info_details.length > 0) {
@@ -170,9 +168,8 @@ export default function ListContractFile() {
           const _employee = employeeOptions.find(
             (x: any) => x.id === element.employee_id
           );
-          const fullName = `${_employee?.last_name ?? ""} ${
-            _employee?.first_name ?? ""
-          }`.trim();
+          const fullName = `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""
+            }`.trim();
           // thêm dấu ; giữa các tên, không thêm sau tên cuối cùng
           _listEmployee +=
             fullName + (index < row.file_info_details.length - 1 ? ";" : "");
@@ -188,18 +185,13 @@ export default function ListContractFile() {
         business: _nghiepVu?.name || "",
         customerName: cus?.partners?.name || "",
         customerAbb: cus?.partners?.abbreviation || "",
-        userName: `${_user.last_name ?? ""} ${_user.first_name ?? ""}`.trim(),
+        userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
         sumTongPrice: _sumTongPrice,
         listEmployee: _listEmployee,
       };
     });
     setDisplayData(mapped);
-  }, [first, rows, data, paramsPaginator, customers]);
-    // Hàm mở dialog thêm mới
-    const openDialogAdd = (id:number) => {
-        setSelectedId(id);
-        setVisibleDebit(true);
-    };
+  }, [employeeOptions,first, rows, data, paramsPaginator, customers]);
 
   return (
     <>
@@ -269,7 +261,6 @@ export default function ListContractFile() {
                 { route: "/ContractFile/delete", action: deleteContractFile },
                 paramsPaginator,
                 setParamsPaginator,
-                () => openDialogAdd(e.id) 
               )
             }
             style={{ width: "6em" }}
@@ -407,30 +398,6 @@ export default function ListContractFile() {
           />
         </DataTableClient>
       </div>
-      <Dialog
-        position="top"
-        dismissableMask
-        header="Tạo bảng kê chi phí"
-        visible={visible}
-        onHide={() => setVisible(false)}
-        style={{ width: "78vw" }}
-      >
-        <p className="m-0">
-          {selectedId && <UpdateDebitChiPhi id={selectedId}  onClose={() => setVisible(false)} ></UpdateDebitChiPhi>}
-        </p>
-      </Dialog>
-      <Dialog
-        position="top"
-        dismissableMask
-        header="Tạo debit khách hàng"
-        visible={visibleDebit}
-        onHide={() => setVisibleDebit(false)}
-        style={{ width: "78vw" }}
-      >
-        <p className="m-0">
-          {selectedId && <UpdateDebit id={selectedId}  onClose={() => setVisibleDebit(false)} ></UpdateDebit>}
-        </p>
-      </Dialog>
     </>
   );
 }
