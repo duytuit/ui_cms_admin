@@ -3,19 +3,26 @@ import { createSlice } from '@reduxjs/toolkit'
 export const fileContractSlice = createSlice({
   name: 'fileContract',
   initialState: {
-    fileContractInfo: null
+    list: null,
+    listSelect:null
   },
   reducers: {
-    setFileContract: (state, action) => {
-      state.fileContractInfo = action.payload;
+    setListFileContract: (state, action) => {
+      state.list = action.payload;
     },
-    clearFileContract: (state) => {
-      state.fileContractInfo = null;
+    clearListFileContract: (state) => {
+      state.list = null;
+    },
+    setListSelectFileContract: (state, action) => {
+      state.listSelect = action.payload;
+    },
+    clearListSelectFileContract: (state) => {
+      state.listSelect = null;
     },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setFileContract,clearFileContract} = fileContractSlice.actions
+export const { setListFileContract,clearListFileContract,setListSelectFileContract,clearListSelectFileContract} = fileContractSlice.actions
 
 export default fileContractSlice.reducer;

@@ -3,19 +3,19 @@ import { createSlice } from '@reduxjs/toolkit'
 export const vehicleSlice = createSlice({
   name: 'vehicle',
   initialState: {
-    vehicleInfo: null
+    list: null
   },
   reducers: {
-    setVehicle: (state, action) => {
-      state.vehicleInfo = action.payload;
+    setListVehicle: (state, action) => {
+      state.list = action.payload;
     },
-    clearVehicle: (state) => {
-      state.vehicleInfo = null;
+    clearListVehicle: (state) => {
+      state.list = null;
     },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setVehicle, clearVehicle } = vehicleSlice.actions
+export const { setListVehicle, clearListVehicle } = vehicleSlice.actions
 
 export default vehicleSlice.reducer;

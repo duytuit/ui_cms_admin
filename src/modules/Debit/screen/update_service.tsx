@@ -50,6 +50,15 @@ export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: (
       value: x.id,
     }));
   }, [ChiHos]);
+  const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
+  const partnerOptions = useMemo(() => {
+    if (!Array.isArray(partnerDetails?.data)) return [];
+    return partnerDetails.data.map((x: any) => ({
+      label: x?.partners?.abbreviation ?? "(không tên)",
+      value: x.id,
+    }));
+  }, [partnerDetails]);
+
   const handleSubmit = (e: any) => {
     e.preventDefault();
     infos.fileInfoId= infos.id;
@@ -72,21 +81,13 @@ export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: (
           setInfos({ ...refreshObject(infos), status: true })
           dispatch(showToast({ ...listToast[0], detail: response.data.message }));
           onClose();
-          navigate('/ContractFile/list');
         } else {
           dispatch(showToast({ ...listToast[2], detail: response.data.message }))
         }
       } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
     }
   };
-  const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
-  const partnerOptions = useMemo(() => {
-    if (!Array.isArray(partnerDetails?.data)) return [];
-    return partnerDetails.data.map((x: any) => ({
-      label: x?.partners?.abbreviation ?? "(không tên)",
-      value: x.id,
-    }));
-  }, [partnerDetails]);
+
   useEffect(() => {
     if (!id) return;
     if (partnerOptions.length === 0) return;  // ✅ quan trọng
@@ -97,7 +98,7 @@ export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: (
         if (detail) {
           const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
           const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
-          const partner = partnerOptions.find((x:any)=>x.value == detail.partnerDetailId)
+          const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
            detail.partnerName = partner?.label
           if(detail.fileInfoDetails && employeeInfo){
              const EmployeeStaffInfo = detail.fileInfoDetails.find((x:any) => x.employeeId == employeeInfo.id);

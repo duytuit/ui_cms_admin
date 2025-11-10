@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { listUser } from '../api';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from 'redux/features/user';
+import { setListUser } from 'redux/features/user';
 
 export const useListUsers = ({ params, debounce = 500 }: any) => {
     const [data, setData] = useState<any[]>([]);
@@ -36,13 +36,13 @@ export const useListUsers = ({ params, debounce = 500 }: any) => {
 
 export const useListUserWithState = (params : any)  => {
     const dispatch = useDispatch();
-    const users = useSelector((state: any) => state.user.userInfo);
+    const lists = useSelector((state: any) => state.user.list);
 
     const [data, setData] = useState<any>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
 
-    const shouldFetch = !Array.isArray(users) || users.length === 0;
+    const shouldFetch = !Array.isArray(lists) || lists.length === 0;
 
     const fetchData = async () => {
         try {
@@ -50,7 +50,7 @@ export const useListUserWithState = (params : any)  => {
             setError(null);
             const res = await listUser({...params});
             const arr = res?.data?.data?.data || [];
-            dispatch(setUser(arr)); // đẩy redux luôn
+            dispatch(setListUser(arr)); // đẩy redux luôn
             setData(arr);               // set local luôn
         } catch (err) {
             setError(err);
@@ -63,9 +63,9 @@ export const useListUserWithState = (params : any)  => {
         if (shouldFetch) {
             fetchData();
         } else {
-            setData(users); // lấy redux
+            setData(lists); // lấy redux
         }
-    }, [shouldFetch, users]); // thêm customers vào deps
+    }, [shouldFetch, lists]); // thêm customers vào deps
 
     return { data, loading, error, refresh: fetchData };
 };

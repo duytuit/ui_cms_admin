@@ -14,6 +14,7 @@ import { classNames } from "primereact/utils";
 import { useListPartner, useListPartnerDetail } from "modules/partner/service";
 import { useListEmployee } from "modules/employee/service";
 import { Helper } from "utils/helper";
+import { clearListFileContract } from "redux/features/fileContract";
 export default function UpdateContractFile() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
@@ -77,11 +78,13 @@ export default function UpdateContractFile() {
   };
 
   async function fetchDataSubmit(info: any) {
+  
     const api = info.id ? updateContractFile : addContractFile;
     const response = await api(info);
     if (response) setLoading(false);
 
     if (response?.status === 200) {
+        dispatch(clearListFileContract())
       if (response.data.status) {
         if (!info.id) setInfos({ ...refreshObject(infos), status: true });
         dispatch(showToast({ ...listToast[0], detail: response.data.message }));
@@ -160,10 +163,10 @@ export default function UpdateContractFile() {
                <div className="field col-12">
                 <Dropdown
                   filter
-                  value={infos.partnerDetailId}
+                  value={infos.customerDetailId}
                   options={partnerOptions}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, partnerDetailId: e.target.value })
+                    setInfos({ ...infos, customerDetailId: e.target.value })
                   }
                   label="Khách hàng"
                   className="w-full"

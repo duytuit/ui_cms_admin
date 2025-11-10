@@ -200,21 +200,7 @@ export default function UpdateReceiptChiGiaoNhan() {
                       setInfos({ ...infos, accountingDate: e })}
                       className={classNames("w-full", "p-inputtext", "input-form-sm")} />
                   </div>
-                  <div className="field col-6">
-                      <Dropdown
-                      value={infos.fundId}
-                      optionValue="value"
-                      optionLabel="label"
-                      options={DMQuyOptions}
-                      label="Loại quỹ"
-                      className="w-full p-inputtext-sm"
-                      onChange={(e: any) =>
-                        setInfos({ ...infos, fundId: e.value })
-                      }
-                      required
-                    />
-                  </div>
-                 <div className="field col-12">
+                 <div className="field col-6">
                     <label htmlFor="">Hình thức thanh toán</label>
                     <div className="flex flex-wrap gap-3">
                       {formOfPayment.map((item) => (
@@ -368,7 +354,6 @@ export default function UpdateReceiptChiGiaoNhan() {
                           GetBank(e.value)
                         }
                       }
-                      required
                     />
                     </div>
                     <div className="col-12">
@@ -377,6 +362,22 @@ export default function UpdateReceiptChiGiaoNhan() {
                         <div className="mt-4"><b>Chi nhánh:</b>{bankSelect.branch_name}</div>
                     </div>
                  </div>}
+                  { infos.formOfPayment == 1 &&<div className="formgrid grid">
+                    <div className="field col-12">
+                        <Dropdown
+                          value={infos.fundId}
+                          optionValue="value"
+                          optionLabel="label"
+                          options={DMQuyOptions}
+                          label="Loại quỹ"
+                          className="w-full p-inputtext-sm"
+                          onChange={(e: any) =>
+                            setInfos({ ...infos, fundId: e.value })
+                          }
+                        />
+                     </div>
+                 </div>}
+                 
               </div>
             </div>
           </Panel>

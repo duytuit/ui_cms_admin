@@ -13,9 +13,9 @@ import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { classNames } from "primereact/utils";
 import { Dropdown } from "components/common/ListForm";
-import { useListEmployee } from "modules/employee/service";
+import { useListEmployee, useListEmployeeWithState } from "modules/employee/service";
 import { useListPartnerDetail } from "modules/partner/service";
-import { useListVehicle } from "modules/VehicleDispatch/service";
+import { useListVehicle, useListVehicleWithState } from "modules/VehicleDispatch/service";
 import { json } from "stream/consumers";
 export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
@@ -25,14 +25,13 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
      // ===== LIST PARTNER & EMPLOYEE =====
     const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
     const { data: partnerVenderDetails } = useListPartnerDetail({ params: { status: 2 }, debounce: 500 });
-    const { data: vehicles } = useListVehicle({ params: { status: 2 }, debounce: 500 });
-    const { data: employees } = useListEmployee({ params: { keyword: "abc" }, debounce: 500 });
+    const { data: vehicles } = useListVehicleWithState({});
+    const { data: employees } = useListEmployeeWithState({});
     // lấy ra nhân viên lái xe với departmentid = 1
     const driverOptions = useMemo(() => {
-      if (!Array.isArray(employees?.data)) return [];
+      if (!Array.isArray(employees)) return [];
 
-      return employees.data
-        .filter((x: any) =>
+      return employees.filter((x: any) =>
           Array.isArray(x.employee_departments) &&
           x.employee_departments[0]?.department_id === 1
         )
@@ -42,8 +41,8 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
         }));
     }, [employees]);
     const vehiclesOptions = useMemo(() => {
-      if (!Array.isArray(vehicles?.data)) return [];
-      return vehicles.data.map((x: any) => ({
+      if (!Array.isArray(vehicles)) return [];
+      return vehicles.map((x: any) => ({
         label: `${x?.number_code ?? "(không tên)"}-${getTypeVehicleLabel(x?.is_external_driver)}`,
         value: x.id,
       }));
@@ -77,7 +76,6 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
 };
   const handleSubmit = (e: any) => {
     e.preventDefault();
-     console.log('info', infos);
     // lưu lại thông thông label của tất cả các dropdown
     infos.driverFee      = toInt(infos.driverFee);
     infos.customsStatus  = toInt(infos.customsStatus);
@@ -104,6 +102,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
     : typeof v === "number"
     ? v
     : parseInt(String(v).replace(/\D/g, ""), 10) || 0;
+
   async function fetchDataSubmit(info: any) {
     if (info.id) {
       const response = await addDebit(info);
@@ -113,7 +112,6 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
           setInfos({ ...refreshObject(infos), status: true })
           dispatch(showToast({ ...listToast[0], detail: response.data.message }));
           onClose();
-          navigate('/ContractFile/list-create-dispatch');
         } else {
           dispatch(showToast({ ...listToast[2], detail: response.data.message }))
         }
@@ -121,7 +119,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
     }
   };
   useEffect(() => {
-     if (!id) return;
+    if (!id) return;
     if (partnerOptions.length === 0) return;  // ✅ quan trọng
     if (id) {
       setLoading(true);
@@ -129,8 +127,10 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
         const detail = res.data.data
         if (detail) {
            const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
-             const partner = partnerOptions.find((x:any)=>x.value == detail.partnerDetailId)
-           detail.partnerName = partner?.label
+             const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
+             detail.partnerName = partner?.label
+             console.log(detail);
+             
           let info = {
             ...detail, status: detail.status === 0 ? true : false,
             loaiToKhai:_loaiToKhai?.name
@@ -233,19 +233,6 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   required
                 />
               </div>
-               <div className="field col-12">
-                <Dropdown
-                  filter
-                  value={infos.partnerDetailId}
-                  options={partnerOptions}
-                  onChange={(e: any) =>
-                    setInfos({ ...infos, partnerDetailId: e.target.value })
-                  }
-                  label="Khách hàng"
-                  className="w-full"
-                  required
-                />
-              </div>
                <div className="field col-3">
                 <InputForm className="w-full"
                   id="customerVehicleType"
@@ -309,14 +296,14 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                <div className="field col-9">
                 <Dropdown
                   filter
-                  value={infos.supplierPartnerDetailId}
+                  value={infos.supplierDetailId}
                   options={partnerVenderOptions}
                   onChange={(e: any) =>
                     {
                         const selected = e.value; // Đây là value (ví dụ: 123)
                         const option = partnerVenderOptions.find((x: any) => x.value === selected);
-                        setInfos({ ...infos, supplierPartnerDetailId: selected, partner_info: {
-                          supplierPartnerDetailId: selected, partnerLabel: option?.label
+                        setInfos({ ...infos, supplierDetailId: selected, partner_info: {
+                          supplierDetailId: selected, partnerLabel: option?.label
                         } })
                     }
                   }

@@ -7,21 +7,22 @@ import { MyCalendar } from "components/common/MyCalendar";
 import { setCustomer, setVendor } from "redux/features/partner";
 import { useDispatch, useSelector } from "react-redux";
 import { loaiHang, loaiToKhai, nghiepVu, phatSinh, tinhChat } from "utils";
-import { useListPartnerDetailWithState } from "modules/partner/service";
+import { useListCustomerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { useListContractFile } from "modules/ContractFile/service";
+import { useListContractFile, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
 import { deleteContractFile } from "modules/ContractFile/api";
 import UpdateDebitChiPhi from "./update_service";
 import { useListDebit, useListDebitService } from "../service";
+import { deleteDebit } from "../api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
-    const [filter, setFilter] = useState({ name: "", partnerDetailId: "" ,fromDate:Helper.lastWeekString(),toDate:Helper.toDayString()});
-    const { data: customerDetails } = useListPartnerDetailWithState({status:1});
+    const [filter, setFilter] = useState({ name: "", customerDetailId: 0 ,fromDate:Helper.lastWeekString(),toDate:Helper.toDayString()});
+    const { data: customerDetails } = useListCustomerDetailWithState({status:1});
     // --- chuyển sang options bằng useMemo ---
     const customerOptions = useMemo(() => {
         if (!Array.isArray(customerDetails)) return [];
@@ -35,7 +36,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
         _setParamsPaginator((prev: any) => ({
             ...prev,
             keyword: filter.name,
-            partnerDetailId : filter.partnerDetailId,
+            customerDetailId : filter.customerDetailId,
             fromDate: filter.fromDate,
             toDate:filter.toDate,
         }));
@@ -48,7 +49,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             filter={filter}
             setFilter={setFilter}
             className="lg:col-9"
-            add="/ContractFile/add"
         >
             <div className="col-2">
                 <Input
@@ -77,9 +77,9 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
                 <Dropdown
                     filter
                     showClear
-                    value={filter.partnerDetailId}
+                    value={filter.customerDetailId}
                     options={customerOptions}
-                    onChange={(e: any) => setFilter({ ...filter, partnerDetailId: e.target.value })}
+                    onChange={(e: any) => setFilter({ ...filter, customerDetailId: e.target.value })}
                     label="Khách hàng"
                     className={classNames("dropdown-input-sm", "p-dropdown-sm")}
                 />
@@ -90,80 +90,63 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
 
 export default function ListContractFileBangKe() {
     const { handleParamUrl } = useHandleParamUrl();
+    const [selectedDebitServiceRows, setSelectedDebitServiceRows] = useState<any[]>([]);
+    const [displayDebitServiceData, setDisplayDebitServiceData] = useState<any[]>([]);
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [displayData, setDisplayData] = useState<any[]>([]);
     const [selectedId, setSelectedId] = useState<any>();
     const [visible, setVisible] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
-    const { data: customers } = useListPartnerDetailWithState({status: 1});
     const [paramsPaginator, setParamsPaginator] = useState({
-        pageNum: 1,
-        pageSize: 20,
-        first: 0,
-        render: false,
-        keyword: "",
+      pageNum: 1,
+      pageSize: 20,
+      first: 0,
+      render: false,
+      keyword: "",
     });
-    const { data, loading, error, refresh } = useListContractFile({
-        params: paramsPaginator,
-        debounce: 500,
-    });
-    const { data:debitService } = useListDebitService({
-        params: {...paramsPaginator,},
-        debounce: 500,
-    });
-    const { data: userInfos } = useListUserWithState({});
-    const userInfosOptions = useMemo(() => {
-        return userInfos
-    }, [userInfos]);
-    const { data: employeeInfos } = useListEmployeeWithState({});
-    const employeeOptions = useMemo(() => {
-        return employeeInfos
-    }, [employeeInfos]);
+    const { data, loading, error, refresh } = useListContractFileNotService({ params: paramsPaginator, debounce: 500,});
+    const { data: debitService } = useListDebitService({ params: {...paramsPaginator,},debounce: 500,});
+    const { data: contractFile } = useListContractFileWithState({});
+    const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
+    const { data: listUser } = useListUserWithState({});
+    const { data: listEmployee } = useListEmployeeWithState({});
+    const openDialogAdd = (id:number) => {
+        setSelectedId(id);
+        setVisible(true);
+    };
     // ✅ Client-side pagination
     useEffect(() => {
         if (!data) return;
         handleParamUrl(paramsPaginator);
         const mapped = (data?.data || []).map((row: any) => {
-            const cus = customers.find((x: any) => x.id === row.partner_detail_id);
-            const _tinhChat = tinhChat.find((x: any) => x.feature === row.feature);
-            const _loaiHang = loaiHang.find((x: any) => x.type === row.type);
-            const _loaiToKhai = loaiToKhai.find((x: any) => x.DeclarationType === row.declaration_type);
-            const _phatSinh = phatSinh.find((x: any) => x.occurrence === row.occurrence);
-            const _nghiepVu = nghiepVu.find((x: any) => x.business === row.business);
-            const _user = userInfosOptions.find((x: any) => x.id === row.updated_by);
-            let _sumTongPrice = 0;
-            let _listEmployee = "";
-            if(row?.file_info_details.length > 0){
-                row.file_info_details.forEach((element:any,index: number) => {
-                    _sumTongPrice+=element.price;
-                    const _employee = employeeOptions.find((x: any) => x.id === element.employee_id);
-                    const fullName = `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""}`.trim();
-                    // thêm dấu ; giữa các tên, không thêm sau tên cuối cùng
-                    _listEmployee += fullName + (index < row.file_info_details.length - 1 ? ";" : "");
-                });
-            }
-         
+            const cus = listCustomer.find((x: any) => x.id === row.customer_detail_id);
+            const _user = listUser.find((x: any) => x.id === row.updated_by);
             return {
                 ...row,
-                feature:_tinhChat?.name || "",
-                type:_loaiHang?.name || "",
-                declaration_type:_loaiToKhai?.name || "",
-                occurrence:_phatSinh?.name || "",
-                business:_nghiepVu?.name || "",
                 customerName: cus?.partners?.name || "",
                 customerAbb: cus?.partners?.abbreviation || "",
                 userName: `${_user.last_name ?? ""} ${_user.first_name ?? ""}`.trim(),
-                sumTongPrice : _sumTongPrice,
-                listEmployee: _listEmployee
             };
         });
+
+          const mappedDebitService = (debitService?.data || []).map((row: any) => {
+          const _customer = listCustomer.find((x: any) => x.id === row.customer_detail_id);
+          const _user = listUser.find((x: any) => x.id === row.updated_by);
+          const _fileContract = contractFile.find((x: any) => x.id === row.file_info_id);
+          return {
+              ...row,
+              customerName:_customer?.partners?.name || "",
+              customerAbb:_customer?.partners?.abbreviation || "",
+              file_number : _fileContract?.file_number,
+              so_cont : _fileContract?.container_code,
+          };
+        });
+
         setDisplayData(mapped);
-    }, [first, rows, data, paramsPaginator,customers]);
-    const openDialogAdd = (id:number) => {
-        setSelectedId(id);
-        setVisible(true);
-    };
+        setDisplayDebitServiceData(mappedDebitService);
+    }, [first, rows, data,debitService, paramsPaginator,listCustomer]);
+ 
     return (
       <>
         <div className="card">
@@ -197,7 +180,7 @@ export default function ListContractFileBangKe() {
                                 scrollable
                                 scrollHeight="flex"
                                 style={{ flex: 1 }}
-                                tableStyle={{ minWidth: "2900px" }}// ép bảng rộng hơn để có scroll ngang
+                                tableStyle={{ minWidth: "1600px" }}// ép bảng rộng hơn để có scroll ngang
                                 >
                                 {/* Custom checkbox column */}
                                 <Column
@@ -236,22 +219,12 @@ export default function ListContractFileBangKe() {
                                 <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="declaration" header="Số tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="sales" header="Tên sales" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="listEmployee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="sumTongPrice" header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="feature" header="Tính chất" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="type" header="Loại hàng" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="declaration_quantity" header="Số lượng tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="declaration_type" header="Loại tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="business" header="Nghiệp vụ" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="occurrence" header="Phát sinh" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="userName" header="Người thực hiện" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="declaration" header="Số bill" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="userName" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
-                                
                             </DataTableClient>
                           </div>
                         </SplitterPanel>
@@ -275,8 +248,85 @@ export default function ListContractFileBangKe() {
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                                  <b>Bảng kê chi phí đã tạo</b>
-
-                                 
+                                  <DataTableClient
+                                      rowHover
+                                      value={displayDebitServiceData}
+                                      onPage={(e: any) => {
+                                        setFirst(e.first);
+                                        setRows(e.rows);
+                                      }}
+                                      loading={loading}
+                                      dataKey="id"
+                                      title="Tài khoản"
+                                      filterDisplay="row"
+                                      className={classNames("Custom-DataTableClient")}
+                                      scrollable
+                                      scrollHeight="flex"
+                                      style={{ flex: 1 }}
+                                      tableStyle={{ minWidth: "2900px" }}
+                                    >
+                                      {/* Custom checkbox column */}
+                                      <Column
+                                        header={
+                                          <Checkbox
+                                            checked={
+                                              selectedDebitServiceRows.length === displayDebitServiceData.length &&
+                                              displayDebitServiceData.length > 0
+                                            }
+                                            onChange={(e: any) => {
+                                              if (e.checked)
+                                                setSelectedDebitServiceRows(displayDebitServiceData.map((d) => d.id));
+                                              else setSelectedDebitServiceRows([]);
+                                            }}
+                                          />
+                                        }
+                                        body={(rowData: any) => (
+                                          <Checkbox
+                                            className="p-checkbox-sm"
+                                            checked={selectedDebitServiceRows.includes(rowData.id)}
+                                            onChange={(e: any) => {
+                                              if (e.checked)
+                                                setSelectedDebitServiceRows((prev) => [...prev, rowData.id]);
+                                              else
+                                                setSelectedDebitServiceRows((prev) =>
+                                                  prev.filter((id) => id !== rowData.id)
+                                                );
+                                            }}
+                                            onClick={(e: any) => e.stopPropagation()} // ⚡ chặn row click
+                                          />
+                                        )}
+                                        style={{ width: "3em" }}
+                                      />
+                                        <Column
+                                            header="Thao tác"
+                                            body={(row: any) => {
+                                                return ActionBody(
+                                                    row,
+                                                    null,
+                                                    { route: "/Debit/delete", action: deleteDebit },
+                                                    paramsPaginator,
+                                                    setParamsPaginator
+                                                );
+                                            }}
+                                        />
+                                        <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Tổng phí HQ" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Tổng phí CH" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Tiền cược" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Phải thanh toán" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Tên giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Xác nhận" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Thời gian xác nhận" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Đã duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Thời gian duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Lý do duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration_quantity" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
+                                         <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
+                                  </DataTableClient>
                               </div>
                             </SplitterPanel>
             

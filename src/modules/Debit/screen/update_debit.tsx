@@ -32,7 +32,6 @@ export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => v
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
-  
   const { data: ChiPhis } = useListServiceCategoryWithState({type:0});
   const { data: ChiHos } = useListServiceCategoryWithState({type:1});
     // --- chuyển sang options bằng useMemo ---
@@ -50,6 +49,14 @@ export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => v
       value: x.id,
     }));
   }, [ChiHos]);
+    const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
+  const partnerOptions = useMemo(() => {
+    if (!Array.isArray(partnerDetails?.data)) return [];
+    return partnerDetails.data.map((x: any) => ({
+      label: x?.partners?.abbreviation ?? "(không tên)",
+      value: x.id,
+    }));
+  }, [partnerDetails]);
   const handleSubmit = (e: any) => {
     e.preventDefault();
     infos.fileInfoId= infos.id;
@@ -79,14 +86,7 @@ export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => v
       } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
     }
   };
-  const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
-  const partnerOptions = useMemo(() => {
-    if (!Array.isArray(partnerDetails?.data)) return [];
-    return partnerDetails.data.map((x: any) => ({
-      label: x?.partners?.abbreviation ?? "(không tên)",
-      value: x.id,
-    }));
-  }, [partnerDetails]);
+
   useEffect(() => {
     if (!id) return;
     if (partnerOptions.length === 0) return;  // ✅ quan trọng

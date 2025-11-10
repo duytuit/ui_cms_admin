@@ -7,7 +7,6 @@ import { getData } from "lib/request";
 import { setPermission } from "redux/features/permission";
 import { setRoles } from "redux/features/role";
 import { showToast } from "redux/features/toast";
-import { setUser } from "redux/features/user";
 
 export const HandleExpired = () => {
     const dispatch = useDispatch();
@@ -31,7 +30,6 @@ const Loading = (props:any) => {
             const userInfo = getAuth.data.data;
             const roles = getAuth.data.rest.permission;
             dispatch(setRoles(roles));
-            dispatch(setUser(userInfo));
             localStorage.setItem('userInfo', JSON.stringify(userInfo));
         };
 

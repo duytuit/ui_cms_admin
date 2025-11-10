@@ -4,15 +4,15 @@ import { Helper } from 'utils/helper';
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
-    userInfo: null,
+    list: null,
     employeeInfo: null
   },
   reducers: {
-    setUser: (state, action) => {
-      state.userInfo = action.payload;
+    setListUser: (state, action) => {
+      state.list = action.payload;
     },
-    clearUser: (state) => {
-      state.userInfo = null;
+    clearListUser: (state) => {
+      state.list = null;
     },
     setEmployeeInfo: (state, action) => {
       const _employeeInfo = Helper.camelToSnake(action.payload);
@@ -27,6 +27,6 @@ export const userSlice = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { setUser, clearUser, setEmployeeInfo, clearEmployeeInfo } = userSlice.actions
+export const { setListUser, clearListUser, setEmployeeInfo, clearEmployeeInfo } = userSlice.actions
 
 export default userSlice.reducer;

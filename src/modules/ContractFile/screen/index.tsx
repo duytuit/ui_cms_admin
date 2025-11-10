@@ -28,7 +28,7 @@ import { useListContractFile } from "../service";
 import { setCustomer, setVendor } from "redux/features/partner";
 import { useDispatch, useSelector } from "react-redux";
 import { loaiHang, loaiToKhai, nghiepVu, phatSinh, tinhChat } from "utils";
-import { useListPartnerDetailWithState } from "modules/partner/service";
+import { useListCustomerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
@@ -40,13 +40,11 @@ import UpdateDebit from "modules/Debit/screen/update_debit";
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   const [filter, setFilter] = useState({
     name: "",
-    partnerDetailId: "",
+    customerDetailId: "",
     fromDate: Helper.lastWeekString(),
     toDate: Helper.toDayString(),
   });
-  const { data: customerDetails } = useListPartnerDetailWithState({
-    status: 1,
-  });
+  const { data: customerDetails } = useListCustomerDetailWithState({ status: 1});
   // --- chuyển sang options bằng useMemo ---
   const customerOptions = useMemo(() => {
     if (!Array.isArray(customerDetails)) return [];
@@ -60,7 +58,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
     _setParamsPaginator((prev: any) => ({
       ...prev,
       keyword: filter.name,
-      partnerDetailId: filter.partnerDetailId,
+      customerDetailId: filter.customerDetailId,
       fromDate: filter.fromDate,
       toDate: filter.toDate,
     }));
@@ -104,10 +102,10 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
         <Dropdown
           filter
           showClear
-          value={filter.partnerDetailId}
+          value={filter.customerDetailId}
           options={customerOptions}
           onChange={(e: any) =>
-            setFilter({ ...filter, partnerDetailId: e.target.value })
+            setFilter({ ...filter, customerDetailId: e.target.value })
           }
           label="Khách hàng"
           className={classNames("dropdown-input-sm", "p-dropdown-sm")}
@@ -124,7 +122,7 @@ export default function ListContractFile() {
   const [selectedId, setSelectedId] = useState<any>();
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(20);
-  const { data: customers } = useListPartnerDetailWithState({status: 1});
+  const { data: customers } = useListCustomerDetailWithState({status: 1});
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
     pageSize: 20,
@@ -149,7 +147,7 @@ export default function ListContractFile() {
     if (!data) return;
     handleParamUrl(paramsPaginator);
     const mapped = (data?.data || []).map((row: any) => {
-      const cus = customers.find((x: any) => x.id === row.partner_detail_id);
+      const cus = customers.find((x: any) => x.id === row.customer_detail_id);
       const _tinhChat = tinhChat.find((x: any) => x.feature === row.feature);
       const _loaiHang = loaiHang.find((x: any) => x.type === row.type);
       const _loaiToKhai = loaiToKhai.find(
@@ -252,150 +250,27 @@ export default function ListContractFile() {
             )}
             style={{ width: "3em" }}
           />
-          <Column
-            header="Thao tác"
-            body={(e: any) =>
-              ActionBody(
-                e,
-                "/ContractFile/detail",
-                { route: "/ContractFile/delete", action: deleteContractFile },
-                paramsPaginator,
-                setParamsPaginator,
-              )
-            }
-            style={{ width: "6em" }}
-          />
-          <Column
-            field="accounting_date"
-            header="Ngày lập"
-            body={(e: any) => DateBody(e.accounting_date)}
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="customerName"
-            header="Khách hàng"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="customerAbb"
-            header="Tên viết tắt"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="file_number"
-            header="Số file"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="declaration"
-            header="Số tờ khai"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="quantity"
-            header="Số lượng"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="container_code"
-            header="Số cont"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="sales"
-            header="Tên sales"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="listEmployee"
-            header="Giao nhận"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="sumTongPrice"
-            header="Duyệt ứng"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="feature"
-            header="Tính chất"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="type"
-            header="Loại hàng"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="declaration_quantity"
-            header="Số lượng tờ khai"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="declaration_type"
-            header="Loại tờ khai"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="business"
-            header="Nghiệp vụ"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="occurrence"
-            header="Phát sinh"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="note"
-            header="Ghi chú"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            field="userName"
-            header="Người thực hiện"
-            filter
-            showFilterMenu={false}
-            filterMatchMode="contains"
-          />
-          <Column
-            header="Cập nhật lúc"
-            body={(e: any) => TimeBody(e.updated_at)}
-          />
+          <Column header="Thao tác" body={(e: any) => ActionBody(e, "/ContractFile/detail", { route: "/ContractFile/delete", action: deleteContractFile }, paramsPaginator, setParamsPaginator)} style={{ width: "6em" }} />
+          <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="declaration" header="Số tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="sales" header="Tên sales" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="listEmployee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="sumTongPrice" header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="feature" header="Tính chất" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="type" header="Loại hàng" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="declaration_quantity" header="Số lượng tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="declaration_type" header="Loại tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="business" header="Nghiệp vụ" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="occurrence" header="Phát sinh" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="userName" header="Người thực hiện" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
+
         </DataTableClient>
       </div>
     </>

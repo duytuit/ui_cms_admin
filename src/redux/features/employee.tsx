@@ -3,19 +3,19 @@ import { createSlice } from '@reduxjs/toolkit'
 export const employeeSlice = createSlice({
   name: 'employee',
   initialState: {
-    employeeInfo: null
+    list: null
   },
   reducers: {
-    setEmployee: (state, action) => {
-      state.employeeInfo = action.payload;
+    setListEmployee: (state, action) => {
+      state.list = action.payload;
     },
-    clearEmployee: (state) => {
-      state.employeeInfo = null;
+    clearListEmployee: (state) => {
+      state.list = null;
     },
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { setEmployee, clearEmployee } = employeeSlice.actions
+export const { setListEmployee, clearListEmployee } = employeeSlice.actions
 
 export default employeeSlice.reducer;

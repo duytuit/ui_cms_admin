@@ -4,7 +4,8 @@ export const partnerSlice = createSlice({
   name: 'partner',
   initialState: {
     vendor: null,
-    customer: null
+    customer: null,
+    list:null
   },
   reducers: {
     setVendor: (state, action) => {
@@ -18,14 +19,24 @@ export const partnerSlice = createSlice({
     },
     clearCustomer: (state) => {
       state.customer = null
+    },
+    setListPartner: (state, action) => {
+      state.list = action.payload;
+    },
+    clearListPartner: (state) => {
+      state.list = null
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const {setVendor,
+export const {
+  setVendor,
   clearVendor,
   setCustomer,
-  clearCustomer} = partnerSlice.actions
+  clearCustomer,
+  setListPartner,
+  clearListPartner
+} = partnerSlice.actions
 
 export default partnerSlice.reducer;

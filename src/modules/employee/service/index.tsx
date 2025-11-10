@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { listEmployee } from '../api';
 import { useDispatch, useSelector } from 'react-redux';
-import { setEmployee } from 'redux/features/employee';
+import { setListEmployee } from 'redux/features/employee';
 
 export const useListEmployee = ({ params, debounce = 500 }: any) => {
     const [data, setData] = useState<any>([]);
@@ -34,13 +34,13 @@ export const useListEmployee = ({ params, debounce = 500 }: any) => {
 };
 export const useListEmployeeWithState = (params : any)  => {
     const dispatch = useDispatch();
-    const employees = useSelector((state: any) => state.employee.employeeInfo);
+    const lists = useSelector((state: any) => state.employee.list);
 
     const [data, setData] = useState<any>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
 
-    const shouldFetch = !Array.isArray(employees) || employees.length === 0;
+    const shouldFetch = !Array.isArray(lists) || lists.length === 0;
 
     const fetchData = async () => {
         try {
@@ -48,7 +48,7 @@ export const useListEmployeeWithState = (params : any)  => {
             setError(null);
             const res = await listEmployee({...params});
             const arr = res?.data?.data?.data || [];
-            dispatch(setEmployee(arr)); // đẩy redux luôn
+            dispatch(setListEmployee(arr)); // đẩy redux luôn
             setData(arr);               // set local luôn
         } catch (err) {
             setError(err);
@@ -61,9 +61,9 @@ export const useListEmployeeWithState = (params : any)  => {
         if (shouldFetch) {
             fetchData();
         } else {
-            setData(employees); // lấy redux
+            setData(lists); // lấy redux
         }
-    }, [shouldFetch, employees]); // thêm customers vào deps
+    }, [shouldFetch, lists]); // thêm customers vào deps
 
     return { data, loading, error, refresh: fetchData };
 };
