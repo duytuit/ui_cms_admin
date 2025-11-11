@@ -89,20 +89,20 @@ export const AddForm = (props:any) => {
              <form onSubmit={onSubmit}>
                 <div className="flex justify-content-between align-items-center mb-4">
                     <div>
-                         {routeList &&<h4 className="m-0">{checkId ? 'Cập nhật' : 'Thêm mới'} {title}</h4>}
+                         {routeList &&<h4 className="m-0">{checkId ? 'Lưu' : 'Thêm mới'} {title}</h4>}
                         {moreOptions && moreOptions.id && <MoreOptions value={moreOptions} />}
                     </div>
                     <div>
                         {routeList &&  <Button type='button' onClick={() => navigate(routeList)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />}
-                        {<Button type='submit' loading={loading} label={checkId ? "Cập nhật" : "Thêm mới"}
-                            className="ml-2" severity="info" size="small" raised />}
+                        {<Button type='submit' loading={loading} label={checkId ? "Lưu" : "Thêm mới"}
+                            className="ml-2" severity="info" size="small" raised icon="pi pi-check"/>}
                     </div>
                 </div>
                 {props.children}
                 <div className="w-full justify-content-end flex">
                     {routeList && <Button type='button' onClick={() => navigate(routeList)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />}
-                    {<Button type='submit' loading={loading} label={checkId ? "Cập nhật" : "Thêm mới"}
-                        className="ml-2" severity="info" size="small" raised />}
+                    {<Button type='submit' loading={loading} label={checkId ? "Lưu" : "Thêm mới"}
+                        className="ml-2" severity="info" size="small" raised icon="pi pi-check"/>}
                 </div>
             </form>
         </div>

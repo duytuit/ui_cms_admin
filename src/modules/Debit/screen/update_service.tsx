@@ -257,7 +257,7 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                   severity="success"
                   raised
                   onClick={() => {
-                    if (!newHaiquan.name || !newHaiquan.price)
+                    if (!newHaiquan.name || !newHaiquan.price || newHaiquan.price <= 0)
                       return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin hải quan" }));
 
                     // convert price về số khi push
@@ -393,7 +393,7 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                   severity="success"
                   raised
                   onClick={() => {
-                    if (!newChiho.name || !newChiho.price)
+                    if (!newChiho.name || !newChiho.price || newChiho.price <= 0)
                       return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin chi hộ" }));
 
                     const numericPrice = parseInt(newChiho.price.replace(/\D/g, ""), 10);

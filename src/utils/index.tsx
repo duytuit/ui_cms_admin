@@ -185,7 +185,7 @@ export const typeService = [
    },
     {
      status:1,
-     name:"Chi hộ"
+     name:"Chi phí chi hộ"
    }
 ];
 export const typeReceipt = [
@@ -240,3 +240,7 @@ export const formOfPayment = [
      name:"Chuyển khoản"
    }
 ];
+// const typeServiceMap: Record<number, string> = {
+//   0: "Chi phí hải quan",
+//   1: "Chi phí chi hộ"
+// };

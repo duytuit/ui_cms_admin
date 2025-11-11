@@ -171,11 +171,11 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
         </React.Fragment>
     );
 };
-export const ActionBodyWithId = (id:number, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, openDialogAdd?:any,duplicated?:any, handleUndo?:any) => {
+export const ActionBodyWithIds = (ids:number, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, openDialogAdd?:any,duplicated?:any, handleUndo?:any) => {
     const dispatch = useDispatch();
     
     async function accept() {
-        const res = await actions.action({ id: id });
+        const res = await actions.action({ ids: ids });
         if (res.status === 200) {
             if(res.data.status){
                 dispatch(showToast({ ...listToast[0], detail: res.data.message  }));
@@ -201,11 +201,6 @@ export const ActionBodyWithId = (id:number, editRoute:any, actions?:any, paramsP
 
     return (
         <React.Fragment>
-            {editRoute && <Link to={editRoute + '/' + id}>
-                <Button icon="pi pi-eye" rounded outlined className="mr-2" />
-            </Link>}
-            {duplicated && <Button onClick={e => duplicated(id)}
-                icon="pi pi-clone" rounded outlined className="mr-2" />}
             {actions && <Button className="mr-2" type='button' icon="pi pi-trash"
                 onClick={actions.options ? actions.options : confirm} rounded outlined severity="danger" />}
             {handleUndo && <Button type='button' icon="pi pi-undo" onClick={e => handleUndo(e)} rounded outlined />}
