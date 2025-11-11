@@ -63,7 +63,7 @@ export const useListVehicleWithState = ({ params, debounce = 500 }: any) => {
           } else {
               setData(lists); // lấy redux
           }
-      }, [shouldFetch, lists]); // thêm customers vào deps
+      }, []); // thêm customers vào deps
   
       return { data, loading, error, refresh: fetchData };
 };

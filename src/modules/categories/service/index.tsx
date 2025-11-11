@@ -63,7 +63,7 @@ export const useListServiceCategoryWithState = (params : any)  => {
         } else {
             setData(ServiceCategorys); // lấy redux
         }
-    }, [shouldFetch, ServiceCategorys]); // thêm customers vào deps
+    }, []); // thêm customers vào deps
 
     return { data, loading, error, refresh: fetchData };
 };
@@ -127,7 +127,7 @@ export const useListIncomeExpenseWithState = (params : any)  => {
         } else {
             setData(IncomeExpenses); // lấy redux
         }
-    }, [shouldFetch, IncomeExpenses]); // thêm customers vào deps
+    }, []); // thêm customers vào deps
 
     return { data, loading, error, refresh: fetchData };
 };
@@ -162,7 +162,7 @@ export const useListBankWithState = (params : any)  => {
         } else {
             setData(Bank); // lấy redux
         }
-    }, [shouldFetch, Bank]); // thêm customers vào deps
+    }, []); // thêm customers vào deps
 
     return { data, loading, error, refresh: fetchData };
 };
@@ -198,7 +198,7 @@ export const useListFundCategoryWithState = (params : any)  => {
         } else {
             setData(FundCategory); // lấy redux
         }
-    }, [shouldFetch, FundCategory]); // thêm customers vào deps
+    }, []); // thêm customers vào deps
 
     return { data, loading, error, refresh: fetchData };
 };
