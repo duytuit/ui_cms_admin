@@ -21,7 +21,7 @@ import { listContractFileNotDispatch } from "modules/ContractFile/api";
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   const [filter, setFilter] = useState({
     name: "",
-    customerDetailId: 0,
+    customerDetailId: "",
     fromDate: Helper.lastWeekString(),
     toDate: Helper.toDayString(),
   });

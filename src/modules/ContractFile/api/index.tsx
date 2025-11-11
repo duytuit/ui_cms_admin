@@ -3,6 +3,7 @@ import { getData, postData } from "lib/request";
 export const listContractFile = async (params: any) => await getData("ContractFile", params);
 export const listContractFileNotDispatch = async (params: any) => await getData("ContractFile/getFileNotDispatch", params);
 export const listContractFileNotService = async (params: any) => await getData("ContractFile/getFileNotService", params);
+export const listContractFileHasDebitService = async (params: any) => await getData("ContractFile/getFileHasDebitService", params);
 export const getCodeContractFile = async (params: any) => await getData("ContractFile/codeFile", params);
 export const listSelectContractFile = async (params: any) => await getData("ContractFile/select", params);
 export const showContractFile = async (params: any) => await getData("ContractFile/show", params);

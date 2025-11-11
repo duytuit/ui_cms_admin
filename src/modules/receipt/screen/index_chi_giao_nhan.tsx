@@ -116,7 +116,7 @@ export default function ListReceiptChiGiaoNhan() {
                             chutk: _bank?.account_holder,
                             nganhang: _bank?.bank_name,
                             hinhthuc: _hinhthuc?.name,
-                            nguoitao: `${_nguoitao.last_name ?? ""} ${_nguoitao.first_name ?? ""}`.trim(),
+                            nguoitao: `${_nguoitao?.last_name ?? ""} ${_nguoitao?.first_name ?? ""}`.trim(),
                             sofile:_sofile?.file_number
                         };
                      });

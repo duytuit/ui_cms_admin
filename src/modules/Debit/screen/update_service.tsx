@@ -17,13 +17,13 @@ import React from "react";
 import { showContractFile } from "modules/ContractFile/api";
 import { useListPartnerDetail } from "modules/partner/service";
 import { useListIncomeExpenseWithState, useListServiceCategoryWithState } from "modules/categories/service";
-export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: () => void }) {
+export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onClose: () => void, price:number }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
   const [productHaiquan, setProductHaiquan] = useState<any[]>([]);
-  const [newHaiquan, setNewHaiquan] = useState<any>({ name: "", price: "", note: "", bill: "", link_bill: "", code_bill: "" });
+  const [newHaiquan, setNewHaiquan] = useState<any>({ serviceId:"", name: "", price: "", note: "", bill: "", linkBill: "", codeBill: "" });
   const [productChiho, setProductChiho] = useState<any[]>([]);
-  const [newChiho, setNewChiho] = useState<any>({ name: "", price: "", note: "", bill: "", link_bill: "", code_bill: "" });
+  const [newChiho, setNewChiho] = useState<any>({ serviceId:"", name: "", price: "", note: "", bill: "", linkBill: "", codeBill: "" });
   // format tiền VN
   const formatCurrency = (value: string) => {
     const numeric = value.replace(/\D/g, "");
@@ -62,10 +62,11 @@ export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: (
   const handleSubmit = (e: any) => {
     e.preventDefault();
     infos.fileInfoId= infos.id;
+    infos.productHaiquan= productHaiquan;
+    infos.productChiho= productChiho;
+    infos.status = infos.status ? 0 : 1;
     let info = {
-      ...infos, status: infos.status ? 0 : 1,
-      productHaiquan: productHaiquan,
-      productChiho: productChiho,
+      ...infos,
       data:JSON.stringify(infos)
     };
     console.log('info', info);
@@ -93,10 +94,10 @@ export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: (
     if (partnerOptions.length === 0) return;  // ✅ quan trọng
     if (id) {
       setLoading(true);
-      showContractFile({ id: id, type: CategoryEnum.country }).then(res => {
+      const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
+      showContractFile({ id: id , type: CategoryEnum.country }).then(res => {
         const detail = res.data.data
         if (detail) {
-          const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
           const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
           const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
            detail.partnerName = partner?.label
@@ -175,8 +176,8 @@ export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: (
                   </td>
                   <td className="pr-4 align-top">
                     <div className="mb-2">
-                        <div><label className="font-medium">Nhân viên:</label> {`${infos?.EmployeeStaffInfo?.lastName ?? ""} ${infos?.EmployeeStaffInfo?.firstName ?? ""}`.trim()}</div>
-                        <div><label className="font-medium">Được duyệt:</label> {infos?.confirm_price ? Helper.formatCurrency(infos?.confirm_price.toString()) : 0}</div>
+                        <div><label className="font-medium">Nhân viên:</label> {`${infos?.EmployeeStaffInfo?.last_name ?? ""} ${infos?.EmployeeStaffInfo?.first_name ?? ""}`.trim()}</div>
+                        <div><label className="font-medium">Được duyệt:</label> {price ? Helper.formatCurrency(price.toString()) : 0}</div>
                     </div>
                   </td>
                 </tr>
@@ -264,11 +265,11 @@ export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: (
 
                     setProductHaiquan([
                       ...productHaiquan,
-                      { ...newHaiquan, price: numericPrice,name: newHaiquan.haiquan_info.name },
+                      { ...newHaiquan, price: numericPrice,name: newHaiquan.haiquan_info.name,serviceId:newHaiquan.haiquan_info.id},
                     ]);
 
                     // reset input
-                    setNewHaiquan({ name: "", price: "", note: "" });
+                    setNewHaiquan({serviceId:"", name: "", price: "", note: "" });
                   }}
                 />
               </div>
@@ -354,10 +355,10 @@ export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: (
                 <div className="field col-2">
                 <InputForm
                   className="w-full"
-                  id="chiho_link_bill"
-                  value={newChiho.link_bill}
+                  id="chiho_linkBill"
+                  value={newChiho.linkBill}
                   onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, link_bill: e.target.value })
+                    setNewChiho({ ...newChiho, linkBill: e.target.value })
                   }
                   label="Link hóa đơn"
                 />
@@ -365,10 +366,10 @@ export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: (
                <div className="field col-2">
                 <InputForm
                   className="w-full"
-                  id="chiho_code_bill"
-                  value={newChiho.code_bill}
+                  id="chiho_codeBill"
+                  value={newChiho.codeBill}
                   onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, code_bill: e.target.value })
+                    setNewChiho({ ...newChiho, codeBill: e.target.value })
                   }
                   label="Mã hóa đơn"
                 />
@@ -399,10 +400,10 @@ export default function UpdateDebitChiPhi({ id, onClose }: { id: any; onClose: (
 
                     setProductChiho([
                       ...productChiho,
-                      { ...newChiho, price: numericPrice, name: newChiho.chiho_info.name },
+                      { ...newChiho, price: numericPrice, name: newChiho.chiho_info.name ,serviceId:newChiho.chiho_info.id},
                     ]);
 
-                    setNewChiho({ name: "", price: "", note: "" , bill: "", link_bill: "", code_bill: ""});
+                    setNewChiho({serviceId:"", name: "", price: "", note: "" , bill: "", linkBill: "", codeBill: ""});
                   }}
                 />
               </div>

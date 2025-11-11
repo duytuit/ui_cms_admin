@@ -171,7 +171,57 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
         </React.Fragment>
     );
 };
+export const ActionBodyWithId = (id:number, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, openDialogAdd?:any,duplicated?:any, handleUndo?:any) => {
+    const dispatch = useDispatch();
+    
+    async function accept() {
+        const res = await actions.action({ id: id });
+        if (res.status === 200) {
+            if(res.data.status){
+                dispatch(showToast({ ...listToast[0], detail: res.data.message  }));
+                if (paramsPaginator && setParamsPaginator) {
+                    setParamsPaginator({ ...paramsPaginator, render: !paramsPaginator.render });
+                };
+            }else{
+                dispatch(showToast({ ...listToast[2], detail: res.data.message  }));
+            }
+        } else {
+            dispatch(showToast({ ...listToast[1], detail: res.data.message  }));
+        }
+    };
 
+    const confirm = () => {
+        confirmDialog({
+            message: 'Bạn có muốn tiếp tục xóa?',
+            header: 'Quản trị dự án',
+            icon: 'pi pi-info-circle',
+            accept,
+        });
+    };
+
+    return (
+        <React.Fragment>
+            {editRoute && <Link to={editRoute + '/' + id}>
+                <Button icon="pi pi-eye" rounded outlined className="mr-2" />
+            </Link>}
+            {duplicated && <Button onClick={e => duplicated(id)}
+                icon="pi pi-clone" rounded outlined className="mr-2" />}
+            {actions && <Button className="mr-2" type='button' icon="pi pi-trash"
+                onClick={actions.options ? actions.options : confirm} rounded outlined severity="danger" />}
+            {handleUndo && <Button type='button' icon="pi pi-undo" onClick={e => handleUndo(e)} rounded outlined />}
+            {openDialogAdd &&
+                <Button
+                    type="button"
+                    icon="pi pi-plus"
+                    rounded
+                    outlined
+                    severity="success"
+                    onClick={() => openDialogAdd()}   // <<< thêm dòng này
+                />
+            }
+        </React.Fragment>
+    );
+};
 export const Column = (props:any) => {
     const { ...prop } = props;
     return (

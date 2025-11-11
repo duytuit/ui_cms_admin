@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, DataTableClient, DateBody } from "components/common/DataTable";
+import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, DataTableClient, DateBody, ActionBodyWithId } from "components/common/DataTable";
 import { Calendar, CalendarY, Dropdown, GridForm, Input } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
@@ -13,7 +13,7 @@ import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { useListContractFile, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
+import { useListContractFile, useListContractFileHasDebitService, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
 import { deleteContractFile } from "modules/ContractFile/api";
 import UpdateDebitChiPhi from "./update_service";
 import { useListDebit, useListDebitService } from "../service";
@@ -21,7 +21,7 @@ import { deleteDebit } from "../api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
-    const [filter, setFilter] = useState({ name: "", customerDetailId: 0 ,fromDate:Helper.lastWeekString(),toDate:Helper.toDayString()});
+    const [filter, setFilter] = useState({ name: "", customerDetailId: "" ,fromDate:Helper.lastWeekString(),toDate:Helper.toDayString()});
     const { data: customerDetails } = useListCustomerDetailWithState({status:1});
     // --- chuyển sang options bằng useMemo ---
     const customerOptions = useMemo(() => {
@@ -89,12 +89,14 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
 };
 
 export default function ListContractFileBangKe() {
+    const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
     const { handleParamUrl } = useHandleParamUrl();
     const [selectedDebitServiceRows, setSelectedDebitServiceRows] = useState<any[]>([]);
     const [displayDebitServiceData, setDisplayDebitServiceData] = useState<any[]>([]);
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [displayData, setDisplayData] = useState<any[]>([]);
     const [selectedId, setSelectedId] = useState<any>();
+    const [price, setPrice] = useState(0);
     const [visible, setVisible] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
@@ -104,16 +106,23 @@ export default function ListContractFileBangKe() {
       first: 0,
       render: false,
       keyword: "",
+      EmployeeId:employeeInfo.id
     });
     const { data, loading, error, refresh } = useListContractFileNotService({ params: paramsPaginator, debounce: 500,});
-    const { data: debitService } = useListDebitService({ params: {...paramsPaginator,},debounce: 500,});
+    const { data: debitService, refresh:refreshHasDebitDispatch } = useListContractFileHasDebitService({ params: {...paramsPaginator,},debounce: 500,});
     const { data: contractFile } = useListContractFileWithState({});
     const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
     const { data: listUser } = useListUserWithState({});
     const { data: listEmployee } = useListEmployeeWithState({});
-    const openDialogAdd = (id:number) => {
+    const openDialogAdd = (id:number,price:number) => {
         setSelectedId(id);
+        setPrice(price);
         setVisible(true);
+    };
+    const handleModalClose = () => {
+      setVisible(false);
+      refresh?.(); 
+      refreshHasDebitDispatch?.(); // reload debitDispatch
     };
     // ✅ Client-side pagination
     useEffect(() => {
@@ -122,27 +131,42 @@ export default function ListContractFileBangKe() {
         const mapped = (data?.data || []).map((row: any) => {
             const cus = listCustomer.find((x: any) => x.id === row.customer_detail_id);
             const _user = listUser.find((x: any) => x.id === row.updated_by);
+            const _employee = listEmployee.find((x: any) => x.id === row.employee_id);
             return {
                 ...row,
                 customerName: cus?.partners?.name || "",
                 customerAbb: cus?.partners?.abbreviation || "",
                 userName: `${_user.last_name ?? ""} ${_user.first_name ?? ""}`.trim(),
+                employee: `${_employee.last_name ?? ""} ${_employee.first_name ?? ""}`.trim(),
             };
         });
-
-          const mappedDebitService = (debitService?.data || []).map((row: any) => {
-          const _customer = listCustomer.find((x: any) => x.id === row.customer_detail_id);
-          const _user = listUser.find((x: any) => x.id === row.updated_by);
-          const _fileContract = contractFile.find((x: any) => x.id === row.file_info_id);
-          return {
+         // gom debits
+         const dataArray = Array.isArray(debitService?.data) ? debitService.data : [];
+        const groupedHasDebitService = Object.values(
+            dataArray.reduce((acc:any, cur:any) => {
+              const { service_id, debit_price, debit_total, debit_type, debit_vat,debit_id, ...rest } = cur;
+              if (!acc[cur.id]) {
+                acc[cur.id] = { ...rest, debits: [] };
+              }
+              // chỉ gom debit nếu debitService có dữ liệu
+              if (debitService?.data) {
+                acc[cur.id].debits.push({ service_id, debit_price, debit_vat, debit_total, debit_type,debit_id });
+              }
+              return acc;
+            }, {} as Record<number, any>)
+          );
+          const mappedDebitService = groupedHasDebitService.map((row: any) => {
+            const _customer = listCustomer?.find((x: any) => x.id === row.customer_detail_id);
+            const _employee = listEmployee.find((x: any) => x.id === row.employee_id);
+            return {
               ...row,
-              customerName:_customer?.partners?.name || "",
-              customerAbb:_customer?.partners?.abbreviation || "",
-              file_number : _fileContract?.file_number,
-              so_cont : _fileContract?.container_code,
-          };
-        });
-
+              customerName: _customer?.partners?.name || "",
+              customerAbb: _customer?.partners?.abbreviation || "",
+              employee: `${_employee.last_name ?? ""} ${_employee.first_name ?? ""}`.trim()
+            };
+          });
+         console.log(mappedDebitService);
+                 
         setDisplayData(mapped);
         setDisplayDebitServiceData(mappedDebitService);
     }, [first, rows, data,debitService, paramsPaginator,listCustomer]);
@@ -210,7 +234,7 @@ export default function ListContractFileBangKe() {
                                   header="Thao tác"
                                   body={(e: any) =>
                                     ActionBody(e, null, null, null, null, () =>
-                                      openDialogAdd(e.id)
+                                      openDialogAdd(e.id,e.total)
                                     )
                                   }
                                   style={{ width: "6em" }}
@@ -219,8 +243,8 @@ export default function ListContractFileBangKe() {
                                 <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="listEmployee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="sumTongPrice" header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="employee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="total" header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="declaration" header="Số bill" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="userName" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -300,8 +324,8 @@ export default function ListContractFileBangKe() {
                                         <Column
                                             header="Thao tác"
                                             body={(row: any) => {
-                                                return ActionBody(
-                                                    row,
+                                                return ActionBodyWithId(
+                                                    row.debit_id,
                                                     null,
                                                     { route: "/Debit/delete", action: deleteDebit },
                                                     paramsPaginator,
@@ -318,7 +342,7 @@ export default function ListContractFileBangKe() {
                                         <Column field="declaration_quantity" header="Tổng phí CH" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="declaration_quantity" header="Tiền cược" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="declaration_quantity" header="Phải thanh toán" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="declaration_quantity" header="Tên giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="employee" header="Tên giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="declaration_quantity" header="Xác nhận" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="declaration_quantity" header="Thời gian xác nhận" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="declaration_quantity" header="Đã duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -355,7 +379,7 @@ export default function ListContractFileBangKe() {
             style={{ width: "78vw" }}
           >
             <p className="m-0">
-              {selectedId && <UpdateDebitChiPhi id={selectedId}  onClose={() => setVisible(false)} ></UpdateDebitChiPhi>}
+              {selectedId && <UpdateDebitChiPhi id={selectedId} price={price} onClose={handleModalClose} ></UpdateDebitChiPhi>}
             </p>
           </Dialog>
       </>
