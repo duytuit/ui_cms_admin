@@ -92,7 +92,7 @@ export const useListCustomerDetailWithState = (params : any)  => {
         } else {
             setData(customers); // lấy redux
         }
-    }, []); // thêm customers vào deps
+    }, [shouldFetch]); // thêm customers vào deps
 
     return { data, loading, error, refresh: fetchData };
 };
@@ -128,7 +128,7 @@ export const useListSupplierDetailWithState = (params : any)  => {
         } else {
             setData(suppliers); // lấy redux
         }
-    }, []); // thêm customers vào deps
+    }, [shouldFetch]); // thêm customers vào deps
 
     return { data, loading, error, refresh: fetchData };
 };

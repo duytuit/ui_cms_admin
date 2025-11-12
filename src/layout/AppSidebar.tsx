@@ -53,7 +53,7 @@ const model = [{
           {
             id: 1,
             name: 'Theo dõi file giá',
-            route: '/page-two',
+            route: '/ContractFile/list-create-filegia',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,

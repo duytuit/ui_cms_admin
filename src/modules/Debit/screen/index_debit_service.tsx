@@ -15,7 +15,6 @@ import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useListContractFile, useListContractFileHasDebitService, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
 import { deleteContractFile } from "modules/ContractFile/api";
 import UpdateDebitChiPhi from "./update_service";
-import { useListDebit, useListDebitService } from "../service";
 import { deleteDebit, deleteMultiDebit } from "../api";
 
 // ✅ Component Header lọc dữ liệu

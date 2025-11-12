@@ -11,6 +11,7 @@ import Customer from "modules/customer/screen";
 import UpdateCustomer from "modules/customer/screen/update";
 import DashBoard from "modules/dashboard/screen";
 import ListCreateDispatch from "modules/Debit/screen/index_debit_dispatch";
+import ListFileGia from "modules/Debit/screen/index_debit_file_gia";
 import ListContractFileBangKe from "modules/Debit/screen/index_debit_service";
 import ListContractFileNangHa from "modules/Debit/screen/index_debit_service_nh";
 import ListDepartment from "modules/department/screen";
@@ -99,6 +100,7 @@ const publicRoutes = [
   { path: "/ContractFile/list-create-bangke", component: ListContractFileBangKe, layout: 'ListContractFileBangKe' },
   { path: "/ContractFile/list-create-nangha", component: ListContractFileNangHa, layout: 'ListContractFileNangHa' },
   { path: "/ContractFile/list-create-dispatch", component: ListCreateDispatch, layout: 'ListCreateDispatch' },
+  { path: "/ContractFile/list-create-filegia", component: ListFileGia, layout: 'ListFileGia' },
   { path: "/ContractFile/add", component: UpdateContractFile, layout: 'UpdateContractFile' },
   { path: "/ContractFile/detail/:id", component: UpdateContractFile, layout: 'UpdateContractFile' },
   // Vehicle 

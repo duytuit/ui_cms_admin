@@ -4,6 +4,7 @@ export const listDebit = async (params: any) => await getData("Debit", params);
 export const listDebitDispatch = async (params: any) => await getData("Debit/dispatch", params);
 export const listDebitService = async (params: any) => await getData("Debit/service", params);
 export const showDebit = async (params: any) => await getData("Debit/show", params);
+export const showDebitByFileId = async (params: any) => await getData("Debit/show/byFileId", params);
 export const deleteDebit = async (params: any) => await postData("Debit/delete", params);
 export const deleteMultiDebit = async (params: any) => await postData("Debit/delete/multi", params);
 export const addDebit = async (params: any) => await postData("Debit/create", params);

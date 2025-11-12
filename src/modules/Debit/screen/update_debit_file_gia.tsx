@@ -6,7 +6,7 @@ import { showToast } from "redux/features/toast";
 import { listToast, loaiToKhai, refreshObject, typeDebit, VatDebit } from "utils";
 import { useDispatch, useSelector } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
-import { addDebit, addDebitService, showDebit, updateDebit } from "../api";
+import { addDebit, addDebitService, showDebit, showDebitByFileId, updateDebit } from "../api";
 import { Dropdown, Input, MultiSelect } from "components/common/ListForm";
 import { Column, DataTable, Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
@@ -17,7 +17,7 @@ import React from "react";
 import { showContractFile } from "modules/ContractFile/api";
 import { useListPartnerDetail } from "modules/partner/service";
 import { useListIncomeExpenseWithState, useListServiceCategoryWithState } from "modules/categories/service";
-export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => void }) {
+export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
   const [productHaiquan, setProductHaiquan] = useState<any[]>([]);
@@ -67,14 +67,13 @@ export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => v
   };
   async function fetchDataSubmit(info: any) {
     if (info.id) {
-       const response = await addDebitService(info);
+       const response = await updateDebit(info);
       if (response) setLoading(false);
       if (response.status === 200) {
         if (response.data.status) {
           setInfos({ ...refreshObject(infos), status: true })
           dispatch(showToast({ ...listToast[0], detail: response.data.message }));
           onClose();
-          navigate('/ContractFile/list');
         } else {
           dispatch(showToast({ ...listToast[2], detail: response.data.message }))
         }
@@ -87,7 +86,7 @@ export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => v
     if (partnerOptions.length === 0) return;  // ✅ quan trọng
     if (id) {
       setLoading(true);
-      showContractFile({ id: id, type: CategoryEnum.country }).then(res => {
+      showDebitByFileId({ FileId: id}).then(res => {
         const detail = res.data.data
         if (detail) {
           const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
@@ -109,7 +108,6 @@ export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => v
           };
           console.log('info',info);
           console.log('employeeInfo',employeeInfo);
-          
           setInfos(info)
         }
       }).catch(err => {
@@ -196,8 +194,8 @@ export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => v
               </tbody>
             </table>
           </Panel>
-          <Panel header="Chi phí hải quan">
-            <div className="formgrid grid">
+          <Panel header="Chi tiết các chi phí">
+            {/* <div className="formgrid grid">
               <div className="field col-3">
                  <Dropdown
                   filter
@@ -265,22 +263,33 @@ export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => v
                   }}
                 />
               </div>
-            </div>
+            </div> */}
 
             <div className="child-table">
               <DataTable rowHover value={productHaiquan}>
-                <Column field="name" header="Phí hải quan" />
-                   <Column
-                      field="price"
-                      header="Số tiền"
-                      body={(row: any) => Helper.formatCurrency(row.price.toString())}
-                      footer={Helper.formatCurrency(
-                        productHaiquan
-                          .reduce((sum, item) => sum + (item.price || 0), 0)
-                          .toString()
-                      )}
-                      footerStyle={{ fontWeight: "bold" }}
-                    />
+                <Column field="name" header="Chi phí" />
+                <Column
+                  field="purchasePrice"
+                  header="Giá mua"
+                  body={(row: any) => Helper.formatCurrency(row.purchasePrice.toString())}
+                  footer={Helper.formatCurrency(
+                    productHaiquan
+                      .reduce((sum, item) => sum + (item.purchasePrice || 0), 0)
+                      .toString()
+                  )}
+                  footerStyle={{ fontWeight: "bold" }}
+                />
+                <Column
+                  field="price"
+                  header="Giá bán"
+                  body={(row: any) => Helper.formatCurrency(row.price.toString())}
+                  footer={Helper.formatCurrency(
+                    productHaiquan
+                      .reduce((sum, item) => sum + (item.price || 0), 0)
+                      .toString()
+                  )}
+                  footerStyle={{ fontWeight: "bold" }}
+                />
                 <Column
                   header="VAT"
                   body={(_: any, opt: any) => (
@@ -315,188 +324,7 @@ export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => v
                 )}
                 footerStyle={{ fontWeight: "bold" }}
                 />
-                <Column field="note" header="Ghi chú" />
-                <Column
-                  header="Thao tác"
-                  body={(_: any, opt: any) => (
-                    <Button
-                      icon="pi pi-trash"
-                      severity="danger"
-                      text
-                      onClick={() =>
-                        setProductHaiquan(productHaiquan.filter((_, i) => i !== opt.rowIndex))
-                      }
-                    />
-                  )}
-                />
-              </DataTable>
-            </div>
-          </Panel>
-          <Panel header="Chi phí chi hộ">
-            <div className="formgrid grid">
-              <div className="field col-2">
-                 <Dropdown
-                  filter
-                   value={newChiho.name}
-                  options={ChiHoOptions}
-                  onChange={(e: any) =>
-                    {
-                        const selected = e.value; // Đây là value (ví dụ: 123)
-                        const option = ChiHoOptions.find((x: any) => x.value === selected);
-                          setNewChiho({ ...newChiho, name: selected, chiho_info: {
-                            id: selected,
-                            name: option ? option.label : ''
-                          } })
-                    }
-                  }
-                  label="Phí chi hộ"
-                  className="w-full"
-                />
-              </div>
-              <div className="field col-2">
-                <InputForm
-                  className="w-full"
-                  id="chiho_price"
-                  value={newChiho.price}
-                  onChange={(e: any) =>
-                    setNewChiho({
-                      ...newChiho,
-                      price: Helper.formatCurrency(e.target.value),
-                    })
-                  }
-                  label="Số tiền"
-                />
-              </div>
-               <div className="field col-2">
-                <InputForm
-                  className="w-full"
-                  id="chiho_bill"
-                  value={newChiho.bill}
-                  onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, bill: e.target.value })
-                  }
-                  label="Hóa đơn"
-                />
-              </div>
-                <div className="field col-2">
-                <InputForm
-                  className="w-full"
-                  id="chiho_link_bill"
-                  value={newChiho.link_bill}
-                  onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, link_bill: e.target.value })
-                  }
-                  label="Link hóa đơn"
-                />
-              </div>
-               <div className="field col-2">
-                <InputForm
-                  className="w-full"
-                  id="chiho_code_bill"
-                  value={newChiho.code_bill}
-                  onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, code_bill: e.target.value })
-                  }
-                  label="Mã hóa đơn"
-                />
-              </div>
-              <div className="field col-1">
-                <InputForm
-                  className="w-full"
-                  id="chiho_note"
-                  value={newChiho.note}
-                  onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, note: e.target.value })
-                  }
-                  label="Ghi chú"
-                />
-              </div>
-              <div className="field col-1">
-                <Button
-                  type="button"
-                  className="w-full p-button-normal"
-                  label="Thêm"
-                  severity="success"
-                  raised
-                  onClick={() => {
-                    if (!newChiho.name || !newChiho.price)
-                      return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin chi hộ" }));
-
-                    const numericPrice = parseInt(newChiho.price.replace(/\D/g, ""), 10);
-                    const thanh_tien = Math.round( numericPrice * (1 + (newChiho.vat || 0) / 100) );
-                    setProductChiho([
-                      ...productChiho,
-                      { ...newChiho, price: numericPrice, name: newChiho.chiho_info.name, thanh_tien: Helper.formatCurrency(thanh_tien.toString()) },
-                    ]);
-
-                    setNewChiho({ name: "", price: "", note: "" , bill: "", link_bill: "", code_bill: ""});
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="child-table">
-              <DataTable rowHover value={productChiho}>
-                <Column field="name" header="Phí chi hộ" />
-                <Column
-                  field="price"
-                  header="Số tiền"
-                  body={(row: any) => Helper.formatCurrency(row.price.toString())}
-                  footer={Helper.formatCurrency(
-                    productChiho
-                      .reduce((sum, item) => sum + (item.price || 0), 0)
-                      .toString()
-                  )}
-                  footerStyle={{ fontWeight: "bold" }}  
-                />
-                    <Column
-                  header="VAT"
-                  body={(_: any, opt: any) => (
-                    <Dropdown
-                      value={productChiho[opt.rowIndex].vat}
-                      optionValue="vat"
-                      optionLabel="name"
-                      options={VatDebit}
-                      className="p-inputtext-sm"
-                      onChange={(e: any) =>
-                         {
-                              const thanh_tien = Math.round( productChiho[opt.rowIndex].price * (1 + (e.target.value || 0) / 100) );
-                              const updatedProductChiho = [...productChiho];
-                              updatedProductChiho[opt.rowIndex] = {
-                                ...updatedProductChiho[opt.rowIndex],
-                                vat: e.target.value,
-                                thanh_tien: Helper.formatCurrency(thanh_tien.toString())
-                              };
-                              setProductChiho(updatedProductChiho);
-                          }
-                      }
-                 
-                      required
-                    />
-                  )}
-                />
-                <Column 
-                field="thanh_tien" 
-                header="Thành tiền"
-                footer={Helper.formatCurrency(
-                  productChiho.reduce((sum, item) => sum + (item.thanh_tien ? parseInt(item.thanh_tien.replace(/\D/g, ""), 10) : 0), 0).toString()
-                )}
-                footerStyle={{ fontWeight: "bold" }}
-                />
-                <Column field="note" header="Ghi chú" />
-                <Column
-                  header="Thao tác"
-                  body={(_: any, opt: any) => (
-                    <Button
-                      icon="pi pi-trash"
-                      severity="danger"
-                      text
-                      onClick={() =>
-                        setProductChiho(productChiho.filter((_, i) => i !== opt.rowIndex))
-                      }
-                    />
-                  )}
-                />
+                <Column field="bill" header="Hóa đơn" />
               </DataTable>
             </div>
           </Panel>
@@ -505,15 +333,7 @@ export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => v
             <InputForm
               className="w-64"
               id="total_price"
-              value={
-                Helper.formatCurrency(
-                  (
-                    productHaiquan.reduce((sum, item) => sum + (item.thanh_tien ? parseInt(item.thanh_tien.replace(/\D/g, ""), 10) : 0), 0) 
-                    +
-                    productChiho.reduce((sum, item) => sum + (item.thanh_tien ? parseInt(item.thanh_tien.replace(/\D/g, ""), 10) : 0), 0)
-                  ).toString()
-                )
-              }
+              value={0}
               onChange={(e: any) =>
               // không cho sửa tổng
               { }

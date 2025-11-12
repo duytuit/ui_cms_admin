@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { listContractFile, listContractFileHasDebitNangHa, listContractFileHasDebitService, listContractFileNotDebitNangHa, listContractFileNotDispatch, listContractFileNotService, listSelectContractFile } from '../api';
+import { listContractFile, listContractFileHasDebitNangHa, listContractFileHasDebitService, listContractFileHasFileGia, listContractFileNotDebitNangHa, listContractFileNotDispatch, listContractFileNotFileGia, listContractFileNotService, listSelectContractFile } from '../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setListFileContract, setListSelectFileContract } from 'redux/features/fileContract';
 
@@ -158,6 +158,66 @@ export const useListContractFileNotDebitNangHa = ({ params, debounce = 500 }: an
             setLoading(true);
             setError(null);
             const res = await listContractFileNotDebitNangHa({ ...params });
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!params || Object.keys(params).length === 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
+
+    return { data, loading, error, refresh: fetchData };
+};
+
+export const useListContractFileNotFileGia = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listContractFileNotFileGia({ ...params });
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!params || Object.keys(params).length === 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
+
+    return { data, loading, error, refresh: fetchData };
+};
+
+export const useListContractFileHasFileGia = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listContractFileHasFileGia({ ...params });
             setData(res?.data?.data || []);
         } catch (err) {
             setError(err);

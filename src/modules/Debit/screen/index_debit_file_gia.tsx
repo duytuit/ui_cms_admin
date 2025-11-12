@@ -11,9 +11,10 @@ import { Checkbox, DataTable, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { useListContractFileHasDebitNangHa, useListContractFileHasDebitService, useListContractFileNotDebitNangHa, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
+import { useListContractFileHasDebitNangHa, useListContractFileHasDebitService, useListContractFileHasFileGia, useListContractFileNotDebitNangHa, useListContractFileNotFileGia, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
 import {  deleteMultiDebit } from "../api";
 import UpdateDebitNangHa from "./update_service_nh";
+import UpdateFileGia from "./update_debit_file_gia";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -84,16 +85,15 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
     );
 };
 
-export default function ListContractFileNangHa() {
+export default function ListFileGia() {
     const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
     const { handleParamUrl } = useHandleParamUrl();
-    const [selectedDebitServiceRows, setSelectedDebitServiceRows] = useState<any[]>([]);
-    const [displayDebitServiceData, setDisplayDebitServiceData] = useState<any[]>([]);
+    const [selectedFileGiaRows, setSelectedFileGiaRows] = useState<any[]>([]);
+    const [displayFileGia, setDisplayFileGia] = useState<any[]>([]);
     const [selectedDetail, setSelectedDetail] = useState<any[]>([]);
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [displayData, setDisplayData] = useState<any[]>([]);
     const [selectedId, setSelectedId] = useState<any>();
-    const [price, setPrice] = useState(0);
     const [visible, setVisible] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
@@ -105,27 +105,36 @@ export default function ListContractFileNangHa() {
       keyword: "",
       EmployeeId:employeeInfo?.id
     });
-    const { data, loading, error, refresh } = useListContractFileNotDebitNangHa({ params: paramsPaginator, debounce: 500,});
-    const { data: debitService, refresh:refreshHasDebitDispatch } = useListContractFileHasDebitNangHa({ params: {...paramsPaginator,},debounce: 500,});
-    const { data: contractFile } = useListContractFileWithState({});
+    const { data, loading, error, refresh } = useListContractFileNotFileGia({ params: paramsPaginator, debounce: 500,});
+    const { data: listFileGia, refresh:refreshHasFileGia } = useListContractFileHasFileGia({ params: {...paramsPaginator,},debounce: 500,});
     const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
     const { data: listUser } = useListUserWithState({});
     const { data: listEmployee } = useListEmployeeWithState({});
     const openDialogAdd = (id:number,price:number) => {
         setSelectedId(id);
-        setPrice(price);
         setVisible(true);
     };
     const handleModalClose = () => {
       setVisible(false);
       refresh?.(); 
-      refreshHasDebitDispatch?.(); // reload debitDispatch
+      refreshHasFileGia?.(); // reload debitDispatch
     };
     // ✅ Client-side pagination
     useEffect(() => {
         if (!data) return;
         handleParamUrl(paramsPaginator);
         const mapped = (data?.data || []).map((row: any) => {
+            const cus = listCustomer.find((x: any) => x.id === row.customer_detail_id);
+            const _user = listUser.find((x: any) => x.id === row.updated_by);
+            return {
+                ...row,
+                customerName: cus?.partners?.name || "",
+                customerAbb: cus?.partners?.abbreviation || "",
+                userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
+            };
+        });
+         
+        const mappedListFileGia = (listFileGia?.data || []).map((row: any) => {
             const cus = listCustomer.find((x: any) => x.id === row.customer_detail_id);
             const _user = listUser.find((x: any) => x.id === row.updated_by);
             const _employee = listEmployee.find((x: any) => x.id === row.employee_id);
@@ -137,45 +146,11 @@ export default function ListContractFileNangHa() {
                 employee: `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""}`.trim(),
             };
         });
-         // gom debits
-         const dataArray = Array.isArray(debitService?.data) ? debitService.data : [];
-         const groupedHasDebitService = Object.values(
-            dataArray.reduce((acc:any, cur:any) => {
-              const { service_id, debit_price,debit_purchase_price, debit_total, debit_type, debit_vat,debit_id,debit_name,debit_updated_at,debit_updated_by, ...rest } = cur;
-              if (!acc[cur.id]) {
-                acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
-              }
-              // chỉ gom debit nếu debitService có dữ liệu
-              if (debitService?.data) {
-                acc[cur.id].debits.push({ service_id, debit_price,debit_purchase_price, debit_vat, debit_total, debit_type,debit_id,debit_name ,debit_updated_at,debit_updated_by});
-                acc[cur.id].debit_ids.push(debit_id);
-              }
-              return acc;
-            }, {} as Record<number, any>)
-          );
-          const mappedDebitService = groupedHasDebitService.map((row: any) => {
-            const _customer = listCustomer?.find((x: any) => x.id === row.customer_detail_id);
-            const _employee = listEmployee.find((x: any) => x.id === row.employee_id);
-            const _sumNH = row.debits
-              .filter((x: any) => x.debit_type === 3)
-              .reduce((sum: number, x: any) => sum + (x.debit_purchase_price || 0), 0);
-            const _sumCuoc = row.debits
-              .filter((x: any) => x.service_id === 19)
-              .reduce((sum: number, x: any) => sum + (x.debit_purchase_price || 0), 0);
-            return {
-              ...row,
-              customerName: _customer?.partners?.name || "",
-              customerAbb: _customer?.partners?.abbreviation || "",
-              employee: `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""}`.trim(),
-              sumCuoc:_sumCuoc,
-              sumNH:_sumNH,
-            };
-          });
-         console.log(mappedDebitService);
+         
                  
         setDisplayData(mapped);
-        setDisplayDebitServiceData(mappedDebitService);
-    }, [first, rows, data,debitService, paramsPaginator,listCustomer]);
+        setDisplayFileGia(mappedListFileGia);
+    }, [first, rows, data,listFileGia, paramsPaginator,listCustomer]);
  
     return (
       <>
@@ -194,7 +169,7 @@ export default function ListContractFileNangHa() {
                           }}
                         >
                           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                            <b>File chưa tạo bảng kê nâng hạ</b>
+                            <b>Bảng chưa tạo file giá</b>
                                 <DataTableClient
                                 rowHover
                                 value={displayData}
@@ -249,7 +224,6 @@ export default function ListContractFileNangHa() {
                                 <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="employee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="declaration" header="Số bill" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -277,10 +251,10 @@ export default function ListContractFileNangHa() {
                               style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                                 <b>Bảng kê nâng hạ đã tạo</b>
+                                 <b>Bảng theo dõi file giá</b>
                                   <DataTableClient
                                       rowHover
-                                      value={displayDebitServiceData}
+                                      value={displayFileGia}
                                       onPage={(e: any) => {
                                         setFirst(e.first);
                                         setRows(e.rows);
@@ -305,25 +279,25 @@ export default function ListContractFileNangHa() {
                                         header={
                                           <Checkbox
                                             checked={
-                                              selectedDebitServiceRows.length === displayDebitServiceData.length &&
-                                              displayDebitServiceData.length > 0
+                                              selectedFileGiaRows.length === displayFileGia.length &&
+                                              displayFileGia.length > 0
                                             }
                                             onChange={(e: any) => {
                                               if (e.checked)
-                                                setSelectedDebitServiceRows(displayDebitServiceData.map((d) => d.id));
-                                              else setSelectedDebitServiceRows([]);
+                                                setSelectedFileGiaRows(displayFileGia.map((d) => d.id));
+                                              else setSelectedFileGiaRows([]);
                                             }}
                                           />
                                         }
                                         body={(rowData: any) => (
                                           <Checkbox
                                             className="p-checkbox-sm"
-                                            checked={selectedDebitServiceRows.includes(rowData.id)}
+                                            checked={selectedFileGiaRows.includes(rowData.id)}
                                             onChange={(e: any) => {
                                               if (e.checked)
-                                                setSelectedDebitServiceRows((prev) => [...prev, rowData.id]);
+                                                setSelectedFileGiaRows((prev) => [...prev, rowData.id]);
                                               else
-                                                setSelectedDebitServiceRows((prev) =>
+                                                setSelectedFileGiaRows((prev) =>
                                                   prev.filter((id) => id !== rowData.id)
                                                 );
                                             }}
@@ -370,7 +344,7 @@ export default function ListContractFileNangHa() {
                               style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                                <b>Chi tiết bảng kê nâng hạ</b>
+                                <b>Chi tiết file giá</b>
                                   <DataTable rowHover value={selectedDetail}>
                                       <Column field="debit_name" header="Chi phí" />
                                       <Column field="debit_type"  body={(row: any) => typeDebit.find((x:any) => x.type === row.debit_type)?.name || ""} header="Loại chi phí" />
@@ -386,13 +360,13 @@ export default function ListContractFileNangHa() {
          <Dialog
             position="top"
             dismissableMask
-            header="Tạo bảng kê nâng hạ"
+            header="Tạo file giá"
             visible={visible}
             onHide={() => setVisible(false)}
             style={{ width: "78vw" }}
           >
             <p className="m-0">
-              {selectedId && <UpdateDebitNangHa id={selectedId} price={price} onClose={handleModalClose} ></UpdateDebitNangHa>}
+              {selectedId && <UpdateFileGia id={selectedId} onClose={handleModalClose} ></UpdateFileGia>}
             </p>
           </Dialog>
       </>
