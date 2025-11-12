@@ -3,11 +3,11 @@ import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
-import { listToast, loaiToKhai, refreshObject, typeDebit } from "utils";
+import { listToast, loaiToKhai, refreshObject, typeDebit, VatDebit } from "utils";
 import { useDispatch, useSelector } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { addDebit, addDebitService, showDebit, updateDebit } from "../api";
-import { Dropdown, MultiSelect } from "components/common/ListForm";
+import { Dropdown, Input, MultiSelect } from "components/common/ListForm";
 import { Column, DataTable, Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
@@ -17,20 +17,15 @@ import React from "react";
 import { showContractFile } from "modules/ContractFile/api";
 import { useListPartnerDetail } from "modules/partner/service";
 import { useListIncomeExpenseWithState, useListServiceCategoryWithState } from "modules/categories/service";
-export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onClose: () => void, price:number }) {
+export default function UpdateDebit({ id, onClose }: { id: any; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
   const [productHaiquan, setProductHaiquan] = useState<any[]>([]);
-  const [newHaiquan, setNewHaiquan] = useState<any>({ serviceId:"", name: "", purchasePrice: "", note: "", bill: "", linkBill: "", codeBill: "" });
+  const [newHaiquan, setNewHaiquan] = useState<any>({ name: "", price: "",vat:0,thanh_tien:"", note: "", bill: "", link_bill: "", code_bill: "" });
   const [productChiho, setProductChiho] = useState<any[]>([]);
-  const [newChiho, setNewChiho] = useState<any>({ serviceId:"", name: "", purchasePrice: "", note: "", bill: "", linkBill: "", codeBill: "" });
-  // format tiền VN
-  const formatCurrency = (value: string) => {
-    const numeric = value.replace(/\D/g, "");
-    return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
+  const [newChiho, setNewChiho] = useState<any>({ name: "", price: "",vat:0,thanh_tien:"", note: "", bill: "", link_bill: "", code_bill: "" });
   const dispatch = useDispatch();
-  
+  const navigate = useNavigate();
   
   const { data: ChiPhis } = useListServiceCategoryWithState({type:0});
   const { data: ChiHos } = useListServiceCategoryWithState({type:1});
@@ -49,7 +44,7 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
       value: x.id,
     }));
   }, [ChiHos]);
-  const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
+    const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
   const partnerOptions = useMemo(() => {
     if (!Array.isArray(partnerDetails?.data)) return [];
     return partnerDetails.data.map((x: any) => ({
@@ -57,15 +52,13 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
       value: x.id,
     }));
   }, [partnerDetails]);
-
   const handleSubmit = (e: any) => {
     e.preventDefault();
     infos.fileInfoId= infos.id;
-    infos.productHaiquan= productHaiquan;
-    infos.productChiho= productChiho;
-    infos.status = infos.status ? 0 : 1;
     let info = {
-      ...infos,
+      ...infos, status: infos.status ? 0 : 1,
+      productHaiquan: productHaiquan,
+      productChiho: productChiho,
       data:JSON.stringify(infos)
     };
     console.log('info', info);
@@ -81,6 +74,7 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
           setInfos({ ...refreshObject(infos), status: true })
           dispatch(showToast({ ...listToast[0], detail: response.data.message }));
           onClose();
+          navigate('/ContractFile/list');
         } else {
           dispatch(showToast({ ...listToast[2], detail: response.data.message }))
         }
@@ -93,12 +87,12 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
     if (partnerOptions.length === 0) return;  // ✅ quan trọng
     if (id) {
       setLoading(true);
-      const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
-      showContractFile({ id: id , type: CategoryEnum.country }).then(res => {
+      showContractFile({ id: id, type: CategoryEnum.country }).then(res => {
         const detail = res.data.data
         if (detail) {
+          const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
           const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
-          const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
+          const partner = partnerOptions.find((x:any)=>x.value == detail.partnerDetailId)
            detail.partnerName = partner?.label
           if(detail.fileInfoDetails && employeeInfo){
              const EmployeeStaffInfo = detail.fileInfoDetails.find((x:any) => x.employeeId == employeeInfo.id);
@@ -175,8 +169,8 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                   </td>
                   <td className="pr-4 align-top">
                     <div className="mb-2">
-                        <div><label className="font-medium">Nhân viên:</label> {`${infos?.EmployeeStaffInfo?.last_name ?? ""} ${infos?.EmployeeStaffInfo?.first_name ?? ""}`.trim()}</div>
-                        <div><label className="font-medium">Được duyệt:</label> {price ? Helper.formatCurrency(price.toString()) : 0}</div>
+                        <div><label className="font-medium">Nhân viên:</label> {`${infos?.EmployeeStaffInfo?.lastName ?? ""} ${infos?.EmployeeStaffInfo?.firstName ?? ""}`.trim()}</div>
+                        <div><label className="font-medium">Được duyệt:</label> {infos?.confirm_price ? Helper.formatCurrency(infos?.confirm_price.toString()) : 0}</div>
                     </div>
                   </td>
                 </tr>
@@ -226,12 +220,12 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
               <div className="field col-3">
                 <InputForm
                   className="w-full"
-                  id="purchasePrice"
-                  value={newHaiquan.purchasePrice}
+                  id="price"
+                  value={newHaiquan.price}
                   onChange={(e: any) =>
                     setNewHaiquan({
                       ...newHaiquan,
-                      purchasePrice: formatCurrency(e.target.value),
+                      price: Helper.formatCurrency(e.target.value),
                     })
                   }
                   label="Số tiền"
@@ -256,19 +250,18 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                   severity="success"
                   raised
                   onClick={() => {
-                    if (!newHaiquan.name || !newHaiquan.purchasePrice || newHaiquan.purchasePrice <= 0)
+                    if (!newHaiquan.name || !newHaiquan.price)
                       return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin hải quan" }));
-
                     // convert price về số khi push
-                    const numericPrice = parseInt(newHaiquan.purchasePrice.replace(/\D/g, ""), 10);
-
+                    const numericPrice = parseInt(newHaiquan.price.replace(/\D/g, ""), 10);
+                    const thanh_tien = Math.round( numericPrice * (1 + (newHaiquan.vat || 0) / 100) );
                     setProductHaiquan([
                       ...productHaiquan,
-                      { ...newHaiquan, purchasePrice: numericPrice,name: newHaiquan.haiquan_info.name,serviceId:newHaiquan.haiquan_info.id},
+                      { ...newHaiquan, price: numericPrice,name: newHaiquan.haiquan_info.name, thanh_tien: Helper.formatCurrency(thanh_tien.toString()) },
                     ]);
 
                     // reset input
-                    setNewHaiquan({serviceId:"", name: "", purchasePrice: "", note: "" });
+                    setNewHaiquan({ name: "", price: "", note: "" });
                   }}
                 />
               </div>
@@ -278,16 +271,50 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
               <DataTable rowHover value={productHaiquan}>
                 <Column field="name" header="Phí hải quan" />
                    <Column
-                      field="purchasePrice"
+                      field="price"
                       header="Số tiền"
-                      body={(row: any) => formatCurrency(row.purchasePrice.toString())}
-                      footer={formatCurrency(
+                      body={(row: any) => Helper.formatCurrency(row.price.toString())}
+                      footer={Helper.formatCurrency(
                         productHaiquan
-                          .reduce((sum, item) => sum + (item.purchasePrice || 0), 0)
+                          .reduce((sum, item) => sum + (item.price || 0), 0)
                           .toString()
                       )}
                       footerStyle={{ fontWeight: "bold" }}
                     />
+                <Column
+                  header="VAT"
+                  body={(_: any, opt: any) => (
+                    <Dropdown
+                      value={productHaiquan[opt.rowIndex].vat}
+                      optionValue="vat"
+                      optionLabel="name"
+                      options={VatDebit}
+                      className="p-inputtext-sm"
+                      onChange={(e: any) =>
+                         {
+                              const thanh_tien = Math.round( productHaiquan[opt.rowIndex].price * (1 + (e.target.value || 0) / 100) );
+                              const updatedProductHaiquan = [...productHaiquan];
+                              updatedProductHaiquan[opt.rowIndex] = {
+                                ...updatedProductHaiquan[opt.rowIndex],
+                                vat: e.target.value,
+                                thanh_tien: Helper.formatCurrency(thanh_tien.toString())
+                              };
+                              setProductHaiquan(updatedProductHaiquan);
+                          }
+                      }
+                 
+                      required
+                    />
+                  )}
+                />
+                <Column 
+                field="thanh_tien" 
+                header="Thành tiền"
+                footer={Helper.formatCurrency(
+                  productHaiquan.reduce((sum, item) => sum + (item.thanh_tien ? parseInt(item.thanh_tien.replace(/\D/g, ""), 10) : 0), 0).toString()
+                )}
+                footerStyle={{ fontWeight: "bold" }}
+                />
                 <Column field="note" header="Ghi chú" />
                 <Column
                   header="Thao tác"
@@ -330,11 +357,11 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                 <InputForm
                   className="w-full"
                   id="chiho_price"
-                  value={newChiho.purchasePrice}
+                  value={newChiho.price}
                   onChange={(e: any) =>
                     setNewChiho({
                       ...newChiho,
-                      purchasePrice: formatCurrency(e.target.value),
+                      price: Helper.formatCurrency(e.target.value),
                     })
                   }
                   label="Số tiền"
@@ -354,10 +381,10 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                 <div className="field col-2">
                 <InputForm
                   className="w-full"
-                  id="chiho_linkBill"
-                  value={newChiho.linkBill}
+                  id="chiho_link_bill"
+                  value={newChiho.link_bill}
                   onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, linkBill: e.target.value })
+                    setNewChiho({ ...newChiho, link_bill: e.target.value })
                   }
                   label="Link hóa đơn"
                 />
@@ -365,10 +392,10 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                <div className="field col-2">
                 <InputForm
                   className="w-full"
-                  id="chiho_codeBill"
-                  value={newChiho.codeBill}
+                  id="chiho_code_bill"
+                  value={newChiho.code_bill}
                   onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, codeBill: e.target.value })
+                    setNewChiho({ ...newChiho, code_bill: e.target.value })
                   }
                   label="Mã hóa đơn"
                 />
@@ -392,17 +419,17 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                   severity="success"
                   raised
                   onClick={() => {
-                    if (!newChiho.name || !newChiho.purchasePrice || newChiho.purchasePrice <= 0)
+                    if (!newChiho.name || !newChiho.price)
                       return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin chi hộ" }));
 
-                    const numericPrice = parseInt(newChiho.purchasePrice.replace(/\D/g, ""), 10);
-
+                    const numericPrice = parseInt(newChiho.price.replace(/\D/g, ""), 10);
+                    const thanh_tien = Math.round( numericPrice * (1 + (newChiho.vat || 0) / 100) );
                     setProductChiho([
                       ...productChiho,
-                      { ...newChiho, purchasePrice: numericPrice, name: newChiho.chiho_info.name ,serviceId:newChiho.chiho_info.id},
+                      { ...newChiho, price: numericPrice, name: newChiho.chiho_info.name, thanh_tien: Helper.formatCurrency(thanh_tien.toString()) },
                     ]);
 
-                    setNewChiho({serviceId:"", name: "", purchasePrice: "", note: "" , bill: "", linkBill: "", codeBill: ""});
+                    setNewChiho({ name: "", price: "", note: "" , bill: "", link_bill: "", code_bill: ""});
                   }}
                 />
               </div>
@@ -412,15 +439,49 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
               <DataTable rowHover value={productChiho}>
                 <Column field="name" header="Phí chi hộ" />
                 <Column
-                  field="purchasePrice"
+                  field="price"
                   header="Số tiền"
-                  body={(row: any) => formatCurrency(row.purchasePrice.toString())}
-                  footer={formatCurrency(
+                  body={(row: any) => Helper.formatCurrency(row.price.toString())}
+                  footer={Helper.formatCurrency(
                     productChiho
-                      .reduce((sum, item) => sum + (item.purchasePrice || 0), 0)
+                      .reduce((sum, item) => sum + (item.price || 0), 0)
                       .toString()
                   )}
                   footerStyle={{ fontWeight: "bold" }}  
+                />
+                    <Column
+                  header="VAT"
+                  body={(_: any, opt: any) => (
+                    <Dropdown
+                      value={productChiho[opt.rowIndex].vat}
+                      optionValue="vat"
+                      optionLabel="name"
+                      options={VatDebit}
+                      className="p-inputtext-sm"
+                      onChange={(e: any) =>
+                         {
+                              const thanh_tien = Math.round( productChiho[opt.rowIndex].price * (1 + (e.target.value || 0) / 100) );
+                              const updatedProductChiho = [...productChiho];
+                              updatedProductChiho[opt.rowIndex] = {
+                                ...updatedProductChiho[opt.rowIndex],
+                                vat: e.target.value,
+                                thanh_tien: Helper.formatCurrency(thanh_tien.toString())
+                              };
+                              setProductChiho(updatedProductChiho);
+                          }
+                      }
+                 
+                      required
+                    />
+                  )}
+                />
+                <Column 
+                field="thanh_tien" 
+                header="Thành tiền"
+                footer={Helper.formatCurrency(
+                  productChiho.reduce((sum, item) => sum + (item.thanh_tien ? parseInt(item.thanh_tien.replace(/\D/g, ""), 10) : 0), 0).toString()
+                )}
+                footerStyle={{ fontWeight: "bold" }}
                 />
                 <Column field="note" header="Ghi chú" />
                 <Column
@@ -444,10 +505,15 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
             <InputForm
               className="w-64"
               id="total_price"
-              value={formatCurrency((
-                productHaiquan.reduce((sum, item) => sum + (item.purchasePrice || 0), 0) +
-                productChiho.reduce((sum, item) => sum + (item.purchasePrice || 0), 0)
-              ).toString())}
+              value={
+                Helper.formatCurrency(
+                  (
+                    productHaiquan.reduce((sum, item) => sum + (item.thanh_tien ? parseInt(item.thanh_tien.replace(/\D/g, ""), 10) : 0), 0) 
+                    +
+                    productChiho.reduce((sum, item) => sum + (item.thanh_tien ? parseInt(item.thanh_tien.replace(/\D/g, ""), 10) : 0), 0)
+                  ).toString()
+                )
+              }
               onChange={(e: any) =>
               // không cho sửa tổng
               { }

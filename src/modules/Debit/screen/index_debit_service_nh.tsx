@@ -1,22 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { RenderHeader, StatusBody, ActionBody, Column, TimeBody, DataTableClient, DateBody, ActionBodyWithIds } from "components/common/DataTable";
-import { Calendar, CalendarY, Dropdown, GridForm, Input } from "components/common/ListForm";
+import { useEffect, useMemo, useState } from "react";
+import { ActionBody, Column, TimeBody, DataTableClient, DateBody, ActionBodyWithIds } from "components/common/DataTable";
+import { Dropdown, GridForm, Input } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
-import { useDispatch, useSelector } from "react-redux";
-import { loaiHang, loaiToKhai, nghiepVu, phatSinh, tinhChat, typeDebit, typeService } from "utils";
+import { typeDebit } from "utils";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
 import { Checkbox, DataTable, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { useListContractFile, useListContractFileHasDebitService, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
-import { deleteContractFile } from "modules/ContractFile/api";
-import UpdateDebitChiPhi from "./update_service";
-import { useListDebit, useListDebitService } from "../service";
-import { deleteDebit, deleteMultiDebit } from "../api";
+import { useListContractFileHasDebitNangHa, useListContractFileHasDebitService, useListContractFileNotDebitNangHa, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
+import {  deleteMultiDebit } from "../api";
+import UpdateDebitNangHa from "./update_service_nh";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -87,7 +84,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
     );
 };
 
-export default function ListContractFileBangKe() {
+export default function ListContractFileNangHa() {
     const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
     const { handleParamUrl } = useHandleParamUrl();
     const [selectedDebitServiceRows, setSelectedDebitServiceRows] = useState<any[]>([]);
@@ -108,8 +105,8 @@ export default function ListContractFileBangKe() {
       keyword: "",
       EmployeeId:employeeInfo?.id
     });
-    const { data, loading, error, refresh } = useListContractFileNotService({ params: paramsPaginator, debounce: 500,});
-    const { data: debitService, refresh:refreshHasDebitDispatch } = useListContractFileHasDebitService({ params: {...paramsPaginator,},debounce: 500,});
+    const { data, loading, error, refresh } = useListContractFileNotDebitNangHa({ params: paramsPaginator, debounce: 500,});
+    const { data: debitService, refresh:refreshHasDebitDispatch } = useListContractFileHasDebitNangHa({ params: {...paramsPaginator,},debounce: 500,});
     const { data: contractFile } = useListContractFileWithState({});
     const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
     const { data: listUser } = useListUserWithState({});
@@ -159,14 +156,9 @@ export default function ListContractFileBangKe() {
           const mappedDebitService = groupedHasDebitService.map((row: any) => {
             const _customer = listCustomer?.find((x: any) => x.id === row.customer_detail_id);
             const _employee = listEmployee.find((x: any) => x.id === row.employee_id);
-            const _sumHQ = row.debits
-              .filter((x: any) => x.debit_type === 0)
+            const _sumNH = row.debits
+              .filter((x: any) => x.debit_type === 3)
               .reduce((sum: number, x: any) => sum + (x.debit_purchase_price || 0), 0);
-
-            const _sumCH = row.debits
-              .filter((x: any) => x.debit_type === 2)
-              .reduce((sum: number, x: any) => sum + (x.debit_purchase_price || 0), 0);
-
             const _sumCuoc = row.debits
               .filter((x: any) => x.service_id === 19)
               .reduce((sum: number, x: any) => sum + (x.debit_purchase_price || 0), 0);
@@ -176,9 +168,7 @@ export default function ListContractFileBangKe() {
               customerAbb: _customer?.partners?.abbreviation || "",
               employee: `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""}`.trim(),
               sumCuoc:_sumCuoc,
-              sumCH:_sumCH,
-              sumHQ: _sumHQ,
-              phaiTra:row.receipt_total-(_sumCH+_sumHQ)
+              sumNH:_sumNH,
             };
           });
          console.log(mappedDebitService);
@@ -204,7 +194,7 @@ export default function ListContractFileBangKe() {
                           }}
                         >
                           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                            <b>File chưa tạo bảng kê</b>
+                            <b>File chưa tạo bảng kê nâng hạ</b>
                                 <DataTableClient
                                 rowHover
                                 value={displayData}
@@ -260,7 +250,7 @@ export default function ListContractFileBangKe() {
                                 <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="employee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="total" body={(row: any) => Helper.formatCurrency(row.total.toString())} header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="declaration" header="Số bill" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="userName" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -287,7 +277,7 @@ export default function ListContractFileBangKe() {
                               style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                                 <b>Bảng kê chi phí đã tạo</b>
+                                 <b>Bảng kê nâng hạ đã tạo</b>
                                   <DataTableClient
                                       rowHover
                                       value={displayDebitServiceData}
@@ -356,13 +346,11 @@ export default function ListContractFileBangKe() {
                                         />
                                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="receipt_total" body={(row: any) => Helper.formatCurrency(row.receipt_total.toString())} header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumHQ" body={(row: any) => Helper.formatCurrency(row.sumHQ.toString())} header="Tổng phí HQ" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumCH" body={(row: any) => Helper.formatCurrency(row.sumCH.toString())} header="Tổng phí CH" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="sumCuoc" body={(row: any) => Helper.formatCurrency(row.sumCuoc.toString())} header="Tiền cược" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="phaiTra" body={(row: any) => Helper.formatCurrency(row.phaiTra.toString())} header="Phải thanh toán" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="sumNH" body={(row: any) => Helper.formatCurrency(row.sumNH.toString())} header="Tổng phí nâng hạ" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="employee" header="Tên giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Xác nhận" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Thời gian xác nhận" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -382,7 +370,7 @@ export default function ListContractFileBangKe() {
                               style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                                <b>Chi tiết bảng kê chi phí</b>
+                                <b>Chi tiết bảng kê nâng hạ</b>
                                   <DataTable rowHover value={selectedDetail}>
                                       <Column field="debit_name" header="Chi phí" />
                                       <Column field="debit_type"  body={(row: any) => typeDebit.find((x:any) => x.type === row.debit_type)?.name || ""} header="Loại chi phí" />
@@ -398,13 +386,13 @@ export default function ListContractFileBangKe() {
          <Dialog
             position="top"
             dismissableMask
-            header="Tạo bảng kê chi phí"
+            header="Tạo bảng kê nâng hạ"
             visible={visible}
             onHide={() => setVisible(false)}
             style={{ width: "78vw" }}
           >
             <p className="m-0">
-              {selectedId && <UpdateDebitChiPhi id={selectedId} price={price} onClose={handleModalClose} ></UpdateDebitChiPhi>}
+              {selectedId && <UpdateDebitNangHa id={selectedId} price={price} onClose={handleModalClose} ></UpdateDebitNangHa>}
             </p>
           </Dialog>
       </>

@@ -1,47 +1,27 @@
 
 import { AddForm, InputForm } from "components/common/AddForm";
-import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, loaiToKhai, refreshObject, typeDebit } from "utils";
-import { useDispatch, useSelector } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
-import { addDebit, addDebitService, showDebit, updateDebit } from "../api";
+import { addDebit, addDebitNangha, addDebitService, showDebit, updateDebit } from "../api";
+import { useDispatch, useSelector } from "react-redux";
 import { Dropdown, MultiSelect } from "components/common/ListForm";
 import { Column, DataTable, Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { classNames } from "primereact/utils";
 import { Button } from "primereact/button";
-import React from "react";
 import { showContractFile } from "modules/ContractFile/api";
-import { useListPartnerDetail } from "modules/partner/service";
-import { useListIncomeExpenseWithState, useListServiceCategoryWithState } from "modules/categories/service";
-export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onClose: () => void, price:number }) {
+import { useListPartnerDetail, useListSupplierDetailWithState } from "modules/partner/service";
+import { useListServiceCategoryWithState } from "modules/categories/service";
+export default function UpdateDebitNangHa({ id, onClose ,price }: { id: any; onClose: () => void, price:number }) {
+  const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
-  const [productHaiquan, setProductHaiquan] = useState<any[]>([]);
-  const [newHaiquan, setNewHaiquan] = useState<any>({ serviceId:"", name: "", purchasePrice: "", note: "", bill: "", linkBill: "", codeBill: "" });
-  const [productChiho, setProductChiho] = useState<any[]>([]);
-  const [newChiho, setNewChiho] = useState<any>({ serviceId:"", name: "", purchasePrice: "", note: "", bill: "", linkBill: "", codeBill: "" });
-  // format tiền VN
-  const formatCurrency = (value: string) => {
-    const numeric = value.replace(/\D/g, "");
-    return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-  };
-  const dispatch = useDispatch();
-  
-  
-  const { data: ChiPhis } = useListServiceCategoryWithState({type:0});
+  const [productNangHa, setProductNangHa] = useState<any[]>([]);
+  const [newNangHa, setNewNangHa] = useState<any>({ serviceId:"", name: "", purchasePrice: "", note: "", bill: "", linkBill: "", codeBill: "" ,SupplierDetailId:"",SupplierName:""});
   const { data: ChiHos } = useListServiceCategoryWithState({type:1});
-    // --- chuyển sang options bằng useMemo ---
-  const ChiPhiOptions = useMemo(() => {
-    if (!Array.isArray(ChiPhis)) return [];
-    return ChiPhis.map((x: any) => ({
-      label: x?.name ?? "(không tên)",
-      value: x.id,
-    }));
-  }, [ChiPhis]);
     const ChiHoOptions = useMemo(() => {
     if (!Array.isArray(ChiHos)) return [];
     return ChiHos.map((x: any) => ({
@@ -57,12 +37,19 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
       value: x.id,
     }));
   }, [partnerDetails]);
+  const { data: supplierDetails } = useListSupplierDetailWithState({status: 2, debounce: 500 });
+  const supplierOptions = useMemo(() => {
+    if (!Array.isArray(supplierDetails)) return [];
+    return supplierDetails.map((x: any) => ({
+      label: x?.partners?.abbreviation ?? "(không tên)",
+      value: x.id,
+    }));
+  }, [supplierDetails]);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
     infos.fileInfoId= infos.id;
-    infos.productHaiquan= productHaiquan;
-    infos.productChiho= productChiho;
+    infos.productNangha= productNangHa;
     infos.status = infos.status ? 0 : 1;
     let info = {
       ...infos,
@@ -74,7 +61,7 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
   };
   async function fetchDataSubmit(info: any) {
     if (info.id) {
-       const response = await addDebitService(info);
+       const response = await addDebitNangha(info);
       if (response) setLoading(false);
       if (response.status === 200) {
         if (response.data.status) {
@@ -122,7 +109,7 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
         //setHasError(true)
       }).finally(() => setLoading(false));
     }
-  }, [id,partnerOptions.length,ChiPhiOptions.length,ChiHoOptions.length])
+  }, [supplierOptions,id,partnerOptions.length,ChiHoOptions])
   return (
     <>
       <AddForm
@@ -202,53 +189,83 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
               </tbody>
             </table>
           </Panel>
-          <Panel header="Chi phí hải quan">
+          <Panel header="Chi phí nâng hạ">
             <div className="formgrid grid">
-              <div className="field col-3">
-                 <Dropdown
+              <div className="field col-2">
+                <Dropdown
                   filter
-                   value={newHaiquan.name}
-                  options={ChiPhiOptions}
+                  value={newNangHa.serviceId}
+                  options={ChiHoOptions}
                   onChange={(e: any) =>
                      {
                         const selected = e.value; // Đây là value (ví dụ: 123)
-                        const option = ChiPhiOptions.find((x: any) => x.value === selected);
-                         setNewHaiquan({ ...newHaiquan, name: selected, haiquan_info: {
+                        const option = ChiHoOptions.find((x: any) => x.value === selected);
+                         setNewNangHa({ ...newNangHa, serviceId: selected, nangha_info: {
                           id: selected,
                           name: option ? option.label : ''
                         } })  
                      }
                   }
-                  label="Phí hải quan"
+                  label="Phí nâng hạ"
                   className="w-full"
                 />
               </div>
-              <div className="field col-3">
+              <div className="field col-2">
+                <Dropdown
+                  filter
+                  value={newNangHa.SupplierDetailId}
+                  options={supplierOptions}
+                  onChange={(e: any) =>
+                     {
+                        const selected = e.value; // Đây là value (ví dụ: 123)
+                        const option = supplierOptions.find((x: any) => x.value === selected);
+                         setNewNangHa({ ...newNangHa, SupplierDetailId: selected, supplier_info: {
+                          id: selected,
+                          name: option ? option.label : ''
+                        } })  
+                     }
+                  }
+                  label="Nhà cung cấp"
+                  className="w-full"
+                />
+              </div>
+              <div className="field col-2">
                 <InputForm
                   className="w-full"
                   id="purchasePrice"
-                  value={newHaiquan.purchasePrice}
+                  value={newNangHa.purchasePrice}
                   onChange={(e: any) =>
-                    setNewHaiquan({
-                      ...newHaiquan,
-                      purchasePrice: formatCurrency(e.target.value),
+                    setNewNangHa({
+                      ...newNangHa,
+                      purchasePrice: Helper.formatCurrency(e.target.value),
                     })
                   }
                   label="Số tiền"
                 />
               </div>
-              <div className="field col-3">
+              <div className="field col-2">
+                <InputForm
+                  className="w-full"
+                  id="bill"
+                  value={newNangHa.bill}
+                  onChange={(e: any) =>
+                    setNewNangHa({ ...newNangHa, bill: e.target.value })
+                  }
+                  label="Hóa đơn"
+                />
+              </div>
+              <div className="field col-2">
                 <InputForm
                   className="w-full"
                   id="note"
-                  value={newHaiquan.note}
+                  value={newNangHa.note}
                   onChange={(e: any) =>
-                    setNewHaiquan({ ...newHaiquan, note: e.target.value })
+                    setNewNangHa({ ...newNangHa, note: e.target.value })
                   }
                   label="Ghi chú"
                 />
               </div>
-              <div className="field col-3">
+              <div className="field col-2">
                 <Button
                   type="button"
                   className="w-full p-button-normal"
@@ -256,38 +273,40 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                   severity="success"
                   raised
                   onClick={() => {
-                    if (!newHaiquan.name || !newHaiquan.purchasePrice || newHaiquan.purchasePrice <= 0)
-                      return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin hải quan" }));
+                    if (!newNangHa.serviceId || !newNangHa.purchasePrice || newNangHa.purchasePrice <= 0)
+                      return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin nâng hạ" }));
 
                     // convert price về số khi push
-                    const numericPrice = parseInt(newHaiquan.purchasePrice.replace(/\D/g, ""), 10);
+                    const numericPrice = parseInt(newNangHa.purchasePrice.replace(/\D/g, ""), 10);
 
-                    setProductHaiquan([
-                      ...productHaiquan,
-                      { ...newHaiquan, purchasePrice: numericPrice,name: newHaiquan.haiquan_info.name,serviceId:newHaiquan.haiquan_info.id},
+                    setProductNangHa([
+                      ...productNangHa,
+                      { ...newNangHa, purchasePrice: numericPrice,name: newNangHa.nangha_info.name,serviceId:newNangHa.nangha_info.id,SupplierName: newNangHa?.supplier_info?.name,SupplierDetailId:newNangHa?.supplier_info?.id},
                     ]);
 
                     // reset input
-                    setNewHaiquan({serviceId:"", name: "", purchasePrice: "", note: "" });
+                    setNewNangHa({serviceId:"", name: "", purchasePrice: "", note: "",SupplierDetailId:"",SupplierName:"",bill:"" });
                   }}
                 />
               </div>
             </div>
 
             <div className="child-table">
-              <DataTable rowHover value={productHaiquan}>
-                <Column field="name" header="Phí hải quan" />
-                   <Column
+              <DataTable rowHover value={productNangHa}>
+                <Column field="name" header="Phí nâng hạ" />
+                <Column field="SupplierName" header="Nhà cung cấp" />
+                <Column
                       field="purchasePrice"
                       header="Số tiền"
-                      body={(row: any) => formatCurrency(row.purchasePrice.toString())}
-                      footer={formatCurrency(
-                        productHaiquan
+                      body={(row: any) => Helper.formatCurrency(row.purchasePrice.toString())}
+                      footer={Helper.formatCurrency(
+                        productNangHa
                           .reduce((sum, item) => sum + (item.purchasePrice || 0), 0)
                           .toString()
                       )}
                       footerStyle={{ fontWeight: "bold" }}
                     />
+                <Column field="bill" header="Hóa đơn" />
                 <Column field="note" header="Ghi chú" />
                 <Column
                   header="Thao tác"
@@ -297,141 +316,7 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                       severity="danger"
                       text
                       onClick={() =>
-                        setProductHaiquan(productHaiquan.filter((_, i) => i !== opt.rowIndex))
-                      }
-                    />
-                  )}
-                />
-              </DataTable>
-            </div>
-          </Panel>
-          <Panel header="Chi phí chi hộ">
-            <div className="formgrid grid">
-              <div className="field col-2">
-                 <Dropdown
-                  filter
-                   value={newChiho.name}
-                  options={ChiHoOptions}
-                  onChange={(e: any) =>
-                    {
-                        const selected = e.value; // Đây là value (ví dụ: 123)
-                        const option = ChiHoOptions.find((x: any) => x.value === selected);
-                          setNewChiho({ ...newChiho, name: selected, chiho_info: {
-                            id: selected,
-                            name: option ? option.label : ''
-                          } })
-                    }
-                  }
-                  label="Phí chi hộ"
-                  className="w-full"
-                />
-              </div>
-              <div className="field col-2">
-                <InputForm
-                  className="w-full"
-                  id="chiho_price"
-                  value={newChiho.purchasePrice}
-                  onChange={(e: any) =>
-                    setNewChiho({
-                      ...newChiho,
-                      purchasePrice: formatCurrency(e.target.value),
-                    })
-                  }
-                  label="Số tiền"
-                />
-              </div>
-               <div className="field col-2">
-                <InputForm
-                  className="w-full"
-                  id="chiho_bill"
-                  value={newChiho.bill}
-                  onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, bill: e.target.value })
-                  }
-                  label="Hóa đơn"
-                />
-              </div>
-                <div className="field col-2">
-                <InputForm
-                  className="w-full"
-                  id="chiho_linkBill"
-                  value={newChiho.linkBill}
-                  onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, linkBill: e.target.value })
-                  }
-                  label="Link hóa đơn"
-                />
-              </div>
-               <div className="field col-2">
-                <InputForm
-                  className="w-full"
-                  id="chiho_codeBill"
-                  value={newChiho.codeBill}
-                  onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, codeBill: e.target.value })
-                  }
-                  label="Mã hóa đơn"
-                />
-              </div>
-              <div className="field col-1">
-                <InputForm
-                  className="w-full"
-                  id="chiho_note"
-                  value={newChiho.note}
-                  onChange={(e: any) =>
-                    setNewChiho({ ...newChiho, note: e.target.value })
-                  }
-                  label="Ghi chú"
-                />
-              </div>
-              <div className="field col-1">
-                <Button
-                  type="button"
-                  className="w-full p-button-normal"
-                  label="Thêm"
-                  severity="success"
-                  raised
-                  onClick={() => {
-                    if (!newChiho.name || !newChiho.purchasePrice || newChiho.purchasePrice <= 0)
-                      return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin chi hộ" }));
-
-                    const numericPrice = parseInt(newChiho.purchasePrice.replace(/\D/g, ""), 10);
-
-                    setProductChiho([
-                      ...productChiho,
-                      { ...newChiho, purchasePrice: numericPrice, name: newChiho.chiho_info.name ,serviceId:newChiho.chiho_info.id},
-                    ]);
-
-                    setNewChiho({serviceId:"", name: "", purchasePrice: "", note: "" , bill: "", linkBill: "", codeBill: ""});
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="child-table">
-              <DataTable rowHover value={productChiho}>
-                <Column field="name" header="Phí chi hộ" />
-                <Column
-                  field="purchasePrice"
-                  header="Số tiền"
-                  body={(row: any) => formatCurrency(row.purchasePrice.toString())}
-                  footer={formatCurrency(
-                    productChiho
-                      .reduce((sum, item) => sum + (item.purchasePrice || 0), 0)
-                      .toString()
-                  )}
-                  footerStyle={{ fontWeight: "bold" }}  
-                />
-                <Column field="note" header="Ghi chú" />
-                <Column
-                  header="Thao tác"
-                  body={(_: any, opt: any) => (
-                    <Button
-                      icon="pi pi-trash"
-                      severity="danger"
-                      text
-                      onClick={() =>
-                        setProductChiho(productChiho.filter((_, i) => i !== opt.rowIndex))
+                        setProductNangHa(productNangHa.filter((_, i) => i !== opt.rowIndex))
                       }
                     />
                   )}
@@ -444,9 +329,8 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
             <InputForm
               className="w-64"
               id="total_price"
-              value={formatCurrency((
-                productHaiquan.reduce((sum, item) => sum + (item.purchasePrice || 0), 0) +
-                productChiho.reduce((sum, item) => sum + (item.purchasePrice || 0), 0)
+              value={Helper.formatCurrency((
+                productNangHa.reduce((sum, item) => sum + (item.purchasePrice || 0), 0)
               ).toString())}
               onChange={(e: any) =>
               // không cho sửa tổng

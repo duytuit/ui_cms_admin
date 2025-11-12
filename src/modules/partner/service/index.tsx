@@ -97,6 +97,43 @@ export const useListCustomerDetailWithState = (params : any)  => {
     return { data, loading, error, refresh: fetchData };
 };
 
+export const useListSupplierDetailWithState = (params : any)  => {
+    const dispatch = useDispatch();
+    const suppliers = useSelector((state: any) => state.partner.supplier);
+
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const shouldFetch = !Array.isArray(suppliers) || suppliers.length === 0;
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listPartnerDetail({...params});
+            const arr = res?.data?.data?.data || [];
+            dispatch(setCustomer(arr)); // đẩy redux luôn
+            setData(arr);               // set local luôn
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (shouldFetch) {
+            fetchData();
+        } else {
+            setData(suppliers); // lấy redux
+        }
+    }, []); // thêm customers vào deps
+
+    return { data, loading, error, refresh: fetchData };
+};
+
+
 export const useListPartnerDetailWithState = (params : any)  => {
     const dispatch = useDispatch();
     const lists = useSelector((state: any) => state.partner.list);

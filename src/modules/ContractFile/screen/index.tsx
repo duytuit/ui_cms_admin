@@ -25,7 +25,6 @@ import {
   updateContractFile,
 } from "../api";
 import { useListContractFile } from "../service";
-import { setCustomer, setVendor } from "redux/features/partner";
 import { useDispatch, useSelector } from "react-redux";
 import { loaiHang, loaiToKhai, nghiepVu, phatSinh, tinhChat } from "utils";
 import { useListCustomerDetailWithState } from "modules/partner/service";

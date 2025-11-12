@@ -8,5 +8,6 @@ export const deleteDebit = async (params: any) => await postData("Debit/delete",
 export const deleteMultiDebit = async (params: any) => await postData("Debit/delete/multi", params);
 export const addDebit = async (params: any) => await postData("Debit/create", params);
 export const addDebitService = async (params: any) => await postData("Debit/service/create", params);
+export const addDebitNangha = async (params: any) => await postData("Debit/nangha/create", params);
 export const updateDebit = async (params: any) => await postData("Debit/update", params);
 export const updateStatusDebit = async (params: any) => await postData("Debit/update/status", params);

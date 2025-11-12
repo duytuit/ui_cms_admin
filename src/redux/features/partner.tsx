@@ -3,16 +3,16 @@ import { createSlice } from '@reduxjs/toolkit'
 export const partnerSlice = createSlice({
   name: 'partner',
   initialState: {
-    vendor: null,
+    supplier: null,
     customer: null,
     list:null
   },
   reducers: {
-    setVendor: (state, action) => {
-      state.vendor = action.payload;
+    setSupplier: (state, action) => {
+      state.supplier = action.payload;
     },
-    clearVendor: (state) => {
-      state.vendor = null
+    clearSupplier: (state) => {
+      state.supplier = null
     },
     setCustomer: (state, action) => {
       state.customer = action.payload;
@@ -31,8 +31,8 @@ export const partnerSlice = createSlice({
 
 // Action creators are generated for each case reducer function
 export const {
-  setVendor,
-  clearVendor,
+  setSupplier,
+  clearSupplier,
   setCustomer,
   clearCustomer,
   setListPartner,

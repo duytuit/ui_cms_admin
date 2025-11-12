@@ -12,6 +12,7 @@ import UpdateCustomer from "modules/customer/screen/update";
 import DashBoard from "modules/dashboard/screen";
 import ListCreateDispatch from "modules/Debit/screen/index_debit_dispatch";
 import ListContractFileBangKe from "modules/Debit/screen/index_debit_service";
+import ListContractFileNangHa from "modules/Debit/screen/index_debit_service_nh";
 import ListDepartment from "modules/department/screen";
 import UpdateDepartment from "modules/department/screen/update";
 import ListEmployee from "modules/employee/screen";
@@ -96,6 +97,7 @@ const publicRoutes = [
   // ContractFile 
   { path: "/ContractFile/list", component: ListContractFile, layout: 'ListContractFile' },
   { path: "/ContractFile/list-create-bangke", component: ListContractFileBangKe, layout: 'ListContractFileBangKe' },
+  { path: "/ContractFile/list-create-nangha", component: ListContractFileNangHa, layout: 'ListContractFileNangHa' },
   { path: "/ContractFile/list-create-dispatch", component: ListCreateDispatch, layout: 'ListCreateDispatch' },
   { path: "/ContractFile/add", component: UpdateContractFile, layout: 'UpdateContractFile' },
   { path: "/ContractFile/detail/:id", component: UpdateContractFile, layout: 'UpdateContractFile' },

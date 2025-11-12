@@ -8,6 +8,7 @@ import { listToast } from 'utils';
 import { useDispatch } from 'react-redux';
 
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
+    const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
     const {onMenuToggle } = useContext(LayoutContext);
     const menubuttonRef = useRef(null);
     const topbarmenuRef = useRef(null);
@@ -34,7 +35,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
                 <i className="pi pi-bars" />
             </button>
             <div className="layout-topbar-menu">
-                    <span>Admin</span>
+                    <span>{`${employeeInfo?.last_name ?? ""} ${employeeInfo?.first_name ?? ""}`.trim()}</span>
                     <div className="p-link layout-topbar-button">
                     <Image src='/assets/images/avatarIcon.jpg' height='35px' width='35px' />
                         <div className='menu-topbar'>

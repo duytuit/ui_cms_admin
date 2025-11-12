@@ -157,15 +157,19 @@ export const typeVehicle = [
 export const typeDebit = [
    {
      type:0,
-     name:"Phí vận chuyển"
+     name:"Phí hải quan"
    },
    {
      type:1,
+     name:"Phí vận chuyển"
+   },
+   {
+     type:2,
      name:"Phí chi hộ"
    },
     {
-     type:2,
-     name:"Phí hải quan"
+     type:3,
+     name:"Phí nâng hạ"
    }
 ];
 export const statusDebit = [
