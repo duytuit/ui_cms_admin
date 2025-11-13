@@ -1,4 +1,4 @@
-import { getData, postData } from "lib/request";
+import { getData, postData, postDataList } from "lib/request";
 
 export const listDebit = async (params: any) => await getData("Debit", params);
 export const listDebitDispatch = async (params: any) => await getData("Debit/dispatch", params);
@@ -10,5 +10,5 @@ export const deleteMultiDebit = async (params: any) => await postData("Debit/del
 export const addDebit = async (params: any) => await postData("Debit/create", params);
 export const addDebitService = async (params: any) => await postData("Debit/service/create", params);
 export const addDebitNangha = async (params: any) => await postData("Debit/nangha/create", params);
-export const updateDebit = async (params: any) => await postData("Debit/update", params);
+export const updateDebitFileGia = async (params: any) => await postData("Debit/updateFileGia", params);
 export const updateStatusDebit = async (params: any) => await postData("Debit/update/status", params);

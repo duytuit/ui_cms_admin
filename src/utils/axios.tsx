@@ -55,7 +55,7 @@ clientApi.interceptors.response.use(
         store.dispatch(showToast({
             severity: 'error',
             summary: 'Error',
-            detail: 'Đường truyền không ổn định, vui lòng thử lại sau!'
+            detail: 'Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!'
         }));
 
         // Nên reject để UI biết là request failed

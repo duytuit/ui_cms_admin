@@ -7,7 +7,7 @@ import { MyCalendar } from "components/common/MyCalendar";
 import { typeDebit } from "utils";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
-import { Checkbox, DataTable, Dialog } from "components/uiCore";
+import { Button, Checkbox, DataTable, Dialog, Tag } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
@@ -134,22 +134,40 @@ export default function ListFileGia() {
             };
         });
          
-        const mappedListFileGia = (listFileGia?.data || []).map((row: any) => {
-            const cus = listCustomer.find((x: any) => x.id === row.customer_detail_id);
-            const _user = listUser.find((x: any) => x.id === row.updated_by);
+        // gom debits
+         const dataArray = Array.isArray(listFileGia?.data) ? listFileGia.data : [];
+         const groupedHasFileGia = Object.values(
+            dataArray.reduce((acc:any, cur:any) => {
+              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_updated_at,cf_updated_by, ...rest } = cur;
+              if (!acc[cur.id]) {
+                acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
+              }
+              // chỉ gom debit nếu debitService có dữ liệu
+              if (listFileGia?.data) {
+                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_updated_at,cf_updated_by});
+                acc[cur.id].debit_ids.push(debit_id);
+              }
+              return acc;
+            }, {} as Record<number, any>)
+          );
+          const mappedDebitFileGia = groupedHasFileGia.map((row: any) => {
+            const _customer = listCustomer?.find((x: any) => x.id === row.customer_detail_id);
             const _employee = listEmployee.find((x: any) => x.id === row.employee_id);
+            const _sumMua = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_purchase_price || 0), 0);
+            const _sumBan = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_price || 0), 0);
             return {
-                ...row,
-                customerName: cus?.partners?.name || "",
-                customerAbb: cus?.partners?.abbreviation || "",
-                userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
-                employee: `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""}`.trim(),
+              ...row,
+              customerName: _customer?.partners?.name || "",
+              customerAbb: _customer?.partners?.abbreviation || "",
+              employee: `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""}`.trim(),
+              sumMua:_sumMua,
+              sumBan:_sumBan,
+              loiNhuan:_sumBan-_sumMua
             };
-        });
-         
-                 
+          });
+         console.log(mappedDebitFileGia);
         setDisplayData(mapped);
-        setDisplayFileGia(mappedListFileGia);
+        setDisplayFileGia(mappedDebitFileGia);
     }, [first, rows, data,listFileGia, paramsPaginator,listCustomer]);
  
     return (
@@ -267,7 +285,7 @@ export default function ListFileGia() {
                                       scrollable
                                       scrollHeight="flex"
                                       style={{ flex: 1 }}
-                                      tableStyle={{ minWidth: "2900px" }}
+                                      tableStyle={{ minWidth: "2000px" }}
                                       onRowClick={(e: any) => {
                                          setSelectedDetail(e.data.debits)
                                          console.log(e.data.debits);
@@ -309,26 +327,27 @@ export default function ListFileGia() {
                                         <Column
                                             header="Thao tác"
                                             body={(row: any) => {
-                                                return ActionBodyWithIds(
-                                                    row.debit_ids,
-                                                    null,
-                                                    { route: "Debit/delete/multi", action: deleteMultiDebit },
-                                                    paramsPaginator,
-                                                    setParamsPaginator
-                                                );
+                                                // return ActionBodyWithIds(
+                                                //     row.debit_ids,
+                                                //     null,
+                                                //     { route: "Debit/delete/multi", action: deleteMultiDebit },
+                                                //     paramsPaginator,
+                                                //     setParamsPaginator
+                                                // );
                                             }}
                                         />
+                                        <Column header="Trạng thái" body={(e: any) => {
+                                          return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
+                                        }} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumCuoc" body={(row: any) => Helper.formatCurrency(row.sumCuoc.toString())} header="Tiền cược" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumNH" body={(row: any) => Helper.formatCurrency(row.sumNH.toString())} header="Tổng phí nâng hạ" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="employee" header="Tên giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Xác nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Thời gian xác nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Đã duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="sumMua" body={(row: any) => Helper.formatCurrency(row.sumMua.toString())}  header="Tổng mua" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="sumBan" body={(row: any) => Helper.formatCurrency(row.sumBan.toString())}  header="Tổng bán" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="loiNhuan" body={(row: any) => Helper.formatCurrency(row.loiNhuan.toString())}  header="Lợi nhuận" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column header="Người duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Thời gian duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Lý do duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -345,10 +364,32 @@ export default function ListFileGia() {
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                                 <b>Chi tiết file giá</b>
-                                  <DataTable rowHover value={selectedDetail}>
+                                  <DataTable 
+                                    rowHover
+                                    scrollable
+                                    scrollHeight="flex"
+                                    style={{ flex: 1 }}
+                                    value={selectedDetail}
+                                   >
+                                      <Column body={(row: any) =>{
+                                          let data = JSON.parse(row.debit_data);
+                                          return data.fileNumber
+                                      }} header="Số file" />
                                       <Column field="debit_name" header="Chi phí" />
                                       <Column field="debit_type"  body={(row: any) => typeDebit.find((x:any) => x.type === row.debit_type)?.name || ""} header="Loại chi phí" />
-                                      <Column field="debit_purchase_price" body={(row: any) => Helper.formatCurrency(row.debit_purchase_price.toString())} header="Số tiền" />
+                                      <Column body={(row: any) =>{
+                                          let data = JSON.parse(row.debit_data);
+                                          return data?.partner_info?.partnerLabel
+                                      }} header="Nhà cung cấp" />
+                                      <Column body={(row: any) =>{
+                                          let data = JSON.parse(row.debit_data);
+                                          return data?.vehicle_info?.vehicleLabel
+                                      }} header="Biển số" />
+                                      <Column field="debit_purchase_price" body={(row: any) => Helper.formatCurrency(row.debit_purchase_price.toString())} header="Giá mua" />
+                                      <Column field="debit_price" body={(row: any) => Helper.formatCurrency(row.debit_price.toString())} header="Giá bán" />
+                                      <Column field="debit_vat" header="VAT" />
+                                      <Column field="debit_total_price" body={(row: any) => Helper.formatCurrency(row.debit_total_price.toString())} header="Thành tiền" />
+                                      <Column field="debit_bill" header="Hóa đơn" />
                                   </DataTable>
                               </div>
                             </SplitterPanel>

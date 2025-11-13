@@ -16,6 +16,19 @@ export const postData = (url:any, data:any, isUpload = false, timeout = 600000) 
     return clientApi.post(url, data, isUpload ? { timeout, headers: { 'Content-Type': 'multipart/form-data' } } : { timeout })
 };
 
+export const postDataList = (url: any, data: any, isUpload = false, timeout = 600000) => {
+  // Nếu data là object với key số, chuyển thành array
+  let payload: any = data;
+  if (data && typeof data === 'object' && !Array.isArray(data)) {
+    const numericKeys = Object.keys(data).filter(key => !isNaN(Number(key)));
+    if (numericKeys.length > 0) {
+      payload = numericKeys.map(key => data[key]);
+    }
+  }
+
+  return clientApi.post(url, payload, { timeout });
+};
+
 // GET data
 export const getData = async (url: string, params: any) => {
     const project = localStorage.getItem("project");

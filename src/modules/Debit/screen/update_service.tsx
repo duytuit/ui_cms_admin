@@ -6,7 +6,7 @@ import { showToast } from "redux/features/toast";
 import { listToast, loaiToKhai, refreshObject, typeDebit } from "utils";
 import { useDispatch, useSelector } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
-import { addDebit, addDebitService, showDebit, updateDebit } from "../api";
+import { addDebitService } from "../api";
 import { Dropdown, MultiSelect } from "components/common/ListForm";
 import { Column, DataTable, Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";

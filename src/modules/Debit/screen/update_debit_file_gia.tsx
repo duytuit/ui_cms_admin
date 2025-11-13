@@ -1,50 +1,24 @@
 
 import { AddForm, InputForm } from "components/common/AddForm";
-import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, loaiToKhai, refreshObject, typeDebit, VatDebit } from "utils";
-import { useDispatch, useSelector } from "react-redux";
-import { CategoryEnum } from "utils/type.enum";
-import { addDebit, addDebitService, showDebit, showDebitByFileId, updateDebit } from "../api";
-import { Dropdown, Input, MultiSelect } from "components/common/ListForm";
+import { useDispatch } from "react-redux";
+import { Dropdown} from "components/common/ListForm";
 import { Column, DataTable, Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { classNames } from "primereact/utils";
-import { Button } from "primereact/button";
-import React from "react";
-import { showContractFile } from "modules/ContractFile/api";
+import { showWithDebitContractFile } from "modules/ContractFile/api";
 import { useListPartnerDetail } from "modules/partner/service";
-import { useListIncomeExpenseWithState, useListServiceCategoryWithState } from "modules/categories/service";
+import { useListServiceCategoryWithState } from "modules/categories/service";
+import { updateDebitFileGia } from "../api";
 export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
-  const [productHaiquan, setProductHaiquan] = useState<any[]>([]);
-  const [newHaiquan, setNewHaiquan] = useState<any>({ name: "", price: "",vat:0,thanh_tien:"", note: "", bill: "", link_bill: "", code_bill: "" });
-  const [productChiho, setProductChiho] = useState<any[]>([]);
-  const [newChiho, setNewChiho] = useState<any>({ name: "", price: "",vat:0,thanh_tien:"", note: "", bill: "", link_bill: "", code_bill: "" });
+  const [debitDetail, setDebitDetail] = useState<any[]>([]);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  
-  const { data: ChiPhis } = useListServiceCategoryWithState({type:0});
-  const { data: ChiHos } = useListServiceCategoryWithState({type:1});
-    // --- chuyển sang options bằng useMemo ---
-  const ChiPhiOptions = useMemo(() => {
-    if (!Array.isArray(ChiPhis)) return [];
-    return ChiPhis.map((x: any) => ({
-      label: x?.name ?? "(không tên)",
-      value: x.id,
-    }));
-  }, [ChiPhis]);
-    const ChiHoOptions = useMemo(() => {
-    if (!Array.isArray(ChiHos)) return [];
-    return ChiHos.map((x: any) => ({
-      label: x?.name ?? "(không tên)",
-      value: x.id,
-    }));
-  }, [ChiHos]);
-    const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
+  const { data: partnerDetails } = useListPartnerDetail({ params: {f:"abc"}, debounce: 500 });
   const partnerOptions = useMemo(() => {
     if (!Array.isArray(partnerDetails?.data)) return [];
     return partnerDetails.data.map((x: any) => ({
@@ -54,20 +28,18 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
   }, [partnerDetails]);
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    infos.fileInfoId= infos.id;
-    let info = {
-      ...infos, status: infos.status ? 0 : 1,
-      productHaiquan: productHaiquan,
-      productChiho: productChiho,
-      data:JSON.stringify(infos)
-    };
-    console.log('info', info);
     setLoading(true);
-    fetchDataSubmit(info);
+    let _file_info = {
+      FileInfoId: infos.id,
+      PartnerDetailId: infos.customerDetailId,
+      AccountingDate: infos.accountingDate,
+      DebitDtos: debitDetail
+    };
+    fetchDataSubmit(_file_info);
   };
-  async function fetchDataSubmit(info: any) {
-    if (info.id) {
-       const response = await updateDebit(info);
+  async function fetchDataSubmit(debitDetail: any) {
+    if (id) {
+       const response = await updateDebitFileGia(debitDetail);
       if (response) setLoading(false);
       if (response.status === 200) {
         if (response.data.status) {
@@ -86,35 +58,32 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
     if (partnerOptions.length === 0) return;  // ✅ quan trọng
     if (id) {
       setLoading(true);
-      showDebitByFileId({ FileId: id}).then(res => {
+      showWithDebitContractFile({ id: id}).then(res => {
         const detail = res.data.data
         if (detail) {
           const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
           const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
-          const partner = partnerOptions.find((x:any)=>x.value == detail.partnerDetailId)
-           detail.partnerName = partner?.label
-          if(detail.fileInfoDetails && employeeInfo){
-             const EmployeeStaffInfo = detail.fileInfoDetails.find((x:any) => x.employeeId == employeeInfo.id);
-             if(EmployeeStaffInfo){
-                detail.employeeStaffId = employeeInfo.id;
-                detail.confirm_price = EmployeeStaffInfo.price;
-                detail.EmployeeStaffInfo = employeeInfo;
-             }
-            
-          }
+          const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
+          detail.partnerName = partner?.label
+           const _debits = detail.debits.map((row: any) => {
+           const cus = partnerOptions.find((x:any)=>x.value == row.supplierDetailId)
+           return {
+                ...row,
+                customerAbb: cus?.label || "",
+            };
+          })
+          setDebitDetail(_debits);
           let info = {
             ...detail, status: detail.status === 0 ? true : false,
              loaiToKhai:_loaiToKhai?.name
           };
-          console.log('info',info);
-          console.log('employeeInfo',employeeInfo);
           setInfos(info)
         }
       }).catch(err => {
         //setHasError(true)
       }).finally(() => setLoading(false));
     }
-  }, [id,partnerOptions.length,ChiPhiOptions.length,ChiHoOptions.length])
+  }, [id,partnerOptions.length])
   return (
     <>
       <AddForm
@@ -166,10 +135,6 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                     </div>
                   </td>
                   <td className="pr-4 align-top">
-                    <div className="mb-2">
-                        <div><label className="font-medium">Nhân viên:</label> {`${infos?.EmployeeStaffInfo?.lastName ?? ""} ${infos?.EmployeeStaffInfo?.firstName ?? ""}`.trim()}</div>
-                        <div><label className="font-medium">Được duyệt:</label> {infos?.confirm_price ? Helper.formatCurrency(infos?.confirm_price.toString()) : 0}</div>
-                    </div>
                   </td>
                 </tr>
                 {/* --- HÀNG 3 --- */}
@@ -266,65 +231,165 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
             </div> */}
 
             <div className="child-table">
-              <DataTable rowHover value={productHaiquan}>
+             <DataTable rowHover value={debitDetail}>
                 <Column field="name" header="Chi phí" />
+
+                <Column
+                  field="type"
+                  header="Loại chi phí"
+                  body={(row: any) =>
+                    typeDebit.find((x: any) => x.type === row.type)?.name || ""
+                  }
+                />
+                <Column field="customerAbb" header="Nhà cung cấp" />
                 <Column
                   field="purchasePrice"
                   header="Giá mua"
-                  body={(row: any) => Helper.formatCurrency(row.purchasePrice.toString())}
+                  body={(row: any) => Helper.formatCurrency(row.purchasePrice?.toString() || "0")}
                   footer={Helper.formatCurrency(
-                    productHaiquan
+                    debitDetail
                       .reduce((sum, item) => sum + (item.purchasePrice || 0), 0)
                       .toString()
                   )}
                   footerStyle={{ fontWeight: "bold" }}
                 />
-                <Column
+               <Column
                   field="price"
                   header="Giá bán"
-                  body={(row: any) => Helper.formatCurrency(row.price.toString())}
+                  body={(_: any, opt: any) => {
+                    const row = debitDetail[opt.rowIndex];
+                    if (row.type === 0) {
+                      return (
+                        <InputForm
+                          className="w-full"
+                          id={`price-${opt.rowIndex}`}
+                          value={Helper.formatCurrency((row.price || 0).toString())}
+                          onChange={(e: any) => {
+                            // Lấy giá trị mới từ Input
+                            const rawValue = e.target.value.replace(/\D/g, "");
+                            const numericValue = parseInt(rawValue, 10) || 0;
+
+                            const updated = [...debitDetail];
+
+                            // ✅ Tính lại thanh_tien luôn khi thay đổi giá
+                            const vatValue = Number(row.vat) || 0;
+                            const qty = Number(row.quantity) || 1;
+                            const thanh_tien = Math.round(numericValue * qty * (1 + vatValue / 100));
+
+                            updated[opt.rowIndex] = { 
+                              ...row, 
+                              price: numericValue,
+                              thanh_tien:thanh_tien
+                            };
+                            setDebitDetail(updated);
+                          }}
+                          label=""
+                        />
+                      );
+                    } else {
+                      return Helper.formatCurrency(row.price?.toString() || "0");
+                    }
+                  }}
                   footer={Helper.formatCurrency(
-                    productHaiquan
+                    debitDetail
                       .reduce((sum, item) => sum + (item.price || 0), 0)
                       .toString()
                   )}
                   footerStyle={{ fontWeight: "bold" }}
                 />
+
                 <Column
                   header="VAT"
                   body={(_: any, opt: any) => (
                     <Dropdown
-                      value={productHaiquan[opt.rowIndex].vat}
+                      value={debitDetail[opt.rowIndex].vat || 0}
+                      options={VatDebit}
                       optionValue="vat"
                       optionLabel="name"
-                      options={VatDebit}
                       className="p-inputtext-sm"
-                      onChange={(e: any) =>
-                         {
-                              const thanh_tien = Math.round( productHaiquan[opt.rowIndex].price * (1 + (e.target.value || 0) / 100) );
-                              const updatedProductHaiquan = [...productHaiquan];
-                              updatedProductHaiquan[opt.rowIndex] = {
-                                ...updatedProductHaiquan[opt.rowIndex],
-                                vat: e.target.value,
-                                thanh_tien: Helper.formatCurrency(thanh_tien.toString())
-                              };
-                              setProductHaiquan(updatedProductHaiquan);
-                          }
-                      }
-                 
+                      onChange={(e: any) => {
+                        const vatValue = Number(e.value) || 0;
+                        const updated = [...debitDetail];
+                        const row = { ...updated[opt.rowIndex] };
+
+                        // ✅ Chuyển price về số nguyên, loại bỏ ký tự không phải số
+                        const rawPrice =
+                          typeof row.price === "string"
+                            ? parseInt(row.price.replace(/\D/g, ""), 10) || 0
+                            : Number(row.price) || 0;
+
+                        // ✅ Nếu có quantity thì nhân thêm, mặc định là 1
+                        const qty = Number(row.quantity) || 1;
+                        // ✅ Tính thành tiền (price * qty * (1 + vat/100))
+                        const thanh_tien = Math.round(rawPrice * qty * (1 + vatValue / 100));
+                        
+                        updated[opt.rowIndex] = {
+                          ...row,
+                          vat: vatValue,
+                          thanh_tien: thanh_tien
+                        };
+
+                        setDebitDetail(updated);
+                      }}
                       required
                     />
                   )}
                 />
-                <Column 
-                field="thanh_tien" 
-                header="Thành tiền"
-                footer={Helper.formatCurrency(
-                  productHaiquan.reduce((sum, item) => sum + (item.thanh_tien ? parseInt(item.thanh_tien.replace(/\D/g, ""), 10) : 0), 0).toString()
-                )}
-                footerStyle={{ fontWeight: "bold" }}
+
+               <Column
+                  field="thanh_tien"
+                  header="Thành tiền"
+                  body={(_: any, opt: any) => {
+                    const row = debitDetail[opt.rowIndex];
+                    // Chuyển price về số thực, giữ decimal
+                    const price = typeof row.price === "string"
+                      ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
+                      : Number(row.price) || 0;
+                    const vat = Number(row.vat) || 0;
+                    // Tính thành tiền
+                    const thanh_tien = Math.round(price * (1 + vat / 100));
+                    // ✅ Cập nhật luôn vào state
+                    if (row.thanh_tien !== thanh_tien) {
+                      const updated = [...debitDetail];
+                      updated[opt.rowIndex] = { ...row, thanh_tien };
+                      setDebitDetail(updated);
+                    }
+                    return Helper.formatCurrency(thanh_tien.toString());
+                  }}
+                  footer={Helper.formatCurrency(
+                    debitDetail
+                      .reduce((sum, item) => {
+                        const price = typeof item.price === "string"
+                          ? parseFloat(item.price.replace(/[^0-9.]/g, "")) || 0
+                          : Number(item.price) || 0;
+
+                        const vat = Number(item.vat) || 0;
+                        return Math.round(sum + price * (1 + vat / 100));
+                      }, 0)
+                      .toString()
+                  )}
+                  footerStyle={{ fontWeight: "bold" }}
                 />
-                <Column field="bill" header="Hóa đơn" />
+
+                <Column
+                  field="bill"
+                  header="Hóa đơn"
+                  body={(_: any, opt: any) => (
+                    <InputForm
+                      className="w-full"
+                      value={debitDetail[opt.rowIndex].bill || ""}
+                      onChange={(e: any) => {
+                        const updated = [...debitDetail];
+                        updated[opt.rowIndex] = {
+                          ...updated[opt.rowIndex],
+                          bill: e.target.value,
+                        };
+                        setDebitDetail(updated);
+                      }}
+                      label="Hóa đơn"
+                    />
+                  )}
+                />
               </DataTable>
             </div>
           </Panel>
@@ -332,13 +397,21 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
           <div className="field mt-4">
             <InputForm
               className="w-64"
-              id="total_price"
-              value={0}
-              onChange={(e: any) =>
-              // không cho sửa tổng
-              { }
-              }
+              id="total_thanhtien"
+              value={Helper.formatCurrency(debitDetail
+                .reduce((sum, item) => {
+                  // Chuyển price về số thực, giữ decimal
+                  const price = typeof item.price === "string"
+                    ? parseFloat(item.price.replace(/[^0-9.]/g, "")) || 0
+                    : Number(item.price) || 0;
+
+                  const vat = Number(item.vat) || 0;
+
+                  return Math.round(sum + price * (1 + vat / 100));
+                }, 0).toString()
+              )}
               label="Tổng cộng"
+              readOnly // ✅ làm input chỉ đọc
             />
           </div>
         </div>
