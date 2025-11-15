@@ -239,9 +239,9 @@ export default function ListFileGia() {
                                   style={{ width: "6em" }}
                                 />
                                 <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="declaration" header="Số bill" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -373,7 +373,7 @@ export default function ListFileGia() {
                                    >
                                       <Column body={(row: any) =>{
                                           let data = JSON.parse(row.debit_data);
-                                          return data.fileNumber
+                                          return data?.fileNumber
                                       }} header="Số file" />
                                       <Column field="debit_name" header="Chi phí" />
                                       <Column field="debit_type"  body={(row: any) => typeDebit.find((x:any) => x.type === row.debit_type)?.name || ""} header="Loại chi phí" />

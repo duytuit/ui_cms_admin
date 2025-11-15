@@ -170,6 +170,10 @@ export const typeDebit = [
     {
      type:3,
      name:"Phí nâng hạ"
+   },
+    {
+     type:4,
+     name:"Phí khác"
    }
 ];
 export const statusDebit = [

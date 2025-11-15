@@ -246,9 +246,9 @@ export default function ListContractFileNangHa() {
                                   style={{ width: "6em" }}
                                 />
                                 <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="employee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="declaration" header="Số bill" filter showFilterMenu={false} filterMatchMode="contains" />

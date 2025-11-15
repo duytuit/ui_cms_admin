@@ -239,9 +239,9 @@ export default function ListCreateDispatch() {
                   />
                   <Column header="Thao tác" body={(e: any) => ActionBody(e, null, null, null, null, () => openDialogAdd(e.id))} style={{ width: "6em" }} />
                   <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                  <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                   <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                   <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-                  <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                   <Column field="type" header="Loại hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                   <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
                   <Column field="declaration" header="Số tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
