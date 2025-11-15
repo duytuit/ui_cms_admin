@@ -108,6 +108,22 @@ export const AddForm = (props:any) => {
         </div>
     )
 };
+export const UpdateForm = (props:any) => {
+    const navigate = useNavigate();
+    const { checkId, title, loading, onSubmit, className, moreOptions, route,routeList,ButtonName,...prop } = props;
+    return (
+        <div className={classNames("card", className)} {...prop}>
+             <form onSubmit={onSubmit}>
+                {props.children}
+                <div className="w-full justify-content-end flex">
+                    {routeList && <Button type='button' onClick={() => navigate(routeList)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />}
+                    {<Button type='submit' loading={loading} label={ButtonName}
+                        className="ml-2" severity="info" size="small" raised icon="pi pi-check"/>}
+                </div>
+            </form>
+        </div>
+    )
+};
 export const MoreOptions = (props:any) => {
     const navigate = useNavigate();
     const { value } = props;

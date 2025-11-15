@@ -4,8 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, loaiToKhai, refreshObject, typeDebit, VatDebit } from "utils";
 import { useDispatch } from "react-redux";
-import { Dropdown} from "components/common/ListForm";
-import { Button, Column, DataTable, Panel } from "components/uiCore";
+import { Dropdown, Input} from "components/common/ListForm";
+import { Button, Column, DataTable, Dialog, Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { classNames } from "primereact/utils";
@@ -13,9 +13,12 @@ import { showWithDebitContractFile } from "modules/ContractFile/api";
 import { useListPartnerDetail, useListSupplierDetailWithState } from "modules/partner/service";
 import { useListServiceCategoryWithState } from "modules/categories/service";
 import { updateDebitFileGia } from "../api";
+import UpdateConfirmService from "./update_confirm_service";
 export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
+  const [visible, setVisible] = useState(false);
+  const [confirmDebitDetail, setConfirmDebitDetail] = useState<any>(null);
   const [debitDetail, setDebitDetail] = useState<any[]>([]);
   const [productDebit, setProductDebit] = useState<any[]>([]);
   const [newDebit, setNewDebit] = useState<any>({ name: "", purchasePrice: "", price: "",vat:0, note: "", bill: "" ,SupplierDetailId:"",SupplierName:""});
@@ -36,6 +39,14 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
         value: x.id,
       }));
     }, [supplierDetails]);
+  const openDialogAdd = (row:any) => {
+        setConfirmDebitDetail(row);
+        setVisible(true);
+    };
+  const handleModalClose = () => {
+    fetchDebitDetail(id, partnerOptions, setInfos, setDebitDetail, setLoading);
+    setVisible(false);
+  };
   const handleSubmit = (e: any) => {
     e.preventDefault();
     setLoading(true);
@@ -64,38 +75,52 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
       } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
     }
   };
+  // Hàm riêng để gọi API và cập nhật state
+  async function fetchDebitDetail(id: number, partnerOptions: any[], setInfos: any, setDebitDetail: any, setLoading: any) {
+    if (!id || partnerOptions.length === 0) return;
 
-  useEffect(() => {
-    if (!id) return;
-    if (partnerOptions.length === 0) return;  // ✅ quan trọng
-    if (id) {
+    try {
       setLoading(true);
-      showWithDebitContractFile({ id: id}).then(res => {
-        const detail = res.data.data
-        if (detail) {
-          const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
-          const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
-          const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
-          detail.partnerName = partner?.label
-           const _debits = detail.debits.map((row: any) => {
-           const cus = partnerOptions.find((x:any)=>x.value == row.supplierDetailId)
-           return {
-                ...row,
-                customerAbb: cus?.label || "",
-            };
-          })
-          setDebitDetail(_debits);
-          let info = {
-            ...detail, status: detail.status === 0 ? true : false,
-             loaiToKhai:_loaiToKhai?.name
-          };
-          setInfos(info)
-        }
-      }).catch(err => {
-        //setHasError(true)
-      }).finally(() => setLoading(false));
+
+      const res = await showWithDebitContractFile({ id });
+      const detail = res.data.data;
+      if (!detail) return;
+
+      // Xử lý partnerName
+      const partner = partnerOptions.find((x: any) => x.value == detail.customerDetailId);
+      detail.partnerName = partner?.label;
+
+      // Xử lý debits
+      const _debits = (detail.debits || []).map((row: any) => {
+        const cus = partnerOptions.find((x: any) => x.value == row.supplierDetailId);
+        return {
+          ...row,
+          customerAbb: cus?.label || "",
+        };
+      });
+
+      // Xử lý loaiToKhai và status
+      const _loaiToKhai = loaiToKhai.find((x: any) => x.DeclarationType === detail.declarationType);
+      const info = {
+        ...detail,
+        status: detail.status === 0,
+        loaiToKhai: _loaiToKhai?.name,
+      };
+
+      // ✅ Cập nhật state luôn trong function
+      setInfos(info);
+      setDebitDetail(_debits);
+    } catch (err) {
+      console.error("fetchDebitDetail error:", err);
+    } finally {
+      setLoading(false);
     }
-  }, [id,partnerOptions.length])
+  }
+  // useEffect gọn hơn
+  useEffect(() => {
+    if (!id || partnerOptions.length === 0) return;
+    fetchDebitDetail(id, partnerOptions, setInfos, setDebitDetail, setLoading);
+  }, [id, partnerOptions.length]);
   return (
     <>
       <AddForm
@@ -174,8 +199,24 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
           <Panel header="Chi tiết các chi phí">
             <div className="child-table">
              <DataTable rowHover value={debitDetail}>
-                <Column field="name" header="Chi phí" />
-
+                <Column
+                    field="name"
+                    header="Chi phí"
+                    body={(row: any) => {
+                        if (row.type === 0) {
+                            return (
+                                <span
+                                    onClick={() => openDialogAdd(row)}
+                                    className="cursor-pointer"
+                                    style={{ color: '#0d6efd', textDecoration: 'underline' }}
+                                >
+                                    {row.name}
+                                </span>
+                            );
+                        }
+                        return row.name; // hoặc return null
+                    }}
+                />
                 <Column
                   field="type"
                   header="Loại chi phí"
@@ -202,8 +243,8 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                     const row = debitDetail[opt.rowIndex];
                     if (row.type === 0) {
                       return (
-                        <InputForm
-                          className="w-full"
+                        <Input
+                          className="w-full input-sm"
                           id={`price-${opt.rowIndex}`}
                           value={Helper.formatCurrency((row.price || 0).toString())}
                           onChange={(e: any) => {
@@ -248,7 +289,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                       options={VatDebit}
                       optionValue="vat"
                       optionLabel="name"
-                      className="p-inputtext-sm"
+                      className="p-inputtext-sm p-dropdown-sm"
                       onChange={(e: any) => {
                         const vatValue = Number(e.value) || 0;
                         const updated = [...debitDetail];
@@ -317,8 +358,8 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                   field="bill"
                   header="Hóa đơn"
                   body={(_: any, opt: any) => (
-                    <InputForm
-                      className="w-full"
+                    <Input
+                      className="w-full input-sm"
                       value={debitDetail[opt.rowIndex].bill || ""}
                       onChange={(e: any) => {
                         const updated = [...debitDetail];
@@ -328,7 +369,6 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                         };
                         setDebitDetail(updated);
                       }}
-                      label="Hóa đơn"
                     />
                   )}
                 />
@@ -600,6 +640,18 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
           </div>
         </div>
       </AddForm>
+       <Dialog
+          position="top"
+          dismissableMask
+          header="Thông tin duyệt chi phí hải quan"
+          visible={visible}
+          onHide={() => setVisible(false)}
+          style={{ width: "50vw",top:"200px" }}
+        >
+          <p className="m-0">
+            {confirmDebitDetail && <UpdateConfirmService debitDetail={confirmDebitDetail} onClose={handleModalClose} ></UpdateConfirmService>}
+          </p>
+        </Dialog>
     </>
   );
 }
