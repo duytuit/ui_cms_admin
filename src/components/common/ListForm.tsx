@@ -71,7 +71,7 @@ export const Dropdown = (props:any) => {
 };
 
 export const GridForm = (props:any) => {
-    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam, add } = props;
+    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam, add , openDialogAdd} = props;
     const handleClear = (e:any) => {
         setParamsPaginator(defaultParam);
         refreshObject(filter)
@@ -100,6 +100,17 @@ export const GridForm = (props:any) => {
                     {add && <Link to={add} >
                         <Button icon='pi pi-plus' label="Thêm mới" className="ml-3" severity="success" size="small" raised />
                     </Link>}
+                    {openDialogAdd &&
+                        <Button
+                            label="Tạo hoàn ứng giao nhận"
+                            type="button"
+                            icon="pi pi-plus"
+                            severity="success"
+                            size="small" 
+                            raised 
+                            onClick={() => openDialogAdd()}   // <<< thêm dòng này
+                        />
+                    }
                 </div>
             </div>
         </form>

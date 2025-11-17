@@ -7,7 +7,7 @@ import { MyCalendar } from "components/common/MyCalendar";
 import { loaiHang, loaiToKhai, nghiepVu, phatSinh, tinhChat } from "utils";
 import { useListCustomerDetailWithState, useListPartnerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
-import { Checkbox, Dialog } from "components/uiCore";
+import { Button, Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
@@ -316,6 +316,9 @@ export default function ListCreateDispatch() {
                           <Column
                               header="Thao tác"
                               body={(row: any) => {
+                                if(row.cf_status_confirm == 1){
+                                                                                
+                                }else{
                                   return ActionBody(
                                       row,
                                       null,
@@ -323,9 +326,17 @@ export default function ListCreateDispatch() {
                                       paramsPaginator,
                                       setParamsPaginator
                                   );
+                                }
                               }}
                           />
-                          <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column header="Trạng thái" body={(row: any) => {
+                            if(row.cf_status_confirm == 1){
+                              return <Button label="đã duyệt" rounded severity="success" size="small" text  />
+                            }else{
+                              return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
+                            }
+                          }} filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="f_accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.f_accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="dispatch_code" header="Mã điều xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -348,8 +359,6 @@ export default function ListCreateDispatch() {
                           <Column field="ticket_fee" header="Tiền Vé" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="overnight_fee" header="Tiền qua đêm" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="penalty_fee" header="Tiền luật" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="declaration_quantity" header="Người duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="declaration_quantity" header="Thời gian duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />

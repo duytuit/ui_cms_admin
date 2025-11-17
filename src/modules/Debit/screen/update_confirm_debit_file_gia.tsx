@@ -14,7 +14,7 @@ import { useListPartnerDetail, useListSupplierDetailWithState } from "modules/pa
 import { useListServiceCategoryWithState } from "modules/categories/service";
 import { confirmFileGia, updateDebitFileGia } from "../api";
 import UpdateConfirmService from "./update_confirm_service";
-export default function UpdateConfirmFileGia({ id, onClose }: { id: any; onClose: () => void }) {
+export default function UpdateConfirmFileGia({ id, status, onClose }: { id: any, status:any, onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
   const [visible, setVisible] = useState(false);
@@ -56,7 +56,8 @@ export default function UpdateConfirmFileGia({ id, onClose }: { id: any; onClose
       PartnerDetailId: infos.customerDetailId,
       AccountingDate: infos.accountingDate,
       DebitDtos: debitDetail,
-      Chiphikhac: productDebit
+      Chiphikhac: productDebit,
+      StatusConfirm: status == 1 ? 0:1
     };
     fetchDataSubmit(_file_info);
   };
@@ -131,7 +132,7 @@ export default function UpdateConfirmFileGia({ id, onClose }: { id: any; onClose
         loading={loading}
         onSubmit={handleSubmit}
         route={Number(id) ? "/debit/update" : "/debit/create"}
-        ButtonName="Duyệt"
+        ButtonName={status == 0 ? "Duyệt" : "Bỏ duyệt"}
       >
         <div className="field">
           <Panel header="Thông tin bảng kê">

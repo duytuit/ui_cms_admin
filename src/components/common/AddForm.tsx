@@ -110,7 +110,7 @@ export const AddForm = (props:any) => {
 };
 export const UpdateForm = (props:any) => {
     const navigate = useNavigate();
-    const { checkId, title, loading, onSubmit, className, moreOptions, route,routeList,ButtonName,...prop } = props;
+    const { checkId, title, loading, onSubmit, className, moreOptions, route, routeList, ButtonName, AddName,...prop } = props;
     return (
         <div className={classNames("card", className)} {...prop}>
              <form onSubmit={onSubmit}>
@@ -118,6 +118,8 @@ export const UpdateForm = (props:any) => {
                 <div className="w-full justify-content-end flex">
                     {routeList && <Button type='button' onClick={() => navigate(routeList)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />}
                     {ButtonName && <Button type='submit' loading={loading} label={ButtonName}
+                        className="ml-2" severity={ButtonName == "Duyệt" ?"info": "warning"} size="small" raised icon="pi pi-check"/>}
+                    {AddName && <Button type='submit' loading={loading} label={AddName}
                         className="ml-2" severity="info" size="small" raised icon="pi pi-check"/>}
                 </div>
             </form>

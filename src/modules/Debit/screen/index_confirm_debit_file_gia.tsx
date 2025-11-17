@@ -93,6 +93,7 @@ export default function ListConfirmFileGia() {
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [displayData, setDisplayData] = useState<any[]>([]);
     const [selectedId, setSelectedId] = useState<any>();
+    const [cfStatusConfirm, setCfStatusConfirm] = useState<any>();
     const [visible, setVisible] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
@@ -108,8 +109,9 @@ export default function ListConfirmFileGia() {
     const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
     const { data: listUser } = useListUserWithState({});
     const { data: listEmployee } = useListEmployeeWithState({});
-    const openDialogAdd = (id:number) => {
+    const openDialogAdd = (id:number,cf_status_confirm:any) => {
         setSelectedId(id);
+        setCfStatusConfirm(cf_status_confirm);
         setVisible(true);
     };
     const handleModalClose = () => {
@@ -124,13 +126,13 @@ export default function ListConfirmFileGia() {
          const dataArray = Array.isArray(listFileGia?.data) ? listFileGia.data : [];
          const groupedHasFileGia = Object.values(
             dataArray.reduce((acc:any, cur:any) => {
-              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_updated_at,cf_updated_by, ...rest } = cur;
+              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by, ...rest } = cur;
               if (!acc[cur.id]) {
                 acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
               }
               // chỉ gom debit nếu debitService có dữ liệu
               if (listFileGia?.data) {
-                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_updated_at,cf_updated_by});
+                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by});
                 acc[cur.id].debit_ids.push(debit_id);
               }
               return acc;
@@ -141,6 +143,8 @@ export default function ListConfirmFileGia() {
             const _employee = listEmployee.find((x: any) => x.id === row.employee_id);
             const _sumMua = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_purchase_price || 0), 0);
             const _sumBan = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_price || 0), 0);
+            const cf_status_confirm = row.debits.find((x: any) => x.cf_status_confirm === 0);
+            console.log("cf_status_confirm",cf_status_confirm);
             return {
               ...row,
               customerName: _customer?.partners?.name || "",
@@ -148,7 +152,8 @@ export default function ListConfirmFileGia() {
               employee: `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""}`.trim(),
               sumMua:_sumMua,
               sumBan:_sumBan,
-              loiNhuan:_sumBan-_sumMua
+              loiNhuan:_sumBan-_sumMua,
+              cf_status_confirm:cf_status_confirm ? 0 : 1
             };
           });
          console.log(mappedDebitFileGia);
@@ -223,7 +228,7 @@ export default function ListConfirmFileGia() {
                                   <Column
                                       header="Thao tác"
                                       body={(row: any) => {
-                                        return <Button icon="pi pi-eye" rounded outlined className="mr-2"  onClick={() =>  openDialogAdd(row.id)} />
+                                        return <Button icon="pi pi-eye" rounded outlined className="mr-2"  onClick={() =>  openDialogAdd(row.id,row.cf_status_confirm)} />
                                       }}
                                   />
                                   <Column header="Trạng thái" body={(row: any) => {
@@ -298,7 +303,7 @@ export default function ListConfirmFileGia() {
               style={{ width: "78vw" }}
             >
               <p className="m-0">
-                {selectedId && <UpdateConfirmFileGia id={selectedId} onClose={handleModalClose} ></UpdateConfirmFileGia>}
+                {selectedId && <UpdateConfirmFileGia id={selectedId} status={cfStatusConfirm} onClose={handleModalClose} ></UpdateConfirmFileGia>}
               </p>
             </Dialog>
       </>

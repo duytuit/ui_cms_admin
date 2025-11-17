@@ -7,7 +7,7 @@ import { MyCalendar } from "components/common/MyCalendar";
 import { typeDebit } from "utils";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
-import { Checkbox, DataTable, Dialog } from "components/uiCore";
+import { Button, Checkbox, DataTable, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
@@ -141,13 +141,13 @@ export default function ListContractFileNangHa() {
          const dataArray = Array.isArray(debitService?.data) ? debitService.data : [];
          const groupedHasDebitService = Object.values(
             dataArray.reduce((acc:any, cur:any) => {
-              const { service_id, debit_price,debit_purchase_price, debit_total, debit_type, debit_vat,debit_id,debit_name,debit_updated_at,debit_updated_by, ...rest } = cur;
+              const { debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by, ...rest } = cur;
               if (!acc[cur.id]) {
                 acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
               }
               // chỉ gom debit nếu debitService có dữ liệu
               if (debitService?.data) {
-                acc[cur.id].debits.push({ service_id, debit_price,debit_purchase_price, debit_vat, debit_total, debit_type,debit_id,debit_name ,debit_updated_at,debit_updated_by});
+                acc[cur.id].debits.push({ debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by});
                 acc[cur.id].debit_ids.push(debit_id);
               }
               return acc;
@@ -162,6 +162,7 @@ export default function ListContractFileNangHa() {
             const _sumCuoc = row.debits
               .filter((x: any) => x.service_id === 19)
               .reduce((sum: number, x: any) => sum + (x.debit_purchase_price || 0), 0);
+              const cf_status_confirm = row.debits.find((x: any) => x.cf_status_confirm === 0);
             return {
               ...row,
               customerName: _customer?.partners?.name || "",
@@ -169,6 +170,7 @@ export default function ListContractFileNangHa() {
               employee: `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""}`.trim(),
               sumCuoc:_sumCuoc,
               sumNH:_sumNH,
+              cf_status_confirm:cf_status_confirm ? 0 : 1
             };
           });
          console.log(mappedDebitService);
@@ -293,7 +295,7 @@ export default function ListContractFileNangHa() {
                                       scrollable
                                       scrollHeight="flex"
                                       style={{ flex: 1 }}
-                                      tableStyle={{ minWidth: "2900px" }}
+                                      tableStyle={{ minWidth: "2000px" }}
                                       onRowClick={(e: any) => {
                                          setSelectedDetail(e.data.debits)
                                          console.log(e.data.debits);
@@ -335,6 +337,9 @@ export default function ListContractFileNangHa() {
                                         <Column
                                             header="Thao tác"
                                             body={(row: any) => {
+                                              if(row.cf_status_confirm == 1){
+                                                                                              
+                                              }else{
                                                 return ActionBodyWithIds(
                                                     row.debit_ids,
                                                     null,
@@ -342,8 +347,16 @@ export default function ListContractFileNangHa() {
                                                     paramsPaginator,
                                                     setParamsPaginator
                                                 );
+                                              }
                                             }}
                                         />
+                                        <Column header="Trạng thái" body={(row: any) => {
+                                          if(row.cf_status_confirm == 1){
+                                            return <Button label="đã duyệt" rounded severity="success" size="small" text  />
+                                          }else{
+                                            return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
+                                          }
+                                        }} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -352,11 +365,6 @@ export default function ListContractFileNangHa() {
                                         <Column field="sumCuoc" body={(row: any) => Helper.formatCurrency(row.sumCuoc.toString())} header="Tiền cược" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="sumNH" body={(row: any) => Helper.formatCurrency(row.sumNH.toString())} header="Tổng phí nâng hạ" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="employee" header="Tên giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Xác nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Thời gian xác nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Đã duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Thời gian duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Lý do duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
                                   </DataTableClient>

@@ -138,13 +138,13 @@ export default function ListFileGia() {
          const dataArray = Array.isArray(listFileGia?.data) ? listFileGia.data : [];
          const groupedHasFileGia = Object.values(
             dataArray.reduce((acc:any, cur:any) => {
-              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_updated_at,cf_updated_by, ...rest } = cur;
+              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by, ...rest } = cur;
               if (!acc[cur.id]) {
                 acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
               }
               // chỉ gom debit nếu debitService có dữ liệu
               if (listFileGia?.data) {
-                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_updated_at,cf_updated_by});
+                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by});
                 acc[cur.id].debit_ids.push(debit_id);
               }
               return acc;
@@ -155,6 +155,7 @@ export default function ListFileGia() {
             const _employee = listEmployee.find((x: any) => x.id === row.employee_id);
             const _sumMua = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_purchase_price || 0), 0);
             const _sumBan = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_price || 0), 0);
+            const cf_status_confirm = row.debits.find((x: any) => x.cf_status_confirm === 0);
             return {
               ...row,
               customerName: _customer?.partners?.name || "",
@@ -162,7 +163,8 @@ export default function ListFileGia() {
               employee: `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""}`.trim(),
               sumMua:_sumMua,
               sumBan:_sumBan,
-              loiNhuan:_sumBan-_sumMua
+              loiNhuan:_sumBan-_sumMua,
+              cf_status_confirm:cf_status_confirm ? 0 : 1
             };
           });
          console.log(mappedDebitFileGia);
