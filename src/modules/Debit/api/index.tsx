@@ -11,5 +11,6 @@ export const addDebit = async (params: any) => await postData("Debit/create", pa
 export const addDebitService = async (params: any) => await postData("Debit/service/create", params);
 export const addDebitNangha = async (params: any) => await postData("Debit/nangha/create", params);
 export const updateDebitFileGia = async (params: any) => await postData("Debit/updateFileGia", params);
+export const confirmFileGia = async (params: any) => await postData("Debit/confirmFileGia", params);
 export const updateStatusDebit = async (params: any) => await postData("Debit/update/status", params);
 export const confirmChiPhiHaiQuan = async (params: any) => await postData("Debit/confirmChiPhiHaiQuan", params);

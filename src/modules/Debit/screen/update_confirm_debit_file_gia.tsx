@@ -1,5 +1,5 @@
 
-import { AddForm, InputForm } from "components/common/AddForm";
+import { AddForm, InputForm, UpdateForm } from "components/common/AddForm";
 import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, loaiToKhai, refreshObject, typeDebit, VatDebit } from "utils";
@@ -12,10 +12,9 @@ import { classNames } from "primereact/utils";
 import { showWithDebitContractFile } from "modules/ContractFile/api";
 import { useListPartnerDetail, useListSupplierDetailWithState } from "modules/partner/service";
 import { useListServiceCategoryWithState } from "modules/categories/service";
-import { updateDebitFileGia } from "../api";
+import { confirmFileGia, updateDebitFileGia } from "../api";
 import UpdateConfirmService from "./update_confirm_service";
-import ViewConfirmService from "./view_confirm_service";
-export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () => void }) {
+export default function UpdateConfirmFileGia({ id, onClose }: { id: any; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
   const [visible, setVisible] = useState(false);
@@ -63,7 +62,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
   };
   async function fetchDataSubmit(debitDetail: any) {
     if (id) {
-       const response = await updateDebitFileGia(debitDetail);
+       const response = await confirmFileGia(debitDetail);
       if (response) setLoading(false);
       if (response.status === 200) {
         if (response.data.status) {
@@ -124,7 +123,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
   }, [id, partnerOptions.length]);
   return (
     <>
-      <AddForm
+      <UpdateForm
         className="w-full"
         style={{ margin: "0 auto" }}
         checkId={infos.id}
@@ -132,6 +131,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
         loading={loading}
         onSubmit={handleSubmit}
         route={Number(id) ? "/debit/update" : "/debit/create"}
+        ButtonName="Duyệt"
       >
         <div className="field">
           <Panel header="Thông tin bảng kê">
@@ -640,7 +640,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
             />
           </div>
         </div>
-      </AddForm>
+      </UpdateForm>
        <Dialog
           position="top"
           dismissableMask
@@ -650,7 +650,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
           style={{ width: "50vw",top:"200px" }}
         >
           <p className="m-0">
-            {confirmDebitDetail && <ViewConfirmService debitDetail={confirmDebitDetail} onClose={handleModalClose} ></ViewConfirmService>}
+            {confirmDebitDetail && <UpdateConfirmService debitDetail={confirmDebitDetail} onClose={handleModalClose} ></UpdateConfirmService>}
           </p>
         </Dialog>
     </>

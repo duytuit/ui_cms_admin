@@ -117,7 +117,7 @@ export const UpdateForm = (props:any) => {
                 {props.children}
                 <div className="w-full justify-content-end flex">
                     {routeList && <Button type='button' onClick={() => navigate(routeList)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />}
-                    {<Button type='submit' loading={loading} label={ButtonName}
+                    {ButtonName && <Button type='submit' loading={loading} label={ButtonName}
                         className="ml-2" severity="info" size="small" raised icon="pi pi-check"/>}
                 </div>
             </form>

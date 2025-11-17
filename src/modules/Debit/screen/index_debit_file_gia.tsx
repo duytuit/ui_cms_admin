@@ -336,8 +336,12 @@ export default function ListFileGia() {
                                                 // );
                                             }}
                                         />
-                                        <Column header="Trạng thái" body={(e: any) => {
-                                          return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
+                                        <Column header="Trạng thái" body={(row: any) => {
+                                          if(row.cf_status_confirm == 1){
+                                            return <Button label="đã duyệt" rounded severity="success" size="small" text  />
+                                          }else{
+                                            return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
+                                          }
                                         }} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
