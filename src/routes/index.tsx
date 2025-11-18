@@ -31,6 +31,7 @@ import UpdateProduct from "modules/product/screen/update";
 import ListReceiptChiGiaoNhan from "modules/receipt/screen/index_chi_giao_nhan";
 import ListReceipt from "modules/receipt/screen/index_chi_giao_nhan";
 import Receipt from "modules/receipt/screen/index_chi_tam_ung";
+import ListChiPhiGiaoNhan from "modules/receipt/screen/index_chiphi_giaonhan";
 import UpdateReceipt from "modules/receipt/screen/update";
 import UpdateReceiptChiGiaoNhan from "modules/receipt/screen/update_chi_giao_nhan";
 import Service from "modules/service/screen";
@@ -116,6 +117,7 @@ const publicRoutes = [
   // Receipt 
   { path: "/receipt/list", component: ListReceipt, layout: 'ListReceipt' },
   { path: "/receipt/add", component: UpdateReceipt, layout: 'UpdateReceipt' },
+  { path: "/receipt/listChiPhiGiaoNhan", component: ListChiPhiGiaoNhan, layout: 'ListChiPhiGiaoNhan' },
   { path: "/receipt/listReceiptChiGiaoNhan", component: ListReceiptChiGiaoNhan, layout: 'ListReceiptChiGiaoNhan' },
   { path: "/receipt/updateReceiptChiGiaoNhan", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
   { path: "/receipt/detail/chigiaonhan/:id", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },

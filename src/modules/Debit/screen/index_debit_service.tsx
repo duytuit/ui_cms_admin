@@ -19,9 +19,8 @@ import { deleteDebit, deleteMultiDebit } from "../api";
 import UpdateHoanUngGiaoNhan from "modules/receipt/screen/update_hoanung_giao_nhan";
 
 // ✅ Component Header lọc dữ liệu
-const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
+const Header = ({ _setParamsPaginator, _paramsPaginator, selected }: any) => {
     const [visible, setVisible] = useState(false);
-    const [selectedId, setSelectedId] = useState<any>();
     const [filter, setFilter] = useState({ name: "", customerDetailId: "" ,fromDate:Helper.lastWeekString(),toDate:Helper.toDayString()});
     const { data: customerDetails } = useListCustomerDetailWithState({status:1});
     // --- chuyển sang options bằng useMemo ---
@@ -34,7 +33,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
     }, [customerDetails]);
     const openDialogAdd = (e:any) => {
        setVisible(true)
-       setSelectedId(1)
     };
     const handleModalClose = () => {
        setVisible(false);
@@ -58,7 +56,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             filter={filter}
             setFilter={setFilter}
             className="lg:col-9"
-            openDialogAdd={()=>openDialogAdd(1)}
         >
             <div className="col-2">
                 <Input
@@ -95,18 +92,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
                 />
             </div>
         </GridForm>
-        <Dialog
-            position="top"
-            dismissableMask
-            header="Tạo hoàn ứng giao nhận"
-            visible={visible}
-            onHide={() => setVisible(false)}
-            style={{ width: "60vw", top:"30px" }}
-        >
-            <p className="m-0">
-              {selectedId && <UpdateHoanUngGiaoNhan debits={selectedId} onClose={handleModalClose} ></UpdateHoanUngGiaoNhan>}
-            </p>
-        </Dialog>
       </>
        
     );
@@ -217,7 +202,7 @@ export default function ListContractFileBangKe() {
     return (
       <>
         <div className="card">
-            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
+            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} selected={selectedDebitServiceRows} />
               <div style={{ height: 'calc(100vh - 8rem)' }}>
                       <Splitter style={{ height: '100%', width: '100%' }}>
                         {/* Panel 1 */}
@@ -315,60 +300,70 @@ export default function ListContractFileBangKe() {
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                                  <b>Bảng kê chi phí đã tạo</b>
-                                  <DataTableClient
-                                      rowHover
-                                      value={displayDebitServiceData}
-                                      onPage={(e: any) => {
-                                        setFirst(e.first);
-                                        setRows(e.rows);
-                                      }}
-                                      loading={loading}
-                                      dataKey="id"
-                                      title="Tài khoản"
-                                      filterDisplay="row"
-                                      className={classNames("Custom-DataTableClient")}
-                                      scrollable
-                                      scrollHeight="flex"
-                                      style={{ flex: 1 }}
-                                      tableStyle={{ minWidth: "2000px" }}
-                                      onRowClick={(e: any) => {
-                                         setSelectedDetail(e.data.debits)
-                                         console.log(e.data.debits);
-                                         
-                                      }}
-                                    >
-                                      {/* Custom checkbox column */}
-                                      <Column
-                                        header={
-                                          <Checkbox
-                                            checked={
-                                              selectedDebitServiceRows.length === displayDebitServiceData.length &&
-                                              displayDebitServiceData.length > 0
+                                    <DataTableClient
+                                        rowHover
+                                        value={displayDebitServiceData}
+                                        onPage={(e: any) => {
+                                          setFirst(e.first);
+                                          setRows(e.rows);
+                                        }}
+                                        loading={loading}
+                                        dataKey="id"
+                                        title="Tài khoản"
+                                        filterDisplay="row"
+                                        className={classNames("Custom-DataTableClient")}
+                                        scrollable
+                                        scrollHeight="flex"
+                                        style={{ flex: 1 }}
+                                        tableStyle={{ minWidth: "2000px" }}
+                                        onRowClick={(e: any) => {
+                                          setSelectedDetail(e.data.debits)
+                                          console.log(e.data.debits);
+                                          
+                                        }}
+                                      >
+                                        {/* Custom checkbox column */}
+                                        <Column
+                                            header={
+                                                <Checkbox
+                                                    checked={
+                                                        selectedDebitServiceRows.length > 0 &&
+                                                        selectedDebitServiceRows.length === displayDebitServiceData.length
+                                                    }
+                                                    onChange={(e:any) => {
+                                                        if (e.checked) {
+                                                            // Lưu nguyên rowData
+                                                            setSelectedDebitServiceRows([...displayDebitServiceData]);
+                                                        } else {
+                                                            setSelectedDebitServiceRows([]);
+                                                        }
+                                                    }}
+                                                />
                                             }
-                                            onChange={(e: any) => {
-                                              if (e.checked)
-                                                setSelectedDebitServiceRows(displayDebitServiceData.map((d) => d.id));
-                                              else setSelectedDebitServiceRows([]);
-                                            }}
-                                          />
-                                        }
-                                        body={(rowData: any) => (
-                                          <Checkbox
-                                            className="p-checkbox-sm"
-                                            checked={selectedDebitServiceRows.includes(rowData.id)}
-                                            onChange={(e: any) => {
-                                              if (e.checked)
-                                                setSelectedDebitServiceRows((prev) => [...prev, rowData.id]);
-                                              else
-                                                setSelectedDebitServiceRows((prev) =>
-                                                  prev.filter((id) => id !== rowData.id)
+                                            body={(rowData: any) => {
+                                                const isChecked =
+                                                    selectedDebitServiceRows.findIndex(x => x.id === rowData.id) !== -1;
+                                                return (
+                                                    <Checkbox
+                                                        className="p-checkbox-sm"
+                                                        checked={isChecked}
+                                                        onChange={(e:any) => {
+                                                            if (e.checked) {
+                                                                // thêm cả object
+                                                                setSelectedDebitServiceRows(prev => [...prev, rowData]);
+                                                            } else {
+                                                                // xoá theo id
+                                                                setSelectedDebitServiceRows(prev =>
+                                                                    prev.filter(x => x.id !== rowData.id)
+                                                                );
+                                                            }
+                                                        }}
+                                                        onClick={(e:any) => e.stopPropagation()}
+                                                    />
                                                 );
                                             }}
-                                            onClick={(e: any) => e.stopPropagation()} // ⚡ chặn row click
-                                          />
-                                        )}
-                                        style={{ width: "3em" }}
-                                      />
+                                            style={{ width: "3em" }}
+                                        />
                                         <Column
                                             header="Thao tác"
                                             body={(row: any) => {

@@ -2,7 +2,7 @@
 import { AddForm, InputForm, UpdateForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import { Panel, RadioButton } from "components/uiCore";
+import { Column, DataTable, Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { formOfPayment, listToast, refreshObject, VatDebit } from "utils";
 import { updateReceipt, addReceipt, showReceipt, addReceiptChiGiaoNhan, updateReceiptChiGiaoNhan } from "../api";
@@ -17,82 +17,62 @@ import { useListEmployee, useListEmployeeWithState } from "modules/employee/serv
 import { useListPartnerDetail } from "modules/partner/service";
 import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { useListContractFile } from "modules/ContractFile/service";
-export default function UpdateHoanUngGiaoNhan({ debits, onClose }: { debits: any, onClose: () => void }) {
+export default function UpdateHoanUngGiaoNhan({ debits, onClose, employeeId,fromDate,toDate}: { debits: any, onClose: () => void,employeeId:number,fromDate:any,toDate:any }) {
+  const amount = Math.abs(debits.reduce((sum: number, item: any) => sum + (item.phaiTra || 0), 0));
+  const check_amount = debits.reduce((sum: number, item: any) => sum + (item.phaiTra || 0), 0);
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [doiTuongOptions, setDoiTuongOptions] = useState<any>([]);
   const [employeeInfo, setEmployeeInfo] = useState<any>({});
   const [bankSelect, setBankSelect] = useState<any>({});
   const [ContractFileOptions, setContractFileOptions] = useState<any[]>([]);
-  const [nhanVienGiaoNhanOptions, setNhanVienGiaoNhanOptions] = useState<any[]>([]);
+  const [nhanVienGiaoNhan, setNhanVienGiaoNhan] = useState<any>();
   const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1 });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSubmit = (e: any) => {
     e.preventDefault();
     let info = {
-      ...infos, amount: parseInt(infos.amount.replace(/\D/g, ""), 10),thanhtien: parseInt(infos.thanhtien.replace(/\D/g, ""), 10), status: infos.status ? 0 : 1,
-     data:JSON.stringify(infos)
+      ...infos,
+      data: JSON.stringify(debits.map((x: any) => ({
+         fileInfoId: x.id,
+         fileName:x.file_number,
+         dienGiai:x.file_number+" KH_"+x.customerAbb,
+         receipt_total:x.receipt_total,
+         sumCH:x.sumCH,
+         sumHQ:x.sumHQ,
+         phaiTra:x.phaiTra
+      }))),
+      description:"Từ ngày "+Helper.formatDMY(new Date(fromDate))+" đến ngày "+Helper.formatDMY(new Date(toDate)),
+      amount:amount,
+      employeeId:employeeId,
+      typeReceipt:check_amount > 0 ? 3 : 2
     };
-    setLoading(true);
-    fetchDataSubmit(info);
+    console.log(info);
+    
+   // setLoading(true);
+   // fetchDataSubmit(info);
   };
   async function fetchDataSubmit(info: any) {
-   
-     if (info.id) {
-         const response = await updateReceiptChiGiaoNhan(info);
-       if (response) setLoading(false);
-       if (response.status === 200) {
-         if (response.data.status) {
-           setInfos({ ...refreshObject(infos), status: true });
-           dispatch(
-             showToast({ ...listToast[0], detail: response.data.message })
-           );
-           navigate("/receipt/listReceiptChiGiaoNhan");
-         } else {
-           dispatch(
-             showToast({ ...listToast[2], detail: response.data.message })
-           );
-         }
-       } else
-         dispatch(
-           showToast({ ...listToast[1], detail: response.data.message })
-         );
-     } else {
-       const response = await addReceiptChiGiaoNhan(info);
-       if (response) setLoading(false);
-       if (response.status === 200) {
-         if (response.data.status) {
-           setInfos({ ...refreshObject(infos), status: true });
-           dispatch(
-             showToast({ ...listToast[0], detail: response.data.message })
-           );
-           navigate("/receipt/listReceiptChiGiaoNhan");
-         } else {
-           dispatch(
-             showToast({ ...listToast[2], detail: response.data.message })
-           );
-         }
-       } else
-         dispatch(
-           showToast({ ...listToast[1], detail: response.data.message })
-         );
-     }
+    const response = await updateReceiptChiGiaoNhan(info);
+    if (response) setLoading(false);
+    if (response.status === 200) {
+      if (response.data.status) {
+        setInfos({ ...refreshObject(infos), status: true });
+        dispatch(
+          showToast({ ...listToast[0], detail: response.data.message })
+        );
+        onClose();
+      } else {
+        dispatch(
+          showToast({ ...listToast[2], detail: response.data.message })
+        );
+      }
+    } else
+      dispatch(
+        showToast({ ...listToast[1], detail: response.data.message })
+      );
   };
- const { data: ContractFile } = useListContractFile({
-     params: {f:"abc"},
-     debounce: 500,
- }); 
- useEffect(() => {
-  const list = ContractFile.data;
-  if (Array.isArray(list) && list.length > 0) {
-    const opts = list.map((x: any) => ({
-      label: x?.file_number ?? "(không tên)",
-      value: x.id,
-    }));
-    setContractFileOptions(opts);
-  }
-}, [ContractFile]);
 
    const { data: DMQuy } = useListFundCategoryWithState({type:1});
    const DMQuyOptions = useMemo(() => {
@@ -122,60 +102,27 @@ export default function UpdateHoanUngGiaoNhan({ debits, onClose }: { debits: any
      params: { keyword: "abc" },
      debounce: 500,
    });
+    const employeeOptions = useMemo(() => {
+      if (!Array.isArray(employees)) return [];
+      return employees.map((x: any,index:number) => ({
+        label: `${index+1}.${x.last_name ?? ""} ${x.first_name ?? ""}`.trim(),
+        value: x.id,
+      }));
+    }, [employees]);
   function GetBank(id:Number){
      const selected = DMBank.find((x: any) => x.id === id);
      setBankSelect(selected || {});
   }
-  function GetNhanVienGiaoNhan(fileId:Number){
-        setNhanVienGiaoNhanOptions([]);
-        setInfos({ ...infos, fileInfoId: fileId })
-        if (!Array.isArray(ContractFile?.data) || !Array.isArray(employees)) return setNhanVienGiaoNhanOptions([]);
-
-        // 1️⃣ Lấy file theo id
-        const file = ContractFile.data.find((x: any) => x.id === fileId);
-        if (!file || !Array.isArray(file.file_info_details)) return setNhanVienGiaoNhanOptions([]);
-
-        // 2️⃣ Lấy danh sách employee_id từ file_info_details
-        const employeeIds = file.file_info_details.map((x: any) => x.employee_id);
-        
-        // 3️⃣ Lọc các nhân viên tương ứng
-        const nhanVienGiaoNhan = employees.filter((e: any) => employeeIds.includes(e.id));
-        
-        // 4️⃣ Map ra option {label, value} nếu cần
-        const _nhanVienGiaoNhan = nhanVienGiaoNhan.map((e: any, i: number) => ({
-          label: `${i + 1}. ${e.last_name ?? ""} ${e.first_name ?? ""}`.trim(),
-          value: e.id,
-        }));
-        if(_nhanVienGiaoNhan.length > 0){
-            setNhanVienGiaoNhanOptions(_nhanVienGiaoNhan);
-        }
-  }
+ 
   useEffect(() => {
       const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
       setEmployeeInfo(employeeInfo);
-      if (id) {
-        showReceipt({ id: id, type: CategoryEnum.country }).then(res => {
-          const detail = res.data.data
-          if (detail) {
-            GetNhanVienGiaoNhan(detail.fileInfoId)
-            GetBank(detail.bankId)
-            const _nguoitao = employees.find((x: any) => x.user_id === detail.updatedBy);
-            setEmployeeInfo(_nguoitao);
-            detail.amount = Helper.formatCurrency(detail.receiptDetails[0].amount.toString())
-            detail.vat = detail.receiptDetails[0].vat
-            detail.thanhtien =Helper.formatCurrency((detail.receiptDetails[0].amount + (detail.receiptDetails[0].amount * detail.receiptDetails[0].vat/100)).toString())
-            let info = {
-              ...detail, status: detail.status === 0 ? true : false,
-            };
-            setInfos(info)
-            
-          }
-        }).catch(err => {
-          //setHasError(true)
-        });
+      // Chọn mặc định nhân viên giao nhận đầu tiên
+      if (employees && employees.length > 0) {
+          const _nvgiaonhan = employees.find((x:any)=>x.id == employeeId)
+          setNhanVienGiaoNhan(`${_nvgiaonhan.last_name ?? ""} ${_nvgiaonhan.first_name ?? ""}`.trim())
       }
-      
-    }, [ContractFile,id])
+    }, [employees])
   return (
     <>
       <UpdateForm       
@@ -189,6 +136,9 @@ export default function UpdateHoanUngGiaoNhan({ debits, onClose }: { debits: any
       >
         <div className="field">
           <Panel header="Thông tin">
+            <h3 className="field" style={{ textAlign: "center",textTransform: 'uppercase' }}>
+              {check_amount > 0 ? "Phiếu thu hoàn ứng giao nhận" : "Phiếu chi hoàn ứng giao nhận"} 
+            </h3>
             <div className="grid">
               <div className="col-8">
                 <div className="formgrid grid">
@@ -218,35 +168,15 @@ export default function UpdateHoanUngGiaoNhan({ debits, onClose }: { debits: any
                       ))}
                     </div>
                   </div>
-                  <div className="field col-6">
-                    <Dropdown
-                      filter
-                      value={infos.fileInfoId}
-                      optionValue="value"
-                      optionLabel="label"
-                      options={ContractFileOptions}
-                      label="Số file"
-                      className="w-full p-inputtext-sm"
-                      onChange={(e: any) =>
-                        GetNhanVienGiaoNhan(e.value)
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="field col-6">
-                    <Dropdown
-                      value={infos.employeeId}
-                      optionValue="value"
-                      optionLabel="label"
-                      options={nhanVienGiaoNhanOptions}
-                      label="Người giao nhận"
-                      className="w-full p-inputtext-sm"
-                      onChange={(e: any) =>
-                        setInfos({ ...infos, employeeId: e.value })
-                      }
-                      required
-                    />
-                  </div>
+                  <div className="field col-12">
+                     <Input
+                      id="sales"
+                      value={nhanVienGiaoNhan}
+                      className="w-full"
+                      label="Giao nhận"
+                      disabled
+                     />
+                  </div> 
                   <div className="field col-12">
                     <Input
                       id="sales"
@@ -260,70 +190,7 @@ export default function UpdateHoanUngGiaoNhan({ debits, onClose }: { debits: any
                     />
                   </div>
                   <div className="field col-12">
-                     <Dropdown
-                      filter
-                      value={infos.incomeExpenseCategoryId}
-                      optionValue="value"
-                      optionLabel="label"
-                      options={DMExpenseOptions}
-                      label="Lý do chi"
-                      className="w-full p-inputtext-sm"
-                      onChange={(e: any) =>
-                        setInfos({ ...infos, incomeExpenseCategoryId: e.value })
-                      }
-                      required
-                    />
-                  </div>
-                   <div className="field col-4">
-                    <InputForm className="w-full"
-                      id="Amount"
-                      value={infos.amount}
-                      onChange={(e: any) =>
-                         {
-                           setInfos({ ...infos, amount: Helper.formatCurrency(e.target.value )})
-                           const thanhtien  = parseInt(e.target.value.replace(/\D/g, ""),10) + ( infos.vat ? ( parseInt(e.target.value.replace(/\D/g, ""),10) * infos.vat ) / 100 : 0  );
-                           setInfos({ ...infos, amount: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
-                         }
-                      }
-                      label="Số tiền"
-                      required
-                    />
-                  </div>
-                   <div className="field col-4">
-                   <Dropdown
-                      value={infos.vat}
-                      optionValue="vat"
-                      optionLabel="name"
-                      options={VatDebit}
-                      label="VAT"
-                      className="w-full p-inputtext-sm"
-                      onChange={(e: any) =>
-                          {
-                             setInfos({ ...infos, vat: e.value })
-                             const thanhtien  = parseInt( infos.amount.replace(/\D/g, ""),10) + ( e.value ? ( parseInt( infos.amount.replace(/\D/g, ""),10) * e.value ) / 100 : 0  );
-                             setInfos({ ...infos, vat: e.value, thanhtien : Helper.formatCurrency(thanhtien.toString()) })
-                          }
-                      }
-                      required
-                    />
-                  </div>
-                   <div className="field col-4">
-                    <InputForm className="w-full"
-                      id="thanhtien"
-                      value={infos.thanhtien}
-                      label="Thành tiền"
-                      disabled
-                    />
-                  </div>
-                   <div className="field col-12">
-                    <InputForm className="w-full"
-                      id="bill"
-                      value={infos.bill}
-                      onChange={(e: any) =>
-                        setInfos({ ...infos, bill: e.target.value })
-                      }
-                      label="Số hóa đơn"
-                    />
+                    <InputForm className="w-full p-inputtext-sm" id="Amount" value={Helper.formatCurrency(amount.toString())} label="Số tiền" disabled />
                   </div>
                    <div className="field col-12">
                     <InputForm className="w-full"
@@ -334,6 +201,36 @@ export default function UpdateHoanUngGiaoNhan({ debits, onClose }: { debits: any
                       }
                       label="Diễn giải"
                     />
+                  </div>
+                   <div className="field col-12">
+                     <div><b>Thông tin chi tiết</b></div>
+                        <DataTable 
+                          rowHover 
+                          value={debits}
+                          scrollable
+                          scrollHeight="flex"
+                          style={{ flex: 1 }}
+                        >
+                            <Column 
+                              header="STT" 
+                              body={(rowData:any, options:any) => options.rowIndex + 1}
+                            />
+                            <Column 
+                              header="Diễn giải" 
+                              body={(row: any) => row.file_number+" KH_"+row.customerAbb }
+                            />
+                            <Column body={(row: any) => Helper.formatCurrency(row.receipt_total.toString())} header="Tạm ứng" />
+                            <Column body={(row: any) => Helper.formatCurrency((row.sumHQ+row.sumCH).toString())} header="Chi phí" />
+                            <Column 
+                              body={(row: any) => Helper.formatCurrency(row.phaiTra.toString())} 
+                              header="Hoàn lại" 
+                              footer={Helper.formatCurrency(
+                              debits.reduce((sum:any, item:any) => sum + (item.phaiTra || 0), 0)
+                              .toString()
+                                )}
+                              footerStyle={{ fontWeight: "bold" }}
+                            />
+                        </DataTable>
                   </div>
                 </div>
               </div>

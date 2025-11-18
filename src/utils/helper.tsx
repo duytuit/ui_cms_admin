@@ -145,6 +145,12 @@ export class Helper {
     };
     return object;
   };
+  static formatDMY (d: Date) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${day}-${m}-${y}`;
+  };
   static formatYMDLocal (d: Date) {
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -173,8 +179,18 @@ export class Helper {
   };
     // format tiền VN
   static formatCurrency(value: string) {
-    const numeric = value.replace(/\D/g, "");
-    return numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+      if (!value) return "0";
+      // Giữ lại dấu âm nếu có
+      const isNegative = value.startsWith("-");
+
+      // Lấy số và bỏ ký tự khác
+      const numeric = value.replace(/[^0-9]/g, "");
+
+      // Format dạng 1.234.567
+      const formatted = numeric.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+      // Trả lại số âm nếu ban đầu là âm
+      return isNegative ? "-" + formatted : formatted;
   };
   static camelToSnake(obj: any): any {
     if (Array.isArray(obj)) {
