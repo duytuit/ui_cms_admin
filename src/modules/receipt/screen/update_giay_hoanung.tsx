@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Column, DataTable, Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { formOfPayment, listToast, refreshObject, VatDebit } from "utils";
-import { updateReceipt, addReceipt, showReceipt, addReceiptChiGiaoNhan, updateReceiptChiGiaoNhan } from "../api";
+import { updateReceipt, addReceipt, showReceipt, addReceiptChiGiaoNhan, updateReceiptChiGiaoNhan, giayHoanUng } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
@@ -17,9 +17,10 @@ import { useListEmployee, useListEmployeeWithState } from "modules/employee/serv
 import { useListPartnerDetail } from "modules/partner/service";
 import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { useListContractFile } from "modules/ContractFile/service";
-export default function UpdateHoanUngGiaoNhan({ debits, onClose, employeeId,fromDate,toDate}: { debits: any, onClose: () => void,employeeId:number,fromDate:any,toDate:any }) {
+export default function UpdateGiayHoanUng({ debits, onClose, employeeId,fromDate,toDate}: { debits: any, onClose: () => void,employeeId:number,fromDate:any,toDate:any }) {
   const amount = Math.abs(debits.reduce((sum: number, item: any) => sum + (item.phaiTra || 0), 0));
   const check_amount = debits.reduce((sum: number, item: any) => sum + (item.phaiTra || 0), 0);
+  const description = "Từ ngày "+Helper.formatDMY(new Date(fromDate))+" đến ngày "+Helper.formatDMY(new Date(toDate));
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [doiTuongOptions, setDoiTuongOptions] = useState<any>([]);
@@ -43,18 +44,17 @@ export default function UpdateHoanUngGiaoNhan({ debits, onClose, employeeId,from
          sumHQ:x.sumHQ,
          phaiTra:x.phaiTra
       }))),
-      description:"Từ ngày "+Helper.formatDMY(new Date(fromDate))+" đến ngày "+Helper.formatDMY(new Date(toDate)),
+      description:description,
       amount:amount,
       employeeId:employeeId,
       typeReceipt:check_amount > 0 ? 3 : 2
     };
     console.log(info);
-    
-   // setLoading(true);
-   // fetchDataSubmit(info);
+    setLoading(true);
+    fetchDataSubmit(info);
   };
   async function fetchDataSubmit(info: any) {
-    const response = await updateReceiptChiGiaoNhan(info);
+    const response = await giayHoanUng(info);
     if (response) setLoading(false);
     if (response.status === 200) {
       if (response.data.status) {
@@ -129,71 +129,16 @@ export default function UpdateHoanUngGiaoNhan({ debits, onClose, employeeId,from
       >
         <div className="field">
           <Panel header="Thông tin">
-            <h3 className="field" style={{ textAlign: "center",textTransform: 'uppercase' }}>
-              {check_amount > 0 ? "Phiếu thu hoàn ứng giao nhận" : "Phiếu chi hoàn ứng giao nhận"} 
+            <h3 style={{ textAlign: "center",textTransform: 'uppercase' }}>
+                 Giấy hoàn ứng
             </h3>
+            <div className="field" style={{ textAlign: "center" }}><i>{description}</i></div> 
             <div className="grid">
-              <div className="col-8">
+              <div className="col-12">
                 <div className="formgrid grid">
-                  <div className="field col-6">
-                    <MyCalendar dateFormat="dd/mm/yy"
-                      value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
-                      onChange={(e: any) =>
-                      setInfos({ ...infos, accountingDate: e })}
-                      className={classNames("w-full", "p-inputtext", "input-form-sm")} />
-                  </div>
-                 <div className="field col-6">
-                    <label htmlFor="">Hình thức thanh toán</label>
-                    <div className="flex flex-wrap gap-3">
-                      {formOfPayment.map((item) => (
-                        <div key={item.value} className="flex align-items-center">
-                          <RadioButton
-                            inputId={`payment_${item.value}`}
-                            name="formOfPayment"
-                            value={item.value}
-                            onChange={(e: any) => setInfos({ ...infos, formOfPayment: e.value })}
-                            checked={infos.formOfPayment == item.value}
-                          />
-                          <label htmlFor={`payment_${item.value}`} className="ml-2">
-                            {item.name}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                   <div className="field col-12">
-                     <Input
-                      id="sales"
-                      value={nhanVienGiaoNhan}
-                      className="w-full"
-                      label="Giao nhận"
-                      disabled
-                     />
-                  </div> 
-                  <div className="field col-12">
-                    <Input
-                      id="sales"
-                      value={employeeInfo ? `${employeeInfo.last_name ?? ''} ${employeeInfo.first_name ?? ''}`.trim() : ''}
-                      onChange={(e: any) =>
-                        setInfos({ ...infos, sales: e.target.value })
-                      }
-                      className="w-full"
-                      label="Người tạo phiếu"
-                      disabled
-                    />
-                  </div>
-                  <div className="field col-12">
-                    <InputForm className="w-full p-inputtext-sm" id="Amount" value={Helper.formatCurrency(amount.toString())} label="Số tiền" disabled />
-                  </div>
-                   <div className="field col-12">
-                    <InputForm className="w-full"
-                      id="note"
-                      value={infos.note}
-                      onChange={(e: any) =>
-                        setInfos({ ...infos, note: e.target.value })
-                      }
-                      label="Diễn giải"
-                    />
+                     <div>Ngày tạo: {Helper.formatDMY(new Date(infos.accountingDate))}</div>
+                     <div>Họ và tên: {nhanVienGiaoNhan}</div>
                   </div>
                    <div className="field col-12">
                      <div><b>Thông tin chi tiết</b></div>
@@ -226,47 +171,6 @@ export default function UpdateHoanUngGiaoNhan({ debits, onClose, employeeId,from
                         </DataTable>
                   </div>
                 </div>
-              </div>
-              <div className="col-4">
-                 { infos.formOfPayment == 2 && <div className="formgrid grid">
-                    <div className="col-12">
-                      <Dropdown
-                      value={infos.bankId}
-                      optionValue="value"
-                      optionLabel="label"
-                      options={DMBankOptions}
-                      label="Tài khoản ngân hàng"
-                      className="w-full p-inputtext-sm"
-                      onChange={(e: any) =>
-                        {
-                          setInfos({ ...infos, bankId: e.value })
-                          GetBank(e.value)
-                        }
-                      }
-                    />
-                    </div>
-                    <div className="col-12">
-                        <div className="mt-4"><b>Số tài khoản:</b>{bankSelect.account_number}</div>
-                        <div className="mt-4"><b>Chủ tài khoản:</b>{bankSelect.bank_name}</div>
-                        <div className="mt-4"><b>Chi nhánh:</b>{bankSelect.branch_name}</div>
-                    </div>
-                 </div>}
-                  { infos.formOfPayment == 1 &&<div className="formgrid grid">
-                    <div className="field col-12">
-                        <Dropdown
-                          value={infos.fundId}
-                          optionValue="value"
-                          optionLabel="label"
-                          options={DMQuyOptions}
-                          label="Loại quỹ"
-                          className="w-full p-inputtext-sm"
-                          onChange={(e: any) =>
-                            setInfos({ ...infos, fundId: e.value })
-                          }
-                        />
-                     </div>
-                 </div>}
-                 
               </div>
             </div>
           </Panel>

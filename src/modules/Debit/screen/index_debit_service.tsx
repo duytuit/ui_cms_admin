@@ -4,22 +4,20 @@ import { Calendar, CalendarY, Dropdown, GridForm, Input } from "components/commo
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
-import { useDispatch, useSelector } from "react-redux";
-import { loaiHang, loaiToKhai, nghiepVu, phatSinh, tinhChat, typeDebit, typeService } from "utils";
+import { typeDebit } from "utils";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
 import { Button, Checkbox, DataTable, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { useListContractFile, useListContractFileHasDebitService, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
-import { deleteContractFile } from "modules/ContractFile/api";
+import { useListContractFileHasDebitService, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
 import UpdateDebitChiPhi from "./update_service";
-import { deleteDebit, deleteMultiDebit } from "../api";
-import UpdateHoanUngGiaoNhan from "modules/receipt/screen/update_hoanung_giao_nhan";
+import { deleteMultiDebit } from "../api";
+import UpdateGiayHoanUng from "modules/receipt/screen/update_giay_hoanung";
 
 // ✅ Component Header lọc dữ liệu
-const Header = ({ _setParamsPaginator, _paramsPaginator, selected }: any) => {
+const Header = ({ _setParamsPaginator, _paramsPaginator, selected ,refreshHasDebitDispatch}: any) => {
     const [visible, setVisible] = useState(false);
     const [filter, setFilter] = useState({ name: "", customerDetailId: "" ,fromDate:Helper.lastWeekString(),toDate:Helper.toDayString()});
     const { data: customerDetails } = useListCustomerDetailWithState({status:1});
@@ -31,11 +29,12 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selected }: any) => {
             value: x.id,
         }));
     }, [customerDetails]);
-    const openDialogAdd = (e:any) => {
+     const openDialogAddHoanUng = (e:any) => {
        setVisible(true)
     };
-    const handleModalClose = () => {
+    const handleModalCloseHoanUng = () => {
        setVisible(false);
+       refreshHasDebitDispatch?.(); 
     };
     useEffect(() => {
         // Mỗi khi filter thay đổi => cập nhật params
@@ -56,6 +55,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selected }: any) => {
             filter={filter}
             setFilter={setFilter}
             className="lg:col-9"
+            openDialogAdd={()=>openDialogAddHoanUng(1)}
         >
             <div className="col-2">
                 <Input
@@ -92,6 +92,17 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selected }: any) => {
                 />
             </div>
         </GridForm>
+          <Dialog
+              position="top"
+              dismissableMask
+              visible={visible}
+              onHide={() => setVisible(false)}
+              style={{ width: "40vw", top:"30px" }}
+          >
+            <p className="m-0">
+              {selected && <UpdateGiayHoanUng debits={selected} onClose={handleModalCloseHoanUng} employeeId={_paramsPaginator.EmployeeId}  fromDate={filter.fromDate} toDate={filter.toDate}  ></UpdateGiayHoanUng>}
+            </p>
+        </Dialog>
       </>
        
     );
@@ -202,7 +213,7 @@ export default function ListContractFileBangKe() {
     return (
       <>
         <div className="card">
-            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} selected={selectedDebitServiceRows} />
+            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} selected={selectedDebitServiceRows} refreshHasDebitDispatch={refreshHasDebitDispatch} />
               <div style={{ height: 'calc(100vh - 8rem)' }}>
                       <Splitter style={{ height: '100%', width: '100%' }}>
                         {/* Panel 1 */}
@@ -324,43 +335,48 @@ export default function ListContractFileBangKe() {
                                       >
                                         {/* Custom checkbox column */}
                                         <Column
-                                            header={
-                                                <Checkbox
-                                                    checked={
-                                                        selectedDebitServiceRows.length > 0 &&
-                                                        selectedDebitServiceRows.length === displayDebitServiceData.length
-                                                    }
-                                                    onChange={(e:any) => {
-                                                        if (e.checked) {
-                                                            // Lưu nguyên rowData
-                                                            setSelectedDebitServiceRows([...displayDebitServiceData]);
-                                                        } else {
-                                                            setSelectedDebitServiceRows([]);
-                                                        }
-                                                    }}
-                                                />
-                                            }
-                                            body={(rowData: any) => {
-                                                const isChecked =
-                                                    selectedDebitServiceRows.findIndex(x => x.id === rowData.id) !== -1;
+                                            header={(rowData: any) => {
+                                                const selectableRows = displayDebitServiceData.filter(row => row.re_status == null && row.cf_status_confirm == 1);
                                                 return (
-                                                    <Checkbox
-                                                        className="p-checkbox-sm"
-                                                        checked={isChecked}
-                                                        onChange={(e:any) => {
-                                                            if (e.checked) {
-                                                                // thêm cả object
-                                                                setSelectedDebitServiceRows(prev => [...prev, rowData]);
-                                                            } else {
-                                                                // xoá theo id
-                                                                setSelectedDebitServiceRows(prev =>
-                                                                    prev.filter(x => x.id !== rowData.id)
-                                                                );
-                                                            }
-                                                        }}
-                                                        onClick={(e:any) => e.stopPropagation()}
-                                                    />
-                                                );
+                                                  <Checkbox
+                                                      checked={
+                                                          selectedDebitServiceRows.length > 0 &&
+                                                          selectedDebitServiceRows.length === selectableRows.length
+                                                      }
+                                                      onChange={(e:any) => {
+                                                          if (e.checked) {
+                                                              // Lưu nguyên rowData
+                                                              const selectableRows = displayDebitServiceData.filter(row => row.re_status == null && row.cf_status_confirm == 1);
+                                                              setSelectedDebitServiceRows([...selectableRows]);
+                                                          } else {
+                                                              setSelectedDebitServiceRows([]);
+                                                          }
+                                                      }}
+                                                  />
+                                                )
+                                            }}
+                                            body={(rowData: any) => {
+                                                const isChecked = selectedDebitServiceRows.findIndex(x => x.id === rowData.id) !== -1;
+                                                if(rowData.re_status == null && rowData.cf_status_confirm == 1){
+                                                    return (
+                                                        <Checkbox
+                                                            className="p-checkbox-sm"
+                                                            checked={isChecked}
+                                                            onChange={(e:any) => {
+                                                                if (e.checked) {
+                                                                    // thêm cả object
+                                                                    setSelectedDebitServiceRows(prev => [...prev, rowData]);
+                                                                } else {
+                                                                    // xoá theo id
+                                                                    setSelectedDebitServiceRows(prev =>
+                                                                        prev.filter(x => x.id !== rowData.id)
+                                                                    );
+                                                                }
+                                                            }}
+                                                            onClick={(e:any) => e.stopPropagation()}
+                                                        />
+                                                    );
+                                                }
                                             }}
                                             style={{ width: "3em" }}
                                         />
@@ -387,7 +403,13 @@ export default function ListContractFileBangKe() {
                                             return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
                                           }
                                         }} filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="file_number" header="Số chứng từ" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column header="Trạng thái hoàn ứng" body={(row: any) => {
+                                          if(row.re_status == 0){
+                                            return <Button label="chưa xử lý" rounded severity="warning" size="small" text  />
+                                          }else if(row.re_status == 1){
+                                            return <Button label="đã xử lý" rounded severity="success" size="small" text  />
+                                          }
+                                        }} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
