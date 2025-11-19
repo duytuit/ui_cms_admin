@@ -45,6 +45,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selected ,refreshHasDeb
             fromDate: filter.fromDate,
             toDate:filter.toDate,
         }));
+      
     }, [filter]);
 
     return (

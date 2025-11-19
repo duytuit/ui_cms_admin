@@ -27,6 +27,7 @@ export default function UpdateGiayHoanUng({ debits, onClose, employeeId,fromDate
   const [employeeInfo, setEmployeeInfo] = useState<any>({});
   const [bankSelect, setBankSelect] = useState<any>({});
   const [ContractFileOptions, setContractFileOptions] = useState<any[]>([]);
+  const [debitRows, setDebitRows] = useState<any[]>([]);
   const [nhanVienGiaoNhan, setNhanVienGiaoNhan] = useState<any>();
   const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1 });
   const dispatch = useDispatch();
@@ -115,7 +116,10 @@ export default function UpdateGiayHoanUng({ debits, onClose, employeeId,fromDate
           const _nvgiaonhan = employees.find((x:any)=>x.id == employeeId)
           setNhanVienGiaoNhan(`${_nvgiaonhan.last_name ?? ""} ${_nvgiaonhan.first_name ?? ""}`.trim())
       }
-    }, [employees])
+      if(debits && debits.length > 0){
+         setDebitRows(debits)
+      }
+    }, [debits,employees])
   return (
     <>
       <UpdateForm       
@@ -144,7 +148,7 @@ export default function UpdateGiayHoanUng({ debits, onClose, employeeId,fromDate
                      <div><b>Thông tin chi tiết</b></div>
                         <DataTable 
                           rowHover 
-                          value={debits}
+                          value={debitRows}
                           scrollable
                           scrollHeight="flex"
                           style={{ flex: 1 }}

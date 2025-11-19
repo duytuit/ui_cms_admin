@@ -31,7 +31,7 @@ import UpdateProduct from "modules/product/screen/update";
 import ListReceiptChiGiaoNhan from "modules/receipt/screen/index_chi_giao_nhan";
 import ListReceipt from "modules/receipt/screen/index_chi_giao_nhan";
 import Receipt from "modules/receipt/screen/index_chi_tam_ung";
-import ListChiPhiGiaoNhan from "modules/receipt/screen/index_chiphi_giaonhan";
+import ListChiPhiGiaoNhan from "modules/receipt/screen/index_xn_chiphi_giaonhan";
 import UpdateReceipt from "modules/receipt/screen/update";
 import UpdateReceiptChiGiaoNhan from "modules/receipt/screen/update_chi_giao_nhan";
 import Service from "modules/service/screen";

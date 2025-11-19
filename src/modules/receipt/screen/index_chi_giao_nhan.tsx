@@ -40,7 +40,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
 
 export default function ListReceiptChiGiaoNhan() {
     const { handleParamUrl } = useHandleParamUrl();
-    const [selectedRows, setSelectedRows] = useState<any>([]);
     const [displayData, setDisplayData] = useState<any>();
     const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -72,7 +71,7 @@ export default function ListReceiptChiGiaoNhan() {
         keyword: "",
     });
     const { data, loading, error, refresh } = useListReceipt({
-        params: paramsPaginator,
+        params: {...paramsPaginator, TypeReceipt:1 },
         debounce: 500,
     });
     const { data: ContractFile } = useListContractFileWithState({
