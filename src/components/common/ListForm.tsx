@@ -71,7 +71,7 @@ export const Dropdown = (props:any) => {
 };
 
 export const GridForm = (props:any) => {
-    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam, add , openDialogAdd} = props;
+    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam, add , openDialogAdd, openDialogAddName} = props;
     const handleClear = (e:any) => {
         setParamsPaginator(defaultParam);
         refreshObject(filter)
@@ -102,7 +102,7 @@ export const GridForm = (props:any) => {
                     </Link>}
                     {openDialogAdd &&
                         <Button
-                            label="Tạo hoàn ứng giao nhận"
+                            label={openDialogAddName??"Tạo hoàn ứng giao nhận"}
                             type="button"
                             icon="pi pi-plus"
                             severity="success"

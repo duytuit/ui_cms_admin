@@ -16,15 +16,17 @@ import UpdateDebitDispatchFile from "./update_dispatch";
 import { useListDebitDispatch } from "../service";
 import { deleteDebit } from "../api";
 import { listContractFileNotDispatch } from "modules/ContractFile/api";
+import UpdateDebitDispatchFileCustom from "./update_dispatch_custom";
 
 // ✅ Component Header lọc dữ liệu
-const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
+const Header = ({ _setParamsPaginator, _paramsPaginator,refreshDebitDispatch }: any) => {
   const [filter, setFilter] = useState({
     name: "",
     customerDetailId: "",
     fromDate: Helper.lastWeekString(),
     toDate: Helper.toDayString(),
   });
+  const [visible, setVisible] = useState(false);
   const { data: customerDetails } = useListCustomerDetailWithState({status: 1});
   // --- chuyển sang options bằng useMemo ---
   const customerOptions = useMemo(() => {
@@ -34,6 +36,13 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
       value: x.id,
     }));
   }, [customerDetails]);
+     const openDialogAdd = (e:any) => {
+       setVisible(true)
+    };
+    const handleModalClose = () => {
+       setVisible(false);
+       refreshDebitDispatch?.();
+    };
   useEffect(() => {
     // Mỗi khi filter thay đổi => cập nhật params
     _setParamsPaginator((prev: any) => ({
@@ -46,12 +55,15 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   }, [filter]);
 
   return (
+    <>
     <GridForm
       paramsPaginator={_paramsPaginator}
       setParamsPaginator={_setParamsPaginator}
       filter={filter}
       setFilter={setFilter}
       className="lg:col-9"
+      openDialogAdd={()=>openDialogAdd(1)}
+      openDialogAddName="Tạo điều xe"
     >
       <div className="col-2">
         <MyCalendar
@@ -83,6 +95,23 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
         />
       </div>
     </GridForm>
+     <Dialog
+        position="top"
+        dismissableMask
+        header="Tạo điều xe theo số file"
+        visible={visible}
+        onHide={() => setVisible(false)}
+        style={{ width: "78vw" }}
+      >
+        <p className="m-0">
+          {
+            <UpdateDebitDispatchFileCustom
+              onClose={handleModalClose}
+            ></UpdateDebitDispatchFileCustom>
+          }
+        </p>
+      </Dialog>
+    </>
   );
 };
 
@@ -142,7 +171,7 @@ export default function ListCreateDispatch() {
       const _fileContract = contractFile.find((x: any) => x.id === row.file_info_id);
       const _customer = partners.find((x: any) => x.id === row.customer_detail_id);
       const _supplier = partners.find((x: any) => x.id === row.supplier_detail_id);
-      console.log(contractFile);
+      console.log("partners",_customer?.partners?.abbreviation);
       
       return {
         ...row,
@@ -173,6 +202,7 @@ export default function ListCreateDispatch() {
         <Header
           _paramsPaginator={paramsPaginator}
           _setParamsPaginator={setParamsPaginator}
+          refreshDebitDispatch={refreshDebitDispatch}
         />
         <div style={{ height: 'calc(100vh - 8rem)' }}>
           <Splitter style={{ height: '100%', width: '100%' }}>
@@ -330,13 +360,15 @@ export default function ListCreateDispatch() {
                               }}
                           />
                           <Column header="Trạng thái" body={(row: any) => {
-                            if(row.cf_status_confirm == 1){
+                            if(row.cf_status_confirm == 1 && row.file_info_id !=null){
                               return <Button label="đã duyệt" rounded severity="success" size="small" text  />
-                            }else{
+                            }else if(row.cf_status_confirm == 0 && row.file_info_id !=null){
                               return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
+                            }else{
+                              return <Button label="không file" rounded severity="success" size="small" text  />
                             }
                           }} filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="f_accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.f_accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="dispatch_code" header="Mã điều xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { listContractFile, listContractFileHasDebitNangHa, listContractFileHasDebitService, listContractFileHasFileGia, listContractFileNotDebitNangHa, listContractFileNotDispatch, listContractFileNotFileGia, listContractFileNotService, listSelectContractFile } from '../api';
 import { useDispatch, useSelector } from 'react-redux';
 import { setListFileContract, setListSelectFileContract } from 'redux/features/fileContract';
@@ -241,7 +241,6 @@ export const useListContractFileHasFileGia = ({ params, debounce = 500 }: any) =
 export const useListContractFileWithState = (params : any)  => {
     const dispatch = useDispatch();
     const lists = useSelector((state: any) => state.fileContract.list);
-
     const [data, setData] = useState<any>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
@@ -269,6 +268,7 @@ export const useListContractFileWithState = (params : any)  => {
         } else {
             setData(lists); // lấy redux
         }
+        
     }, []); // thêm customers vào deps
 
     return { data, loading, error, refresh: fetchData };
