@@ -132,7 +132,6 @@ export default function ListContractFileBangKe() {
     });
     const { data, loading, error, refresh } = useListContractFileNotService({ params: paramsPaginator, debounce: 500,});
     const { data: debitService, refresh:refreshHasDebitDispatch } = useListContractFileHasDebitService({ params: {...paramsPaginator,},debounce: 500,});
-    const { data: contractFile } = useListContractFileWithState({});
     const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
     const { data: listUser } = useListUserWithState({});
     const { data: listEmployee } = useListEmployeeWithState({});
@@ -149,6 +148,7 @@ export default function ListContractFileBangKe() {
     // ✅ Client-side pagination
     useEffect(() => {
         if (!data) return;
+        console.log(listCustomer);
         handleParamUrl(paramsPaginator);
         const mapped = (data?.data || []).map((row: any) => {
             const cus = listCustomer.find((x: any) => x.id === row.customer_detail_id);

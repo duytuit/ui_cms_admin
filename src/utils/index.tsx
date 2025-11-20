@@ -174,6 +174,22 @@ export const typeDebit = [
     {
      type:4,
      name:"Phí khác"
+   },
+    {
+     type:5,
+     name:"Đầu kỳ KH"
+   },
+    {
+     type:6,
+     name:"Đầu kỳ NCC"
+   },
+    {
+     type:7,
+     name:"Mua hàng NCC"
+   },
+    {
+     type:8,
+     name:"Bán hàng KH"
    }
 ];
 export const statusDebit = [

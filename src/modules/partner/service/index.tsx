@@ -92,7 +92,7 @@ export const useListCustomerDetailWithState = (params : any)  => {
         } else {
             setData(customers); // lấy redux
         }
-    }, [shouldFetch]); // thêm customers vào deps
+    }, [JSON.stringify(params)]); // thêm customers vào deps
 
     return { data, loading, error, refresh: fetchData };
 };
