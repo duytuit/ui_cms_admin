@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { listPartner, listPartnerDetail } from '../api';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCustomer, setListPartner } from 'redux/features/partner';
+import { setCustomer, setListPartner, setSupplier } from 'redux/features/partner';
 
 export const useListPartner = ({ params, debounce = 500 }: any) => {
     const [data, setData] = useState<any>([]);
@@ -113,7 +113,7 @@ export const useListSupplierDetailWithState = (params : any)  => {
             setError(null);
             const res = await listPartnerDetail({...params});
             const arr = res?.data?.data?.data || [];
-            dispatch(setCustomer(arr)); // đẩy redux luôn
+            dispatch(setSupplier(arr)); // đẩy redux luôn
             setData(arr);               // set local luôn
         } catch (err) {
             setError(err);
