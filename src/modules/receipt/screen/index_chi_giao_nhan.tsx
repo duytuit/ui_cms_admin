@@ -7,7 +7,7 @@ import { classNames } from "primereact/utils";
 import { useListReceipt } from "../service";
 import { deleteReceipt } from "../api";
 import { useListEmployeeWithState } from "modules/employee/service";
-import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
+import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
 import { Helper } from "utils/helper";
 import { formOfPayment } from "utils";
 import { useListContractFile, useListContractFileWithState } from "modules/ContractFile/service";
@@ -79,7 +79,7 @@ export default function ListReceiptChiGiaoNhan() {
          debounce: 500,
     }); 
     const { data: employees } = useListEmployeeWithState({});
-    const { data: DMExpense } = useListIncomeExpenseWithState({type:1}); // danh mục chi phí
+    const { data: DMExpense } = useListExpenseWithState({type:1}); // danh mục chi phí
     const { data: DMBank } = useListBankWithState({type:1});
     const { data: DMQuy } = useListFundCategoryWithState({type:1});
     // ✅ Client-side pagination

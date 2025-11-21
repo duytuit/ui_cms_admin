@@ -97,7 +97,7 @@ const model = [{
               {
                 id: 1,
                 name: 'Số dư đầu kỳ KH',
-                route: '/page-two',
+                route: '/debit/ListDauKyKh',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -108,7 +108,7 @@ const model = [{
               {
                 id: 1,
                 name: 'Số dư đầu kỳ NCC',
-                route: '/page-two',
+                route: '/debit/ListDauKyNcc',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -146,7 +146,7 @@ const model = [{
           {
             id: 1,
             name: 'Danh sách cược',
-            route: '/page-two',
+            route: '/debit/listCuoc',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -157,7 +157,7 @@ const model = [{
           {
             id: 1,
             name: 'Bảng tạm thu',
-            route: '/page-two',
+            route: '/debit/listTamThu',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -205,7 +205,7 @@ const model = [{
       },
         {
         id: 1,
-        name: 'Mua - Bán hàng',
+        name: 'Mua-Bán hàng',
         route: '/page-two',
         created_at: '2023-05-29 14:14:02',
         updated_at: null,
@@ -217,19 +217,8 @@ const model = [{
         items: [
           {
             id: 1,
-            name: 'Mua hàng',
-            route: '/page-two',
-            created_at: '2023-05-29 14:14:02',
-            updated_at: null,
-            deleted_at: null,
-            status: 1,
-            category_id: 1,
-            sort: 1,
-          },
-          {
-            id: 1,
-            name: 'Bán hàng',
-            route: '/page-two',
+            name: 'Chứng từ mua-bán',
+            route: '/debit/ListMuaBan',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,

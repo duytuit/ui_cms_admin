@@ -10,11 +10,19 @@ import UpdateContractFile from "modules/ContractFile/screen/update";
 import Customer from "modules/customer/screen";
 import UpdateCustomer from "modules/customer/screen/update";
 import DashBoard from "modules/dashboard/screen";
+import ListBanHangKh from "modules/Debit/screen/index_muaban";
 import ListConfirmFileGia from "modules/Debit/screen/index_confirm_debit_file_gia";
+import ListCuoc from "modules/Debit/screen/index_cuoc";
+import ListDauKyKh from "modules/Debit/screen/index_dauky_kh";
+import ListDauKyNcc from "modules/Debit/screen/index_dauky_ncc";
 import ListCreateDispatch from "modules/Debit/screen/index_debit_dispatch";
 import ListFileGia from "modules/Debit/screen/index_debit_file_gia";
 import ListContractFileBangKe from "modules/Debit/screen/index_debit_service";
 import ListContractFileNangHa from "modules/Debit/screen/index_debit_service_nh";
+import ListTamThu from "modules/Debit/screen/index_tamthu";
+import UpdateBanHangKh from "modules/Debit/screen/update_muaban";
+import UpdateDauKyKh from "modules/Debit/screen/update_dauky_kh";
+import UpdateDauKyNCC from "modules/Debit/screen/update_dauky_ncc";
 import ListDepartment from "modules/department/screen";
 import UpdateDepartment from "modules/department/screen/update";
 import ListEmployee from "modules/employee/screen";
@@ -41,6 +49,8 @@ import UpdateStorages from "modules/storage/screen/update";
 import User from "modules/user/screen";
 import ListVehicle from "modules/VehicleDispatch/screen";
 import UpdateVehicle from "modules/VehicleDispatch/screen/update";
+import ListMuaBan from "modules/Debit/screen/index_muaban";
+import UpdateMuaBan from "modules/Debit/screen/update_muaban";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -123,9 +133,19 @@ const publicRoutes = [
   { path: "/receipt/detail/chigiaonhan/:id", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
   { path: "/receipt/detail/:id", component: UpdateReceipt, layout: 'DetailReceipt' },
   // Debit 
-  // { path: "/debit/list", component: ListDebit, layout: 'ListDebit' },
-  // { path: "/debit/add", component: UpdateDebit, layout: 'UpdateDebit' },
-  // { path: "/debit/detail/:id", component: UpdateDebit, layout: 'UpdateDebit' },
+  { path: "/debit/listCuoc", component: ListCuoc, layout: 'ListCuoc' },
+  { path: "/debit/listTamThu", component: ListTamThu, layout: 'ListTamThu' },
+  { path: "/debit/ListDauKyKh", component: ListDauKyKh, layout: 'ListDauKyKh' },
+  { path: "/debit/addDauKyKh", component: UpdateDauKyKh, layout: 'UpdateDauKyKh' },
+  { path: "/debit/detailDauKyKh/:id", component: UpdateDauKyKh, layout: 'UpdateDauKyKh' },
+  { path: "/debit/ListDauKyNcc", component: ListDauKyNcc, layout: 'ListDauKyNcc' },
+  { path: "/debit/addDauKyNCC", component: UpdateDauKyNCC, layout: 'UpdateDauKyNCC' },
+  { path: "/debit/detailDauKyNCC/:id", component: UpdateDauKyNCC, layout: 'UpdateDauKyNCC' },
+
+  { path: "/debit/ListMuaBan", component: ListMuaBan, layout: 'ListMuaBan' },
+  { path: "/debit/addMuaBan", component: UpdateMuaBan, layout: 'UpdateMuaBan' },
+  { path: "/debit/detailMuaBan/:id", component: UpdateMuaBan, layout: 'UpdateMuaBan' },
+  //{ path: "/debit/detail/:id", component: UpdateDebit, layout: 'UpdateDebit' },
   // { path: "/auth/forgotpassword", component: ForgotPassword, layout: null, public: true },
   // { path: "/auth/verifyaccount", component: VerifyAccount, layout: null, public: true },
   // { path: "/auth/changepassword", component: ChangePassword, layout: null },

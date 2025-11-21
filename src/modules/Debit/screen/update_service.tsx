@@ -16,7 +16,7 @@ import { Button } from "primereact/button";
 import React from "react";
 import { showContractFile } from "modules/ContractFile/api";
 import { useListPartnerDetail } from "modules/partner/service";
-import { useListIncomeExpenseWithState, useListServiceCategoryWithState } from "modules/categories/service";
+import { useListServiceCategoryWithState } from "modules/categories/service";
 export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onClose: () => void, price:number }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});

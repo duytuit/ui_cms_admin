@@ -9,5 +9,6 @@ export const giayHoanUng = (params:any) => postData("receipt/create/giayHoanUng"
 export const addReceiptChiGiaoNhan = (params:any) => postData("receipt/create/chigiaonhan", params);
 export const updateReceiptChiGiaoNhan = (params:any) => postData("receipt/update/chigiaonhan", params);
 export const showReceipt = (params:any) => getData("receipt/show", params);
+export const showWithDebit = (params:any) => getData("receipt/showWithDebit", params);
 export const updateReceipt = (params:any) => postData("receipt/update", params);
 export const updateStatusReceipt = (params:any) => postData("receipt/update/status", params);

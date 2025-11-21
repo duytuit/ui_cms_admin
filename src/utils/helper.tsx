@@ -179,7 +179,7 @@ export class Helper {
   };
     // format tiền VN
   static formatCurrency(value: string) {
-      if (!value) return "0";
+      if (!value) return "";
       // Giữ lại dấu âm nếu có
       const isNegative = value.startsWith("-");
 
@@ -203,5 +203,8 @@ export class Helper {
       }, {} as any);
     }
     return obj;
+  }
+  static toInt (v: any){
+     return v == null ? "" : typeof v === "number" ? v : parseInt(String(v).replace(/\D/g, ""), 10) || "";
   }
 }

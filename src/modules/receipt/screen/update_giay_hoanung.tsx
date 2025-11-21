@@ -15,7 +15,7 @@ import { Helper } from "utils/helper";
 import { Dropdown, Input } from "components/common/ListForm";
 import { useListEmployee, useListEmployeeWithState } from "modules/employee/service";
 import { useListPartnerDetail } from "modules/partner/service";
-import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
+import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
 import { useListContractFile } from "modules/ContractFile/service";
 export default function UpdateGiayHoanUng({ debits, onClose, employeeId,fromDate,toDate}: { debits: any, onClose: () => void,employeeId:number,fromDate:any,toDate:any }) {
   const amount = Math.abs(debits.reduce((sum: number, item: any) => sum + (item.phaiTra || 0), 0));
@@ -83,7 +83,7 @@ export default function UpdateGiayHoanUng({ debits, onClose, employeeId,fromDate
          value: x.id,
        }));
      }, [DMQuy]);
-   const { data: DMExpense } = useListIncomeExpenseWithState({type:1}); // danh mục chi phí
+   const { data: DMExpense } = useListExpenseWithState({type:1}); // danh mục chi phí
    const DMExpenseOptions = useMemo(() => {
        if (!Array.isArray(DMExpense)) return [];
        return DMExpense.map((x: any) => ({

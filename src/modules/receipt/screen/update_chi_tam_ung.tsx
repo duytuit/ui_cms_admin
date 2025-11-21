@@ -15,7 +15,7 @@ import { Helper } from "utils/helper";
 import { Dropdown, Input } from "components/common/ListForm";
 import { useListEmployee } from "modules/employee/service";
 import { useListPartnerDetail } from "modules/partner/service";
-import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState, useListServiceCategoryWithState } from "modules/categories/service";
+import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState, useListServiceCategoryWithState } from "modules/categories/service";
 import { useListContractFile, useListContractFileWithState } from "modules/ContractFile/service";
 export default function UpdateReceiptChiTam() {
   const { id } = useParams();
@@ -89,7 +89,7 @@ export default function UpdateReceiptChiTam() {
          value: x.id,
        }));
      }, [DMQuy]);
-   const { data: DMExpense } = useListIncomeExpenseWithState({type:1}); // danh mục chi phí
+   const { data: DMExpense } = useListExpenseWithState({type:1}); // danh mục chi phí
    const DMExpenseOptions = useMemo(() => {
        if (!Array.isArray(DMExpense)) return [];
        return DMExpense.map((x: any) => ({
@@ -185,19 +185,16 @@ export default function UpdateReceiptChiTam() {
           };
           setInfos(info)
           // set doiTuongOptions according to returned type_doi_tuong
-       
         }
       }).catch(err => {
         //setHasError(true)
       });
     }
-
       // initialize with default mapped partner options
       setDoiTuongOptions(partnerOptions)
       const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
       setEmployeeInfo(employeeInfo);
       console.log(employeeInfo);
-      
     }, [DMExpenseOptions,DMQuyOptions,DMBankOptions,partnerOptions, partnerVenderOptions, nhanviengiaonhanOptions, id])
   return (
     <>

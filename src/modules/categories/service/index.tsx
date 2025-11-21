@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setBank, setFundCategory, setIncomeExpense, setServiceCategory, setServiceCategoryChiHo } from 'redux/features/category';
+import { setBank, setExpense, setFundCategory, setIncome, setIncomeExpense, setServiceCategory, setServiceCategoryChiHo } from 'redux/features/category';
 import { listBank, listFundCategory, listIncomeExpense, listServiceCategory } from '../api';
 
 export const useListServiceCategory = ({ params, debounce = 500 }: any) => {
@@ -126,6 +126,76 @@ export const useListIncomeExpenseWithState = (params : any)  => {
             fetchData();
         } else {
             setData(IncomeExpenses); // lấy redux
+        }
+    }, []); // thêm customers vào deps
+
+    return { data, loading, error, refresh: fetchData };
+};
+export const useListExpenseWithState = (params : any)  => {
+    const dispatch = useDispatch();
+    const Expenses = useSelector((state: any) => state.category.Expense);
+
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const shouldFetch = !Array.isArray(Expenses) || Expenses.length === 0;
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listIncomeExpense({...params});
+            const arr = res?.data?.data?.data || [];
+            dispatch(setExpense(arr)); // đẩy redux luôn
+            setData(arr);               // set local luôn
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (shouldFetch) {
+            fetchData();
+        } else {
+            setData(Expenses); // lấy redux
+        }
+    }, []); // thêm customers vào deps
+
+    return { data, loading, error, refresh: fetchData };
+};
+export const useListIncomeWithState = (params : any)  => {
+    const dispatch = useDispatch();
+    const Incomes = useSelector((state: any) => state.category.Income);
+
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const shouldFetch = !Array.isArray(Incomes) || Incomes.length === 0;
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listIncomeExpense({...params});
+            const arr = res?.data?.data?.data || [];
+            dispatch(setIncome(arr)); // đẩy redux luôn
+            setData(arr);               // set local luôn
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (shouldFetch) {
+            fetchData();
+        } else {
+            setData(Incomes); // lấy redux
         }
     }, []); // thêm customers vào deps
 
