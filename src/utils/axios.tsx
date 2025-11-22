@@ -7,7 +7,7 @@ export const clientApi = axios.create({
     // axios Cấu hình yêu cầu được cấu hình với tùy chọn BaseURL, cho biết rằng phần công khai URL yêu cầu
     baseURL: process.env.REACT_APP_API_URL+'api/',
     // hết giờ
-    timeout: 10000,
+    timeout: 30000,
     headers: {
         "Accept":  `application/json`
     },

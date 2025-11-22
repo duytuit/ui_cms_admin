@@ -159,3 +159,6 @@ display: none !important;
 .layout-main-container {
     padding-bottom: 0;
 }
+.my-title-center .p-column-title {
+    width: 100%;
+}

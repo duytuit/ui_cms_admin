@@ -243,7 +243,7 @@ const model = [{
           {
             id: 1,
             name: 'Công nợ khách hàng',
-            route: '/page-two',
+            route: '/debit/ListTongHopKH',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -254,7 +254,7 @@ const model = [{
           {
             id: 1,
             name: 'Công nợ nhà cung cấp',
-            route: '/page-two',
+            route: '/debit/ListChiTietKH',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,

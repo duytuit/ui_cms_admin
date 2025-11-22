@@ -52,6 +52,8 @@ import UpdateVehicle from "modules/VehicleDispatch/screen/update";
 import ListMuaBan from "modules/Debit/screen/index_muaban";
 import UpdateMuaBan from "modules/Debit/screen/update_muaban";
 import UpdateImportExcel from "modules/partner/screen/updateImportExcel";
+import ListTongHopKH from "modules/Debit/screen/index_tonghop_kh";
+import ListChiTietKH from "modules/Debit/screen/index_chitiet_kh";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -146,6 +148,10 @@ const publicRoutes = [
   { path: "/debit/ListMuaBan", component: ListMuaBan, layout: 'ListMuaBan' },
   { path: "/debit/addMuaBan", component: UpdateMuaBan, layout: 'UpdateMuaBan' },
   { path: "/debit/detailMuaBan/:id", component: UpdateMuaBan, layout: 'UpdateMuaBan' },
+
+  //công nợ khách hàng
+  { path: "/debit/ListTongHopKH", component: ListTongHopKH, layout: 'ListTongHopKH' },
+  { path: "/debit/ListChiTietKH", component: ListChiTietKH, layout: 'ListChiTietKH' },
   
   { path: "/user/inportExcelPartner", component: UpdateImportExcel, layout: 'UpdateImportExcel' },
 
