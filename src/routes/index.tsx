@@ -51,6 +51,7 @@ import ListVehicle from "modules/VehicleDispatch/screen";
 import UpdateVehicle from "modules/VehicleDispatch/screen/update";
 import ListMuaBan from "modules/Debit/screen/index_muaban";
 import UpdateMuaBan from "modules/Debit/screen/update_muaban";
+import UpdateImportExcel from "modules/partner/screen/updateImportExcel";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -145,6 +146,9 @@ const publicRoutes = [
   { path: "/debit/ListMuaBan", component: ListMuaBan, layout: 'ListMuaBan' },
   { path: "/debit/addMuaBan", component: UpdateMuaBan, layout: 'UpdateMuaBan' },
   { path: "/debit/detailMuaBan/:id", component: UpdateMuaBan, layout: 'UpdateMuaBan' },
+  
+  { path: "/user/inportExcelPartner", component: UpdateImportExcel, layout: 'UpdateImportExcel' },
+
   //{ path: "/debit/detail/:id", component: UpdateDebit, layout: 'UpdateDebit' },
   // { path: "/auth/forgotpassword", component: ForgotPassword, layout: null, public: true },
   // { path: "/auth/verifyaccount", component: VerifyAccount, layout: null, public: true },

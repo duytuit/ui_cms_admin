@@ -177,11 +177,11 @@ export const typeDebit = [
    },
     {
      type:5,
-     name:"Đầu kỳ KH"
+     name:"Phí dịch vụ đầu kỳ KH"
    },
     {
      type:6,
-     name:"Đầu kỳ NCC"
+     name:"Phí chi hộ đầu kỳ KH"
    },
     {
      type:7,
@@ -190,6 +190,38 @@ export const typeDebit = [
     {
      type:8,
      name:"Bán hàng KH"
+   },
+   {
+     type:9,
+     name:"Bán hàng NV"
+   },
+   {
+     type:10,
+     name:"Phí dịch vụ đầu kỳ NCC"
+   },
+   {
+     type:11,
+     name:"Phí chi hộ đầu kỳ NCC"
+   }
+];
+export const TypeDebitDKKH = [
+   {
+     value:5,
+     name:"Phí dịch vụ"
+   },
+    {
+     value:6,
+     name:"Phí chi hộ"
+   }
+];
+export const TypeDebitDKNCC = [
+   {
+     value:10,
+     name:"Phí dịch vụ"
+   },
+    {
+     value:11,
+     name:"Phí chi hộ"
    }
 ];
 export const statusDebit = [

@@ -630,6 +630,17 @@ const model = [{
             actions: '[{"action":"import"},{"action":"export"},{"action":"delete"},{"action":"update"},{"action":"add"},{"action":"detail"},{"action":"view"}]'
           },
           {
+            id: 1,
+            name: 'Import đối tác',
+            route: '/user/inportExcelPartner',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
             id: 2,
             name: 'Cấu hình email',
             route: '/page-two',

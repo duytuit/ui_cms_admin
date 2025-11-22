@@ -10,12 +10,12 @@ import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { Dropdown, Input } from "components/common/ListForm";
 import { useListPartnerDetail } from "modules/partner/service";
-import { listToast, refreshObject } from "utils";
+import { listToast, refreshObject, TypeDebitDKNCC } from "utils";
 import { addDebitDauKyKH, addDebitDauKyNCC, showDebit, updateDebitDauKyVaMuaBan } from "../api";
 export default function UpdateDauKyNCC() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
-  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1 });
+  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1,type:10 });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { data: supplierDetails } = useListPartnerDetail({ params: { status: 2 }, debounce: 500 });
@@ -125,14 +125,28 @@ export default function UpdateDauKyNCC() {
                       required
                     />
                   </div>
-                  <div className="field col-4">
+                  <div className="field col-3">
                     <MyCalendar dateFormat="dd/mm/yy"
                       value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
                       onChange={(e: any) =>
                       setInfos({ ...infos, accountingDate: e })}
                       className={classNames("w-full", "p-inputtext", "input-form-sm")} />
                   </div>
-                   <div className="field col-4">
+                  <div className="field col-3">
+                    <Dropdown
+                      value={infos.type}
+                      optionValue="value"
+                      optionLabel="name"
+                      options={TypeDebitDKNCC}
+                      label="Loại dịch vụ"
+                      className="p-inputtext-sm"
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, type: e.target.value })
+                      }
+                      required
+                    />
+                   </div>
+                   <div className="field col-3">
                     <InputForm className="w-full"
                       id="price"
                       value={infos.price}
@@ -145,7 +159,7 @@ export default function UpdateDauKyNCC() {
                       required
                     />
                   </div>
-                   <div className="field col-4">
+                   <div className="field col-3">
                     <InputForm className="w-full"
                       id="name"
                       value={infos.name}

@@ -12,6 +12,7 @@ import { Helper } from "utils/helper";
 import { useListDebitCuocTamThu, useListDebitDauKyKH, useListDebitDauKyNCC } from "../service";
 import { useListContractFileWithState } from "modules/ContractFile/service";
 import { deleteDebit } from "../api";
+import { TypeDebitDKKH } from "utils";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -119,6 +120,7 @@ export default function ListDauKyNcc() {
     const mapped = (data?.data || []).map((row: any) => {
       const cus = suppliers.find((x: any) => x.id === row.supplier_detail_id);
       const _user = employees.find((x: any) => x.user_id === row.updated_by);
+      const _type = TypeDebitDKKH.find((x: any) => x.value === row.type);
       return {
         ...row,
         customerName: cus?.partners?.name || "",
@@ -203,6 +205,7 @@ export default function ListDauKyNcc() {
           <Column field="accounting_date" header="Ngày hạch toán" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="customerName" header="Nhà cung cấp" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="type" header="Loại dịch vụ" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="price"   body={(row: any) => Helper.formatCurrency(row.price.toString())} header="Số tiền" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="name" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="userName" header="Người thực hiện" filter showFilterMenu={false} filterMatchMode="contains" />
