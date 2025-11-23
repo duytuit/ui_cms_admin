@@ -52,6 +52,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
       setFilter={setFilter}
       className="lg:col-9"
     >
+      <div className="col-2">Ngày phiếu thu</div>
       <div className="col-2">
         <MyCalendar
           dateFormat="dd/mm/yy"
@@ -127,7 +128,6 @@ export default function ListTongHopKH() {
         <ColumnGroup>
             <Row>
                 <Column rowSpan={2} />
-                <Column header="Thao tác" rowSpan={2} />
                 <Column header="Thông Tin" headerClassName="my-title-center" />
                 <Column header="Đầu kỳ" headerClassName="my-title-center" colSpan={2} />
                 <Column header="Trong kỳ" headerClassName="my-title-center" colSpan={2} />
@@ -177,18 +177,6 @@ export default function ListTongHopKH() {
           scrollable
           tableStyle={{ minWidth: "1600px" }} // ép bảng rộng hơn để có scroll ngang
         >
-          <Column
-           body={(row: any) => {
-              return ActionBody(
-                    row,
-                    "/debit/detailDauKyKh",
-                    { route: "/debit/delete", action: deleteDebit },
-                    paramsPaginator,
-                    setParamsPaginator
-                );
-            }}
-           style={{ width: "6em" }} 
-          />
           <Column field="customerName" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="customerAbb"  filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="customerAbb"  filter showFilterMenu={false} filterMatchMode="contains" />

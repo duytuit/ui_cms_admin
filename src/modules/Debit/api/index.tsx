@@ -1,6 +1,7 @@
 import { getData, postData, postDataList } from "lib/request";
 
 export const listDebit = async (params: any) => await getData("Debit", params);
+export const listDebitCongNoChiTietKH = async (params: any) => await getData("Debit/congnochitietkh", params);
 export const listDebitMuaBan = async (params: any) => await getData("Debit/muaban", params);
 export const listDebitDauKyKH = async (params: any) => await getData("Debit/daukykh", params);
 export const listDebitDauKyNCC = async (params: any) => await getData("Debit/daukyncc", params);

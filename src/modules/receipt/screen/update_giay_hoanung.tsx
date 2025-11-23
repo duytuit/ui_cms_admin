@@ -1,32 +1,23 @@
 
-import { AddForm, InputForm, UpdateForm } from "components/common/AddForm";
+import { UpdateForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import { Column, DataTable, Panel, RadioButton } from "components/uiCore";
+import { Column, DataTable, Panel } from "components/uiCore";
 import { showToast } from "redux/features/toast";
-import { formOfPayment, listToast, refreshObject, VatDebit } from "utils";
-import { updateReceipt, addReceipt, showReceipt, addReceiptChiGiaoNhan, updateReceiptChiGiaoNhan, giayHoanUng } from "../api";
+import { listToast, refreshObject } from "utils";
+import { giayHoanUng } from "../api";
 import { useDispatch } from "react-redux";
-import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { CategoryEnum } from "utils/type.enum";
-import { classNames } from "primereact/utils";
-import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
-import { Dropdown, Input } from "components/common/ListForm";
-import { useListEmployee, useListEmployeeWithState } from "modules/employee/service";
-import { useListPartnerDetail } from "modules/partner/service";
+import { useListEmployeeWithState } from "modules/employee/service";
 import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
-import { useListContractFile } from "modules/ContractFile/service";
 export default function UpdateGiayHoanUng({ debits, onClose, employeeId,fromDate,toDate}: { debits: any, onClose: () => void,employeeId:number,fromDate:any,toDate:any }) {
   const amount = Math.abs(debits.reduce((sum: number, item: any) => sum + (item.phaiTra || 0), 0));
   const check_amount = debits.reduce((sum: number, item: any) => sum + (item.phaiTra || 0), 0);
   const description = "Từ ngày "+Helper.formatDMY(new Date(fromDate))+" đến ngày "+Helper.formatDMY(new Date(toDate));
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
-  const [doiTuongOptions, setDoiTuongOptions] = useState<any>([]);
   const [employeeInfo, setEmployeeInfo] = useState<any>({});
   const [bankSelect, setBankSelect] = useState<any>({});
-  const [ContractFileOptions, setContractFileOptions] = useState<any[]>([]);
   const [debitRows, setDebitRows] = useState<any[]>([]);
   const [nhanVienGiaoNhan, setNhanVienGiaoNhan] = useState<any>();
   const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1 });

@@ -242,7 +242,7 @@ const model = [{
         items: [
           {
             id: 1,
-            name: 'Công nợ khách hàng',
+            name: 'Công nợ tổng hợp KH',
             route: '/debit/ListTongHopKH',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
@@ -253,7 +253,7 @@ const model = [{
           },
           {
             id: 1,
-            name: 'Công nợ nhà cung cấp',
+            name: 'Công nợ chi tiết KH',
             route: '/debit/ListChiTietKH',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
