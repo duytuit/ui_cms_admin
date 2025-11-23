@@ -146,9 +146,14 @@ export default function ListChiTietKH() {
       const cus = customers.find((x: any) => x.id === row.customer_detail_id);
       const _user = employees.find((x: any) => x.user_id === row.updated_by);
       const _typeKH = TypeDebitDKKH.find((x: any) => x.value === row.type);
+      const data = JSON.parse(row.data);
       const thanh_tien = Math.round(row.price * (1 + row.vat / 100));
       return {
         ...row,
+        fileNumber:data?.fileNumber || "",
+        declaration:data?.declaration || "",
+        dispatch_code: row.type ===1 ? row.dispatch_code :'',
+        file_bill:data?.bill || "",
         customerName: cus?.partners?.name || "",
         customerAbb: cus?.partners?.abbreviation || "",
         userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
@@ -226,29 +231,12 @@ export default function ListChiTietKH() {
         >
           <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="customerAbb" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column 
-          body={(row: any) =>{
-              let data = JSON.parse(row.data);
-              return data?.fileNumber
-          }} filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="bill"  filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column 
-          body={(row: any) =>{
-              let data = JSON.parse(row.data);
-              return data?.declaration
-          }} filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column 
-          body={(row: any) =>{
-             if(row.type === 1){
-                 return row.dispatch_code
-             }
-          }} filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="fileNumber" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="bill" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="declaration" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="dispatch_code" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="name" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column 
-          body={(row: any) =>{
-              let data = JSON.parse(row.data);
-              return data?.bill
-          }} filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="file_bill" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column // dịch vụ
           body={(row: any) =>{
              if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){ // dịch vụ
@@ -261,7 +249,7 @@ export default function ListChiTietKH() {
                 const thanh_tien = Math.round(price * (1 + vat / 100));
                 return Helper.formatCurrency(thanh_tien.toString());
              }
-          }} filter showFilterMenu={false} filterMatchMode="contains" />
+          }} />
           <Column // chi hộ
           body={(row: any) =>{
              if(row.type === 2 || row.type === 3 || row.type === 6){
@@ -274,19 +262,19 @@ export default function ListChiTietKH() {
                 const thanh_tien = Math.round(price * (1 + vat / 100));
                 return Helper.formatCurrency(thanh_tien.toString());
              }
-          }} filter showFilterMenu={false} filterMatchMode="contains" />
+          }} />
           <Column 
           body={(row: any) =>{
              if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){
                 return Helper.formatCurrency(row.receipt_total.toString());
              }
-          }} filter showFilterMenu={false} filterMatchMode="contains" />
+          }} />
           <Column 
           body={(row: any) =>{
              if(row.type === 2 || row.type === 3 || row.type === 6){
                  return Helper.formatCurrency(row.receipt_total.toString());
              }
-          }} filter showFilterMenu={false} filterMatchMode="contains" />
+          }} />
           <Column  // còn dịch vụ
            body={(row: any) =>{
              if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){
@@ -300,7 +288,7 @@ export default function ListChiTietKH() {
                 const conlai =thanh_tien - row.receipt_total
                 return Helper.formatCurrency(conlai.toString());
              }
-          }} frozen alignFrozen="right" className="font-bold" filter showFilterMenu={false} filterMatchMode="contains" />
+          }} frozen alignFrozen="right" className="font-bold" />
           <Column  // còn chi hộ
           body={(row: any) =>{
              if(row.type === 2 || row.type === 3 || row.type === 6){
@@ -314,7 +302,7 @@ export default function ListChiTietKH() {
                 const conlai =thanh_tien - row.receipt_total
                 return Helper.formatCurrency(conlai.toString());
              }
-          }} frozen alignFrozen="right" className="font-bold" filter showFilterMenu={false} filterMatchMode="contains" />
+          }} frozen alignFrozen="right" className="font-bold" />
           <Column 
           body={(row: any) =>{
                 // Chuyển price về số thực, giữ decimal
@@ -326,7 +314,7 @@ export default function ListChiTietKH() {
                 const thanh_tien = Math.round(price * (1 + vat / 100));
                 const conlai =thanh_tien - row.receipt_total
                 return Helper.formatCurrency(conlai.toString());
-          }} frozen alignFrozen="right" className="font-bold" filter showFilterMenu={false} filterMatchMode="contains" />
+          }} frozen alignFrozen="right" className="font-bold"/>
           <Column
             header={
               <Checkbox
@@ -411,8 +399,9 @@ export default function ListChiTietKH() {
                   />
               );
             }
-          }} frozen alignFrozen="right" className="font-bold" filter showFilterMenu={false} filterMatchMode="contains" />
+          }} frozen alignFrozen="right" className="font-bold"/>
           <Column 
+           
            body={(row:any, options:any) => {
              if(row.type === 2 || row.type === 3 || row.type === 6){
               const price = typeof row.price === "string"
@@ -449,7 +438,7 @@ export default function ListChiTietKH() {
                   />
               );
             }
-          }} frozen alignFrozen="right" className="font-bold" filter showFilterMenu={false} filterMatchMode="contains" />
+          }} frozen alignFrozen="right" className="font-bold"/>
         </DataTableClient>
       </div>
     </>
