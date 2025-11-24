@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {  listDebit, listDebitCongNoChiTietKH, listDebitCuocTamThu, listDebitDauKyKH, listDebitDauKyNCC, listDebitDispatch, listDebitMuaBan, listDebitService } from '../api';
+import {  listBanhangKH, listDebit, listDebitCongNoChiTietKH, listDebitCuocTamThu, listDebitDauKyKH, listDebitDauKyNCC, listDebitDispatch, listDebitMuaBan, listDebitService, listHasDebitNoFileDispatchKH, listMuahangNCC, listNoDebitNoFileDispatchKH } from '../api';
 
 export const useListDebit = ({ params, debounce = 500 }: any) => {
     const [data, setData] = useState<any>([]);
@@ -214,6 +214,122 @@ export const useListDebitCongNoChiTietKH = ({ params, debounce = 500 }: any) => 
             setLoading(true);
             setError(null);
             const res = await listDebitCongNoChiTietKH({ ...params });
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!params || Object.keys(params).length === 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
+
+    return { data, loading, error, refresh: fetchData };
+};
+export const useListNoDebitNoFileDispatchKH = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listNoDebitNoFileDispatchKH({ ...params });
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!params || Object.keys(params).length === 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
+
+    return { data, loading, error, refresh: fetchData };
+};
+export const useListHasDebitNoFileDispatchKH = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listHasDebitNoFileDispatchKH({ ...params });
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!params || Object.keys(params).length === 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
+
+    return { data, loading, error, refresh: fetchData };
+};
+export const useListMuahangNCC = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listMuahangNCC({ ...params });
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!params || Object.keys(params).length === 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
+
+    return { data, loading, error, refresh: fetchData };
+};
+export const useListBanhangKH = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listBanhangKH({ ...params });
             setData(res?.data?.data || []);
         } catch (err) {
             setError(err);

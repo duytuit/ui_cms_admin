@@ -10,7 +10,6 @@ import UpdateContractFile from "modules/ContractFile/screen/update";
 import Customer from "modules/customer/screen";
 import UpdateCustomer from "modules/customer/screen/update";
 import DashBoard from "modules/dashboard/screen";
-import ListBanHangKh from "modules/Debit/screen/index_muaban";
 import ListConfirmFileGia from "modules/Debit/screen/index_confirm_debit_file_gia";
 import ListCuoc from "modules/Debit/screen/index_cuoc";
 import ListDauKyKh from "modules/Debit/screen/index_dauky_kh";
@@ -20,7 +19,6 @@ import ListFileGia from "modules/Debit/screen/index_debit_file_gia";
 import ListContractFileBangKe from "modules/Debit/screen/index_debit_service";
 import ListContractFileNangHa from "modules/Debit/screen/index_debit_service_nh";
 import ListTamThu from "modules/Debit/screen/index_tamthu";
-import UpdateBanHangKh from "modules/Debit/screen/update_muaban";
 import UpdateDauKyKh from "modules/Debit/screen/update_dauky_kh";
 import UpdateDauKyNCC from "modules/Debit/screen/update_dauky_ncc";
 import ListDepartment from "modules/department/screen";
@@ -49,11 +47,14 @@ import UpdateStorages from "modules/storage/screen/update";
 import User from "modules/user/screen";
 import ListVehicle from "modules/VehicleDispatch/screen";
 import UpdateVehicle from "modules/VehicleDispatch/screen/update";
-import ListMuaBan from "modules/Debit/screen/index_muaban";
-import UpdateMuaBan from "modules/Debit/screen/update_muaban";
 import UpdateImportExcel from "modules/partner/screen/updateImportExcel";
 import ListTongHopKH from "modules/Debit/screen/index_tonghop_kh";
 import ListChiTietKH from "modules/Debit/screen/index_chitiet_kh";
+import ListDebitNoFileKH from "modules/Debit/screen/index_debit_no_file_kh";
+import UpdateMuaHang from "modules/Debit/screen/update_muahang";
+import ListMuaHang from "modules/Debit/screen/index_muahang";
+import ListBanHang from "modules/Debit/screen/index_banhang";
+import UpdateBanHang from "modules/Debit/screen/update_banhang";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -144,10 +145,15 @@ const publicRoutes = [
   { path: "/debit/ListDauKyNcc", component: ListDauKyNcc, layout: 'ListDauKyNcc' },
   { path: "/debit/addDauKyNCC", component: UpdateDauKyNCC, layout: 'UpdateDauKyNCC' },
   { path: "/debit/detailDauKyNCC/:id", component: UpdateDauKyNCC, layout: 'UpdateDauKyNCC' },
+  { path: "/debit/ListDebitNoFileKH", component: ListDebitNoFileKH, layout: 'ListDebitNoFileKH' },
 
-  { path: "/debit/ListMuaBan", component: ListMuaBan, layout: 'ListMuaBan' },
-  { path: "/debit/addMuaBan", component: UpdateMuaBan, layout: 'UpdateMuaBan' },
-  { path: "/debit/detailMuaBan/:id", component: UpdateMuaBan, layout: 'UpdateMuaBan' },
+  { path: "/debit/ListMuaHang", component: ListMuaHang, layout: 'ListMuaHang' },
+  { path: "/debit/UpdateMuaHang", component: UpdateMuaHang, layout: 'UpdateMuaHang' },
+  { path: "/debit/detailMuaHang/:id", component: UpdateMuaHang, layout: 'UpdateMuaHang' },
+
+  { path: "/debit/ListBanHang", component: ListBanHang, layout: 'ListBanHang' },
+  { path: "/debit/UpdateBanHang", component: UpdateBanHang, layout: 'UpdateBanHang' },
+  { path: "/debit/detailBanHang/:id", component: UpdateBanHang, layout: 'UpdateBanHang' },
 
   //công nợ khách hàng
   { path: "/debit/ListTongHopKH", component: ListTongHopKH, layout: 'ListTongHopKH' },

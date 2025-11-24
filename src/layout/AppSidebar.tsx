@@ -64,7 +64,7 @@ const model = [{
            {
             id: 1,
             name: 'Debit KH các lô hàng không lập file',
-            route: '/page-two',
+            route: '/debit/ListDebitNoFileKH',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -217,8 +217,19 @@ const model = [{
         items: [
           {
             id: 1,
-            name: 'Chứng từ mua-bán',
-            route: '/debit/ListMuaBan',
+            name: 'Mua hàng',
+            route: '/debit/ListMuaHang',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
+            id: 1,
+            name: 'Bán hàng',
+            route: '/debit/ListBanHang',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,

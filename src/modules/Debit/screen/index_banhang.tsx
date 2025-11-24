@@ -7,7 +7,7 @@ import { MyCalendar } from "components/common/MyCalendar";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import { useListDebitMuaBan } from "../service";
+import { useListBanhangKH, useListDebitMuaBan, useListMuahangNCC } from "../service";
 import { FilterMatchMode } from "primereact/api";
 import { deleteReceipt } from "modules/receipt/api";
 
@@ -46,7 +46,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
       filter={filter}
       setFilter={setFilter}
       className="lg:col-9"
-       add="/debit/addMuaBan"
+       add="/debit/UpdateBanHang"
     >
       <div className="col-2">
         <MyCalendar
@@ -68,7 +68,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   );
 };
 
-export default function ListMuaBan() {
+export default function ListBanHang() {
   const { handleParamUrl } = useHandleParamUrl();
   const [filters, setFilters] = useState({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -102,7 +102,7 @@ export default function ListMuaBan() {
     render: false,
     keyword: "",
   });
-  const { data, loading, error, refresh } = useListDebitMuaBan({
+  const { data, loading, error, refresh } = useListBanhangKH({
     params: paramsPaginator,
     debounce: 500,
   });
@@ -170,28 +170,14 @@ export default function ListMuaBan() {
             <Column
                 header="Thao tác"
                 body={(row: any) => {
-                    return ActionBody(
-                        row,
-                        "/debit/detailMuaBan",
-                        { route: "/receipt/delete", action: deleteReceipt },
-                        paramsPaginator,
-                        setParamsPaginator
-                    );
+                   
                 }}
             />
-            <Column
-                field="accounting_date"
-                header="Ngày chứng từ"
-                body={(e: any) => DateBody(e.accounting_date)}
-                filter
-                showFilterMenu={false}
-                filterMatchMode="contains"
-            />
-            <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+            <Column field="code_receipt" header="Số phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="sofile" header="Đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="fullname_giaonhan" header="Tên đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="fullname_giaonhan" header="Tên viết tắt" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="lydochi" header="Lý do" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="total_amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
                   footer={getSumColumn("total_amount")}
                   footerStyle={{ fontWeight: "bold" }}
@@ -201,11 +187,6 @@ export default function ListMuaBan() {
                   footer={getSumColumn("total_with_vat")}
                   footerStyle={{ fontWeight: "bold" }}
             />
-            <Column field="tenquy" header="Quỹ" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="hinhthuc" header="Hình thức" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="stk" header="STK" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="chutk" header="Tên tài khoản" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="nganhang" header="Ngân hàng" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="note" header="Diễn giải" />
             <Column field="nguoitao" header="Người cập nhật" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
