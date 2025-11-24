@@ -127,44 +127,138 @@ export default function ListChiTietKH() {
     render: false,
     keyword: "",
   });
+  const [filters, setFilters] = useState({
+      fileNumber: "",
+      customerAbb:"",
+      bill: "",
+      declaration: "",
+      dispatch_code: "",
+      name: "",
+      file_bill: ""
+  });
   const { data, loading, error, refresh } = useListDebitCongNoChiTietKH({
     params: paramsPaginator,
     debounce: 500,
   });
-  const updateRow = (index: number, patch: any) => {
-    setDisplayData(prev => {
-      const clone = [...prev];
-      clone[index] = { ...clone[index], ...patch };
-      return clone;
+    // --- Header template with filter ---
+  const customerAbbHeader = (
+     <div className="py-1">
+         <Input
+            value={filters.customerAbb}
+            onChange={(e:any) => setFilters({ ...filters, customerAbb: e.target.value })}
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );
+    const fileNumberHeader = (
+     <div className="py-1">
+         <Input
+            value={filters.fileNumber}
+            onChange={(e:any) => setFilters({ ...filters, fileNumber: e.target.value })}
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );
+    const billHeader = (
+     <div className="py-1">
+         <Input
+            value={filters.bill}
+            onChange={(e:any) => setFilters({ ...filters, bill: e.target.value })}
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );
+    const declarationHeader = (
+     <div className="py-1">
+         <Input
+            value={filters.declaration}
+            onChange={(e:any) => setFilters({ ...filters, declaration: e.target.value })}
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );
+    const dispatchCodeHeader = (
+     <div className="py-1">
+         <Input
+            value={filters.dispatch_code}
+            onChange={(e:any) => setFilters({ ...filters, dispatch_code: e.target.value })}
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );
+    const nameHeader = (
+     <div className="py-1">
+         <Input
+            value={filters.name}
+            onChange={(e:any) => setFilters({ ...filters, name: e.target.value })}
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );
+  const fileBillHeader = (
+     <div className="py-1">
+         <Input
+            value={filters.file_bill}
+            onChange={(e:any) => setFilters({ ...filters, file_bill: e.target.value })}
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );
+    // --- Filter dữ liệu dựa vào input ---
+const applyFilters = (rows: any[]) => {
+    return rows.filter((row) => {
+        const f = filters;
+
+        return (
+            (f.customerAbb ? row.customerAbb?.toLowerCase().includes(f.customerAbb.toLowerCase()) : true) &&
+            (f.fileNumber ? row.fileNumber?.toLowerCase().includes(f.fileNumber.toLowerCase()) : true) &&
+            (f.bill ? row.bill?.toLowerCase().includes(f.bill.toLowerCase()) : true) &&
+            (f.declaration ? row.declaration?.toLowerCase().includes(f.declaration.toLowerCase()) : true) &&
+            (f.dispatch_code ? row.dispatch_code?.toLowerCase().includes(f.dispatch_code.toLowerCase()) : true) &&
+            (f.name ? row.name?.toLowerCase().includes(f.name.toLowerCase()) : true) &&
+            (f.file_bill ? row.file_bill?.toLowerCase().includes(f.file_bill.toLowerCase()) : true)
+        );
     });
-  };
-  // ✅ Client-side pagination
-  useEffect(() => {
+};
+useEffect(() => {
     if (!data) return;
+
     handleParamUrl(paramsPaginator);
+
     const mapped = (data?.data || []).map((row: any) => {
-      const cus = customers.find((x: any) => x.id === row.customer_detail_id);
-      const _user = employees.find((x: any) => x.user_id === row.updated_by);
-      const _typeKH = TypeDebitDKKH.find((x: any) => x.value === row.type);
-      const data = JSON.parse(row.data);
-      const thanh_tien = Math.round(row.price * (1 + row.vat / 100));
-      return {
-        ...row,
-        fileNumber:data?.fileNumber || "",
-        declaration:data?.declaration || "",
-        dispatch_code: row.type ===1 ? row.dispatch_code :'',
-        file_bill:data?.bill || "",
-        customerName: cus?.partners?.name || "",
-        customerAbb: cus?.partners?.abbreviation || "",
-        userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
-        typeKH: _typeKH?.name || "",
-        conlai_dv:(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5)?thanh_tien-row.receipt_total:0,
-        conlai_ch:(row.type === 2 || row.type === 3 || row.type === 6) ? thanh_tien-row.receipt_total: 0
-      };
+        const cus = customers.find((x: any) => x.id === row.customer_detail_id);
+        const _user = employees.find((x: any) => x.user_id === row.updated_by);
+        const _typeKH = TypeDebitDKKH.find((x: any) => x.value === row.type);
+        const _data = JSON.parse(row.data);
+        const thanh_tien = Math.round(row.price * (1 + row.vat / 100));
+
+        return {
+            ...row,
+            fileNumber: _data?.fileNumber || "",
+            declaration: _data?.declaration || "",
+            dispatch_code: row.type === 1 ? row.dispatch_code : "",
+            bill: _data?.bill || "",
+            file_bill: _data?.bill || "",
+            customerName: cus?.partners?.name || "",
+            customerAbb: cus?.partners?.abbreviation || "",
+            userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
+            typeKH: _typeKH?.name || "",
+            conlai_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5) ? thanh_tien - row.receipt_total : 0,
+            conlai_ch: (row.type === 2 || row.type === 3 || row.type === 6) ? thanh_tien - row.receipt_total : 0
+        };
     });
-    console.log(mapped);
-    setDisplayData(mapped);
-  }, [first, rows, data, paramsPaginator, customers]);
+
+    const filtered = applyFilters(mapped);
+    setDisplayData(filtered);
+
+}, [first, rows, data, paramsPaginator, filters, customers, employees]);
   const headerGroup = (
         <ColumnGroup>
             <Row>
@@ -178,22 +272,43 @@ export default function ListChiTietKH() {
                 <Column frozen alignFrozen="right" className="font-bold"  header="Số thu" headerClassName="my-title-center" colSpan={3} />
             </Row>
             <Row>
-                <Column header="Số file" />
-                <Column header="Số bill" />
-                <Column header="Số tờ khai" />
-                <Column header="Mã điều xe" />
-                <Column header="Nội dung" />
-                <Column header="Số hóa đơn" />
-                <Column header="Dịch vụ" />
-                <Column header="Chi hộ" />
-                <Column header="Dịch vụ" />
-                <Column header="Chi hộ" />
+                <Column header="Số file"/>
+                <Column header="Số bill"/>
+                <Column header="Số tờ khai"/>
+                <Column header="Mã điều xe"/>
+                <Column header="Nội dung"/>
+                <Column header="Số hóa đơn"/>
+                <Column header="Dịch vụ"/>
+                <Column header="Chi hộ"/>
+                <Column header="Dịch vụ"/>
+                <Column header="Chi hộ"/>
                 <Column frozen alignFrozen="right" className="font-bold" header="Dịch vụ" />
-                <Column frozen alignFrozen="right" className="font-bold"  header="Chi hộ" />
-                <Column frozen alignFrozen="right" className="font-bold"  header="Còn lại" />
-                <Column frozen alignFrozen="right" className="font-bold"  header="" />
-                <Column frozen alignFrozen="right" className="font-bold"  header="Số thu dịch vụ" />
-                <Column frozen alignFrozen="right" className="font-bold"  header="Số thu chi hộ" />
+                <Column frozen alignFrozen="right" className="font-bold" header="Chi hộ" />
+                <Column frozen alignFrozen="right" className="font-bold" header="Còn lại" />
+                <Column frozen alignFrozen="right" className="font-bold" header="" />
+                <Column frozen alignFrozen="right" className="font-bold" header="Số thu dịch vụ" />
+                <Column frozen alignFrozen="right" className="font-bold" header="Số thu chi hộ" />
+            </Row>
+             <Row>
+                <Column />
+                <Column />
+                <Column header={customerAbbHeader}/>
+                <Column header={fileNumberHeader}/>
+                <Column header={billHeader}/>
+                <Column header={declarationHeader}/>
+                <Column header={dispatchCodeHeader}/>
+                <Column header={nameHeader}/>
+                <Column header={fileBillHeader}/>
+                <Column />
+                <Column />
+                <Column />
+                <Column /> 
+                <Column frozen alignFrozen="right" className="font-bold"/>
+                <Column frozen alignFrozen="right" className="font-bold"/>
+                <Column frozen alignFrozen="right" className="font-bold"/>
+                <Column frozen alignFrozen="right" className="font-bold"/>
+                <Column frozen alignFrozen="right" className="font-bold"/>
+                <Column frozen alignFrozen="right" className="font-bold"/>
             </Row>
         </ColumnGroup>
     );
@@ -227,7 +342,7 @@ export default function ListChiTietKH() {
           filterDisplay="row"
           className={classNames("Custom-DataTableClient")}
           scrollable
-          tableStyle={{ minWidth: "1600px" }} // ép bảng rộng hơn để có scroll ngang
+          tableStyle={{ minWidth: "2000px" }} // ép bảng rộng hơn để có scroll ngang
         >
           <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="customerAbb" filter showFilterMenu={false} filterMatchMode="contains" />
