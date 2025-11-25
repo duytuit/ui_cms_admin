@@ -10,7 +10,7 @@ import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { useListContractFileWithState } from "modules/ContractFile/service";
 import UpdateHoanUngGiaoNhan from "modules/receipt/screen/update_hoanung_giao_nhan";
-import { confirmCancelGiaoNhan, deleteReceipt } from "../api";
+import { deleteReceipt } from "../api";
 import { FilterMatchMode } from "primereact/api";
 import { useListReceipt, useListXacNhanChiPhiGiaoNhan } from "../service";
 import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
@@ -109,7 +109,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator}: any) => {
     );
 };
 
-export default function ListChiPhiGiaoNhan() {
+export default function ListViewChiPhiGiaoNhan() {
     const { handleParamUrl } = useHandleParamUrl();
         const [displayData, setDisplayData] = useState<any>();
         const [filters, setFilters] = useState({
@@ -247,23 +247,17 @@ export default function ListChiPhiGiaoNhan() {
           >
               <Column
                 header="Thao tác"
-                body={(row: any) =>
-                    {
-                        if(row.status === 0){
-                            return ActionBody(row, null, null, null, null, () =>
-                                openDialogAdd(row)
-                            )
-                        }else{
-                            return ActionBody(
-                                row,
-                                null,
-                                { route: "/receipt/confirmCancelGiaoNhan", action: confirmCancelGiaoNhan },
-                                paramsPaginator,
-                                setParamsPaginator
-                            );
-                        }
+                body={(row: any) => {
+                    if(row.status == 0){
+                        return ActionBody(
+                            row,
+                            null,
+                            { route: "/receipt/delete", action: deleteReceipt },
+                            paramsPaginator,
+                            setParamsPaginator
+                        );
                     }
-                }
+                 }}
               />
                <Column header="Trạng thái" body={(row: any) => {
                     if(row.status == 1){

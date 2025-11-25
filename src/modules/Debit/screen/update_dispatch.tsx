@@ -19,7 +19,7 @@ import { useListVehicle, useListVehicleWithState } from "modules/VehicleDispatch
 import { json } from "stream/consumers";
 export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
-  const [infos, setInfos] = useState<any>({});
+  const [infos, setInfos] = useState<any>({isExternalDriver:1});
   const dispatch = useDispatch();
   const navigate = useNavigate();
      // ===== LIST PARTNER & EMPLOYEE =====
@@ -43,7 +43,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
     const vehiclesOptions = useMemo(() => {
       if (!Array.isArray(vehicles)) return [];
       return vehicles.map((x: any) => ({
-        label: `${x?.number_code ?? "(không tên)"}-${getTypeVehicleLabel(x?.is_external_driver)}`,
+        label: `${x?.number_code ?? "(không tên)"}`,
         value: x.id,
       }));
     }, [vehicles]);
@@ -89,6 +89,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
     infos.goodsFee       = toInt(infos.goodsFee);
     infos.fileInfoId= infos.id;
     infos.data = JSON.stringify(infos);
+    infos.vehicleNumber = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleLabel : infos.vehicleNumber
     let info = {
       ...infos, status: infos.status ? 0 : 1,
     };
@@ -133,7 +134,8 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
              
           let info = {
             ...detail, status: detail.status === 0 ? true : false,
-            loaiToKhai:_loaiToKhai?.name
+            loaiToKhai:_loaiToKhai?.name,
+            isExternalDriver:1
           };
           setInfos(info)
         }
@@ -215,14 +217,14 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
           </Panel>
           <Panel header="Thông tin điều xe">
             <div className="formgrid grid">
-              <div className="field col-3">
+              <div className="field col-4">
                 <MyCalendar dateFormat="dd/mm/yy"
                   value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
                   onChange={(e: any) =>
                     setInfos({ ...infos, accountingDate: e })}
                   className={classNames("w-full", "p-inputtext", "input-form-sm")} />
               </div>
-               <div className="field col-9">
+               <div className="field col-8">
                 <InputForm className="w-full"
                   id="route"
                   value={infos.route}
@@ -233,7 +235,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   required
                 />
               </div>
-               <div className="field col-3">
+               <div className="field col-4">
                 <InputForm className="w-full"
                   id="customerVehicleType"
                   value={infos.customerVehicleType}
@@ -243,7 +245,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   label="Loại xe KH"
                 />
               </div>
-              <div className="field col-9">
+              <div className="field col-8">
                 <InputForm className="w-full"
                   id="supplierVehicleType"
                   value={infos.supplierVehicleType}
@@ -253,7 +255,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   label="Loại xe NCC"
                 />
               </div>
-               <div className="field col-3">
+               <div className="field col-4">
                 <InputForm className="w-full"
                   id="sellingPrice"
                   value={infos.sellingPrice}
@@ -263,7 +265,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   label="Cước bán"
                 />
               </div>
-               <div className="field col-5">
+               <div className="field col-4">
                 <InputForm className="w-full"
                   id="driverFee"
                   value={infos.driverFee}
@@ -283,7 +285,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   label="TTHQ"
                 />
               </div>
-               <div className="field col-3">
+               <div className="field col-4">
                 <InputForm className="w-full"
                   id="purchasePrice"
                   value={infos.purchasePrice}
@@ -293,7 +295,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   label="Cước mua"
                 />
               </div>
-               <div className="field col-9">
+               <div className="field col-8">
                 <Dropdown
                   filter
                   value={infos.supplierDetailId}
@@ -311,7 +313,22 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   className="w-full"
                 />
               </div>
-               <div className="field col-3">
+               <div className="field col-2">
+                <Dropdown
+                  value={infos.isExternalDriver}
+                  optionValue="isExternalDriver"
+                  optionLabel="name"
+                  options={typeVehicle}
+                  onChange={(e: any) =>
+                    {
+                        setInfos({ ...infos, isExternalDriver: e.target.value })
+                    }
+                  }
+                  label="Loại xe"
+                  className="w-full"
+                />
+               </div>
+                {infos.isExternalDriver == 0 && <div className="field col-2">
                 <Dropdown
                   filter
                   value={infos.vehicleId}
@@ -327,11 +344,19 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   }
                   label="Biển số xe"
                   className="w-full"
-                  required
                 />
-              </div>
+              </div>}
+               {infos.isExternalDriver == 1 && <div className="field col-2">
+                  <InputForm className="w-full"
+                      id="vehicleNumber"
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, vehicleNumber: e.target.value })
+                      }
+                      label="Biển số xe"
+                    />
+              </div>}
               
-              <div className="field col-9">
+              <div className="field col-8">
                 <Dropdown
                   value={infos.employeeDriverId}
                   options={driverOptions}
@@ -349,7 +374,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   required
                 />
               </div>
-              <div className="field col-3">
+              <div className="field col-4">
                 <InputForm className="w-full"
                   id="mealFee"
                   value={infos.mealFee}
@@ -359,7 +384,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   label="Tiền ăn"
                 />
               </div>
-              <div className="field col-4">
+              <div className="field col-3">
                 <InputForm className="w-full"
                   id="ticketFee"
                   value={infos.ticketFee}
@@ -389,7 +414,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   label="Tiền luật"
                 />
               </div>
-              <div className="field col-3">
+              <div className="field col-4">
                 <InputForm className="w-full"
                   id="goodsFee"
                   value={infos.goodsFee}
@@ -399,7 +424,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                   label="Lượng hàng về"
                 />
               </div>
-              <div className="field col-9">
+              <div className="field col-8">
                 <InputForm className="w-full"
                   id="note"
                   onChange={(e: any) =>

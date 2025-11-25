@@ -55,6 +55,8 @@ import UpdateMuaHang from "modules/Debit/screen/update_muahang";
 import ListMuaHang from "modules/Debit/screen/index_muahang";
 import ListBanHang from "modules/Debit/screen/index_banhang";
 import UpdateBanHang from "modules/Debit/screen/update_banhang";
+import ListViewChiPhiGiaoNhan from "modules/receipt/screen/index_view_chiphi_giaonhan";
+import ListReceiptThuKH from "modules/receipt/screen/index_thu_kh";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -131,7 +133,9 @@ const publicRoutes = [
   // Receipt 
   { path: "/receipt/list", component: ListReceipt, layout: 'ListReceipt' },
   { path: "/receipt/add", component: UpdateReceipt, layout: 'UpdateReceipt' },
+  { path: "/receipt/listReceiptThuKH", component: ListReceiptThuKH, layout: 'ListReceiptThuKH' },
   { path: "/receipt/listChiPhiGiaoNhan", component: ListChiPhiGiaoNhan, layout: 'ListChiPhiGiaoNhan' },
+  { path: "/receipt/listViewChiPhiGiaoNhan", component: ListViewChiPhiGiaoNhan, layout: 'ListViewChiPhiGiaoNhan' },
   { path: "/receipt/listReceiptChiGiaoNhan", component: ListReceiptChiGiaoNhan, layout: 'ListReceiptChiGiaoNhan' },
   { path: "/receipt/updateReceiptChiGiaoNhan", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
   { path: "/receipt/detail/chigiaonhan/:id", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },

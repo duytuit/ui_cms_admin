@@ -33,3 +33,4 @@ export const addDebitMuaHangNCC = async (params: any) => await postData("Debit/c
 export const addDebitBanHangKH = async (params: any) => await postData("Debit/create/banhang", params);
 export const updateDebitMuaHangNCC = async (params: any) => await postData("Debit/update/muahang", params);
 export const updateDebitBanHangKH = async (params: any) => await postData("Debit/update/banhang", params);
+export const showWithIds = async (params: any) => await postData("Debit/showWithIds", params);

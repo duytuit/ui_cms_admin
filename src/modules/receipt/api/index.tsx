@@ -13,3 +13,4 @@ export const showReceipt = (params:any) => getData("receipt/show", params);
 export const showWithDebit = (params:any) => getData("receipt/showWithDebit", params);
 export const updateReceipt = (params:any) => postData("receipt/update", params);
 export const updateStatusReceipt = (params:any) => postData("receipt/update/status", params);
+export const confirmCancelGiaoNhan = (params:any) => postData("receipt/confirmCancelGiaoNhan", params);

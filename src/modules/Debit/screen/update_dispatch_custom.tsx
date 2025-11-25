@@ -20,7 +20,7 @@ import { json } from "stream/consumers";
 import { useListContractFileWithState } from "modules/ContractFile/service";
 export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: () => void }) {
   const [loading, setLoading] = useState(false);
-  const [infos, setInfos] = useState<any>({accounting_date: Helper.toDayString()});
+  const [infos, setInfos] = useState<any>({accountingDate: Helper.toDayString(),isExternalDriver:1});
   const dispatch = useDispatch();
   const navigate = useNavigate();
   // ===== LIST PARTNER & EMPLOYEE =====
@@ -52,7 +52,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
   const vehiclesOptions = useMemo(() => {
     if (!Array.isArray(vehicles)) return [];
     return vehicles.map((x: any) => ({
-      label: `${x?.number_code ?? "(không tên)"}-${getTypeVehicleLabel(x?.is_external_driver)}`,
+      label: `${x?.number_code ?? "(không tên)"}`,
       value: x.id,
     }));
   }, [vehicles]);
@@ -98,6 +98,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
     infos.goodsFee       = toInt(infos.goodsFee);
     infos.data = JSON.stringify(infos);
     infos.fileInfoId= infos.id;
+    infos.vehicleNumber = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleLabel : infos.vehicleNumber
     let info = {
       ...infos, status: infos.status ? 0 : 1,
     };
@@ -138,7 +139,8 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
           partnerName:partner?.label,
           customerDetailId:detail.customer_detail_id,
           accountingDate:detail.accounting_date,
-          containerCode:detail.container_code
+          containerCode:detail.container_code,
+          isExternalDriver:1
         };
         setInfos(info)
         console.log(info);
@@ -148,20 +150,20 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
    function getDetailPartner(id: number) {
       setInfos({})
       let info = {
+        isExternalDriver:1,
         accountingDate: Helper.toDayString(),
         customerDetailId:id
       };
       setInfos(info)
   }
   useEffect(() => {
-    setLoading(false)
   }, [fileContract,partnerOptions, driverOptions, vehiclesOptions, partnerVenderOptions]);
   return (
     <>
       <AddForm
         className="w-full"
         style={{ margin: "0 auto" }}
-        checkId={infos.id}
+        checkId={1}
         title="xe"
         loading={loading}
         onSubmit={handleSubmit}
@@ -250,14 +252,14 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
           </Panel>
           <Panel header="Thông tin điều xe">
             <div className="formgrid grid">
-              <div className="field col-3">
+              <div className="field col-4">
                 <MyCalendar dateFormat="dd/mm/yy"
                   value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
                   onChange={(e: any) =>
                     setInfos({ ...infos, accountingDate: e })}
                   className={classNames("w-full", "p-inputtext", "input-form-sm")} />
               </div>
-               <div className="field col-9">
+               <div className="field col-8">
                 <InputForm className="w-full"
                   id="route"
                   value={infos.route}
@@ -268,7 +270,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   required
                 />
               </div>
-               <div className="field col-3">
+               <div className="field col-4">
                 <InputForm className="w-full"
                   id="customerVehicleType"
                   value={infos.customerVehicleType}
@@ -278,7 +280,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="Loại xe KH"
                 />
               </div>
-              <div className="field col-9">
+              <div className="field col-8">
                 <InputForm className="w-full"
                   id="supplierVehicleType"
                   value={infos.supplierVehicleType}
@@ -288,7 +290,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="Loại xe NCC"
                 />
               </div>
-               <div className="field col-3">
+               <div className="field col-4">
                 <InputForm className="w-full"
                   id="sellingPrice"
                   value={infos.sellingPrice}
@@ -298,7 +300,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="Cước bán"
                 />
               </div>
-               <div className="field col-5">
+               <div className="field col-4">
                 <InputForm className="w-full"
                   id="driverFee"
                   value={infos.driverFee}
@@ -318,7 +320,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="TTHQ"
                 />
               </div>
-               <div className="field col-3">
+               <div className="field col-4">
                 <InputForm className="w-full"
                   id="purchasePrice"
                   value={infos.purchasePrice}
@@ -328,7 +330,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="Cước mua"
                 />
               </div>
-               <div className="field col-9">
+               <div className="field col-8">
                 <Dropdown
                   filter
                   value={infos.supplierDetailId}
@@ -346,7 +348,22 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   className="w-full"
                 />
               </div>
-               <div className="field col-3">
+              <div className="field col-2">
+                <Dropdown
+                  value={infos.isExternalDriver}
+                  optionValue="isExternalDriver"
+                  optionLabel="name"
+                  options={typeVehicle}
+                  onChange={(e: any) =>
+                    {
+                        setInfos({ ...infos, isExternalDriver: e.target.value })
+                    }
+                  }
+                  label="Loại xe"
+                  className="w-full"
+                />
+               </div>
+                {infos.isExternalDriver == 0 && <div className="field col-2">
                 <Dropdown
                   filter
                   value={infos.vehicleId}
@@ -362,11 +379,18 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   }
                   label="Biển số xe"
                   className="w-full"
-                  required
                 />
-              </div>
-              
-              <div className="field col-9">
+              </div>}
+               {infos.isExternalDriver == 1 && <div className="field col-2">
+                  <InputForm className="w-full"
+                      id="vehicleNumber"
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, vehicleNumber: e.target.value })
+                      }
+                      label="Biển số xe"
+                    />
+              </div>}
+              <div className="field col-8">
                 <Dropdown
                   value={infos.employeeDriverId}
                   options={driverOptions}
@@ -384,7 +408,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   required
                 />
               </div>
-              <div className="field col-3">
+              <div className="field col-4">
                 <InputForm className="w-full"
                   id="mealFee"
                   value={infos.mealFee}
@@ -394,7 +418,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="Tiền ăn"
                 />
               </div>
-              <div className="field col-4">
+              <div className="field col-3">
                 <InputForm className="w-full"
                   id="ticketFee"
                   value={infos.ticketFee}
@@ -424,7 +448,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="Tiền luật"
                 />
               </div>
-              <div className="field col-3">
+              <div className="field col-4">
                 <InputForm className="w-full"
                   id="goodsFee"
                   value={infos.goodsFee}
@@ -434,7 +458,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="Lượng hàng về"
                 />
               </div>
-              <div className="field col-9">
+              <div className="field col-8">
                 <InputForm className="w-full"
                   id="note"
                   onChange={(e: any) =>

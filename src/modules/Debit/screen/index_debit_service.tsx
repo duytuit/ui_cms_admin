@@ -408,7 +408,7 @@ export default function ListContractFileBangKe() {
                                           if(row.re_status == 0){
                                             return <Button label="chưa xử lý" rounded severity="warning" size="small" text  />
                                           }else if(row.re_status == 1){
-                                            return <Button label="đã xử lý" rounded severity="success" size="small" text  />
+                                            return <Button label="đã tạo phiếu" rounded severity="success" size="small" text  />
                                           }
                                         }} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
