@@ -181,7 +181,6 @@ export default function UpdateContractFile() {
                     setInfos({ ...infos, declaration: e.target.value })
                   }
                   label="Số tờ khai"
-                  required
                 />
               </div>
                <div className="field col-3">
@@ -196,7 +195,6 @@ export default function UpdateContractFile() {
                     setInfos({ ...infos, declarationQuantity: v });
                   }}
                   label="Số lượng tờ khai"
-                  required
                 />
               </div>
               <div className="field col-3">
@@ -221,7 +219,6 @@ export default function UpdateContractFile() {
                     setInfos({ ...infos, bill: e.target.value })
                   }
                   label="Số bill"
-                  required
                 />
               </div>
               <div className="field col-2">
@@ -232,7 +229,6 @@ export default function UpdateContractFile() {
                     setInfos({ ...infos, quantity: e.target.value })
                   }
                   label="Số lượng"
-                  required
                 />
               </div>
               <div className="field col-2">

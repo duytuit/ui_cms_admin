@@ -145,7 +145,6 @@ const UpdateEmployee = () => {
                         setInfos({ ...infos, email: e.target.value })
                       }
                       label="Email"
-                      required
                     />
                   </div>
                 </div>

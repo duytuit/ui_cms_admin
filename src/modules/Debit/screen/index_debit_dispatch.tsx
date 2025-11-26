@@ -164,7 +164,7 @@ export default function ListCreateDispatch() {
         business: _nghiepVu?.name || "",
         customerName: cus?.partners?.name || "",
         customerAbb: cus?.partners?.abbreviation || "",
-        userName: `${_user.last_name ?? ""} ${_user.first_name ?? ""}`.trim(),
+        userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
       };
     });
       const mappedDebitDispatch = (debitDispatch?.data || []).map((row: any) => {
