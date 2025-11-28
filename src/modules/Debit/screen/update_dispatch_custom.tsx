@@ -103,8 +103,8 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
       ...infos, status: infos.status ? 0 : 1,
     };
     console.log(info);
-    setLoading(true);
-    fetchDataSubmit(info);
+    //setLoading(true);
+    fetchDataSubmit(info); 
   };
   const toInt = (v: any) =>
   v == null
@@ -126,29 +126,25 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
         }
       } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
   };
-  function getDetailFileContract(id: number) {
-    setInfos({})
+  const getDetailFileContract = (id: number) => {
     if (fileContract && fileContract.length > 0) {
-      const detail = fileContract.find((x:any) => x.id == id)
+      const detail = fileContract.find((x:any) => x.id === id)
       if(detail){
         const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declaration_type);
-        const partner = partnerOptions.find((x:any)=>x.value == detail.customer_detail_id)
-        let info = {
-          ...detail, status: detail.status === 0 ? true : false,
+        const partner = partnerOptions.find((x:any)=>x.value === detail.customer_detail_id)
+        setInfos({...infos,...detail,
           loaiToKhai:_loaiToKhai?.name,
           partnerName:partner?.label,
           customerDetailId:detail.customer_detail_id,
           accountingDate:detail.accounting_date,
           containerCode:detail.container_code,
           isExternalDriver:1
-        };
-        setInfos(info)
-        console.log(info);
+        })
       }
     }
   }
-   function getDetailPartner(id: number) {
-      setInfos({})
+   function getDetailPartner(event:any,id: number) {
+    event.preventDefault()
       let info = {
         isExternalDriver:1,
         accountingDate: Helper.toDayString(),
@@ -183,7 +179,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                         options={partnerOptions}
                         onChange={(e: any) =>
                           {
-                             getDetailPartner(e.value)
+                             setInfos({...infos,id:0,declaration:'',bill:'',container_code:'',quantity:'',loaiToKhai:'',isExternalDriver:1,accountingDate: Helper.toDayString(),customerDetailId:e.value})
                           }
                         }
                         label="khách hàng"
@@ -213,11 +209,10 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                         showClear
                         value={infos.id}
                         options={fileContractOptions}
-                        onChange={(e: any) =>
-                          {
-                              getDetailFileContract(e.value)
-                          }
-                        }
+                        onChange={(e:any) => {
+                            setInfos((prev: any) => ({ ...prev, id: e.value }));
+                            getDetailFileContract(e.value);
+                        }}
                         label="Số file"
                         className="w-full"
                       />
@@ -405,7 +400,6 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                         } })
                      }
                   }
-                  required
                 />
               </div>
               <div className="field col-4">

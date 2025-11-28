@@ -12,7 +12,7 @@ import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useListContractFileHasDebitNangHa, useListContractFileHasDebitService, useListContractFileNotDebitNangHa, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
-import {  deleteMultiDebit } from "../api";
+import {  deleteMultiDebit, delMultiDebit } from "../api";
 import UpdateDebitNangHa from "./update_service_nh";
 
 // ✅ Component Header lọc dữ liệu
@@ -343,7 +343,7 @@ export default function ListContractFileNangHa() {
                                                 return ActionBodyWithIds(
                                                     row.debit_ids,
                                                     null,
-                                                    { route: "Debit/delete/multi", action: deleteMultiDebit },
+                                                    { route: "Debit/delete/multiDebit", action: delMultiDebit },
                                                     paramsPaginator,
                                                     setParamsPaginator
                                                 );

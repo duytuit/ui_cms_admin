@@ -50,6 +50,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
       setFilter={setFilter}
       className="lg:col-9"
        add="/debit/addDauKyKh"
+       addOne="/debit/UpdateImportDauKy"
     >
       <div className="col-2">
         <Input

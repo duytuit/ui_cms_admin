@@ -371,7 +371,6 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                         } })
                      }
                   }
-                  required
                 />
               </div>
               <div className="field col-4">

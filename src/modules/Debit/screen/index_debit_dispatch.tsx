@@ -377,20 +377,20 @@ export default function ListCreateDispatch() {
                           <Column field="customer_vehicle_type" header="Loại xe KH" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplier_vehicle_type" header="Loại xe NCC" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="purchase_price" header="Cước mua" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="price" header="Cước bán" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="driver_fee" header="Lái xe thu cước" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="goods_fee" header="Lương hàng về" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="purchase_price" body={(row: any) => Helper.formatCurrency(row.purchase_price.toString())} header="Cước mua" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="price" body={(row: any) => Helper.formatCurrency(row.price.toString())} header="Cước bán" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="driver_fee" body={(row: any) => Helper.formatCurrency(row.driver_fee.toString())} header="Lái xe thu cước" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="goods_fee" body={(row: any) => Helper.formatCurrency(row.goods_fee.toString())} header="Lương hàng về" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplierName" header="Nhà cung cấp" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplierAbb" header="Tên viết tắt NCC" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="declaration_quantity" header="Biển số xe" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="vehicle_number" header="Biển số xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Lái xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="TTHQ" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Điểm trả hàng" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="meal_fee" header="Tiền ăn" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="ticket_fee" header="Tiền Vé" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="overnight_fee" header="Tiền qua đêm" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="penalty_fee" header="Tiền luật" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="meal_fee" body={(row: any) => Helper.formatCurrency(row.meal_fee.toString())} header="Tiền ăn" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="ticket_fee" body={(row: any) => Helper.formatCurrency(row.ticket_fee.toString())} header="Tiền Vé" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="overnight_fee" body={(row: any) => Helper.formatCurrency(row.overnight_fee.toString())} header="Tiền qua đêm" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="penalty_fee" body={(row: any) => Helper.formatCurrency(row.penalty_fee.toString())} header="Tiền luật" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />

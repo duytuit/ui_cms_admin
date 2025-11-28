@@ -9,12 +9,13 @@ import { Button, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { useListContractFileWithState } from "modules/ContractFile/service";
-import UpdateHoanUngGiaoNhan from "modules/receipt/screen/update_hoanung_giao_nhan";
+import UpdateHoanUngGiaoNhan from "modules/receipt/screen/view_hoanung_giao_nhan";
 import { confirmCancelGiaoNhan, deleteReceipt } from "../api";
 import { FilterMatchMode } from "primereact/api";
 import { useListReceipt, useListXacNhanChiPhiGiaoNhan } from "../service";
 import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { formOfPayment } from "utils";
+import ViewHoanUngGiaoNhan from "modules/receipt/screen/view_hoanung_giao_nhan";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator}: any) => {
@@ -134,6 +135,7 @@ export default function ListChiPhiGiaoNhan() {
         const [first, setFirst] = useState(0);
         const [rows, setRows] = useState(20);
         const [visible, setVisible] = useState(false);
+        const [visibleView, setVisibleView] = useState(false);
         const [receiptData, setRecieptData] = useState<any[]>([]);
         const [detail, setDetail] = useState<any>();
         const [paramsPaginator, setParamsPaginator] = useState({
@@ -155,6 +157,12 @@ export default function ListChiPhiGiaoNhan() {
         const { data: DMExpense } = useListIncomeExpenseWithState({}); // danh mục chi phí
         const { data: DMBank } = useListBankWithState({type:1});
         const { data: DMQuy } = useListFundCategoryWithState({type:1});
+        const openDialogView = (row:any) => {
+            const data = JSON.parse(row.data)
+            setRecieptData(data)
+            setDetail(row)
+            setVisibleView(true);
+        };
         const openDialogAdd = (row:any) => {
             const data = JSON.parse(row.data)
             setRecieptData(data)
@@ -265,9 +273,14 @@ export default function ListChiPhiGiaoNhan() {
                     }
                 }
               />
-               <Column header="Trạng thái" body={(row: any) => {
+               <Column header="Trạng thái" style={{width:"150px"}} body={(row: any) => {
                     if(row.status == 1){
-                      return <Button label="đã tạo phiếu thu" rounded severity="success" size="small" text  />
+                    return (<>
+                      <div className="flex">
+                          <Button icon="pi pi-eye" rounded outlined className="mr-2" onClick={()=>openDialogView(row)} />
+                          <Button label="đã tạo phiếu thu" rounded severity="success" size="small" text  />
+                           </div>
+                    </>)
                     }else{
                       return <Button label="chưa xử lý" rounded severity="warning" size="small" text  />
                     }
@@ -327,6 +340,17 @@ export default function ListChiPhiGiaoNhan() {
                 >
                 <p className="m-0">
                     {detail && <UpdateHoanUngGiaoNhan detail={detail} debits={receiptData} onClose={handleModalClose} ></UpdateHoanUngGiaoNhan>}
+                </p>
+          </Dialog>
+          <Dialog
+                position="top"
+                dismissableMask
+                visible={visibleView}
+                onHide={() => setVisibleView(false)}
+                style={{ width: "60vw", top:"30px" }}
+                >
+                <p className="m-0">
+                    {detail && <ViewHoanUngGiaoNhan detail={detail} debits={receiptData} onClose={handleModalClose} ></ViewHoanUngGiaoNhan>}
                 </p>
           </Dialog>
       </>

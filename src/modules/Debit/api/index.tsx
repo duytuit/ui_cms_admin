@@ -17,7 +17,9 @@ export const showDebitByFileId = async (params: any) => await getData("Debit/sho
 export const updateDebitToStatusDichVu = async (params: any) => await postData("Debit/updateDebitToStatusDichVu", params);
 export const deleteDebit = async (params: any) => await postData("Debit/delete", params);
 export const deleteMultiDebit = async (params: any) => await postData("Debit/delete/multi", params);
+export const delMultiDebit = async (params: any) => await postData("Debit/delete/multiDebit", params);
 export const addDebit = async (params: any) => await postData("Debit/create", params);
+export const importDebitDauKyKH = async (params: any) => await postData("Debit/importDauKy", params);
 export const addDebitDauKyKH = async (params: any) => await postData("Debit/create/daukykh", params);
 export const addDebitDauKyNCC = async (params: any) => await postData("Debit/create/daukyncc", params);
 export const addDebitMuaBan= async (params: any) => await postData("Debit/create/muaban", params);

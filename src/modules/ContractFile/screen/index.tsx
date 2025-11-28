@@ -172,6 +172,12 @@ export default function ListContractFile() {
             fullName + (index < row.file_info_details.length - 1 ? ";" : "");
         });
       }
+       let _sumAmount = 0;
+       if (row?.receipts.length > 0) {
+        row.receipts.forEach((element: any, index: number) => {
+          _sumAmount += element.receipt_details?.amount || 0;
+        });
+      }
 
       return {
         ...row,
@@ -185,6 +191,7 @@ export default function ListContractFile() {
         userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
         sumTongPrice: _sumTongPrice,
         listEmployee: _listEmployee,
+        sumAmount: _sumAmount,
       };
     });
     setDisplayData(mapped);
@@ -259,7 +266,7 @@ export default function ListContractFile() {
           <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="sales" header="Tên sales" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="listEmployee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="sumTongPrice" header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column body={(row: any) => Helper.formatCurrency(row.sumAmount.toString())}  header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="feature" header="Tính chất" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="type" header="Loại hàng" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="declaration_quantity" header="Số lượng tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />

@@ -329,13 +329,13 @@ export default function ListFileGia() {
                                         <Column
                                             header="Thao tác"
                                             body={(row: any) => {
-                                                // return ActionBodyWithIds(
-                                                //     row.debit_ids,
-                                                //     null,
-                                                //     { route: "Debit/delete/multi", action: deleteMultiDebit },
-                                                //     paramsPaginator,
-                                                //     setParamsPaginator
-                                                // );
+                                                return ActionBodyWithIds(
+                                                    row.debit_ids,
+                                                    null,
+                                                    { route: "Debit/delete/multi", action: deleteMultiDebit },
+                                                    paramsPaginator,
+                                                    setParamsPaginator
+                                                );
                                             }}
                                         />
                                         <Column header="Trạng thái" body={(row: any) => {

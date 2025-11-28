@@ -157,6 +157,15 @@ export class Helper {
     const day = String(d.getDate()).padStart(2, "0");
     return `${y}-${m}-${day}`;
   };
+  static parseMoney = (value: string | number): number => {
+  if (!value) return 0;
+
+  if (typeof value === "number") return value;
+
+  // Loại bỏ tất cả dấu phẩy
+  const numStr = value.replace(/,/g, "");
+  return Number(numStr);
+};
    static toDayString() {
     const d = new Date();
     const y = d.getFullYear();

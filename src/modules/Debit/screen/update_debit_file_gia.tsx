@@ -466,10 +466,10 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                     severity="success"
                     raised
                     onClick={() => {
-                      if (!newDebit.name || !newDebit.price || newDebit.price <= 0 || !newDebit.purchasePrice || newDebit.purchasePrice <= 0)
+                      if (!newDebit.name || !newDebit.price || newDebit.price <= 0)
                       return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin chi phí khác" }));
                       // convert price về số khi push
-                      const numericpurchasePrice = parseInt(newDebit.purchasePrice.replace(/\D/g, ""), 10);
+                      const numericpurchasePrice = parseInt(newDebit.purchasePrice.replace(/\D/g, ""), 10)|| 0
                       const numericPrice = parseInt(newDebit.price.replace(/\D/g, ""), 10);
                       setProductDebit([
                        ...productDebit,

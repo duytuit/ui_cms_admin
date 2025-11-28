@@ -57,6 +57,7 @@ import ListBanHang from "modules/Debit/screen/index_banhang";
 import UpdateBanHang from "modules/Debit/screen/update_banhang";
 import ListViewChiPhiGiaoNhan from "modules/receipt/screen/index_view_chiphi_giaonhan";
 import ListReceiptThuKH from "modules/receipt/screen/index_thu_kh";
+import UpdateImportDauKy from "modules/Debit/screen/imports/updateImportDauKy";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -145,6 +146,7 @@ const publicRoutes = [
   { path: "/debit/listTamThu", component: ListTamThu, layout: 'ListTamThu' },
   { path: "/debit/ListDauKyKh", component: ListDauKyKh, layout: 'ListDauKyKh' },
   { path: "/debit/addDauKyKh", component: UpdateDauKyKh, layout: 'UpdateDauKyKh' },
+  { path: "/debit/UpdateImportDauKy", component: UpdateImportDauKy, layout: 'UpdateImportDauKy' },
   { path: "/debit/detailDauKyKh/:id", component: UpdateDauKyKh, layout: 'UpdateDauKyKh' },
   { path: "/debit/ListDauKyNcc", component: ListDauKyNcc, layout: 'ListDauKyNcc' },
   { path: "/debit/addDauKyNCC", component: UpdateDauKyNCC, layout: 'UpdateDauKyNCC' },

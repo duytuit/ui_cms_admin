@@ -9,12 +9,13 @@ import { Button, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { useListContractFileWithState } from "modules/ContractFile/service";
-import UpdateHoanUngGiaoNhan from "modules/receipt/screen/update_hoanung_giao_nhan";
+import UpdateHoanUngGiaoNhan from "modules/receipt/screen/view_hoanung_giao_nhan";
 import { deleteReceipt } from "../api";
 import { FilterMatchMode } from "primereact/api";
 import { useListReceipt, useListXacNhanChiPhiGiaoNhan } from "../service";
 import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { formOfPayment } from "utils";
+import ViewHoanUngGiaoNhan from "modules/receipt/screen/view_hoanung_giao_nhan";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator}: any) => {
@@ -256,6 +257,8 @@ export default function ListViewChiPhiGiaoNhan() {
                             paramsPaginator,
                             setParamsPaginator
                         );
+                    }else{
+                          return  <Button icon="pi pi-eye" rounded outlined className="mr-2" onClick={()=>   openDialogAdd(row)} />
                     }
                  }}
               />
@@ -320,7 +323,7 @@ export default function ListViewChiPhiGiaoNhan() {
                 style={{ width: "60vw", top:"30px" }}
                 >
                 <p className="m-0">
-                    {detail && <UpdateHoanUngGiaoNhan detail={detail} debits={receiptData} onClose={handleModalClose} ></UpdateHoanUngGiaoNhan>}
+                    {detail && <ViewHoanUngGiaoNhan detail={detail} debits={receiptData} onClose={handleModalClose} ></ViewHoanUngGiaoNhan>}
                 </p>
           </Dialog>
       </>
