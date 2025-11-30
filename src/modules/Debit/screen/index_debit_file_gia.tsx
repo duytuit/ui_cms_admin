@@ -15,6 +15,7 @@ import { useListContractFileHasDebitNangHa, useListContractFileHasDebitService, 
 import {  deleteMultiDebit } from "../api";
 import UpdateDebitNangHa from "./update_service_nh";
 import UpdateFileGia from "./update_debit_file_gia";
+import { Link } from "react-router-dom";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -291,7 +292,6 @@ export default function ListFileGia() {
                                       onRowClick={(e: any) => {
                                          setSelectedDetail(e.data.debits)
                                          console.log(e.data.debits);
-                                         
                                       }}
                                     >
                                       {/* Custom checkbox column */}
@@ -340,7 +340,16 @@ export default function ListFileGia() {
                                         />
                                         <Column header="Trạng thái" body={(row: any) => {
                                           if(row.cf_status_confirm == 1){
-                                            return <Button label="đã duyệt" rounded severity="success" size="small" text  />
+                                            return (
+                                              <>
+                                                <div className="flex justify-content-between align-items-center">
+                                                    <Button label="đã duyệt" rounded severity="success" size="small" text  />
+                                                    <a href={`/debit/print?id=${row.id}`} target="_blank" rel="noopener noreferrer">
+                                                       <Button label="In" rounded icon="pi pi-print" severity="info" size="small" text />
+                                                    </a>
+                                                 </div>
+                                              </>
+                                            )
                                           }else{
                                             return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
                                           }

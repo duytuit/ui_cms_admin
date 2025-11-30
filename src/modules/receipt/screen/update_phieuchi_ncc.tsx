@@ -4,47 +4,38 @@ import { useEffect, useMemo, useState } from "react";
 import { Column, DataTable, Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { formOfPayment, listToast, refreshObject } from "utils";
-import { updateHoanUngGiaoNhan, updateReceiptChiGiaoNhan } from "../api";
+import { addPhieuChiNCC, addPhieuThuKH } from "../api";
 import { useDispatch } from "react-redux";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { Dropdown, Input } from "components/common/ListForm";
 import { useListEmployeeWithState } from "modules/employee/service";
-import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
-export default function UpdateHoanUngGiaoNhan({ detail, debits, onClose}: {detail:any, debits: any, onClose: () => void }) {
-  const amount = Math.abs(debits.reduce((sum: number, item: any) => sum + (item.phaiTra || 0), 0));
-  const check_amount = debits.reduce((sum: number, item: any) => sum + (item.phaiTra || 0), 0);
+import { useListBankWithState, useListFundCategoryWithState } from "modules/categories/service";
+export default function UpdatePhieuChiNCC({debits, onClose}: {debits: any, onClose: () => void }) {
+  const amount = debits.reduce((sum: number, item: any) => {
+                  const conlai = (item.conlai_dv || 0) + (item.conlai_ch || 0);
+                  return sum + conlai;
+                }, 0);
   const [loading, setLoading] = useState(false);
   const [employeeInfo, setEmployeeInfo] = useState<any>({});
   const [bankSelect, setBankSelect] = useState<any>({});
-  const [nhanVienGiaoNhan, setNhanVienGiaoNhan] = useState<any>();
-  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1,incomeExpenseCategoryId:check_amount > 0 ? 1 : 9 });
+  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1});
   const dispatch = useDispatch();
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    infos.Debits = JSON.stringify(debits);
+    infos.amount = amount;
     let info = {
       ...infos,
-      data: JSON.stringify(debits.map((x: any) => ({
-         fileInfoId: x.id,
-         fileName:x.file_number,
-         dienGiai:x.file_number+" KH_"+x.customerAbb,
-         receipt_total:x.receipt_total,
-         sumCH:x.sumCH,
-         sumHQ:x.sumHQ,
-         phaiTra:x.phaiTra
-      }))),
-      id:detail.id,
-      amount:amount,
-      typeReceipt:check_amount > 0 ? 3 : 2,
-      status:1
+      data: JSON.stringify(infos),
     };
     console.log(info);
     setLoading(true);
     fetchDataSubmit(info);
   };
   async function fetchDataSubmit(info: any) {
-    const response = await updateHoanUngGiaoNhan(info);
+    const response = await addPhieuChiNCC(info);
     if (response) setLoading(false);
     if (response.status === 200) {
       if (response.data.status) {
@@ -56,14 +47,6 @@ export default function UpdateHoanUngGiaoNhan({ detail, debits, onClose}: {detai
       }
     } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
   };
-   const { data: DMExpense } = useListIncomeExpenseWithState({}); // danh mục chi phí
-   const DMExpenseOptions = useMemo(() => {
-       if (!Array.isArray(DMExpense)) return [];
-       return DMExpense.map((x: any) => ({
-         label: x?.name ?? "(không tên)",
-         value: x.id,
-       }));
-     }, [DMExpense]);
    const { data: DMQuy } = useListFundCategoryWithState({type:1});
    const DMQuyOptions = useMemo(() => {
        if (!Array.isArray(DMQuy)) return [];
@@ -92,11 +75,7 @@ export default function UpdateHoanUngGiaoNhan({ detail, debits, onClose}: {detai
   useEffect(() => {
       const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
       setEmployeeInfo(employeeInfo);
-      if (detail&&employees && employees.length > 0) {
-          const _nvgiaonhan = employees.find((x:any)=>x.id == detail.employee_id)
-          setNhanVienGiaoNhan(`${_nvgiaonhan.last_name ?? ""} ${_nvgiaonhan.first_name ?? ""}`.trim())
-      }
-    }, [detail,debits,employees])
+    }, [debits,employees])
   return (
     <>
       <UpdateForm       
@@ -105,16 +84,16 @@ export default function UpdateHoanUngGiaoNhan({ detail, debits, onClose}: {detai
         checkId={infos.id}
         loading={loading}
         onSubmit={handleSubmit}
-        route={Number(detail.id) ? "/receipt/update" : "/receipt/create"}
-        AddName={check_amount > 0 ? "Tạo phiếu thu hoàn ứng" : "Tạo phiếu chi hoàn ứng"}
+        route="/receipt/create"
+        AddName="Tạo phiếu chi nhà cung cấp"
       >
         <div className="field">
           <Panel header="Thông tin">
             <h3 className="field" style={{ textAlign: "center",textTransform: 'uppercase' }}>
-              {check_amount > 0 ? "Phiếu thu hoàn ứng giao nhận" : "Phiếu chi hoàn ứng giao nhận"} 
+              Phiếu chi
             </h3>
             <div className="grid">
-              <div className="col-8">
+              <div className="col-10">
                 <div className="formgrid grid">
                   <div className="field col-6">
                     <MyCalendar dateFormat="dd/mm/yy"
@@ -142,44 +121,20 @@ export default function UpdateHoanUngGiaoNhan({ detail, debits, onClose}: {detai
                       ))}
                     </div>
                   </div>
-                  <div className="field col-12">
-                     <Input
-                      id="sales"
-                      value={nhanVienGiaoNhan}
-                      className="w-full"
-                      label="Giao nhận"
-                      disabled
-                     />
-                  </div> 
-                  <div className="field col-12">
+                  <div className="field col-6">
                     <Input
                       id="sales"
                       value={employeeInfo ? `${employeeInfo.last_name ?? ''} ${employeeInfo.first_name ?? ''}`.trim() : ''}
                       onChange={(e: any) =>
                         setInfos({ ...infos, sales: e.target.value })
                       }
-                      className="w-full"
+                      className="w-full p-inputtext-sm"
                       label="Người tạo phiếu"
                       disabled
                     />
                   </div>
-                  <div className="field col-12">
+                  <div className="field col-6">
                     <InputForm className="w-full p-inputtext-sm" id="Amount" value={Helper.formatCurrency(amount.toString())} label="Số tiền" disabled />
-                  </div>
-                   <div className="field col-12">
-                     <Dropdown
-                      filter
-                      value={infos.incomeExpenseCategoryId}
-                      optionValue="value"
-                      optionLabel="label"
-                      options={DMExpenseOptions}
-                      label={check_amount > 0 ? "Lý do thu" : "Lý do chi"}
-                      className="w-full p-inputtext-sm"
-                      onChange={(e: any) =>
-                        setInfos({ ...infos, incomeExpenseCategoryId: e.value })
-                      }
-                      disabled
-                    />
                   </div>
                    <div className="field col-12">
                     <InputForm className="w-full"
@@ -200,30 +155,65 @@ export default function UpdateHoanUngGiaoNhan({ detail, debits, onClose}: {detai
                           scrollHeight="flex"
                           style={{ flex: 1 }}
                         >
+                            <Column  body={(rowData:any, options:any) => options.rowIndex + 1} />
+                            <Column field="supplierAbb" header="Tên nhà cung cấp"/>
+                            <Column header="Số file"
+                            body={(row: any) =>{
+                                let data = JSON.parse(row.data);
+                                return data?.fileNumber
+                            }}/>
+                            <Column  header="Mã điều xe" 
+                            body={(row: any) =>{
+                              if(row.type === 1){
+                                  return row.dispatch_code
+                              }
+                            }} />
+                            <Column field="name" header="Nội dung"/>
+                            <Column  header="Dịch vụ" 
+                            body={(row: any) =>{
+                              if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){ // dịch vụ
+                                  // Chuyển price về số thực, giữ decimal
+                                  const purchase_price = typeof row.purchase_price === "string"
+                                    ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
+                                    : Number(row.purchase_price) || 0;
+                                  const purchase_vat = Number(row.purchase_vat) || 0;
+                                  // Tính thành tiền
+                                  const thanh_tien = Math.round(purchase_price * (1 + purchase_vat / 100));
+                                  return Helper.formatCurrency(thanh_tien.toString());
+                              }
+                            }}/>
+                            <Column  header="Chi hộ" 
+                             body={(row: any) =>{
+                              if(row.type === 2 || row.type === 3 || row.type === 6){
+                                  // Chuyển price về số thực, giữ decimal
+                                  const purchase_price = typeof row.purchase_price === "string"
+                                    ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
+                                    : Number(row.purchase_price) || 0;
+                                  const purchase_vat = Number(row.purchase_vat) || 0;
+                                  // Tính thành tiền
+                                  const thanh_tien = Math.round(purchase_price * (1 + purchase_vat / 100));
+                                  return Helper.formatCurrency(thanh_tien.toString());
+                              }
+                            }}/>
                             <Column 
-                              header="STT" 
-                              body={(rowData:any, options:any) => options.rowIndex + 1}
-                            />
-                            <Column 
-                              header="Diễn giải" 
-                              body={(row: any) => row.dienGiai }
-                            />
-                            <Column body={(row: any) => Helper.formatCurrency(row.receipt_total.toString())} header="Tạm ứng" />
-                            <Column body={(row: any) => Helper.formatCurrency((row.sumHQ+row.sumCH).toString())} header="Chi phí" />
-                            <Column 
-                              body={(row: any) => Helper.formatCurrency(row.phaiTra.toString())} 
-                              header="Hoàn lại" 
-                              footer={Helper.formatCurrency(
-                              debits.reduce((sum:any, item:any) => sum + (item.phaiTra || 0), 0)
-                              .toString()
+                              header="Số tiền chi" 
+                               body={(row: any) => {
+                                  const conlai = (row.conlai_dv || 0) + (row.conlai_ch || 0);
+                                  return Helper.formatCurrency(conlai.toString());
+                                }}
+                                footer={Helper.formatCurrency(
+                                  debits.reduce((sum: number, item: any) => {
+                                      const conlai = (item.conlai_dv || 0) + (item.conlai_ch || 0);
+                                      return sum + conlai;
+                                  }, 0).toString()
                                 )}
-                              footerStyle={{ fontWeight: "bold" }}
+                                footerStyle={{ fontWeight: "bold" }}
                             />
                         </DataTable>
                   </div>
                 </div>
               </div>
-              <div className="col-4">
+              <div className="col-2">
                  { infos.formOfPayment == 2 && <div className="formgrid grid">
                     <div className="col-12">
                       <Dropdown

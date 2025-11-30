@@ -34,11 +34,8 @@ import Post from "modules/post/screen";
 import Updatepost from "modules/post/screen/update";
 import Product from "modules/product/screen";
 import UpdateProduct from "modules/product/screen/update";
-import ListReceiptChiGiaoNhan from "modules/receipt/screen/index_chi_giao_nhan";
-import ListReceipt from "modules/receipt/screen/index_chi_giao_nhan";
-import Receipt from "modules/receipt/screen/index_chi_tam_ung";
+import ListReceipt from "modules/receipt/screen/index_chi";
 import ListChiPhiGiaoNhan from "modules/receipt/screen/index_xn_chiphi_giaonhan";
-import UpdateReceipt from "modules/receipt/screen/update";
 import UpdateReceiptChiGiaoNhan from "modules/receipt/screen/update_chi_giao_nhan";
 import Service from "modules/service/screen";
 import UpdateService from "modules/service/screen/update";
@@ -56,8 +53,12 @@ import ListMuaHang from "modules/Debit/screen/index_muahang";
 import ListBanHang from "modules/Debit/screen/index_banhang";
 import UpdateBanHang from "modules/Debit/screen/update_banhang";
 import ListViewChiPhiGiaoNhan from "modules/receipt/screen/index_view_chiphi_giaonhan";
-import ListReceiptThuKH from "modules/receipt/screen/index_thu_kh";
 import UpdateImportDauKy from "modules/Debit/screen/imports/updateImportDauKy";
+import PrintDebit from "modules/Debit/screen/exports/print_debit";
+import UpdateImportDauKyNCC from "modules/Debit/screen/imports/updateImportDauKyNCC";
+import ListChiTietNCC from "modules/Debit/screen/index_chitiet_ncc";
+import ListReceiptThu from "modules/receipt/screen/index_thu";
+import ListReceiptChi from "modules/receipt/screen/index_chi";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -91,9 +92,6 @@ const publicRoutes = [
   { path: "/bill/detail/:id", component: UpdateBill, layout: 'DetailBill' },
 
   // receipt 
-  { path: "/receipt/list", component: Receipt, layout: 'ListReceipt' },
-  { path: "/receipt/add", component: UpdateReceipt, layout: 'UpdateReceipt' },
-  { path: "/receipt/detail/:id", component: UpdateReceipt, layout: 'DetailReceipt' },
 
   // post 
   { path: "/post/list", component: Post, layout: 'ListPost' },
@@ -133,20 +131,19 @@ const publicRoutes = [
   { path: "/department/detail/:id", component: UpdateDepartment, layout: 'UpdateDepartment' },
   // Receipt 
   { path: "/receipt/list", component: ListReceipt, layout: 'ListReceipt' },
-  { path: "/receipt/add", component: UpdateReceipt, layout: 'UpdateReceipt' },
-  { path: "/receipt/listReceiptThuKH", component: ListReceiptThuKH, layout: 'ListReceiptThuKH' },
+  { path: "/receipt/ListReceiptThu", component: ListReceiptThu, layout: 'ListReceiptThu' },
+  { path: "/receipt/ListReceiptChi", component: ListReceiptChi, layout: 'ListReceiptChi' },
   { path: "/receipt/listChiPhiGiaoNhan", component: ListChiPhiGiaoNhan, layout: 'ListChiPhiGiaoNhan' },
   { path: "/receipt/listViewChiPhiGiaoNhan", component: ListViewChiPhiGiaoNhan, layout: 'ListViewChiPhiGiaoNhan' },
-  { path: "/receipt/listReceiptChiGiaoNhan", component: ListReceiptChiGiaoNhan, layout: 'ListReceiptChiGiaoNhan' },
   { path: "/receipt/updateReceiptChiGiaoNhan", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
   { path: "/receipt/detail/chigiaonhan/:id", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
-  { path: "/receipt/detail/:id", component: UpdateReceipt, layout: 'DetailReceipt' },
   // Debit 
   { path: "/debit/listCuoc", component: ListCuoc, layout: 'ListCuoc' },
   { path: "/debit/listTamThu", component: ListTamThu, layout: 'ListTamThu' },
   { path: "/debit/ListDauKyKh", component: ListDauKyKh, layout: 'ListDauKyKh' },
   { path: "/debit/addDauKyKh", component: UpdateDauKyKh, layout: 'UpdateDauKyKh' },
   { path: "/debit/UpdateImportDauKy", component: UpdateImportDauKy, layout: 'UpdateImportDauKy' },
+  { path: "/debit/UpdateImportDauKyNCC", component: UpdateImportDauKyNCC, layout: 'UpdateImportDauKyNCC' },
   { path: "/debit/detailDauKyKh/:id", component: UpdateDauKyKh, layout: 'UpdateDauKyKh' },
   { path: "/debit/ListDauKyNcc", component: ListDauKyNcc, layout: 'ListDauKyNcc' },
   { path: "/debit/addDauKyNCC", component: UpdateDauKyNCC, layout: 'UpdateDauKyNCC' },
@@ -160,10 +157,12 @@ const publicRoutes = [
   { path: "/debit/ListBanHang", component: ListBanHang, layout: 'ListBanHang' },
   { path: "/debit/UpdateBanHang", component: UpdateBanHang, layout: 'UpdateBanHang' },
   { path: "/debit/detailBanHang/:id", component: UpdateBanHang, layout: 'UpdateBanHang' },
+  { path: "/debit/print", component: PrintDebit,  layout: null, public: true  },
 
   //công nợ khách hàng
   { path: "/debit/ListTongHopKH", component: ListTongHopKH, layout: 'ListTongHopKH' },
   { path: "/debit/ListChiTietKH", component: ListChiTietKH, layout: 'ListChiTietKH' },
+  { path: "/debit/ListChiTietNCC", component: ListChiTietNCC, layout: 'ListChiTietNCC' },
   
   { path: "/user/inportExcelPartner", component: UpdateImportExcel, layout: 'UpdateImportExcel' },
 

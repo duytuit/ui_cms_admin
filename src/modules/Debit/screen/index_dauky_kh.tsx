@@ -1,18 +1,17 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, DataTableClient, DateBody, } from "components/common/DataTable";
-import { Calendar, CalendarY, Dropdown, GridForm, Input, } from "components/common/ListForm";
+import { useEffect, useMemo, useState } from "react";
+import { ActionBody, Column, TimeBody, DataTableClient, DateBody, } from "components/common/DataTable";
+import { Dropdown, GridForm, Input, } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { useListCustomerDetailWithState } from "modules/partner/service";
-import { useListUserWithState } from "modules/user/service";
-import { Checkbox, Dialog } from "components/uiCore";
+import { Checkbox } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import { useListDebitCuocTamThu, useListDebitDauKyKH } from "../service";
-import { useListContractFileWithState } from "modules/ContractFile/service";
+import { useListDebitDauKyKH } from "../service";
 import { deleteDebit } from "../api";
 import { TypeDebitDKKH } from "utils";
+import { FilterMatchMode } from "primereact/api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -96,6 +95,13 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
 
 export default function ListDauKyKh() {
   const { handleParamUrl } = useHandleParamUrl();
+   const [filters, setFilters] = useState({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      type: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      });
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [displayData, setDisplayData] = useState<any[]>([]);
   const [first, setFirst] = useState(0);
@@ -113,7 +119,23 @@ export default function ListDauKyKh() {
     params: paramsPaginator,
     debounce: 500,
   });
+ const getSumColumn = (field: string) => {
+        const filtered = (displayData??[]).filter((item: any) => {
+            return Object.entries(filters).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
 
+        const sum = filtered.reduce((acc: any, item: any) => {
+            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
   // ✅ Client-side pagination
   useEffect(() => {
     if (!data) return;
@@ -153,6 +175,8 @@ export default function ListDauKyKh() {
             setFirst(e.first);
             setRows(e.rows);
           }}
+          filters={filters}
+          onFilter={(e:any) => setFilters(e.filters)}
           loading={loading}
           dataKey="id"
           title="Tài khoản"
@@ -208,7 +232,11 @@ export default function ListDauKyKh() {
           <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="type" header="Loại dịch vụ" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="price"   body={(row: any) => Helper.formatCurrency(row.price.toString())} header="Số tiền" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="price"   
+           body={(row: any) => Helper.formatCurrency(row.price.toString())}
+            footer={getSumColumn("price")}
+            footerStyle={{ fontWeight: "bold" }}
+           header="Số tiền" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="name" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="userName" header="Người thực hiện" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />

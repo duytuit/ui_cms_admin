@@ -14,18 +14,17 @@ import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { Dropdown, Input } from "components/common/ListForm";
 import { useListEmployee, useListEmployeeWithState } from "modules/employee/service";
-import { useListPartnerDetail } from "modules/partner/service";
+import { useListCustomerDetailWithState, useListPartnerDetail } from "modules/partner/service";
 import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
 import { useListContractFile } from "modules/ContractFile/service";
 export default function UpdateReceiptChiGiaoNhan() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
-  const [doiTuongOptions, setDoiTuongOptions] = useState<any>([]);
   const [employeeInfo, setEmployeeInfo] = useState<any>({});
   const [bankSelect, setBankSelect] = useState<any>({});
   const [ContractFileOptions, setContractFileOptions] = useState<any[]>([]);
   const [nhanVienGiaoNhanOptions, setNhanVienGiaoNhanOptions] = useState<any[]>([]);
-  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1 });
+  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1,incomeExpenseCategoryId:15 });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSubmit = (e: any) => {
@@ -48,7 +47,7 @@ export default function UpdateReceiptChiGiaoNhan() {
            dispatch(
              showToast({ ...listToast[0], detail: response.data.message })
            );
-           navigate("/receipt/listReceiptChiGiaoNhan");
+           navigate("/receipt/ListReceiptChi");
          } else {
            dispatch(
              showToast({ ...listToast[2], detail: response.data.message })
@@ -67,7 +66,7 @@ export default function UpdateReceiptChiGiaoNhan() {
            dispatch(
              showToast({ ...listToast[0], detail: response.data.message })
            );
-           navigate("/receipt/listReceiptChiGiaoNhan");
+           navigate("/receipt/ListReceiptChi");
          } else {
            dispatch(
              showToast({ ...listToast[2], detail: response.data.message })
@@ -79,20 +78,25 @@ export default function UpdateReceiptChiGiaoNhan() {
          );
      }
   };
+ const { data: customers } = useListCustomerDetailWithState({status: 1});
  const { data: ContractFile } = useListContractFile({
      params: {f:"abc"},
      debounce: 500,
  }); 
- useEffect(() => {
+useEffect(() => {
   const list = ContractFile.data;
+
   if (Array.isArray(list) && list.length > 0) {
-    const opts = list.map((x: any) => ({
-      label: x?.file_number ?? "(không tên)",
-      value: x.id,
-    }));
+    const opts = list.map((x: any) => {
+      const cus = customers.find((c: any) => c.id === x.customer_detail_id);
+      return {
+        label: `${x.file_number} - ${cus ? cus.partners.abbreviation : 'N/A'}`,
+        value: x.id
+      };
+    });
     setContractFileOptions(opts);
   }
-}, [ContractFile]);
+}, [ContractFile, customers]);
 
    const { data: DMQuy } = useListFundCategoryWithState({type:1});
    const DMQuyOptions = useMemo(() => {
@@ -182,10 +186,10 @@ export default function UpdateReceiptChiGiaoNhan() {
         className="w-full"
         style={{ margin: "0 auto" }}
         checkId={infos.id}
-        title="phiếu chi"
+        title="phiếu chi giao nhận"
         loading={loading}
         onSubmit={handleSubmit}
-        routeList="/receipt/listReceiptChiGiaoNhan"
+        routeList="/receipt/ListReceiptChi"
         route={Number(id) ? "/receipt/update" : "/receipt/create"}
       >
         <div className="field">
@@ -273,6 +277,7 @@ export default function UpdateReceiptChiGiaoNhan() {
                         setInfos({ ...infos, incomeExpenseCategoryId: e.value })
                       }
                       required
+                      disabled
                     />
                   </div>
                    <div className="field col-4">

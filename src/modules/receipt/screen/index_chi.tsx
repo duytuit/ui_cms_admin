@@ -1,16 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, DataTableClient, DateBody } from "components/common/DataTable";
-import { Calendar, CalendarY, Dropdown, GridForm, Input } from "components/common/ListForm";
+import { useEffect, useState } from "react";
+import { ActionBody, Column, TimeBody, DataTableClient, DateBody } from "components/common/DataTable";
+import { GridForm } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
 import { classNames } from "primereact/utils";
-import { useListReceipt } from "../service";
+import { useListReceipt, useListReceiptChi } from "../service";
 import { deleteReceipt } from "../api";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
 import { Helper } from "utils/helper";
-import { formOfPayment } from "utils";
-import { useListContractFile, useListContractFileWithState } from "modules/ContractFile/service";
+import { formOfPayment, typeReceipt } from "utils";
+import { useListContractFileWithState } from "modules/ContractFile/service";
 import { FilterMatchMode } from "primereact/api";
 
 // ✅ Component Header lọc dữ liệu
@@ -33,12 +33,13 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             setFilter={setFilter}
             className="lg:col-9"
             add="/receipt/updateReceiptChiGiaoNhan"
+            addName="Thêm phiếu chi giao nhận"
         >
         </GridForm>
     );
 };
 
-export default function ListReceiptChiGiaoNhan() {
+export default function ListReceiptChi() {
     const { handleParamUrl } = useHandleParamUrl();
     const [displayData, setDisplayData] = useState<any>();
     const [filters, setFilters] = useState({
@@ -70,8 +71,8 @@ export default function ListReceiptChiGiaoNhan() {
         type: CategoryEnum.country,
         keyword: "",
     });
-    const { data, loading, error, refresh } = useListReceipt({
-        params: {...paramsPaginator, TypeReceipt:1 },
+    const { data, loading, error, refresh } = useListReceiptChi({
+        params: {...paramsPaginator},
         debounce: 500,
     });
     const { data: ContractFile } = useListContractFileWithState({
@@ -90,33 +91,26 @@ export default function ListReceiptChiGiaoNhan() {
                         const _employee = employees.find((x: any) => x.id === row.employee_id);
                         const _fullname_giaonhan = `${_employee?.last_name ?? ""} ${ _employee?.first_name ?? ""}`.trim();
                         const _lydochi = DMExpense.find((x: any) => x.id === row.income_expense_category_id);
-                        // Tính tổng tiền chi tiết
-                        const amount = (row.receipt_details ?? []).reduce((a:any, b:any) => a + (b.amount ?? 0), 0);
-                        // VAT (nếu có, ví dụ row.vat_rate = 10 nghĩa là 10%)
-                        const vatRate = row.vat ?? 0; // mặc định 0%
-                        const vatAmount = (amount * vatRate) / 100;
-                        const totalWithVat = amount + vatAmount;
                         const _tenquy = DMQuy.find((x: any) => x.id === row.fund_id);
                         const _bank = DMBank.find((x: any) => x.id === row.bank_id);
                         const _hinhthuc = formOfPayment.find((x: any) => x.value === row.form_of_payment);
                         const _nguoitao = employees.find((x: any) => x.user_id === row.created_by);
                         const _sofile = ContractFile.find((x: any) => x.id === row.file_info_id);
-                        
+                        const _typeReceipt = typeReceipt.find((x: any) => x.typeReceipt === row.type_receipt);
                         return {
                             ...row,
                             fullname_giaonhan : _fullname_giaonhan,
                             lydochi : _lydochi?.name,
-                            total_amount:  Helper.formatCurrency(amount.toString()),
-                            vat_rate: vatRate,
-                            vat_amount: vatAmount,
-                            total_with_vat: Helper.formatCurrency(totalWithVat.toString()),
                             tenquy: _tenquy?.fund_name,
                             stk: _bank?.account_number,
                             chutk: _bank?.account_holder,
                             nganhang: _bank?.bank_name,
                             hinhthuc: _hinhthuc?.name,
                             nguoitao: `${_nguoitao?.last_name ?? ""} ${_nguoitao?.first_name ?? ""}`.trim(),
-                            sofile:_sofile?.file_number
+                            sofile:_sofile?.file_number,
+                            amount: Helper.formatCurrency(row.amount.toString()),
+                            total: Helper.formatCurrency(row.total.toString()),
+                            typeReceipt: _typeReceipt?.name || "",
                         };
                      });
         setDisplayData(mapped);
@@ -186,16 +180,16 @@ export default function ListReceiptChiGiaoNhan() {
                 <Column field="fullname_giaonhan" header="Người giao nhận" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="lydochi" header="Lý do chi" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="bill" header="Số hóa đơn" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="total_amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                     footer={getSumColumn("total_amount")}
+                <Column field="amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                     footer={getSumColumn("amount")}
                      footerStyle={{ fontWeight: "bold" }}
                 />
-                <Column field="vat_rate" header="VAT" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="total_with_vat" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                     footer={getSumColumn("total_with_vat")}
+                <Column field="total" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                     footer={getSumColumn("total")}
                      footerStyle={{ fontWeight: "bold" }}
                 />
                 <Column field="tenquy" header="Quỹ" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                <Column field="typeReceipt" header="Kiểu phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="hinhthuc" header="Hình thức" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="stk" header="STK" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="chutk" header="Tên tài khoản" filter showFilterMenu={false}  filterMatchMode="contains"/>

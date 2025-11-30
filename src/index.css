@@ -162,3 +162,10 @@ display: none !important;
 .my-title-center .p-column-title {
     width: 100%;
 }
+.table-title-center .p-column-title {
+    text-align: center;
+    width: 100%;
+}
+.Custom-DataTableClient >.p-datatable-wrapper {
+  flex-basis: 0;
+}

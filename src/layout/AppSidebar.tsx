@@ -262,27 +262,75 @@ const model = [{
         sort: 1,
         icon: 'pi pi-home',
         items: [
-          {
+           {
             id: 1,
-            name: 'Công nợ tổng hợp KH',
-            route: '/debit/ListTongHopKH',
+            name: 'Khách hàng',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
             status: 1,
             category_id: 1,
             sort: 1,
+            items: [
+                {
+                  id: 1,
+                  name: 'Công nợ tổng hợp KH',
+                  route: '/debit/ListTongHopKH',
+                  created_at: '2023-05-29 14:14:02',
+                  updated_at: null,
+                  deleted_at: null,
+                  status: 1,
+                  category_id: 1,
+                  sort: 1,
+                },
+                {
+                  id: 1,
+                  name: 'Công nợ chi tiết KH',
+                  route: '/debit/ListChiTietKH',
+                  created_at: '2023-05-29 14:14:02',
+                  updated_at: null,
+                  deleted_at: null,
+                  status: 1,
+                  category_id: 1,
+                  sort: 1,
+                },
+            ]
           },
           {
             id: 1,
-            name: 'Công nợ chi tiết KH',
-            route: '/debit/ListChiTietKH',
+            name: 'Nhà cung cấp',
+            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
             status: 1,
             category_id: 1,
             sort: 1,
+            items: [
+                {
+                  id: 1,
+                  name: 'Công nợ tổng hợp NCC',
+                  route: '/debit/ListTongHopKH',
+                  created_at: '2023-05-29 14:14:02',
+                  updated_at: null,
+                  deleted_at: null,
+                  status: 1,
+                  category_id: 1,
+                  sort: 1,
+                },
+                {
+                  id: 1,
+                  name: 'Công nợ chi tiết NCC',
+                  route: '/debit/ListChiTietNCC',
+                  created_at: '2023-05-29 14:14:02',
+                  updated_at: null,
+                  deleted_at: null,
+                  status: 1,
+                  category_id: 1,
+                  sort: 1,
+                },
+            ]
           },
           {
             id: 1,
@@ -324,7 +372,7 @@ const model = [{
       },
       {
         id: 5,
-        name: 'Sổ quỹ',
+        name: 'Quỹ - Ngân Hàng',
         sort: 1,
         status: 1,
         created_at: '2023-06-01 10:04:39',
@@ -334,7 +382,7 @@ const model = [{
         items: [
           {
             id: 1,
-            name: 'Danh mục thu',
+            name: 'Tiền mặt',
             route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
@@ -346,7 +394,7 @@ const model = [{
               {
                 id: 1,
                 name: 'Phiếu thu',
-                route: '/receipt/listReceiptThuKH',
+                route: '/receipt/ListReceiptThu',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -356,8 +404,8 @@ const model = [{
               },
               {
                 id: 1,
-                name: 'Thu tiền hoàn cước giao nhận',
-                route: '/page-two',
+                name: 'Phiếu chi',
+                route: '/receipt/ListReceiptChi',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -365,44 +413,11 @@ const model = [{
                 category_id: 1,
                 sort: 1,
               },
-              {
-                id: 1,
-                name: 'Thu hoàn ứng lái xe',
-                route: '/page-two',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              },
-              {
-                id: 1,
-                name: 'Thu nội bộ',
-                route: '/page-two',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              },
-              {
-                id: 1,
-                name: 'Thu tạm ứng bảng phơi',
-                route: '/page-two',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              }
             ]
           },
           {
             id: 1,
-            name: 'Danh mục chi',
+            name: 'Tiền gửi ngân hàng',
             route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
@@ -413,29 +428,7 @@ const model = [{
             items: [
               {
                 id: 1,
-                name: 'Phiếu chi',
-                route: '/receipt/listReceiptChi',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              },
-              {
-                id: 1,
-                name: 'Phiếu chi giao nhận',
-                route: '/receipt/listReceiptChiGiaoNhan',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              },
-              {
-                id: 1,
-                name: 'Trả tiền nhà cung cấp',
+                name: 'Giấy báo có',
                 route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
@@ -446,18 +439,7 @@ const model = [{
               },
               {
                 id: 1,
-                name: 'Chi tạm ứng lái xe',
-                route: '/page-two',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              },
-              {
-                id: 1,
-                name: 'Chi nội bộ',
+                name: 'Ủy nhiệm chi',
                 route: '/page-two',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
@@ -695,29 +677,35 @@ const model = [{
 export default function AppSidebar(){
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCity, setSelectedCity] = useState<any>();
-  const [activeMenu, setActiveMenu] = useState('');
   const [data, setData] = useState<any>([]);
   const project = localStorage.getItem('project');
   const fetchProject = async () => {
-          try {
-              const res = await listStorage({ });
-               if(res?.data?.data?.data){
-                   let  _data =  res.data.data.data.map((item:any)=>({ name: item.name, projectId: item.id }))
-                   setData(_data);
-               }
-          } catch (err) {
-          } finally {
-          }
-      };
+    try {
+      const res = await listStorage({});
+      if (res?.data?.data?.data) {
+        const _data = res.data.data.data.map((item: any) => ({
+          name: item.name,
+          projectId: item.id,
+        }));
+        setData(_data);
+      }
+    } catch (err) {} 
+  };
+
   useEffect(() => {
     fetchProject();
-    if (project) {
-      const _project = JSON.parse(project)
-      setSelectedCity(_project);
-    } else {
-      setSelectedCity(null);
-    }
   }, []);
+
+  // khi data đã load xong → set selected
+  useEffect(() => {
+    if (data.length > 0) {
+      if (project) {
+        setSelectedCity(JSON.parse(project));
+      } else {
+        setSelectedCity(data[0]);
+      }
+    }
+  }, [data]);
   const onChange = (event: any) => {
     setSelectedCity(event.value);
     localStorage.setItem('project', JSON.stringify(event.value))
@@ -744,5 +732,4 @@ export default function AppSidebar(){
       </ul>
     </MenuProvider>
   );
-
 };

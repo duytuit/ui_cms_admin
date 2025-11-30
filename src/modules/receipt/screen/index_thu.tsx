@@ -1,16 +1,16 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ActionBody, Column, TimeBody, DataTableClient, DateBody } from "components/common/DataTable";
 import { Dropdown, GridForm, Input } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
 import { classNames } from "primereact/utils";
-import { useListReceipt } from "../service";
-import { deleteReceipt } from "../api";
+import { useListReceipt, useListReceiptThu } from "../service";
+import { deleteReceipt, showReceipt } from "../api";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
 import { Helper } from "utils/helper";
-import { formOfPayment, typeDebit } from "utils";
-import { useListContractFile, useListContractFileWithState } from "modules/ContractFile/service";
+import { formOfPayment, typeReceipt } from "utils";
+import { useListContractFileWithState } from "modules/ContractFile/service";
 import { FilterMatchMode } from "primereact/api";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { MyCalendar } from "components/common/MyCalendar";
@@ -95,7 +95,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   );
 };
 
-export default function ListReceiptThuKH() {
+export default function ListReceiptThu() {
     const { handleParamUrl } = useHandleParamUrl();
     const [displayData, setDisplayData] = useState<any>();
     const [filters, setFilters] = useState({
@@ -119,7 +119,7 @@ export default function ListReceiptThuKH() {
     });
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
-    const [selectedDetail, setSelectedDetail] = useState<any[]>([]);
+    const [selectedDetail, setSelectedDetail] = useState<any>(null);
     const [paramsPaginator, setParamsPaginator] = useState({
         pageNum: 1,
         pageSize: 20,
@@ -128,8 +128,8 @@ export default function ListReceiptThuKH() {
         type: CategoryEnum.country,
         keyword: "",
     });
-    const { data, loading, error, refresh } = useListReceipt({
-        params: {...paramsPaginator, TypeReceipt:0 },
+    const { data, loading, error, refresh } = useListReceiptThu({
+        params: {...paramsPaginator},
         debounce: 500,
     });
     const { data: ContractFile } = useListContractFileWithState({
@@ -148,33 +148,26 @@ export default function ListReceiptThuKH() {
                         const _employee = employees.find((x: any) => x.id === row.employee_id);
                         const _fullname_giaonhan = `${_employee?.last_name ?? ""} ${ _employee?.first_name ?? ""}`.trim();
                         const _lydochi = DMExpense.find((x: any) => x.id === row.income_expense_category_id);
-                        // Tính tổng tiền chi tiết
-                        const amount = (row.receipt_details ?? []).reduce((a:any, b:any) => a + (b.amount ?? 0), 0);
-                        // VAT (nếu có, ví dụ row.vat_rate = 10 nghĩa là 10%)
-                        const vatRate = row.vat ?? 0; // mặc định 0%
-                        const vatAmount = (amount * vatRate) / 100;
-                        const totalWithVat = amount + vatAmount;
                         const _tenquy = DMQuy.find((x: any) => x.id === row.fund_id);
                         const _bank = DMBank.find((x: any) => x.id === row.bank_id);
                         const _hinhthuc = formOfPayment.find((x: any) => x.value === row.form_of_payment);
                         const _nguoitao = employees.find((x: any) => x.user_id === row.created_by);
                         const _sofile = ContractFile.find((x: any) => x.id === row.file_info_id);
-                        
+                        const _typeReceipt = typeReceipt.find((x: any) => x.typeReceipt === row.type_receipt);
                         return {
                             ...row,
                             fullname_giaonhan : _fullname_giaonhan,
                             lydochi : _lydochi?.name,
-                            total_amount:  Helper.formatCurrency(amount.toString()),
-                            vat_rate: vatRate,
-                            vat_amount: vatAmount,
-                            total_with_vat: Helper.formatCurrency(totalWithVat.toString()),
                             tenquy: _tenquy?.fund_name,
                             stk: _bank?.account_number,
                             chutk: _bank?.account_holder,
                             nganhang: _bank?.bank_name,
                             hinhthuc: _hinhthuc?.name,
                             nguoitao: `${_nguoitao?.last_name ?? ""} ${_nguoitao?.first_name ?? ""}`.trim(),
-                            sofile:_sofile?.file_number
+                            sofile:_sofile?.file_number,
+                            amount: Helper.formatCurrency(row.amount.toString()),
+                            total: Helper.formatCurrency(row.total.toString()),
+                            typeReceipt: _typeReceipt?.name || "",
                         };
                      });
         setDisplayData(mapped);
@@ -196,11 +189,22 @@ export default function ListReceiptThuKH() {
 
         return Helper.formatCurrency(sum.toString());
     };
-    function getDetail(ids:any){
-        showWithIds({ ids: ids}).then(res => {
+    function getDetail(id:any){
+        showReceipt({ id: id}).then(res => {
             const detail = res.data.data
             if (detail) {
-                setSelectedDetail(detail)
+                let receiptDetails = detail.receiptDetails;
+                if (receiptDetails && receiptDetails.length > 0) {
+                  let data = JSON.parse(detail.data);
+                    let debits = JSON.parse(data.Debits);
+                    if (debits && debits.length > 0) {
+                        receiptDetails = receiptDetails.map((x: any) => ({
+                            ...x,
+                            debit: debits.find((y: any) => y.id == x.debitId) || null,
+                        }));
+                        setSelectedDetail(receiptDetails);
+                    }
+                }
             }
             }).catch(err => {
             //setHasError(true)
@@ -234,20 +238,7 @@ export default function ListReceiptThuKH() {
                                 style={{ flex: 1 }}
                                 tableStyle={{ minWidth: "2000px" }}
                                 onRowClick={(e: any) => {
-                                    let receipt_details = e.data.receipt_details;
-                                    if (receipt_details && receipt_details.length > 0) {
-                                        let data = JSON.parse(e.data.data);
-                                        let debits = JSON.parse(data.Debits);
-
-                                        if (debits && debits.length > 0) {
-                                            receipt_details = receipt_details.map((x: any) => ({
-                                                ...x,
-                                                debit: debits.find((y: any) => y.id == x.debit_id) || null,
-                                            }));
-                                            console.log(receipt_details);
-                                            setSelectedDetail(receipt_details);
-                                        }
-                                    }
+                                    getDetail(e.data.id);
                                 }}
                             >
                                 <Column
@@ -271,16 +262,16 @@ export default function ListReceiptThuKH() {
                                     showFilterMenu={false}
                                     filterMatchMode="contains"
                                 />
-                                <Column field="total_amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                                    footer={getSumColumn("total_amount")}
+                                <Column field="amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                                    footer={getSumColumn("amount")}
                                     footerStyle={{ fontWeight: "bold" }}
                                 />
-                                <Column field="vat_rate" header="VAT" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                                <Column field="total_with_vat" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                                    footer={getSumColumn("total_with_vat")}
+                                <Column field="total" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                                    footer={getSumColumn("total")}
                                     footerStyle={{ fontWeight: "bold" }}
                                 />
                                 <Column field="tenquy" header="Quỹ" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                <Column field="typeReceipt" header="Kiểu phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column field="hinhthuc" header="Hình thức" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column field="stk" header="STK" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column field="chutk" header="Tên tài khoản" filter showFilterMenu={false}  filterMatchMode="contains"/>
@@ -308,14 +299,14 @@ export default function ListReceiptThuKH() {
                             <Column 
                               body={(row: any) =>
                                  {
-                                   return row.debit.customerName
+                                   return row.debit?.customerName
                                  }
                               }
                              header="Tên khách hàng" />
                             <Column header="Số file" 
                              body={(row: any) =>
                                  {
-                                   let data = JSON.parse(row?.debit?.data);
+                                   let data = JSON.parse(row?.debit?.data || '{}');
                                    return data.fileNumber
                                  }
                               }
@@ -323,15 +314,15 @@ export default function ListReceiptThuKH() {
                             <Column field="dispatch_code" header="Mã điều xe" 
                              body={(row: any) =>
                                    {
-                                      if(row.debit.type == 1){
-                                         return row.debit.dispatch_code
+                                      if(row.debit?.type == 1){
+                                         return row.debit?.dispatch_code
                                       }
                                    }
                               }/>
                             <Column header="Dịch vụ" 
                              body={(row: any) =>
                                  {
-                                   return row.debit.name
+                                   return row.debit?.name
                                  }
                               }
                             /> 

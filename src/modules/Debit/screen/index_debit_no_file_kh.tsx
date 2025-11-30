@@ -173,7 +173,7 @@ export default function ListDebitNoFileKH() {
         customerAbb: cus?.partners?.abbreviation || "",
         supplierName:_supplier?.partners?.name || "",
         supplierAbb:_supplier?.partners?.abbreviation || "",
-        userName: `${_user.last_name ?? ""} ${_user.first_name ?? ""}`.trim(),
+        userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
       };
     });
       const mappedDebitDispatch = (debitDispatch?.data || []).map((row: any) => {

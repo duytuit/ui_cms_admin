@@ -247,12 +247,24 @@ export const typeService = [
 export const typeReceipt = [
    {
      typeReceipt:0,
-     name:"Thu"
+     name:"Thu KH"
    },
     {
      typeReceipt:1,
      name:"Chi giao nhận"
-   }
+   },
+    {
+     typeReceipt:2,
+     name:"Chi hoàn ứng giao nhận"
+   },
+    {
+     typeReceipt:3,
+     name:"Thu hoàn ứng giao nhận"
+   },
+   {
+     typeReceipt:7,
+     name:"Chi NCC"
+   },
 ];
 export const VatDebit = [
    {

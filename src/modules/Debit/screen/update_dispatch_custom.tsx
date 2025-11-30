@@ -97,7 +97,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
     infos.penaltyFee     = toInt(infos.penaltyFee);
     infos.goodsFee       = toInt(infos.goodsFee);
     infos.data = JSON.stringify(infos);
-    infos.fileInfoId= infos.id;
+    infos.fileInfoId= infos.id || 0;
     infos.vehicleNumber = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleLabel : infos.vehicleNumber
     let info = {
       ...infos, status: infos.status ? 0 : 1,
@@ -179,7 +179,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                         options={partnerOptions}
                         onChange={(e: any) =>
                           {
-                             setInfos({...infos,id:0,declaration:'',bill:'',container_code:'',quantity:'',loaiToKhai:'',isExternalDriver:1,accountingDate: Helper.toDayString(),customerDetailId:e.value})
+                             setInfos({...infos,declaration:'',bill:'',container_code:'',quantity:'',loaiToKhai:'',isExternalDriver:1,accountingDate: Helper.toDayString(),customerDetailId:e.value})
                           }
                         }
                         label="khách hàng"

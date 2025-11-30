@@ -13,7 +13,7 @@ import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useListContractFileHasDebitService, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
 import UpdateDebitChiPhi from "./update_service";
-import { deleteMultiDebit } from "../api";
+import { deleteMultiDebit, delMultiDebit } from "../api";
 import UpdateGiayHoanUng from "modules/receipt/screen/update_giay_hoanung";
 
 // ✅ Component Header lọc dữ liệu
@@ -390,7 +390,7 @@ export default function ListContractFileBangKe() {
                                                 return ActionBodyWithIds(
                                                     row.debit_ids,
                                                     null,
-                                                    { route: "Debit/delete/multi", action: deleteMultiDebit },
+                                                    { route: "Debit/delete/multiDebit", action: delMultiDebit },
                                                     paramsPaginator,
                                                     setParamsPaginator
                                                 );

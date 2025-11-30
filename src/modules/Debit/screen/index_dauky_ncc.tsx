@@ -12,7 +12,7 @@ import { Helper } from "utils/helper";
 import { useListDebitCuocTamThu, useListDebitDauKyKH, useListDebitDauKyNCC } from "../service";
 import { useListContractFileWithState } from "modules/ContractFile/service";
 import { deleteDebit } from "../api";
-import { TypeDebitDKKH } from "utils";
+import { TypeDebitDKKH, TypeDebitDKNCC } from "utils";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -49,7 +49,8 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
       filter={filter}
       setFilter={setFilter}
       className="lg:col-9"
-       add="/debit/addDauKyNCC"
+      add="/debit/addDauKyNCC"
+      addOne="/debit/UpdateImportDauKyNCC"
     >
       <div className="col-2">
         <Input
@@ -120,12 +121,13 @@ export default function ListDauKyNcc() {
     const mapped = (data?.data || []).map((row: any) => {
       const cus = suppliers.find((x: any) => x.id === row.supplier_detail_id);
       const _user = employees.find((x: any) => x.user_id === row.updated_by);
-      const _type = TypeDebitDKKH.find((x: any) => x.value === row.type);
+      const _type = TypeDebitDKNCC.find((x: any) => x.value === row.type);
       return {
         ...row,
         customerName: cus?.partners?.name || "",
         customerAbb: cus?.partners?.abbreviation || "",
         userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
+        type: _type ? _type.name : "",
       };
     });
     setDisplayData(mapped);
