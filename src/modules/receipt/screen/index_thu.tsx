@@ -17,6 +17,7 @@ import { MyCalendar } from "components/common/MyCalendar";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { DataTable } from "components/uiCore";
 import { showWithIds } from "modules/Debit/api";
+import { text } from "stream/consumers";
 
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   const [filter, setFilter] = useState({
@@ -326,15 +327,33 @@ export default function ListReceiptThu() {
                                  }
                               }
                             /> 
-                            <Column field="amount" body={(row: any) =>{
-                                return Helper.formatCurrency(row.amount.toString());
-                            }} header="Số tiền" />
-                            <Column field="vat" header="VAT" />
-                            <Column body={(row: any) =>{
-                                 const thanh_tien = Math.round(row.amount * (1 + row.vat / 100));
-                                return Helper.formatCurrency(thanh_tien.toString());
+                            <Column 
+                              field="amount" 
+                              body={(row: any) =>{
+                                  return Helper.formatCurrency(row.amount.toString());
+                              }} 
+                              header="Số tiền" 
+                              footer={selectedDetail ? Helper.formatCurrency((selectedDetail?.reduce((acc: any, item: any) => {
+                                  return acc + (item.amount || 0);
+                              }, 0)).toString()) : undefined}
+                              style={{ textAlign: 'right' }}
+                              className="table-title-center"
+                            />
+                            <Column field="vat" header="VAT" style={{ textAlign: 'center' }} className="table-title-center" />
+                            <Column 
+                                body={(row: any) =>{
+                                    const thanh_tien = Math.round(row.amount * (1 + row.vat / 100));
+                                    return Helper.formatCurrency(thanh_tien.toString());
 
-                            }} header="Thành tiền" />
+                                }} 
+                                header="Thành tiền" 
+                                footer={selectedDetail ? Helper.formatCurrency((selectedDetail?.reduce((acc: any, item: any) => {
+                                    const thanh_tien = Math.round(item.amount * (1 + item.vat / 100));
+                                    return acc + thanh_tien;
+                                }, 0)).toString()) : undefined}
+                                style={{ textAlign: 'right' }}
+                                className="table-title-center"
+                             />
                             </DataTable>
                         </div>
                     </SplitterPanel>
