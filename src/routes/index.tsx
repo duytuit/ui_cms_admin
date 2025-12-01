@@ -59,6 +59,8 @@ import UpdateImportDauKyNCC from "modules/Debit/screen/imports/updateImportDauKy
 import ListChiTietNCC from "modules/Debit/screen/index_chitiet_ncc";
 import ListReceiptThu from "modules/receipt/screen/index_thu";
 import ListReceiptChi from "modules/receipt/screen/index_chi";
+import UpdateReceiptChiNoiBo from "modules/receipt/screen/update_chi_noibo";
+import ListConfirmContractFileBangKe from "modules/Debit/screen/index_confirm_debit_service";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -115,6 +117,7 @@ const publicRoutes = [
   // ContractFile 
   { path: "/ContractFile/list", component: ListContractFile, layout: 'ListContractFile' },
   { path: "/ContractFile/list-create-bangke", component: ListContractFileBangKe, layout: 'ListContractFileBangKe' },
+  { path: "/ContractFile/list-confirm-bangke", component: ListConfirmContractFileBangKe, layout: 'ListConfirmContractFileBangKe' },
   { path: "/ContractFile/list-create-nangha", component: ListContractFileNangHa, layout: 'ListContractFileNangHa' },
   { path: "/ContractFile/list-create-dispatch", component: ListCreateDispatch, layout: 'ListCreateDispatch' },
   { path: "/ContractFile/list-create-filegia", component: ListFileGia, layout: 'ListFileGia' },
@@ -135,6 +138,8 @@ const publicRoutes = [
   { path: "/receipt/ListReceiptChi", component: ListReceiptChi, layout: 'ListReceiptChi' },
   { path: "/receipt/listChiPhiGiaoNhan", component: ListChiPhiGiaoNhan, layout: 'ListChiPhiGiaoNhan' },
   { path: "/receipt/listViewChiPhiGiaoNhan", component: ListViewChiPhiGiaoNhan, layout: 'ListViewChiPhiGiaoNhan' },
+  { path: "/receipt/updateReceiptChiNoiBo", component: UpdateReceiptChiNoiBo, layout: 'UpdateReceiptChiNoiBo' },
+  { path: "/receipt/detail/chinoibo/:id", component: UpdateReceiptChiNoiBo, layout: 'UpdateReceiptChiNoiBo' },
   { path: "/receipt/updateReceiptChiGiaoNhan", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
   { path: "/receipt/detail/chigiaonhan/:id", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
   // Debit 

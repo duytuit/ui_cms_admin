@@ -33,7 +33,9 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             setFilter={setFilter}
             className="lg:col-9"
             add="/receipt/updateReceiptChiGiaoNhan"
-            addName="Thêm phiếu chi giao nhận"
+            addName="Phiếu chi giao nhận"
+            addOne="/receipt/updateReceiptChiNoiBo"
+            addOneName="Phiếu chi nội bộ"
         >
         </GridForm>
     );
@@ -158,13 +160,24 @@ export default function ListReceiptChi() {
                 <Column
                    header="Thao tác"
                    body={(row: any) => {
-                        return ActionBody(
-                            row,
-                            "/receipt/detail/chigiaonhan",
-                            { route: "/receipt/delete", action: deleteReceipt },
-                            paramsPaginator,
-                            setParamsPaginator
-                        );
+                        if(row.type_receipt == 8){
+                            return ActionBody(
+                                row,
+                                "/receipt/detail/chinoibo",
+                                { route: "/receipt/delete", action: deleteReceipt },
+                                paramsPaginator,
+                                setParamsPaginator
+                            );
+                        }
+                        if(row.type_receipt == 1){
+                            return ActionBody(
+                                row,
+                                "/receipt/detail/chigiaonhan",
+                                { route: "/receipt/delete", action: deleteReceipt },
+                                paramsPaginator,
+                                setParamsPaginator
+                            );
+                        }
                     }}
                 />
                 <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>

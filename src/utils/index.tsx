@@ -265,6 +265,10 @@ export const typeReceipt = [
      typeReceipt:7,
      name:"Chi NCC"
    },
+   {
+     typeReceipt:8,
+     name:"Chi Nội Bộ"
+   },
 ];
 export const VatDebit = [
    {

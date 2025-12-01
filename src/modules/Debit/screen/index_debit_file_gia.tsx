@@ -16,11 +16,14 @@ import {  deleteMultiDebit } from "../api";
 import UpdateDebitNangHa from "./update_service_nh";
 import UpdateFileGia from "./update_debit_file_gia";
 import { Link } from "react-router-dom";
+import UpdateVATFileGia from "./update_vat_file_gia";
+import UpdateXuatHoaDon from "./update_xuat_hoadon";
 
 // ✅ Component Header lọc dữ liệu
-const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
+const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFileGia,_setSelectedRows}: any) => {
     const [filter, setFilter] = useState({ name: "", customerDetailId: "" ,fromDate:Helper.lastWeekString(),toDate:Helper.toDayString()});
     const { data: customerDetails } = useListCustomerDetailWithState({status:1});
+    const [visible, setVisible] = useState(false);
     // --- chuyển sang options bằng useMemo ---
     const customerOptions = useMemo(() => {
         if (!Array.isArray(customerDetails)) return [];
@@ -39,14 +42,25 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             toDate:filter.toDate,
         }));
     }, [filter]);
-
+    const openDialogAdd = () => {
+      console.log(selected);
+      setVisible(true);
+    };
+    const handleModalClose = () => {
+        setVisible(false);
+        _setSelectedRows([])
+        refreshHasFileGia?.(); 
+    };
     return (
-        <GridForm
+      <>
+       <GridForm
             paramsPaginator={_paramsPaginator}
             setParamsPaginator={_setParamsPaginator}
             filter={filter}
             setFilter={setFilter}
             className="lg:col-9"
+            openDialogAdd={()=>openDialogAdd()}
+            openDialogAddName="Xuất hóa đơn"
         >
             <div className="col-2">
                 <Input
@@ -83,6 +97,19 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
                 />
             </div>
         </GridForm>
+         <Dialog
+                position="top"
+                dismissableMask
+                visible={visible}
+                onHide={() => setVisible(false)}
+                style={{ width: "30vw", top:"30px" }}
+            >
+              <p className="m-0">
+                {selected && <UpdateXuatHoaDon ids={selected} onClose={handleModalClose} ></UpdateXuatHoaDon>}
+              </p>
+          </Dialog>
+      </>
+       
     );
 };
 
@@ -95,7 +122,9 @@ export default function ListFileGia() {
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [displayData, setDisplayData] = useState<any[]>([]);
     const [selectedId, setSelectedId] = useState<any>();
+    const [selectedIdEdit, setSelectedIdEdit] = useState<any>();
     const [visible, setVisible] = useState(false);
+    const [visibleEdit, setVisibleEdit] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
     const [paramsPaginator, setParamsPaginator] = useState({
@@ -114,6 +143,15 @@ export default function ListFileGia() {
     const openDialogAdd = (id:number,price:number) => {
         setSelectedId(id);
         setVisible(true);
+    };
+    const openDialogEdit = (id:number) => {
+        setSelectedIdEdit(id);
+        setVisibleEdit(true);
+    };
+    const handleModalEditClose = () => {
+      setVisibleEdit(false);
+      refresh?.(); 
+      refreshHasFileGia?.(); // reload debitDispatch
     };
     const handleModalClose = () => {
       setVisible(false);
@@ -139,13 +177,13 @@ export default function ListFileGia() {
          const dataArray = Array.isArray(listFileGia?.data) ? listFileGia.data : [];
          const groupedHasFileGia = Object.values(
             dataArray.reduce((acc:any, cur:any) => {
-              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by, ...rest } = cur;
+              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number, ...rest } = cur;
               if (!acc[cur.id]) {
                 acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
               }
               // chỉ gom debit nếu debitService có dữ liệu
               if (listFileGia?.data) {
-                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by});
+                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number});
                 acc[cur.id].debit_ids.push(debit_id);
               }
               return acc;
@@ -176,7 +214,7 @@ export default function ListFileGia() {
     return (
       <>
         <div className="card">
-            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
+            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} selected={selectedFileGiaRows} refreshHasFileGia={refreshHasFileGia}   _setSelectedRows={setSelectedFileGiaRows} />
               <div style={{ height: 'calc(100vh - 8rem)' }}>
                       <Splitter style={{ height: '100%', width: '100%' }}>
                         {/* Panel 1 */}
@@ -208,30 +246,6 @@ export default function ListFileGia() {
                                 style={{ flex: 1 }}
                                 tableStyle={{ minWidth: "1600px" }}// ép bảng rộng hơn để có scroll ngang
                                 >
-                                {/* Custom checkbox column */}
-                                <Column
-                                    header={
-                                    <Checkbox
-                                        checked={selectedRows.length === displayData.length && displayData.length > 0}
-                                        onChange={(e:any) => {
-                                            if (e.checked) setSelectedRows(displayData.map(d => d.id));
-                                            else setSelectedRows([]);
-                                        }}
-                                    />
-                                    }
-                                    body={(rowData:any) => (
-                                    <Checkbox
-                                        className="p-checkbox-sm"
-                                        checked={selectedRows.includes(rowData.id)}
-                                        onChange={(e:any) => {
-                                            if (e.checked) setSelectedRows(prev => [...prev, rowData.id]);
-                                            else setSelectedRows(prev => prev.filter(id => id !== rowData.id));
-                                        }}
-                                        onClick={(e:any) => e.stopPropagation()} // ⚡ chặn row click
-                                    />
-                                    )}
-                                    style={{ width: "3em" }}
-                                />
                                <Column
                                   header="Thao tác"
                                   body={(e: any) =>
@@ -334,9 +348,12 @@ export default function ListFileGia() {
                                                     null,
                                                     { route: "Debit/delete/multi", action: deleteMultiDebit },
                                                     paramsPaginator,
-                                                    setParamsPaginator
+                                                    setParamsPaginator,
+                                                    null,
+                                                     () =>openDialogEdit(row.id)
                                                 );
                                             }}
+                                            style={{ width: "5em" }}
                                         />
                                         <Column header="Trạng thái" body={(row: any) => {
                                           if(row.cf_status_confirm == 1){
@@ -396,15 +413,13 @@ export default function ListFileGia() {
                                           let data = JSON.parse(row.debit_data);
                                           return data?.partner_info?.partnerLabel
                                       }} header="Nhà cung cấp" />
-                                      <Column body={(row: any) =>{
-                                          let data = JSON.parse(row.debit_data);
-                                          return data?.vehicle_info?.vehicleLabel
-                                      }} header="Biển số" />
+                                      <Column field="debit_vehicle_number" header="Biển số" />
                                       <Column field="debit_purchase_price" body={(row: any) => Helper.formatCurrency(row.debit_purchase_price.toString())} header="Giá mua" />
                                       <Column field="debit_price" body={(row: any) => Helper.formatCurrency(row.debit_price.toString())} header="Giá bán" />
                                       <Column field="debit_vat" header="VAT" />
                                       <Column field="debit_total_price" body={(row: any) => Helper.formatCurrency(row.debit_total_price.toString())} header="Thành tiền" />
-                                      <Column field="debit_bill" header="Hóa đơn" />
+                                      <Column field="debit_cus_bill" header="Hóa đơn" />
+                                      <Column field="debit_cus_bill_date" body={(e: any) => DateBody(e.debit_cus_bill_date)} header="Ngày xuất hóa đơn" />
                                   </DataTable>
                               </div>
                             </SplitterPanel>
@@ -423,6 +438,18 @@ export default function ListFileGia() {
           >
             <p className="m-0">
               {selectedId && <UpdateFileGia id={selectedId} onClose={handleModalClose} ></UpdateFileGia>}
+            </p>
+          </Dialog>
+           <Dialog
+            position="top"
+            dismissableMask
+            header="Sửa VAT file giá"
+            visible={visibleEdit}
+            onHide={() => setVisibleEdit(false)}
+            style={{ width: "78vw" }}
+          >
+            <p className="m-0">
+              {selectedIdEdit && <UpdateVATFileGia id={selectedIdEdit} onClose={handleModalEditClose} ></UpdateVATFileGia>}
             </p>
           </Dialog>
       </>

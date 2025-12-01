@@ -171,7 +171,7 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
         </React.Fragment>
     );
 };
-export const ActionBodyWithIds = (ids:number, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, openDialogAdd?:any,duplicated?:any, handleUndo?:any) => {
+export const ActionBodyWithIds = (ids:number, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, openDialogAdd?:any,openDialogEdit?:any,duplicated?:any, handleUndo?:any) => {
     const dispatch = useDispatch();
     
     async function accept() {
@@ -212,6 +212,16 @@ export const ActionBodyWithIds = (ids:number, editRoute:any, actions?:any, param
                     outlined
                     severity="success"
                     onClick={() => openDialogAdd()}   // <<< thêm dòng này
+                />
+            }
+            {openDialogEdit &&
+                <Button
+                    type="button"
+                    icon="pi pi-pencil"
+                    rounded
+                    outlined
+                    severity="success"
+                    onClick={() => openDialogEdit()}   // <<< thêm dòng này
                 />
             }
         </React.Fragment>

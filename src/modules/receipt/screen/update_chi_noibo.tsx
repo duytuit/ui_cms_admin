@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { formOfPayment, listToast, refreshObject, VatDebit } from "utils";
-import { updateReceipt, addReceipt, showReceipt, addReceiptChiGiaoNhan, updateReceiptChiGiaoNhan } from "../api";
+import { updateReceipt, addReceipt, showReceipt, addReceiptChiGiaoNhan, updateReceiptChiGiaoNhan, addReceiptChiNoiBo, updateReceiptChiNoiBo } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
@@ -17,14 +17,14 @@ import { useListEmployee, useListEmployeeWithState } from "modules/employee/serv
 import { useListCustomerDetailWithState, useListPartnerDetail } from "modules/partner/service";
 import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
 import { useListContractFile } from "modules/ContractFile/service";
-export default function UpdateReceiptChiGiaoNhan() {
+export default function UpdateReceiptChiNoiBo() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [employeeInfo, setEmployeeInfo] = useState<any>({});
   const [bankSelect, setBankSelect] = useState<any>({});
   const [ContractFileOptions, setContractFileOptions] = useState<any[]>([]);
   const [nhanVienGiaoNhanOptions, setNhanVienGiaoNhanOptions] = useState<any[]>([]);
-  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1,incomeExpenseCategoryId:15 });
+  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1 });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSubmit = (e: any) => {
@@ -39,7 +39,7 @@ export default function UpdateReceiptChiGiaoNhan() {
   async function fetchDataSubmit(info: any) {
    
      if (info.id) {
-         const response = await updateReceiptChiGiaoNhan(info);
+         const response = await updateReceiptChiNoiBo(info);
        if (response) setLoading(false);
        if (response.status === 200) {
          if (response.data.status) {
@@ -58,7 +58,7 @@ export default function UpdateReceiptChiGiaoNhan() {
            showToast({ ...listToast[1], detail: response.data.message })
          );
      } else {
-       const response = await addReceiptChiGiaoNhan(info);
+       const response = await addReceiptChiNoiBo(info);
        if (response) setLoading(false);
        if (response.status === 200) {
          if (response.data.status) {
@@ -126,6 +126,13 @@ useEffect(() => {
      params: { keyword: "abc" },
      debounce: 500,
    });
+     const employeeOptions = useMemo(() => {
+    if (!Array.isArray(employees)) return [];
+    return employees.map((x: any,index:number) => ({
+      label: `${index+1}.${x.last_name ?? ""} ${x.first_name ?? ""}`.trim(),
+      value: x.id,
+    }));
+  }, [employees]);
   function GetBank(id:Number){
      const selected = DMBank.find((x: any) => x.id === id);
      setBankSelect(selected || {});
@@ -161,7 +168,6 @@ useEffect(() => {
         showReceipt({ id: id, type: CategoryEnum.country }).then(res => {
           const detail = res.data.data
           if (detail) {
-            GetNhanVienGiaoNhan(detail.fileInfoId)
             GetBank(detail.bankId)
             const _nguoitao = employees.find((x: any) => x.user_id === detail.updatedBy);
             setEmployeeInfo(_nguoitao);
@@ -186,7 +192,7 @@ useEffect(() => {
         className="w-full"
         style={{ margin: "0 auto" }}
         checkId={infos.id}
-        title="phiếu chi giao nhận"
+        title="phiếu chi nội bộ"
         loading={loading}
         onSubmit={handleSubmit}
         routeList="/receipt/ListReceiptChi"
@@ -223,28 +229,13 @@ useEffect(() => {
                       ))}
                     </div>
                   </div>
-                  <div className="field col-6">
-                    <Dropdown
-                      filter
-                      value={infos.fileInfoId}
-                      optionValue="value"
-                      optionLabel="label"
-                      options={ContractFileOptions}
-                      label="Số file"
-                      className="w-full p-inputtext-sm"
-                      onChange={(e: any) =>
-                        GetNhanVienGiaoNhan(e.value)
-                      }
-                      required
-                    />
-                  </div>
-                  <div className="field col-6">
+                  <div className="field col-12">
                     <Dropdown
                       value={infos.employeeId}
                       optionValue="value"
                       optionLabel="label"
-                      options={nhanVienGiaoNhanOptions}
-                      label="Người giao nhận"
+                      options={employeeOptions}
+                      label="Nhận viên"
                       className="w-full p-inputtext-sm"
                       onChange={(e: any) =>
                         setInfos({ ...infos, employeeId: e.value })
@@ -277,7 +268,6 @@ useEffect(() => {
                         setInfos({ ...infos, incomeExpenseCategoryId: e.value })
                       }
                       required
-                      disabled
                     />
                   </div>
                    <div className="field col-4">

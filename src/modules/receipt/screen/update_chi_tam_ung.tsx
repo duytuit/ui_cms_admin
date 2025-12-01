@@ -101,7 +101,7 @@ export default function UpdateReceiptChiTam() {
    const DMBankOptions = useMemo(() => {
        if (!Array.isArray(DMBank)) return [];
        return DMBank.map((x: any) => ({
-         label: x?.account_holder ?? "(không tên)",
+         label: `${x.account_number} - ${x.account_holder}`,
          value: x.id,
        }));
      }, [DMBank]);
