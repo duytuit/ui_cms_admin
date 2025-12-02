@@ -28,8 +28,24 @@ export default function ViewHoanUngGiaoNhan({ detail, debits, onClose}: {detail:
                   header="Diễn giải" 
                   body={(row: any) => row.dienGiai }
                 />
-                <Column body={(row: any) => Helper.formatCurrency(row.receipt_total.toString())} header="Tạm ứng" />
-                <Column body={(row: any) => Helper.formatCurrency((row.sumHQ+row.sumCH).toString())} header="Chi phí" />
+                <Column 
+                   body={(row: any) => Helper.formatCurrency(row.receipt_total.toString())} 
+                   header="Tạm ứng" 
+                   footer={Helper.formatCurrency(
+                    debits.reduce((sum:any, item:any) => sum + (item.receipt_total || 0), 0)
+                    .toString()
+                      )}
+                   footerStyle={{ fontWeight: "bold" }}
+                />
+                <Column 
+                  body={(row: any) => Helper.formatCurrency((row.sumHQ+row.sumCH).toString())} 
+                  header="Chi phí" 
+                  footer={Helper.formatCurrency(
+                    debits.reduce((sum:any, item:any) => sum + ((item.sumHQ || 0)+(item.sumCH || 0)), 0)
+                    .toString()
+                      )}
+                  footerStyle={{ fontWeight: "bold" }}  
+                />
                 <Column 
                   body={(row: any) => Helper.formatCurrency(row.phaiTra.toString())} 
                   header="Hoàn lại" 

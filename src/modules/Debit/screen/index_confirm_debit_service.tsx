@@ -132,7 +132,6 @@ export default function ListConfirmContractFileBangKe() {
       first: 0,
       render: false,
       keyword: "",
-      EmployeeId:employeeInfo?.id
     });
     const { data: debitService, loading, refresh:refreshHasDebitDispatch } = useListContractFileHasDebitService({ params: {...paramsPaginator,},debounce: 500,});
     const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
@@ -169,6 +168,7 @@ export default function ListConfirmContractFileBangKe() {
           const mappedDebitService = groupedHasDebitService.map((row: any) => {
             const _customer = listCustomer?.find((x: any) => x.id === row.customer_detail_id);
             const _employee = listEmployee.find((x: any) => x.id === row.employee_id);
+            const _userUpdate = listEmployee.find((x: any) => x.user_id === row.cf_updated_by);
             const _sumHQ = row.debits
               .filter((x: any) => x.debit_type === 0)
               .reduce((sum: number, x: any) => sum + (x.debit_purchase_price || 0), 0);
@@ -190,7 +190,8 @@ export default function ListConfirmContractFileBangKe() {
               sumCH:_sumCH,
               sumHQ: _sumHQ,
               phaiTra:row.receipt_total-(_sumCH+_sumHQ),
-              cf_status_confirm:cf_status_confirm ? 0 : 1
+              cf_status_confirm:cf_status_confirm ? 0 : 1,
+              userUpdate: `${_userUpdate?.last_name ?? ""} ${_userUpdate?.first_name ?? ""}`.trim(),
             };
           });
          console.log(mappedDebitService);
@@ -287,7 +288,7 @@ export default function ListConfirmContractFileBangKe() {
                                         <Column field="sumCuoc" body={(row: any) => Helper.formatCurrency(row.sumCuoc.toString())} header="Tiền cược" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="phaiTra" body={(row: any) => Helper.formatCurrency(row.phaiTra.toString())} header="Phải thanh toán" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="employee" header="Tên giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column header="Người cập nhật" body={(row: any) => row.userUpdate} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
                                   </DataTableClient>
                               </div>
@@ -317,7 +318,7 @@ export default function ListConfirmContractFileBangKe() {
           header="Xác nhận duyệt bảng kê chi phí"
           visible={visible}
           onHide={() => setVisible(false)}
-          style={{ width: "40vw" }}
+          style={{ width: "40vw",top:"200px" }}
         >
           <p className="m-0">
             {selectedDebits && <UpdateConfirmManagerService debitDetail={selectedDebits} onClose={handleModalClose} ></UpdateConfirmManagerService>}

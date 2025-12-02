@@ -9,10 +9,9 @@ import { Button, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { useListContractFileWithState } from "modules/ContractFile/service";
-import UpdateHoanUngGiaoNhan from "modules/receipt/screen/view_hoanung_giao_nhan";
 import { deleteReceipt } from "../api";
 import { FilterMatchMode } from "primereact/api";
-import { useListReceipt, useListXacNhanChiPhiGiaoNhan } from "../service";
+import { useListXacNhanChiPhiGiaoNhan } from "../service";
 import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { formOfPayment } from "utils";
 import ViewHoanUngGiaoNhan from "modules/receipt/screen/view_hoanung_giao_nhan";
@@ -263,10 +262,21 @@ export default function ListViewChiPhiGiaoNhan() {
                  }}
               />
                <Column header="Trạng thái" body={(row: any) => {
-                    if(row.status == 1){
-                      return <Button label="đã tạo phiếu thu" rounded severity="success" size="small" text  />
+                    if(row.status == 0){
+                        return (
+                            <>
+                                <div className="flex align-items-center">
+                                    <Button icon="pi pi-eye" rounded outlined className="mr-2" onClick={()=>openDialogAdd(row)} />
+                                    <Button label="chưa xử lý" rounded severity="warning" size="small" text  />
+                                </div>
+                            </>
+                        ) 
                     }else{
-                      return <Button label="chưa xử lý" rounded severity="warning" size="small" text  />
+                       return (
+                            <>
+                               <Button label="đã tạo phiếu thu" rounded severity="success" size="small" text  />
+                            </>
+                        )
                     }
                 }} filter showFilterMenu={false} filterMatchMode="contains" />
               <Column

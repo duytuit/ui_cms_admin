@@ -30,7 +30,9 @@ export const addDebitService = async (params: any) => await postData("Debit/serv
 export const addDebitNangha = async (params: any) => await postData("Debit/nangha/create", params);
 export const updateDebitFileGia = async (params: any) => await postData("Debit/updateFileGia", params);
 export const updateVATDebitFileGia = async (params: any) => await postData("Debit/updateVATFileGia", params);
+export const updateVATDebitNoFile = async (params: any) => await postData("Debit/updateVATDebitNoFile", params);
 export const updateBillCustomerFileGia = async (params: any) => await postData("Debit/updateBillCustomerFileGia", params);
+export const updateBillCustomerFileNoFile = async (params: any) => await postData("Debit/updateBillDebitNoFile", params);
 export const confirmFileGia = async (params: any) => await postData("Debit/confirmFileGia", params);
 export const updateStatusDebit = async (params: any) => await postData("Debit/update/status", params);
 export const confirmDebitNoFileDispatchKH = async (params: any) => await postData("Debit/confirmDebitNoFileDispatchKH", params);

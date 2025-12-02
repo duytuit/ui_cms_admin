@@ -712,8 +712,12 @@ export default function AppSidebar(){
     if (data.length > 0) {
       if (project) {
         setSelectedCity(JSON.parse(project));
+        localStorage.setItem('project', JSON.stringify(JSON.parse(project)))
+        setSearchParams({ "projectId": JSON.parse(project).projectId})
       } else {
         setSelectedCity(data[0]);
+        localStorage.setItem('project', JSON.stringify(data[0]))
+        setSearchParams({ "projectId": data[0].projectId})
       }
     }
   }, [data]);

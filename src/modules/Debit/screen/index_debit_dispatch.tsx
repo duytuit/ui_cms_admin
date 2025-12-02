@@ -175,7 +175,7 @@ export default function ListCreateDispatch() {
       
       return {
         ...row,
-        file_number : _fileContract?.file_number,
+        file_number : _fileContract?.file_number|| "không file",
         so_cont : _fileContract?.container_code,
         customerName:_customer?.partners?.name || "",
         customerAbb:_customer?.partners?.abbreviation || "",
@@ -346,7 +346,7 @@ export default function ListCreateDispatch() {
                           <Column
                               header="Thao tác"
                               body={(row: any) => {
-                                if(row.cf_status_confirm == 1){
+                                if(row.cf_status_confirm == 1 || (row.cf_status == 2 && row.file_info_id ==null) ){
                                                                                 
                                 }else{
                                   return ActionBody(

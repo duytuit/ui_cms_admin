@@ -179,6 +179,7 @@ export default function ListReceiptChi() {
                             );
                         }
                     }}
+                    style={{ width: "6em" }}
                 />
                 <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column

@@ -61,6 +61,7 @@ import ListReceiptThu from "modules/receipt/screen/index_thu";
 import ListReceiptChi from "modules/receipt/screen/index_chi";
 import UpdateReceiptChiNoiBo from "modules/receipt/screen/update_chi_noibo";
 import ListConfirmContractFileBangKe from "modules/Debit/screen/index_confirm_debit_service";
+import PrintDebitNoFile from "modules/Debit/screen/exports/print_debit_no_file";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -163,6 +164,7 @@ const publicRoutes = [
   { path: "/debit/UpdateBanHang", component: UpdateBanHang, layout: 'UpdateBanHang' },
   { path: "/debit/detailBanHang/:id", component: UpdateBanHang, layout: 'UpdateBanHang' },
   { path: "/debit/print", component: PrintDebit,  layout: null, public: true  },
+  { path: "/debit/printNoFile", component: PrintDebitNoFile,  layout: null, public: true  },
 
   //công nợ khách hàng
   { path: "/debit/ListTongHopKH", component: ListTongHopKH, layout: 'ListTongHopKH' },

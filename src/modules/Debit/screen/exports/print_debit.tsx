@@ -181,8 +181,8 @@ export default function PrintDebit() {
                   className="table-title-center"
                   style={{ textAlign: 'right' }}
                   />
-                <Column header="GHI CHÚ" className="table-title-center"/>
-                <Column header="HÓA ĐƠN" body={(row: any) => row.debit_bill } className="table-title-center"/>
+                <Column header="GHI CHÚ" className="table-title-center"  style={{ textAlign: 'center' }}/>
+                <Column header="HÓA ĐƠN" body={(row: any) => row.debit_bill } className="table-title-center"  style={{ textAlign: 'center' }}/>
             </DataTable>
       </div>
     </>

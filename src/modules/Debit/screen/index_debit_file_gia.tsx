@@ -177,13 +177,13 @@ export default function ListFileGia() {
          const dataArray = Array.isArray(listFileGia?.data) ? listFileGia.data : [];
          const groupedHasFileGia = Object.values(
             dataArray.reduce((acc:any, cur:any) => {
-              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number, ...rest } = cur;
+              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number, ...rest } = cur;
               if (!acc[cur.id]) {
                 acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
               }
               // chỉ gom debit nếu debitService có dữ liệu
               if (listFileGia?.data) {
-                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number});
+                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number});
                 acc[cur.id].debit_ids.push(debit_id);
               }
               return acc;
@@ -195,6 +195,7 @@ export default function ListFileGia() {
             const _sumMua = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_purchase_price || 0), 0);
             const _sumBan = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_price || 0), 0);
             const cf_status_confirm = row.debits.find((x: any) => x.cf_status_confirm === 0);
+            const _userUpdate = listEmployee.find((x: any) => x.user_id === row.cf_updated_by);
             return {
               ...row,
               customerName: _customer?.partners?.name || "",
@@ -203,7 +204,8 @@ export default function ListFileGia() {
               sumMua:_sumMua,
               sumBan:_sumBan,
               loiNhuan:_sumBan-_sumMua,
-              cf_status_confirm:cf_status_confirm ? 0 : 1
+              cf_status_confirm:cf_status_confirm ? 0 : 1,
+              userUpdate: `${_userUpdate?.last_name ?? ""} ${_userUpdate?.first_name ?? ""}`.trim(),
             };
           });
          console.log(mappedDebitFileGia);
@@ -343,15 +345,27 @@ export default function ListFileGia() {
                                         <Column
                                             header="Thao tác"
                                             body={(row: any) => {
-                                                return ActionBodyWithIds(
-                                                    row.debit_ids,
-                                                    null,
-                                                    { route: "Debit/delete/multi", action: deleteMultiDebit },
-                                                    paramsPaginator,
-                                                    setParamsPaginator,
-                                                    null,
-                                                     () =>openDialogEdit(row.id)
-                                                );
+                                               if(row.cf_status_confirm == 0){
+                                                    return ActionBodyWithIds(
+                                                        row.debit_ids,
+                                                        null,
+                                                        { route: "Debit/delete/multi", action: deleteMultiDebit },
+                                                        paramsPaginator,
+                                                        setParamsPaginator,
+                                                        null,
+                                                        () =>openDialogEdit(row.id)
+                                                    );
+                                                }else{
+                                                     return ActionBodyWithIds(
+                                                        row.debit_ids,
+                                                        null,
+                                                        null,
+                                                        paramsPaginator,
+                                                        setParamsPaginator,
+                                                        null,
+                                                        () =>openDialogEdit(row.id)
+                                                    );
+                                                }
                                             }}
                                             style={{ width: "5em" }}
                                         />
@@ -382,8 +396,8 @@ export default function ListFileGia() {
                                         <Column header="Người duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Thời gian duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Lý do duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
+                                        <Column header="Người cập nhật" body={(row: any) => row.userUpdate} filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.cf_updated_at)} />
                                   </DataTableClient>
                               </div>
                             </SplitterPanel>

@@ -120,7 +120,7 @@ export const StatusPartnerBody = (rowData:any, actions:any ,_status:number) => {
     return <InputSwitch checked={checked} onChange={confirm} />
 };
 
-export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, openDialogAdd?:any,duplicated?:any, handleUndo?:any) => {
+export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, openDialogAdd?:any,duplicated?:any, handleUndo?:any, openDialogEdit?:any) => {
     const dispatch = useDispatch();
     
     async function accept() {
@@ -166,6 +166,16 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
                     outlined
                     severity="success"
                     onClick={() => openDialogAdd()}   // <<< thêm dòng này
+                />
+            }
+            {openDialogEdit &&
+                <Button
+                    type="button"
+                    icon="pi pi-pencil"
+                    rounded
+                    outlined
+                    severity="success"
+                    onClick={() => openDialogEdit()}   // <<< thêm dòng này
                 />
             }
         </React.Fragment>

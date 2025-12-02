@@ -258,7 +258,7 @@ useEffect(() => {
 
         return {
             ...row,
-            fileNumber: _data?.fileNumber || "",
+            fileNumber: _data?.fileNumber || "không file",
             declaration: _data?.declaration || "",
             dispatch_code: row.type === 1 ? row.dispatch_code : "",
             bill: _data?.bill || "",

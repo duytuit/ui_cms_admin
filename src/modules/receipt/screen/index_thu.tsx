@@ -245,13 +245,15 @@ export default function ListReceiptThu() {
                                 <Column
                                 header="Thao tác"
                                 body={(row: any) => {
-                                        return ActionBody(
-                                            row,
-                                            null,
-                                            { route: "/receipt/delete", action: deleteReceipt },
-                                            paramsPaginator,
-                                            setParamsPaginator
-                                        );
+                                      if(row.type_receipt !== 3){
+                                          return ActionBody(
+                                              row,
+                                              null,
+                                              { route: "/receipt/delete", action: deleteReceipt },
+                                              paramsPaginator,
+                                              setParamsPaginator
+                                          );
+                                      }
                                     }}
                                 />
                                 <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>

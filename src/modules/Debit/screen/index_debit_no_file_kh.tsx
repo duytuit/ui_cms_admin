@@ -8,19 +8,18 @@ import { loaiHang, loaiToKhai, nghiepVu, phatSinh, tinhChat } from "utils";
 import { useListCustomerDetailWithState, useListPartnerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
 import { Button, Checkbox, Dialog } from "components/uiCore";
-import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { useListContractFile, useListContractFileNotDispatch, useListContractFileWithState } from "modules/ContractFile/service";
-import UpdateDebitDispatchFile from "./update_dispatch";
-import { useListDebitDispatch, useListHasDebitNoFileDispatchKH, useListNoDebitNoFileDispatchKH } from "../service";
-import { deleteDebit, updateDebitToStatusDichVu } from "../api";
-import { listContractFileNotDispatch } from "modules/ContractFile/api";
-import UpdateDebitDispatchFileCustom from "./update_dispatch_custom";
+import { useListContractFileWithState } from "modules/ContractFile/service";
+import { useListHasDebitNoFileDispatchKH, useListNoDebitNoFileDispatchKH } from "../service";
+import { updateDebitToStatusDichVu } from "../api";
 import UpdateDebitNoFileKH from "./update_debit_no_file_kh";
+import { FilterMatchMode } from "primereact/api";
+import UpdateVATDebitNoFile from "./update_vat_debit_no_file";
+import UpdateXuatHoaDonNoFile from "./update_xuat_hoadon_no_file";
 
 // ✅ Component Header lọc dữ liệu
-const Header = ({ _setParamsPaginator, _paramsPaginator,selected,refresh,refreshDebitDispatch ,_setSelectedRows}: any) => {
+const Header = ({ _setParamsPaginator, _paramsPaginator,selected,refresh,refreshDebitDispatch ,_setSelectedRows,selectedDebitDispatchRows,_setSelectedDebitDispatchRows}: any) => {
   const [filter, setFilter] = useState({
     name: "",
     customerDetailId: "",
@@ -28,6 +27,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,selected,refresh,refresh
     toDate: Helper.toDayString(),
   });
   const [visible, setVisible] = useState(false);
+  const [visibleXuatHoaDon, setVisibleXuatHoaDon] = useState(false);
   const { data: customerDetails } = useListCustomerDetailWithState({status: 1});
   // --- chuyển sang options bằng useMemo ---
   const customerOptions = useMemo(() => {
@@ -37,8 +37,13 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,selected,refresh,refresh
       value: x.id,
     }));
   }, [customerDetails]);
-   const openDialogAddOne = (e:any) => {
-       setVisible(true)
+    const openDialogAddOne = (e:any) => {
+       setVisibleXuatHoaDon(true)
+    };
+     const handleModalCloseOne = () => {
+       setVisibleXuatHoaDon(false);
+       _setSelectedDebitDispatchRows([])
+       refreshDebitDispatch?.();
     };
      const openDialogAdd = (e:any) => {
        setVisible(true)
@@ -120,6 +125,17 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,selected,refresh,refresh
           }
         </p>
       </Dialog>
+       <Dialog
+              position="top"
+              dismissableMask
+              visible={visibleXuatHoaDon}
+              onHide={() => setVisibleXuatHoaDon(false)}
+              style={{ width: "30vw", top:"30px" }}
+          >
+            <p className="m-0">
+              {selectedDebitDispatchRows && <UpdateXuatHoaDonNoFile ids={selectedDebitDispatchRows} onClose={handleModalCloseOne} ></UpdateXuatHoaDonNoFile>}
+            </p>
+        </Dialog>
     </>
   );
 };
@@ -132,6 +148,27 @@ export default function ListDebitNoFileKH() {
   const [displayDebitDispatchData, setDisplayDebitDispatchData] = useState<any[]>([]);
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(20);
+  const [selectedIdEdit, setSelectedIdEdit] = useState<any>();
+  const [visibleEdit, setVisibleEdit] = useState(false);
+  const [filters, setFilters] = useState({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  code_receipt: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  accounting_date: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  sofile: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  fullname_giaonhan: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  lydochi: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  total_amount: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  vat_rate: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  total_with_vat: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  tenquy: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  hinhthuc: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  stk: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  chutk: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  nganhang: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  note: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  nguoitao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
   const {data: partners } = useListPartnerDetailWithState({});
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
@@ -144,6 +181,32 @@ export default function ListDebitNoFileKH() {
   const { data: debitDispatch, refresh:refreshDebitDispatch  } = useListHasDebitNoFileDispatchKH({params: {...paramsPaginator}, debounce: 500,});
   const { data: contractFile } = useListContractFileWithState({});
   const { data: userInfosOptions } = useListUserWithState({});
+   const openDialogEdit = (id:number) => {
+        setSelectedIdEdit(id);
+        setVisibleEdit(true);
+    };
+    const handleModalEditClose = () => {
+      setVisibleEdit(false);
+      refresh?.(); 
+      refreshDebitDispatch?.(); // reload debitDispatch
+    };
+  const getSumColumn = (field: string) => {
+        const filtered = (displayDebitDispatchData??[]).filter((item: any) => {
+            return Object.entries(filters).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
+
+        const sum = filtered.reduce((acc: any, item: any) => {
+            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
   // ✅ Client-side pagination
   useEffect(() => {
     if (!data) return;
@@ -177,20 +240,29 @@ export default function ListDebitNoFileKH() {
       };
     });
       const mappedDebitDispatch = (debitDispatch?.data || []).map((row: any) => {
-      const _fileContract = contractFile.find((x: any) => x.id === row.file_info_id);
-      const _customer = partners.find((x: any) => x.id === row.customer_detail_id);
-      const _supplier = partners.find((x: any) => x.id === row.supplier_detail_id);
-      console.log("partners",_customer?.partners?.abbreviation);
-      
-      return {
-        ...row,
-        file_number : _fileContract?.file_number,
-        so_cont : _fileContract?.container_code,
-        customerName:_customer?.partners?.name || "",
-        customerAbb:_customer?.partners?.abbreviation || "",
-        supplierName:_supplier?.partners?.name || "",
-        supplierAbb:_supplier?.partners?.abbreviation || "",
-      };
+        const _fileContract = contractFile.find((x: any) => x.id === row.file_info_id);
+        const _customer = partners.find((x: any) => x.id === row.customer_detail_id);
+        const _supplier = partners.find((x: any) => x.id === row.supplier_detail_id);
+        console.log("partners",_customer?.partners?.abbreviation);
+        const thanh_tien = Math.round(row.price * (1 + row.vat / 100));
+        return {
+          ...row,
+          purchase_price: Helper.formatCurrency(row.purchase_price?.toString() || "0"),
+          driver_fee: Helper.formatCurrency(row.driver_fee?.toString() || "0"),
+          goods_fee: Helper.formatCurrency(row.goods_fee?.toString() || "0"),
+          meal_fee: Helper.formatCurrency(row.meal_fee?.toString() || "0"),
+          ticket_fee: Helper.formatCurrency(row.ticket_fee?.toString() || "0"),
+          overnight_fee: Helper.formatCurrency(row.overnight_fee?.toString() || "0"),
+          penalty_fee: Helper.formatCurrency(row.penalty_fee?.toString() || "0"),
+          file_number : _fileContract?.file_number,
+          so_cont : _fileContract?.container_code,
+          customerName:_customer?.partners?.name || "",
+          customerAbb:_customer?.partners?.abbreviation || "",
+          supplierName:_supplier?.partners?.name || "",
+          supplierAbb:_supplier?.partners?.abbreviation || "",
+          price: Helper.formatCurrency(row.price?.toString() || "0"),
+          thanh_tien: Helper.formatCurrency(thanh_tien.toString() || "0"),
+        };
     });
     setDisplayData(mapped);
     setDisplayDebitDispatchData(mappedDebitDispatch);
@@ -205,6 +277,8 @@ export default function ListDebitNoFileKH() {
           refresh={refresh}
           refreshDebitDispatch={refreshDebitDispatch}
           _setSelectedRows={setSelectedRows}
+          selectedDebitDispatchRows={selectedDebitDispatchRows}
+          _setSelectedDebitDispatchRows={setSelectedDebitDispatchRows}
         />
         <div style={{ height: 'calc(100vh - 8rem)' }}>
           <Splitter style={{ height: '100%', width: '100%' }}>
@@ -284,20 +358,36 @@ export default function ListDebitNoFileKH() {
                           <Column field="customer_vehicle_type" header="Loại xe KH" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplier_vehicle_type" header="Loại xe NCC" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="purchase_price" header="Cước mua" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="price" header="Cước bán" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="driver_fee" header="Lái xe thu cước" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="goods_fee" header="Lương hàng về" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="purchase_price" header="Cước mua"
+                           body={(row: any) => Helper.formatCurrency(row.purchase_price.toString())}
+                           filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="price" header="Cước bán"
+                           body={(row: any) => Helper.formatCurrency(row.price.toString())}
+                           filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="driver_fee" header="Lái xe thu cước"
+                            body={(row: any) => Helper.formatCurrency(row.driver_fee.toString())}
+                           filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="goods_fee" header="Lương hàng về"
+                            body={(row: any) => Helper.formatCurrency(row.goods_fee.toString())}
+                           filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplierName" header="Nhà cung cấp" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplierAbb" header="Tên viết tắt NCC" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="declaration_quantity" header="Biển số xe" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="vehicle_number" header="Biển số xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Lái xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="TTHQ" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Điểm trả hàng" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="meal_fee" header="Tiền ăn" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="ticket_fee" header="Tiền Vé" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="overnight_fee" header="Tiền qua đêm" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="penalty_fee" header="Tiền luật" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="meal_fee" header="Tiền ăn"
+                            body={(row: any) => Helper.formatCurrency(row.meal_fee.toString())}
+                           filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="ticket_fee" header="Tiền Vé"
+                            body={(row: any) => Helper.formatCurrency(row.ticket_fee.toString())}
+                           filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="overnight_fee" header="Tiền qua đêm"
+                            body={(row: any) => Helper.formatCurrency(row.overnight_fee.toString())}
+                           filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="penalty_fee" header="Tiền luật"
+                            body={(row: any) => Helper.formatCurrency(row.penalty_fee.toString())}
+                           filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
@@ -343,22 +433,21 @@ export default function ListDebitNoFileKH() {
                                           displayDebitDispatchData.length > 0
                                         }
                                         onChange={(e: any) => {
-                                          if (e.checked) setSelectedDebitDispatchRows(displayDebitDispatchData);
+                                          if (e.checked) setSelectedDebitDispatchRows(displayDebitDispatchData.map((d) => d.id));
                                           else setSelectedDebitDispatchRows([]);
                                         }}
                                     />
                                   )
                               }}
                               body={(rowData: any) => {
-                                  const isChecked = selectedDebitDispatchRows.findIndex(x => x.id === rowData.id) !== -1;
                                   return (
                                       <Checkbox
                                           className="p-checkbox-sm"
-                                          checked={isChecked}
+                                          checked={selectedDebitDispatchRows.includes(rowData.id)}
                                           onChange={(e:any) => {
                                               if (e.checked) {
                                                   // thêm cả object
-                                                  setSelectedDebitDispatchRows(prev => [...prev, rowData]);
+                                                  setSelectedDebitDispatchRows(prev => [...prev, rowData.id]);
                                               } else {
                                                   // xoá theo id
                                                   setSelectedDebitDispatchRows(prev =>
@@ -383,9 +472,23 @@ export default function ListDebitNoFileKH() {
                                       null,
                                       { route: "/Debit/updateDebitToStatusDichVu", action: updateDebitToStatusDichVu },
                                       paramsPaginator,
-                                      setParamsPaginator
+                                      setParamsPaginator,
+                                      null,null,null,() => openDialogEdit(row.id)
                                   );
                                 }
+                              }}
+                            style={{ width: "6em" }}
+                          />
+                           <Column
+                              header="In"
+                              body={(row: any) => {
+                                 return (
+                                          <>
+                                               <a href={`/debit/printNoFile?id=${row.id}`} target="_blank" rel="noopener noreferrer">
+                                                  <Button label="In" rounded icon="pi pi-print" severity="info" size="small" text />
+                                              </a>
+                                          </>
+                                        )
                               }}
                           />
                           <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
@@ -393,11 +496,17 @@ export default function ListDebitNoFileKH() {
                           <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="name" header="Số hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="name" header="Ngày xuất hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="price" header="Số tiền" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="cus_bill" header="Số hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="cus_bill_date" body={(e: any) => DateBody(e.cus_bill_date)} header="Ngày xuất hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="price" header="Số tiền" 
+                              footer={getSumColumn("price")}
+                              footerStyle={{ fontWeight: "bold" }}
+                          filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="vat" header="VAT" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="thanh_tien" header="Thành tiền" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="thanh_tien" header="Thành tiền" 
+                              footer={getSumColumn("thanh_tien")}
+                              footerStyle={{ fontWeight: "bold" }}
+                          filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="so_cont" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="customer_vehicle_type" header="Loại xe KH" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplier_vehicle_type" header="Loại xe NCC" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -405,7 +514,7 @@ export default function ListDebitNoFileKH() {
                           <Column field="goods_fee" header="Lương hàng về" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplierName" header="Nhà cung cấp" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplierAbb" header="Tên viết tắt NCC" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="declaration_quantity" header="Biển số xe" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="vehicle_number" header="Biển số xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Lái xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="TTHQ" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Điểm trả hàng" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -422,6 +531,18 @@ export default function ListDebitNoFileKH() {
           </Splitter>
         </div>
       </div>
+       <Dialog
+          position="top"
+          dismissableMask
+          header="Sửa VAT công nợ không lập file"
+          visible={visibleEdit}
+          onHide={() => setVisibleEdit(false)}
+          style={{ width: "78vw" }}
+        >
+          <p className="m-0">
+            {selectedIdEdit && <UpdateVATDebitNoFile id={selectedIdEdit} onClose={handleModalEditClose} ></UpdateVATDebitNoFile>}
+          </p>
+        </Dialog>
     </>
   );
 }

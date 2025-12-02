@@ -9,13 +9,13 @@ import { Button, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { useListContractFileWithState } from "modules/ContractFile/service";
-import UpdateHoanUngGiaoNhan from "modules/receipt/screen/view_hoanung_giao_nhan";
 import { confirmCancelGiaoNhan, deleteReceipt } from "../api";
 import { FilterMatchMode } from "primereact/api";
 import { useListReceipt, useListXacNhanChiPhiGiaoNhan } from "../service";
 import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { formOfPayment } from "utils";
-import ViewHoanUngGiaoNhan from "modules/receipt/screen/view_hoanung_giao_nhan";
+import UpdateHoanUngGiaoNhan from "./update_hoanung_giaonhan";
+import ViewHoanUngGiaoNhan from "./view_hoanung_giao_nhan";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator}: any) => {
@@ -274,15 +274,17 @@ export default function ListChiPhiGiaoNhan() {
                 }
               />
                <Column header="Trạng thái" style={{width:"150px"}} body={(row: any) => {
-                    if(row.status == 1){
-                    return (<>
-                      <div className="flex">
-                          <Button icon="pi pi-eye" rounded outlined className="mr-2" onClick={()=>openDialogView(row)} />
-                          <Button label="đã tạo phiếu thu" rounded severity="success" size="small" text  />
-                           </div>
-                    </>)
+                    if(row.status == 0){
+                        return <Button label="chưa xử lý" rounded severity="warning" size="small" text  />
                     }else{
-                      return <Button label="chưa xử lý" rounded severity="warning" size="small" text  />
+                       return (
+                            <>
+                            <div className="flex align-items-center">
+                                <Button icon="pi pi-eye" rounded outlined className="mr-2" onClick={()=>openDialogView(row)} />
+                                <Button label="đã tạo phiếu thu" rounded severity="success" size="small" text  />
+                                </div>
+                            </>
+                        )
                     }
                 }} filter showFilterMenu={false} filterMatchMode="contains" />
               <Column
