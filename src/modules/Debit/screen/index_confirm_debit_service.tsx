@@ -18,6 +18,7 @@ import UpdateGiayHoanUng from "modules/receipt/screen/update_giay_hoanung";
 import UpdateConfirmService from "./update_confirm_service";
 import { log } from "console";
 import { showWithDebitContractFile } from "modules/ContractFile/api";
+import UpdateConfirmManagerService from "./update_confirm_manager_service";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator, selected ,refreshHasDebitDispatch}: any) => {
@@ -136,19 +137,13 @@ export default function ListConfirmContractFileBangKe() {
     const { data: debitService, loading, refresh:refreshHasDebitDispatch } = useListContractFileHasDebitService({ params: {...paramsPaginator,},debounce: 500,});
     const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
     const { data: listEmployee } = useListEmployeeWithState({});
-    const openDialogAdd = async (row: any) => {
-        const res = await showWithDebitContractFile({ id: row.id });
-        const detail = res.data.data;
-        if (detail) {
-            setSelectedDebits(detail.debits.filter((x: any) => x.type === 0));
-        } else {
-            setSelectedDebits([]);
-        }
+    const openDialogAdd = (row: any) => {
+        const debitHaiQuan = row.debits.find((x: any) => x.debit_type === 0);
+        setSelectedDebits(debitHaiQuan);
         setVisible(true);
     };
     const handleModalClose = () => {
       setVisible(false);
-      setSelectedDebits([]);
       refreshHasDebitDispatch?.(); // reload debitDispatch
     };
     // ✅ Client-side pagination
@@ -206,7 +201,7 @@ export default function ListConfirmContractFileBangKe() {
     return (
       <>
         <div className="card">
-            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} selected={selectedDebitServiceRows} refreshHasDebitDispatch={refreshHasDebitDispatch} />
+            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} selected={selectedDebitServiceRows}/>
               <div style={{ height: 'calc(100vh - 8rem)' }}>
                      <Splitter layout="vertical" style={{ width: '100%', height: '100%' }}>
                             {/* Panel 2.1 */}
@@ -272,7 +267,7 @@ export default function ListConfirmContractFileBangKe() {
                                         <Column
                                           header="Thao tác"
                                           body={(row: any) => {
-                                            return <Button icon="pi pi-eye" rounded outlined className="mr-2"  onClick={() =>  openDialogAdd(row)} />
+                                              return <Button icon="pi pi-eye" rounded outlined className="mr-2"  onClick={() =>  openDialogAdd(row)} />
                                           }}
                                         />
                                         <Column header="Trạng thái" body={(row: any) => {
@@ -280,13 +275,6 @@ export default function ListConfirmContractFileBangKe() {
                                             return <Button label="đã duyệt" rounded severity="success" size="small" text  />
                                           }else{
                                             return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
-                                          }
-                                        }} filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Trạng thái hoàn ứng" body={(row: any) => {
-                                          if(row.re_status == 0){
-                                            return <Button label="chưa xử lý" rounded severity="warning" size="small" text  />
-                                          }else if(row.re_status == 1){
-                                            return <Button label="đã tạo phiếu" rounded severity="success" size="small" text  />
                                           }
                                         }} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
@@ -329,10 +317,10 @@ export default function ListConfirmContractFileBangKe() {
           header="Xác nhận duyệt bảng kê chi phí"
           visible={visible}
           onHide={() => setVisible(false)}
-          style={{ width: "60vw" }}
+          style={{ width: "40vw" }}
         >
           <p className="m-0">
-            {selectedDebits && <UpdateConfirmService debitDetail={selectedDebits} onClose={handleModalClose} ></UpdateConfirmService>}
+            {selectedDebits && <UpdateConfirmManagerService debitDetail={selectedDebits} onClose={handleModalClose} ></UpdateConfirmManagerService>}
           </p>
         </Dialog>
       </>
