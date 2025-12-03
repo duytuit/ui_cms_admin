@@ -601,7 +601,7 @@ const model = [{
           },
           {
             id: 1,
-            name: 'Duyệt bảng kê chi phí',
+            name: 'Duyệt chi phí hải quan',
             route: '/ContractFile/list-confirm-bangke',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
