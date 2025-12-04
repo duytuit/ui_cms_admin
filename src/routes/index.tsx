@@ -62,6 +62,8 @@ import ListReceiptChi from "modules/receipt/screen/index_chi";
 import UpdateReceiptChiNoiBo from "modules/receipt/screen/update_chi_noibo";
 import ListConfirmContractFileBangKe from "modules/Debit/screen/index_confirm_debit_service";
 import PrintDebitNoFile from "modules/Debit/screen/exports/print_debit_no_file";
+import ListChuyenTienNoiBo from "modules/receipt/screen/index_chuyentien_noibo";
+import UpdateChuyenTienNoiBo from "modules/receipt/screen/update_chuyentien_noibo";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -143,6 +145,10 @@ const publicRoutes = [
   { path: "/receipt/detail/chinoibo/:id", component: UpdateReceiptChiNoiBo, layout: 'UpdateReceiptChiNoiBo' },
   { path: "/receipt/updateReceiptChiGiaoNhan", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
   { path: "/receipt/detail/chigiaonhan/:id", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
+  { path: "/receipt/ListChuyenTienNoiBo", component: ListChuyenTienNoiBo, layout: 'ListChuyenTienNoiBo' },
+  { path: "/receipt/UpdateChuyenTienNoiBo", component: UpdateChuyenTienNoiBo, layout: 'UpdateChuyenTienNoiBo' },
+  { path: "/receipt/detail/chuyentiennoibo/:id", component: UpdateChuyenTienNoiBo, layout: 'UpdateChuyenTienNoiBo' },
+  
   // Debit 
   { path: "/debit/listCuoc", component: ListCuoc, layout: 'ListCuoc' },
   { path: "/debit/listTamThu", component: ListTamThu, layout: 'ListTamThu' },

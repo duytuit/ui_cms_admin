@@ -449,7 +449,18 @@ const model = [{
                 sort: 1,
               }
             ]
+          },
+          {
+              id: 5,
+              name: 'Chuyển tiền nội bộ',
+              sort: 1,
+              status: 1,
+              created_at: '2023-06-01 10:04:39',
+              deleted_at: null,
+              updated_at: null,
+              route: '/receipt/ListChuyenTienNoiBo',
           }
+         
         ]
       },
       {

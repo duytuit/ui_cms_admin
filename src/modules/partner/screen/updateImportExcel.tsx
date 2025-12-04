@@ -1,7 +1,7 @@
 
 import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, scrollToTop, refreshObject } from "utils";
 import { useDispatch } from "react-redux";
@@ -11,6 +11,8 @@ import { addPartner, showPartner, updatePartner } from "../api";
 import { Input } from "components/common/ListForm";
 import * as XLSX from 'xlsx';
 import { FileUpload } from "primereact/fileupload";
+import { Button } from "primereact/button";
+import { Menu } from "primereact/menu";
 export default function UpdateImportExcel() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
@@ -57,6 +59,22 @@ export default function UpdateImportExcel() {
       });
     }
   }, [])
+  const menuRight = useRef<Menu>(null);
+
+    const items = [
+        {
+            items: [
+                {
+                    label: 'Công nợ chi tiết',
+                    command: () => console.log("Thêm mới")
+                },
+                {
+                    label: 'Công nợ chi tiết 1',
+                    command: () => console.log("Chỉnh sửa")
+                }
+            ]
+        }
+    ];
   return (
     <>
        <div>
@@ -84,6 +102,17 @@ export default function UpdateImportExcel() {
               ))}
           </tbody>
       </table>
+       <div className="card flex justify-content-center">
+            <Menu model={items} popup ref={menuRight} id="popup_menu_right" />
+            <Button 
+                label="Export"
+                icon="pi pi-file-export"
+                severity="info" 
+                onClick={(e) => menuRight.current?.toggle(e)}
+                aria-controls="popup_menu_right"
+                aria-haspopup
+            />
+        </div>
     </>
   );
 }

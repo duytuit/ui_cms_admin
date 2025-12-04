@@ -16,6 +16,7 @@ import { TypeDebitDKKH } from "utils";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import UpdatePhieuThuKH from "modules/receipt/screen/update_phieuthu_kh";
+import { icon } from "@fortawesome/fontawesome-svg-core";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setSelectedRows}: any) => {
@@ -54,7 +55,18 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
       toDate: filter.toDate,
     }));
   }, [filter]);
-
+ const items = [
+        {
+            label: 'Công nợ chi tiết',
+            icon: "pi pi-file-export",
+            command: () => console.log("Thêm mới")
+        },
+        {
+            icon: "pi pi-file-export",
+            label: 'Công nợ chi tiết 1',
+            command: () => console.log("Chỉnh sửa")
+        }
+    ];
   return (
     <>
       <GridForm
@@ -65,6 +77,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
         className="lg:col-9"
         openDialogAdd={()=>openDialogAdd()}
         openDialogAddName="Lập phiếu thu"
+        MenuItems={items}
       >
         <div className="col-2">Ngày công nợ</div>
         <div className="col-2">

@@ -9,6 +9,7 @@ import { refreshObject } from "utils";
 import { MyCalendar } from "./MyCalendar";
 import Calendarz from "components/uiCore/form/Calendar";
 import { Link } from "react-router-dom";
+import { Menu } from "primereact/menu";
 
 export const Calendar = (props:any) => {
     const { id,className, ...prop } = props;
@@ -71,7 +72,8 @@ export const Dropdown = (props:any) => {
 };
 
 export const GridForm = (props:any) => {
-    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam, add ,addName, addOne,addOneName, openDialogAdd, openDialogAddName, openDialogAddOne, openDialogAddNameOne} = props;
+    const menuRight = useRef<Menu>(null);
+    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam, add ,addName, addOne,addOneName, openDialogAdd, openDialogAddName, openDialogAddOne, openDialogAddNameOne, MenuItems} = props;
     const handleClear = (e:any) => {
         setParamsPaginator(defaultParam);
         refreshObject(filter)
@@ -125,6 +127,21 @@ export const GridForm = (props:any) => {
                             raised 
                             onClick={() => openDialogAddOne()}   // <<< thêm dòng này
                         />
+                    }
+                    {
+                      MenuItems &&
+                         <div className="ml-1">
+                            <Menu model={MenuItems} popup ref={menuRight} id="popup_menu_right" />
+                            <Button 
+                                label="Export"
+                                icon="pi pi-file-export"
+                                severity="info" 
+                                size="small" 
+                                onClick={(e:any) => menuRight.current?.toggle(e)}
+                                aria-controls="popup_menu_right"
+                                aria-haspopup
+                            />
+                        </div>
                     }
                 </div>
             </div>
