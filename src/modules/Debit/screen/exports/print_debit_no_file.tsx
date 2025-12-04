@@ -123,6 +123,7 @@ export default function PrintDebitNoFile() {
             >
                 <Column header="STT" body={(rowData:any, options:any) => options.rowIndex + 1} style={{ paddingLeft: '15px' }} />
                 <Column header="NỘI DUNG" body={(row: any) => row.name } className="table-title-center" />
+                <Column header="BIỂN SỐ" body={(row: any) => row.vehicleNumber } className="table-title-center" />
                 <Column header="SỐ TIỀN" body={(row: any) => Helper.formatCurrency(row.price.toString()) } className="table-title-center" style={{ textAlign: 'right' }}/>
                 <Column header="VAT" body={(row: any) => row.vat } className="table-title-center" style={{ textAlign: 'center' }}/>
                 <Column header="THÀNH TIỀN" 
@@ -136,7 +137,7 @@ export default function PrintDebitNoFile() {
                   style={{ textAlign: 'right' }}
                   />
                 <Column field="note" header="GHI CHÚ" className="table-title-center"  style={{ textAlign: 'center' }}/>
-                <Column header="HÓA ĐƠN" body={(row: any) => row.cus_bill } className="table-title-center"  style={{ textAlign: 'center' }}/>
+                <Column header="HÓA ĐƠN" body={(row: any) => row.cusBill } className="table-title-center"  style={{ textAlign: 'center' }}/>
             </DataTable>
       </div>
     </>

@@ -133,6 +133,7 @@ export const GridForm = (props:any) => {
                          <div className="ml-1">
                             <Menu model={MenuItems} popup ref={menuRight} id="popup_menu_right" />
                             <Button 
+                                type="button"
                                 label="Export"
                                 icon="pi pi-file-export"
                                 severity="info" 

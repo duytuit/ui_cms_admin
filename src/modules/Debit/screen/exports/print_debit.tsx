@@ -24,13 +24,13 @@ export default function PrintDebit() {
                     const dataArray = Array.isArray(detail) ? detail : [];
                     const groupedHasFileGia = Object.values(
                         dataArray.reduce((acc:any, cur:any) => {
-                          const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by, ...rest } = cur;
+                          const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_vehicle_number, ...rest } = cur;
                           if (!acc[cur.id]) {
                             acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
                           }
                           // chỉ gom debit nếu debitService có dữ liệu
                           if (detail) {
-                            acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by});
+                            acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_vehicle_number});
                             acc[cur.id].debit_ids.push(debit_id);
                           }
                           return acc;
@@ -169,6 +169,7 @@ export default function PrintDebit() {
             >
                 <Column header="STT" body={(rowData:any, options:any) => options.rowIndex + 1} style={{ paddingLeft: '15px' }} />
                 <Column header="NỘI DUNG" body={(row: any) => row.debit_name } className="table-title-center" />
+                <Column header="BIỂN SỐ" body={(row: any) => row.debit_vehicle_number } className="table-title-center" />
                 <Column header="SỐ TIỀN" body={(row: any) => Helper.formatCurrency(row.debit_price.toString()) } className="table-title-center" style={{ textAlign: 'right' }}/>
                 <Column header="VAT" body={(row: any) => row.debit_vat } className="table-title-center" style={{ textAlign: 'center' }}/>
                 <Column header="THÀNH TIỀN" 

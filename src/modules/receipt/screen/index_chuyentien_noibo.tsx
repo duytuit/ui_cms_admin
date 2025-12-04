@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { ActionBody, Column, TimeBody, DataTableClient, DateBody } from "components/common/DataTable";
-import { Dropdown, GridForm, Input } from "components/common/ListForm";
+import { ActionBody, Column, TimeBody, DataTableClient } from "components/common/DataTable";
+import { GridForm } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
 import { classNames } from "primereact/utils";
-import { useListReceipt, useListReceiptThu } from "../service";
+import { useListReceiptThu } from "../service";
 import { deleteReceipt, showReceipt } from "../api";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
@@ -14,10 +14,6 @@ import { useListContractFileWithState } from "modules/ContractFile/service";
 import { FilterMatchMode } from "primereact/api";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { MyCalendar } from "components/common/MyCalendar";
-import { Splitter, SplitterPanel } from "primereact/splitter";
-import { DataTable } from "components/uiCore";
-import { showWithIds } from "modules/Debit/api";
-import { text } from "stream/consumers";
 
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   const [filter, setFilter] = useState({
@@ -196,7 +192,7 @@ export default function ListChuyenTienNoiBo() {
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
              <DataTableClient
                     rowHover
-                    value={displayData}
+                    value={[]}
                     paginator
                     rows={rows}
                     first={first}

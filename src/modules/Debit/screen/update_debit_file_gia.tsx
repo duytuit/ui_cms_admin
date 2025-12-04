@@ -226,6 +226,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                   }
                 />
                 <Column field="customerAbb" header="Nhà cung cấp" />
+                <Column field="vehicleNumber" header="Biển số" />
                 <Column
                   field="purchasePrice"
                   header="Giá mua"

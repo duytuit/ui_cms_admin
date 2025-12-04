@@ -261,6 +261,7 @@ export default function ListContractFile() {
           <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="bill" header="Bill" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="declaration" header="Số tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />

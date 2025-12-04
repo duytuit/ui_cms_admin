@@ -261,6 +261,7 @@ export default function ListFileGia() {
                                 <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="sales" header="Tên Sales" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="declaration" header="Số bill" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -304,7 +305,7 @@ export default function ListFileGia() {
                                       scrollable
                                       scrollHeight="flex"
                                       style={{ flex: 1 }}
-                                      tableStyle={{ minWidth: "2000px" }}
+                                      tableStyle={{ minWidth: "2100px" }}
                                       onRowClick={(e: any) => {
                                          setSelectedDetail(e.data.debits)
                                          console.log(e.data.debits);
@@ -390,6 +391,22 @@ export default function ListFileGia() {
                                         <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column header="Số hóa đơn"  body={(e: any) => 
+                                          {
+                                            if(e.debits && e.debits.length > 0){
+                                                return e.debits[0]?.debit_cus_bill || "";
+                                              }
+                                          }
+                                        } filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column header="Ngày hóa đơn"
+                                          body={(e: any) =>
+                                            {
+                                              if(e.debits && e.debits.length > 0){
+                                                return DateBody(e.debits[0]?.debit_cus_bill_date)
+                                              }
+                                            }
+                                          } filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="sales" header="Tên Sales" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="sumMua" body={(row: any) => Helper.formatCurrency(row.sumMua.toString())}  header="Tổng mua" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="sumBan" body={(row: any) => Helper.formatCurrency(row.sumBan.toString())}  header="Tổng bán" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="loiNhuan" body={(row: any) => Helper.formatCurrency(row.loiNhuan.toString())}  header="Lợi nhuận" filter showFilterMenu={false} filterMatchMode="contains" />

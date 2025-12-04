@@ -1,4 +1,4 @@
-import { getData, postData, postDataList } from "lib/request";
+import { getData, getDataV3, postData, postDataList } from "lib/request";
 
 export const listDebit = async (params: any) => await getData("Debit", params);
 export const listMuahangNCC = async (params: any) => await getData("Debit/muahangNCC", params);
@@ -42,3 +42,5 @@ export const addDebitBanHangKH = async (params: any) => await postData("Debit/cr
 export const updateDebitMuaHangNCC = async (params: any) => await postData("Debit/update/muahang", params);
 export const updateDebitBanHangKH = async (params: any) => await postData("Debit/update/banhang", params);
 export const showWithIds = async (params: any) => await postData("Debit/showWithIds", params);
+export const exportDebitKH = async (params: any) => await getDataV3("Debit/excel/congnokh", params);
+export const exportDebitKHVer1 = async (params: any) => await getDataV3("Debit/excel/congnokh_v1", params);

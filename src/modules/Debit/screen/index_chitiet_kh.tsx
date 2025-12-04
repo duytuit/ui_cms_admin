@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, DataTableClient, DateBody, } from "components/common/DataTable";
 import { Calendar, CalendarY, Dropdown, GridForm, Input, } from "components/common/ListForm";
-import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { useListCustomerDetailWithState } from "modules/partner/service";
@@ -11,15 +10,16 @@ import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { useListDebitCongNoChiTietKH, useListDebitCuocTamThu, useListDebitDauKyKH } from "../service";
 import { useListContractFileWithState } from "modules/ContractFile/service";
-import { deleteDebit } from "../api";
+import { deleteDebit, exportDebitKH, exportDebitKHVer1 } from "../api";
 import { TypeDebitDKKH } from "utils";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import UpdatePhieuThuKH from "modules/receipt/screen/update_phieuthu_kh";
-import { icon } from "@fortawesome/fontawesome-svg-core";
+import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setSelectedRows}: any) => {
+   const { handleParamUrl } = useHandleParamUrl();
   const [filter, setFilter] = useState({
     name: "",
     customerDetailId: "",
@@ -55,16 +55,36 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
       toDate: filter.toDate,
     }));
   }, [filter]);
+  async function ExportExcelCongNoKH(){
+    const respo = await exportDebitKH(Helper.convertObjectToQueryString(_paramsPaginator));
+    const url = window.URL.createObjectURL(new Blob([respo.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'cong_no_chi_tiet_kh.xlsx'); // or any other extension
+    document.body.appendChild(link);
+    link.click();
+    link?.parentNode?.removeChild(link);  
+  }
+  async function ExportExcelCongNoKHVer1(){
+    const respo = await exportDebitKHVer1(Helper.convertObjectToQueryString(_paramsPaginator));
+    const url = window.URL.createObjectURL(new Blob([respo.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'cong_no_chi_tiet_kh_ver1.xlsx'); // or any other extension
+    document.body.appendChild(link);
+    link.click();
+    link?.parentNode?.removeChild(link);  
+  }
  const items = [
         {
             label: 'Công nợ chi tiết',
             icon: "pi pi-file-export",
-            command: () => console.log("Thêm mới")
+            command: () => ExportExcelCongNoKH()
         },
         {
             icon: "pi pi-file-export",
             label: 'Công nợ chi tiết 1',
-            command: () => console.log("Chỉnh sửa")
+            command: () => ExportExcelCongNoKHVer1()
         }
     ];
   return (

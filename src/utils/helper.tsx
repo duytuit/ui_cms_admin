@@ -83,6 +83,17 @@ export class Helper {
       })
       .join('&');
   }
+  static convertObjectToQueryString(params: Record<string, any>): string {
+    const cleanParams: Record<string, string> = {};
+
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === null || value === undefined) return;
+
+      cleanParams[key] = String(value); // ép thành string
+    });
+
+    return new URLSearchParams(cleanParams).toString();
+  }
   // static makeSignature(data:any, hash_key:any) {
   //   const hash_data = Helper.convertObjToParam(data);
   //   console.log(hash_data);
