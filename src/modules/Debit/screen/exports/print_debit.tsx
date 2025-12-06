@@ -24,13 +24,13 @@ export default function PrintDebit() {
                     const dataArray = Array.isArray(detail) ? detail : [];
                     const groupedHasFileGia = Object.values(
                         dataArray.reduce((acc:any, cur:any) => {
-                          const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_vehicle_number, ...rest } = cur;
+                          const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_vehicle_number,debit_cus_bill, ...rest } = cur;
                           if (!acc[cur.id]) {
                             acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
                           }
                           // chỉ gom debit nếu debitService có dữ liệu
                           if (detail) {
-                            acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_vehicle_number});
+                            acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_vehicle_number,debit_cus_bill});
                             acc[cur.id].debit_ids.push(debit_id);
                           }
                           return acc;
@@ -64,7 +64,7 @@ export default function PrintDebit() {
     const footerGroup = (
     <ColumnGroup>
       <Row>
-        <Column footer="TỔNG CHI PHÍ LÔ HÀNG" colSpan={2}  footerStyle={{ textAlign: 'center' }}/>
+        <Column footer="TỔNG CHI PHÍ LÔ HÀNG" colSpan={3}  footerStyle={{ textAlign: 'center' }}/>
         <Column 
             footer={Helper.formatCurrency(displayFileGia[0]?.debits.reduce((sum: number, x: any) => {
                       return sum + x.debit_price;
@@ -183,7 +183,7 @@ export default function PrintDebit() {
                   style={{ textAlign: 'right' }}
                   />
                 <Column header="GHI CHÚ" className="table-title-center"  style={{ textAlign: 'center' }}/>
-                <Column header="HÓA ĐƠN" body={(row: any) => row.debit_bill } className="table-title-center"  style={{ textAlign: 'center' }}/>
+                <Column header="HÓA ĐƠN" body={(row: any) => row.debit_cus_bill } className="table-title-center"  style={{ textAlign: 'center' }}/>
             </DataTable>
       </div>
     </>

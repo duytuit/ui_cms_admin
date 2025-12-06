@@ -6,18 +6,17 @@ import { showToast } from "redux/features/toast";
 import { listToast, loaiToKhai, refreshObject, typeDebit, typeVehicle } from "utils";
 import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
-import { addDebit } from "../api";
+import { addDebit, ShowWithFileInfoAsync, updateDebit } from "../api";
 import { showContractFile } from "modules/ContractFile/api";
-import { InputSwitch, Panel } from "components/uiCore";
+import { Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { classNames } from "primereact/utils";
 import { Dropdown } from "components/common/ListForm";
-import { useListEmployee, useListEmployeeWithState } from "modules/employee/service";
+import { useListEmployeeWithState } from "modules/employee/service";
 import { useListPartnerDetail } from "modules/partner/service";
-import { useListVehicle, useListVehicleWithState } from "modules/VehicleDispatch/service";
-import { json } from "stream/consumers";
-export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onClose: () => void }) {
+import { useListVehicleWithState } from "modules/VehicleDispatch/service";
+export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: any; onClose: () => void ,type?:number}) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({isExternalDriver:1});
   const dispatch = useDispatch();
@@ -80,14 +79,13 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
     infos.driverFee      = toInt(infos.driverFee);
     infos.customsStatus  = toInt(infos.customsStatus);
     infos.purchasePrice  = toInt(infos.purchasePrice);
-    infos.sellingPrice   = toInt(infos.sellingPrice);
-    infos.price          = toInt(infos.sellingPrice);
+    infos.price          = toInt(infos.price);
     infos.mealFee        = toInt(infos.mealFee);
     infos.ticketFee      = toInt(infos.ticketFee);
     infos.overnightFee   = toInt(infos.overnightFee);
     infos.penaltyFee     = toInt(infos.penaltyFee);
     infos.goodsFee       = toInt(infos.goodsFee);
-    infos.fileInfoId= infos.id;
+    infos.fileInfoId= type == 0? infos.id :infos.fileInfo.id;
     infos.data = JSON.stringify(infos);
     infos.vehicleNumber = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleLabel : infos.vehicleNumber
     let info = {
@@ -103,10 +101,22 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
     : typeof v === "number"
     ? v
     : parseInt(String(v).replace(/\D/g, ""), 10) || 0;
-
   async function fetchDataSubmit(info: any) {
-    if (info.id) {
+    if (info.id && type == 0) {
       const response = await addDebit(info);
+      if (response) setLoading(false);
+      if (response.status === 200) {
+        if (response.data.status) {
+          setInfos({ ...refreshObject(infos), status: true })
+          dispatch(showToast({ ...listToast[0], detail: response.data.message }));
+          onClose();
+        } else {
+          dispatch(showToast({ ...listToast[2], detail: response.data.message }))
+        }
+      } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
+    }
+     if (info.id && type == 1) {
+      const response = await updateDebit(info);
       if (response) setLoading(false);
       if (response.status === 200) {
         if (response.data.status) {
@@ -122,7 +132,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
   useEffect(() => {
     if (!id) return;
     if (partnerOptions.length === 0) return;  // ✅ quan trọng
-    if (id) {
+    if (id && type == 0) {
       setLoading(true);
       showContractFile({ id: id, type: CategoryEnum.country }).then(res => {
         const detail = res.data.data
@@ -137,6 +147,31 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
             loaiToKhai:_loaiToKhai?.name,
             isExternalDriver:1
           };
+          setInfos(info)
+        }
+      }).catch(err => {
+        //setHasError(true)
+      }).finally(() => setLoading(false));
+    }
+     if (id && type == 1) {
+      setLoading(true);
+      ShowWithFileInfoAsync({ id: id, type: CategoryEnum.country }).then(res => {
+        const detail = res.data.data
+        if (detail) {
+          const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
+          const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.fileInfo.declarationType);
+          detail.partnerName = partner?.label;
+          detail.route = detail.name;
+          detail.fileNumber = detail.fileInfo.fileNumber;
+          detail.declaration = detail.fileInfo.declaration;
+          detail.bill = detail.fileInfo.bill;
+          detail.quantity = detail.fileInfo.quantity;
+          detail.containerCode = detail.fileInfo.containerCode;
+          detail.isExternalDriver = detail.vehicleId > 0 ? 0 : 1;
+          let info = {
+            ...detail, status: detail.status === 0 ? true : false, loaiToKhai:_loaiToKhai?.name
+          };
+          console.log(info);
           setInfos(info)
         }
       }).catch(err => {
@@ -257,10 +292,10 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
               </div>
                <div className="field col-4">
                 <InputForm className="w-full"
-                  id="sellingPrice"
-                  value={infos.sellingPrice}
+                  id="price"
+                  value={Helper.formatCurrency(infos.price ? infos.price.toString():'')}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, sellingPrice: Helper.formatCurrency(e.target.value) })
+                    setInfos({ ...infos, price: e.target.value })
                   }
                   label="Cước bán"
                 />
@@ -268,9 +303,9 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                <div className="field col-4">
                 <InputForm className="w-full"
                   id="driverFee"
-                  value={infos.driverFee}
+                  value={Helper.formatCurrency(infos.driverFee?infos.driverFee.toString():'')}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, driverFee: Helper.formatCurrency(e.target.value) })
+                    setInfos({ ...infos, driverFee: e.target.value })
                   }
                   label="Lái xe thu cước"
                 /> 
@@ -278,9 +313,9 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                <div className="field col-4">
                 <InputForm className="w-full"
                   id="customsStatus"
-                  value={infos.customsStatus}
+                  value={Helper.formatCurrency(infos.customsStatus?infos.customsStatus.toString():"")}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, customsStatus: Helper.formatCurrency(e.target.value) })
+                    setInfos({ ...infos, customsStatus: e.target.value })
                   }
                   label="TTHQ"
                 />
@@ -288,9 +323,9 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                <div className="field col-4">
                 <InputForm className="w-full"
                   id="purchasePrice"
-                  value={infos.purchasePrice}
+                  value={Helper.formatCurrency(infos.purchasePrice?infos.purchasePrice.toString():'')}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, purchasePrice: Helper.formatCurrency(e.target.value) })
+                    setInfos({ ...infos, purchasePrice: e.target.value })
                   }
                   label="Cước mua"
                 />
@@ -349,6 +384,7 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
                {infos.isExternalDriver == 1 && <div className="field col-2">
                   <InputForm className="w-full"
                       id="vehicleNumber"
+                      value={infos.vehicleNumber}
                       onChange={(e: any) =>
                         setInfos({ ...infos, vehicleNumber: e.target.value })
                       }
@@ -376,9 +412,9 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
               <div className="field col-4">
                 <InputForm className="w-full"
                   id="mealFee"
-                  value={infos.mealFee}
+                  value={Helper.formatCurrency(infos.mealFee?infos.mealFee.toString():'')}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, mealFee: Helper.formatCurrency(e.target.value) })
+                    setInfos({ ...infos, mealFee: e.target.value })
                   }
                   label="Tiền ăn"
                 />
@@ -386,9 +422,9 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
               <div className="field col-3">
                 <InputForm className="w-full"
                   id="ticketFee"
-                  value={infos.ticketFee}
+                  value={Helper.formatCurrency(infos.ticketFee?infos.ticketFee.toString():'')}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, ticketFee: Helper.formatCurrency(e.target.value) })
+                    setInfos({ ...infos, ticketFee: e.target.value })
                   }
                   label="Tiền vé"
                 />
@@ -396,9 +432,9 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
               <div className="field col-2">
                 <InputForm className="w-full"
                   id="overnightFee"
-                  value={infos.overnightFee}
+                  value={Helper.formatCurrency(infos.overnightFee?infos.overnightFee.toString():"")}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, overnightFee: Helper.formatCurrency(e.target.value) })
+                    setInfos({ ...infos, overnightFee: e.target.value })
                   }
                   label="Tiền qua đêm"
                 />
@@ -406,9 +442,9 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
               <div className="field col-3">
                 <InputForm className="w-full"
                   id="penaltyFee"
-                  value={infos.penaltyFee}
+                  value={Helper.formatCurrency(infos.penaltyFee?infos.penaltyFee.toString():'')}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, penaltyFee: Helper.formatCurrency(e.target.value) })
+                    setInfos({ ...infos, penaltyFee: e.target.value })
                   }
                   label="Tiền luật"
                 />
@@ -416,9 +452,9 @@ export default function UpdateDebitDispatchFile({ id, onClose }: { id: any; onCl
               <div className="field col-4">
                 <InputForm className="w-full"
                   id="goodsFee"
-                  value={infos.goodsFee}
+                  value={Helper.formatCurrency(infos.goodsFee?infos.goodsFee.toString():'')}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, goodsFee: Helper.formatCurrency(e.target.value) })
+                    setInfos({ ...infos, goodsFee: e.target.value })
                   }
                   label="Lượng hàng về"
                 />

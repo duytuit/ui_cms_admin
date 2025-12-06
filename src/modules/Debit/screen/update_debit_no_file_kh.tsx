@@ -114,6 +114,7 @@ export default function UpdateDebitNoFileKH({ debits, onClose}: { debits: any, o
                         <Column header="STT" body={(rowData:any, options:any) => options.rowIndex + 1}/>
                         <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="dispatch_code" header="Mã điều xe" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="vehicle_number" header="Biển số" />
                         <Column field="price" header="Số tiền"
                           body={(row: any) => Helper.formatCurrency(row.price?.toString() || "0")}
                           footer={Helper.formatCurrency(

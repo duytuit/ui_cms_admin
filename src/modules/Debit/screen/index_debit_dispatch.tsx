@@ -123,6 +123,7 @@ export default function ListCreateDispatch() {
   const [displayDebitDispatchData, setDisplayDebitDispatchData] = useState<any[]>([]);
   const [visible, setVisible] = useState(false);
   const [selectedId, setSelectedId] = useState<any>();
+  const [type, setType] = useState<any>();
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(20);
   const {data: partners } = useListPartnerDetailWithState({});
@@ -190,8 +191,20 @@ export default function ListCreateDispatch() {
   const openDialogAdd = (id: number) => {
     setSelectedId(id);
     setVisible(true);
+    setType(0)
   };
   const handleModalClose = () => {
+    setVisible(false);
+    refresh?.(); 
+    refreshDebitDispatch?.(); // reload debitDispatch
+  };
+  // Hàm mở dialog thêm mới
+  const openDialogEdit = (id: number) => {
+    setSelectedId(id);
+    setVisible(true);
+    setType(1)
+  };
+  const handleModalEditClose = () => {
     setVisible(false);
     refresh?.(); 
     refreshDebitDispatch?.(); // reload debitDispatch
@@ -354,10 +367,13 @@ export default function ListCreateDispatch() {
                                       null,
                                       { route: "/Debit/delete", action: deleteDebit },
                                       paramsPaginator,
-                                      setParamsPaginator
+                                      setParamsPaginator,
+                                      null,null,null,
+                                      () => openDialogEdit(row.id)
                                   );
                                 }
                               }}
+                              style={{width:"6em"}}
                           />
                           <Column header="Trạng thái" body={(row: any) => {
                             if(row.cf_status_confirm == 1 && row.file_info_id !=null){
@@ -413,6 +429,7 @@ export default function ListCreateDispatch() {
             <UpdateDebitDispatchFile
               id={selectedId}
               onClose={handleModalClose}
+              type={type}
             ></UpdateDebitDispatchFile>
           )}
         </p>

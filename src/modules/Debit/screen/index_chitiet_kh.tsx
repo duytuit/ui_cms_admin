@@ -150,7 +150,7 @@ export default function ListChiTietKH() {
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [displayData, setDisplayData] = useState<any[]>([]);
   const [first, setFirst] = useState(0);
-  const [rows, setRows] = useState(50);
+  const [rows, setRows] = useState(12);
   const { data: customers } = useListCustomerDetailWithState({status: 1});
   const { data: employees } = useListEmployeeWithState({});
   const [paramsPaginator, setParamsPaginator] = useState({

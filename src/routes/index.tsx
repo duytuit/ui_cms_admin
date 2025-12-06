@@ -64,6 +64,7 @@ import ListConfirmContractFileBangKe from "modules/Debit/screen/index_confirm_de
 import PrintDebitNoFile from "modules/Debit/screen/exports/print_debit_no_file";
 import ListChuyenTienNoiBo from "modules/receipt/screen/index_chuyentien_noibo";
 import UpdateChuyenTienNoiBo from "modules/receipt/screen/update_chuyentien_noibo";
+import ListDebitChiTietGiaoNhan from "modules/Debit/screen/index_chitiet_giaonhan";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -176,6 +177,7 @@ const publicRoutes = [
   { path: "/debit/ListTongHopKH", component: ListTongHopKH, layout: 'ListTongHopKH' },
   { path: "/debit/ListChiTietKH", component: ListChiTietKH, layout: 'ListChiTietKH' },
   { path: "/debit/ListChiTietNCC", component: ListChiTietNCC, layout: 'ListChiTietNCC' },
+  { path: "/debit/ListDebitChiTietGiaoNhan", component: ListDebitChiTietGiaoNhan, layout: 'ListDebitChiTietGiaoNhan' },
   
   { path: "/user/inportExcelPartner", component: UpdateImportExcel, layout: 'UpdateImportExcel' },
 

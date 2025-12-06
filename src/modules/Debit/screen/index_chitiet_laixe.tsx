@@ -1,37 +1,41 @@
-import { useEffect, useMemo, useState } from "react";
-import { Column, DataTableClient, DateBody, } from "components/common/DataTable";
-import { Dropdown, GridForm, Input, } from "components/common/ListForm";
-import { useHandleParamUrl } from "hooks/useHandleParamUrl";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, DataTableClient, DateBody, } from "components/common/DataTable";
+import { Calendar, CalendarY, Dropdown, GridForm, Input, } from "components/common/ListForm";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
-import { useListSupplierDetailWithState } from "modules/partner/service";
+import { useListCustomerDetailWithState } from "modules/partner/service";
+import { useListUserWithState } from "modules/user/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import { useListDebitCongNoChiTietNCC } from "../service";
+import { useListDebitCongNoChiTietKH, useListDebitCuocTamThu, useListDebitDauKyKH } from "../service";
+import { useListContractFileWithState } from "modules/ContractFile/service";
+import { deleteDebit, exportDebitKH, exportDebitKHVer1 } from "../api";
 import { TypeDebitDKKH } from "utils";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
-import UpdatePhieuChiNCC from "modules/receipt/screen/update_phieuchi_ncc";
+import UpdatePhieuThuKH from "modules/receipt/screen/update_phieuthu_kh";
+import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setSelectedRows}: any) => {
+   const { handleParamUrl } = useHandleParamUrl();
   const [filter, setFilter] = useState({
     name: "",
-    supplierDetailId: "",
+    customerDetailId: "",
     fromDate: Helper.lastWeekString(),
     toDate: Helper.toDayString(),
   });
   const [visible, setVisible] = useState(false);
-  const { data: supplierDetails } = useListSupplierDetailWithState({ status: 2});
+  const { data: customerDetails } = useListCustomerDetailWithState({ status: 1});
   // --- chuyển sang options bằng useMemo ---
-  const supplierOptions = useMemo(() => {
-    if (!Array.isArray(supplierDetails)) return [];
-    return supplierDetails.map((x: any) => ({
+  const customerOptions = useMemo(() => {
+    if (!Array.isArray(customerDetails)) return [];
+    return customerDetails.map((x: any) => ({
       label: x?.partners?.abbreviation ?? "(không tên)",
       value: x.id,
     }));
-  }, [supplierDetails]);
+  }, [customerDetails]);
   const openDialogAdd = () => {
     console.log(selected);
     setVisible(true);
@@ -46,12 +50,43 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
     _setParamsPaginator((prev: any) => ({
       ...prev,
       keyword: filter.name,
-      supplierDetailId: filter.supplierDetailId,
+      customerDetailId: filter.customerDetailId,
       fromDate: filter.fromDate,
       toDate: filter.toDate,
     }));
   }, [filter]);
-
+  async function ExportExcelCongNoKH(){
+    const respo = await exportDebitKH(Helper.convertObjectToQueryString(_paramsPaginator));
+    const url = window.URL.createObjectURL(new Blob([respo.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'cong_no_chi_tiet_kh.xlsx'); // or any other extension
+    document.body.appendChild(link);
+    link.click();
+    link?.parentNode?.removeChild(link);  
+  }
+  async function ExportExcelCongNoKHVer1(){
+    const respo = await exportDebitKHVer1(Helper.convertObjectToQueryString(_paramsPaginator));
+    const url = window.URL.createObjectURL(new Blob([respo.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'cong_no_chi_tiet_kh_ver1.xlsx'); // or any other extension
+    document.body.appendChild(link);
+    link.click();
+    link?.parentNode?.removeChild(link);  
+  }
+ const items = [
+        {
+            label: 'Công nợ chi tiết',
+            icon: "pi pi-file-export",
+            command: () => ExportExcelCongNoKH()
+        },
+        {
+            icon: "pi pi-file-export",
+            label: 'Công nợ chi tiết 1',
+            command: () => ExportExcelCongNoKHVer1()
+        }
+    ];
   return (
     <>
       <GridForm
@@ -61,7 +96,8 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
         setFilter={setFilter}
         className="lg:col-9"
         openDialogAdd={()=>openDialogAdd()}
-        openDialogAddName="Lập phiếu chi"
+        openDialogAddName="Lập phiếu thu"
+        MenuItems={items}
       >
         <div className="col-2">Ngày công nợ</div>
         <div className="col-2">
@@ -84,12 +120,12 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
           <Dropdown
             filter
             showClear
-            value={filter.supplierDetailId}
-            options={supplierOptions}
+            value={filter.customerDetailId}
+            options={customerOptions}
             onChange={(e: any) =>
-              setFilter({ ...filter, supplierDetailId: e.target.value })
+              setFilter({ ...filter, customerDetailId: e.target.value })
             }
-            label="Nhà cung cấp"
+            label="Khách hàng"
             className={classNames("dropdown-input-sm", "p-dropdown-sm")}
           />
         </div>
@@ -102,20 +138,20 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
             style={{ width: "70vw", top:"30px" }}
         >
           <p className="m-0">
-            {selected && <UpdatePhieuChiNCC debits={selected} onClose={handleModalClose} ></UpdatePhieuChiNCC>}
+            {selected && <UpdatePhieuThuKH debits={selected} onClose={handleModalClose} ></UpdatePhieuThuKH>}
           </p>
       </Dialog>
     </>
   );
 };
 
-export default function ListChiTietNCC() {
+export default function ListDebitLaiXe() {
   const { handleParamUrl } = useHandleParamUrl();
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [displayData, setDisplayData] = useState<any[]>([]);
   const [first, setFirst] = useState(0);
-  const [rows, setRows] = useState(12);
-  const { data: suppliers } = useListSupplierDetailWithState({status: 2});
+  const [rows, setRows] = useState(50);
+  const { data: customers } = useListCustomerDetailWithState({status: 1});
   const { data: employees } = useListEmployeeWithState({});
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
@@ -126,23 +162,23 @@ export default function ListChiTietNCC() {
   });
   const [filters, setFilters] = useState({
       fileNumber: "",
-      supplierAbb:"",
+      customerAbb:"",
       bill: "",
       declaration: "",
       dispatch_code: "",
       name: "",
       file_bill: ""
   });
-  const { data, loading, error, refresh } = useListDebitCongNoChiTietNCC({
+  const { data, loading, error, refresh } = useListDebitCongNoChiTietKH({
     params: paramsPaginator,
     debounce: 500,
   });
     // --- Header template with filter ---
-  const supplierAbbHeader = (
+  const customerAbbHeader = (
      <div className="py-1">
          <Input
-            value={filters.supplierAbb}
-            onChange={(e:any) => setFilters({ ...filters, supplierAbb: e.target.value })}
+            value={filters.customerAbb}
+            onChange={(e:any) => setFilters({ ...filters, customerAbb: e.target.value })}
             size="small"
             className={classNames("input-sm")}
           />
@@ -214,7 +250,7 @@ const applyFilters = (rows: any[]) => {
         const f = filters;
 
         return (
-            (f.supplierAbb ? row.supplierAbb?.toLowerCase().includes(f.supplierAbb.toLowerCase()) : true) &&
+            (f.customerAbb ? row.customerAbb?.toLowerCase().includes(f.customerAbb.toLowerCase()) : true) &&
             (f.fileNumber ? row.fileNumber?.toLowerCase().includes(f.fileNumber.toLowerCase()) : true) &&
             (f.bill ? row.bill?.toLowerCase().includes(f.bill.toLowerCase()) : true) &&
             (f.declaration ? row.declaration?.toLowerCase().includes(f.declaration.toLowerCase()) : true) &&
@@ -245,14 +281,13 @@ useEffect(() => {
     if (!data) return;
 
     handleParamUrl(paramsPaginator);
-    console.log(suppliers);
-    
+
     const mapped = (data?.data || []).map((row: any) => {
-        const sup = suppliers.find((x: any) => x.id === row.supplier_detail_id);
+        const cus = customers.find((x: any) => x.id === row.customer_detail_id);
         const _user = employees.find((x: any) => x.user_id === row.updated_by);
         const _typeKH = TypeDebitDKKH.find((x: any) => x.value === row.type);
         const _data = JSON.parse(row.data);
-        const thanh_tien = Math.round(row.purchase_price * (1 + row.purchase_vat / 100));
+        const thanh_tien = Math.round(row.price * (1 + row.vat / 100));
 
         return {
             ...row,
@@ -261,8 +296,8 @@ useEffect(() => {
             dispatch_code: row.type === 1 ? row.dispatch_code : "",
             bill: _data?.bill || "",
             file_bill: _data?.bill || "",
-            supplierName: sup?.partners?.name || "",
-            supplierAbb: sup?.partners?.abbreviation || "",
+            customerName: cus?.partners?.name || "",
+            customerAbb: cus?.partners?.abbreviation || "",
             userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
             typeKH: _typeKH?.name || "",
             thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5) ? thanh_tien : 0,
@@ -280,13 +315,13 @@ useEffect(() => {
     const filtered = applyFilters(mapped);
     setDisplayData(filtered);
 
-}, [first, rows, data, paramsPaginator, filters, suppliers, employees]);
+}, [first, rows, data, paramsPaginator, filters, customers, employees]);
   const headerGroup = (
         <ColumnGroup>
             <Row>
                 <Column rowSpan={2} />
                 <Column header="Ngày hạch toán" rowSpan={2} />
-                <Column header="Nhà cung cấp" headerClassName="my-title-center" rowSpan={2} />
+                <Column header="Khách hàng" headerClassName="my-title-center" rowSpan={2} />
                 <Column header="Chứng từ" headerClassName="my-title-center" colSpan={6} />
                 <Column header="Nợ" headerClassName="my-title-center" colSpan={2} />
                 <Column header="Đã thu" headerClassName="my-title-center" colSpan={2} />
@@ -314,7 +349,7 @@ useEffect(() => {
              <Row>
                 <Column />
                 <Column />
-                <Column header={supplierAbbHeader}/>
+                <Column header={customerAbbHeader}/>
                 <Column header={fileNumberHeader}/>
                 <Column header={billHeader}/>
                 <Column header={declarationHeader}/>
@@ -367,7 +402,7 @@ useEffect(() => {
           tableStyle={{ minWidth: "2000px" }} // ép bảng rộng hơn để có scroll ngang
         >
           <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="supplierAbb" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="customerAbb" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="fileNumber" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="bill" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="declaration" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -478,11 +513,11 @@ useEffect(() => {
           <Column 
            body={(row:any, options:any) => {
             if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){
-              const purchase_price = typeof row.purchase_price === "string"
-                ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
-                : Number(row.purchase_price) || 0;
-              const purchase_vat = Number(row.purchase_vat) || 0;
-              const thanh_tien = Math.round(purchase_price * (1 + purchase_vat / 100));
+              const price = typeof row.price === "string"
+                ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
+                : Number(row.price) || 0;
+              const vat = Number(row.vat) || 0;
+              const thanh_tien = Math.round(price * (1 + vat / 100));
               const conlai = thanh_tien - (row.receipt_total || 0);
               return (
                  <Input
@@ -517,11 +552,11 @@ useEffect(() => {
            
            body={(row:any, options:any) => {
              if(row.type === 2 || row.type === 3 || row.type === 6){
-              const purchase_price = typeof row.purchase_price === "string"
-                ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
-                : Number(row.purchase_price) || 0;
-              const purchase_vat = Number(row.purchase_vat) || 0;
-              const thanh_tien = Math.round(purchase_price * (1 + purchase_vat / 100));
+              const price = typeof row.price === "string"
+                ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
+                : Number(row.price) || 0;
+              const vat = Number(row.vat) || 0;
+              const thanh_tien = Math.round(price * (1 + vat / 100));
               const conlai = thanh_tien - (row.receipt_total || 0);
               return (
                  <Input

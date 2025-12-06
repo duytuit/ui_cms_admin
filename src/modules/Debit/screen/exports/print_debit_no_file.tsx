@@ -36,7 +36,7 @@ export default function PrintDebitNoFile() {
     const footerGroup = (
     <ColumnGroup>
       <Row>
-        <Column footer="TỔNG CHI PHÍ LÔ HÀNG" colSpan={2}  footerStyle={{ textAlign: 'center' }}/>
+        <Column footer="TỔNG CHI PHÍ LÔ HÀNG" colSpan={3}  footerStyle={{ textAlign: 'center' }}/>
         <Column 
             footer={Helper.formatCurrency(details.reduce((sum: number, x: any) => {
                       return sum + x.price;

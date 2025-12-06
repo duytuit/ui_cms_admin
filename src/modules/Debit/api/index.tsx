@@ -7,6 +7,8 @@ export const listNoDebitNoFileDispatchKH = async (params: any) => await getData(
 export const listHasDebitNoFileDispatchKH= async (params: any) => await getData("Debit/hasDebitNoFileDispatchKH", params);
 export const listDebitCongNoChiTietKH = async (params: any) => await getData("Debit/congnochitietkh", params);
 export const listDebitCongNoChiTietNCC = async (params: any) => await getData("Debit/congnochitietncc", params);
+export const listCongNoGiaoNhan = async (params: any) => await getData("Debit/congNoGiaoNhan", params);
+export const listCongNoLaiXe = async (params: any) => await getData("Debit/congNoLaiXe", params);
 export const listDebitMuaBan = async (params: any) => await getData("Debit/muaban", params);
 export const listDebitDauKyKH = async (params: any) => await getData("Debit/daukykh", params);
 export const listDebitDauKyNCC = async (params: any) => await getData("Debit/daukyncc", params);
@@ -14,12 +16,14 @@ export const listDebitDispatch = async (params: any) => await getData("Debit/dis
 export const listDebitCuocTamThu = async (params: any) => await getData("Debit/cuoctamthu", params);
 export const listDebitService = async (params: any) => await getData("Debit/service", params);
 export const showDebit = async (params: any) => await getData("Debit/show", params);
+export const ShowWithFileInfoAsync = async (params: any) => await getData("Debit/ShowWithFileInfoAsync", params);
 export const showDebitByFileId = async (params: any) => await getData("Debit/show/byFileId", params);
 export const updateDebitToStatusDichVu = async (params: any) => await postData("Debit/updateDebitToStatusDichVu", params);
 export const deleteDebit = async (params: any) => await postData("Debit/delete", params);
 export const deleteMultiDebit = async (params: any) => await postData("Debit/delete/multi", params);
 export const delMultiDebit = async (params: any) => await postData("Debit/delete/multiDebit", params);
 export const addDebit = async (params: any) => await postData("Debit/create", params);
+export const updateDebit = async (params: any) => await postData("Debit/updateDebit", params);
 export const importDebitDauKyKH = async (params: any) => await postData("Debit/importDauKy", params);
 export const importDebitDauKyNCC = async (params: any) => await postData("Debit/importDauKyNCC", params);
 export const addDebitDauKyKH = async (params: any) => await postData("Debit/create/daukykh", params);

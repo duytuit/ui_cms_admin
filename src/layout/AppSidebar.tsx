@@ -342,6 +342,17 @@ const model = [{
             status: 1,
             category_id: 1,
             sort: 1,
+          },
+          {
+            id: 1,
+            name: 'Công nợ giao nhận',
+            route: '/debit/ListDebitChiTietGiaoNhan',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
           }
         ]
       },
