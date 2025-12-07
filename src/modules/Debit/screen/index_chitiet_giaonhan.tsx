@@ -7,7 +7,7 @@ import { useListCustomerDetailWithState } from "modules/partner/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import { useListDebitCongNoChiTietKH } from "../service";
+import { useListCongNoGiaoNhan, useListDebitCongNoChiTietKH } from "../service";
 import { exportDebitKH, exportDebitKHVer1 } from "../api";
 import { TypeDebitDKKH } from "utils";
 import { ColumnGroup } from "primereact/columngroup";
@@ -25,15 +25,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
     toDate: Helper.toDayString(),
   });
   const [visible, setVisible] = useState(false);
-  const { data: customerDetails } = useListCustomerDetailWithState({ status: 1});
-  // --- chuyển sang options bằng useMemo ---
-  const customerOptions = useMemo(() => {
-    if (!Array.isArray(customerDetails)) return [];
-    return customerDetails.map((x: any) => ({
-      label: x?.partners?.abbreviation ?? "(không tên)",
-      value: x.id,
-    }));
-  }, [customerDetails]);
   const openDialogAdd = () => {
     console.log(selected);
     setVisible(true);
@@ -94,8 +85,9 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
         setFilter={setFilter}
         className="lg:col-9"
         openDialogAdd={()=>openDialogAdd()}
-        openDialogAddName="Lập phiếu thu"
-        MenuItems={items}
+        openDialogAddName="Hoàn trả phiếu tạm thu"
+        openDialogAddOne={()=>openDialogAdd()}
+        openDialogAddNameOne="Thu giao nhận"
       >
         <div className="col-2">Ngày công nợ</div>
         <div className="col-2">
@@ -114,31 +106,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
             className={classNames("w-full", "p-inputtext", "input-sm")}
           />
         </div>
-        <div className="col-6">
-          <Dropdown
-            filter
-            showClear
-            value={filter.customerDetailId}
-            options={customerOptions}
-            onChange={(e: any) =>
-              setFilter({ ...filter, customerDetailId: e.target.value })
-            }
-            label="Khách hàng"
-            className={classNames("dropdown-input-sm", "p-dropdown-sm")}
-          />
-        </div>
       </GridForm>
-      <Dialog
-            position="top"
-            dismissableMask
-            visible={visible}
-            onHide={() => setVisible(false)}
-            style={{ width: "70vw", top:"30px" }}
-        >
-          <p className="m-0">
-            {selected && <UpdatePhieuThuKH debits={selected} onClose={handleModalClose} ></UpdatePhieuThuKH>}
-          </p>
-      </Dialog>
     </>
   );
 };
@@ -167,7 +135,7 @@ export default function ListDebitChiTietGiaoNhan() {
       name: "",
       file_bill: ""
   });
-  const { data, loading, error, refresh } = useListDebitCongNoChiTietKH({
+  const { data, loading, error, refresh } = useListCongNoGiaoNhan({
     params: paramsPaginator,
     debounce: 500,
   });
@@ -283,10 +251,10 @@ useEffect(() => {
     const mapped = (data?.data || []).map((row: any) => {
         const cus = customers.find((x: any) => x.id === row.customer_detail_id);
         const _user = employees.find((x: any) => x.user_id === row.updated_by);
+        const _giaonhan = employees.find((x: any) => x.id === row.employee_staff_id);
         const _typeKH = TypeDebitDKKH.find((x: any) => x.value === row.type);
         const _data = JSON.parse(row.data);
         const thanh_tien = Math.round(row.price * (1 + row.vat / 100));
-
         return {
             ...row,
             fileNumber: _data?.fileNumber || "không file",
@@ -297,6 +265,7 @@ useEffect(() => {
             customerName: cus?.partners?.name || "",
             customerAbb: cus?.partners?.abbreviation || "",
             userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
+            userGiaoNhan: `${_giaonhan?.last_name ?? ""} ${_giaonhan?.first_name ?? ""}`.trim(),
             typeKH: _typeKH?.name || "",
             thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5) ? thanh_tien : 0,
             thanhtien_ch: (row.type === 2 || row.type === 3 || row.type === 6) ? thanh_tien : 0,
@@ -392,7 +361,7 @@ useEffect(() => {
           tableStyle={{ minWidth: "2000px" }} // ép bảng rộng hơn để có scroll ngang
         >
           <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="userGiaoNhan" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="fileNumber" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="name" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column // dịch vụ

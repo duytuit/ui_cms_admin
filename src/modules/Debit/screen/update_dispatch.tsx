@@ -159,14 +159,14 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
         const detail = res.data.data
         if (detail) {
           const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
-          const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.fileInfo.declarationType);
+          const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.fileInfo?.declarationType);
           detail.partnerName = partner?.label;
           detail.route = detail.name;
-          detail.fileNumber = detail.fileInfo.fileNumber;
-          detail.declaration = detail.fileInfo.declaration;
-          detail.bill = detail.fileInfo.bill;
-          detail.quantity = detail.fileInfo.quantity;
-          detail.containerCode = detail.fileInfo.containerCode;
+          detail.fileNumber = detail.fileInfo?.fileNumber;
+          detail.declaration = detail.fileInfo?.declaration;
+          detail.bill = detail.fileInfo?.bill;
+          detail.quantity = detail.fileInfo?.quantity;
+          detail.containerCode = detail.fileInfo?.containerCode;
           detail.isExternalDriver = detail.vehicleId > 0 ? 0 : 1;
           let info = {
             ...detail, status: detail.status === 0 ? true : false, loaiToKhai:_loaiToKhai?.name

@@ -89,7 +89,7 @@ export default function UpdateReceiptChiTam() {
          value: x.id,
        }));
      }, [DMQuy]);
-   const { data: DMExpense } = useListExpenseWithState({type:1}); // danh mục chi phí
+   const { data: DMExpense } = useListExpenseWithState({type:1,enable:1}); // danh mục chi phí
    const DMExpenseOptions = useMemo(() => {
        if (!Array.isArray(DMExpense)) return [];
        return DMExpense.map((x: any) => ({

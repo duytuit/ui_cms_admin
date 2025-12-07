@@ -48,3 +48,5 @@ export const updateDebitBanHangKH = async (params: any) => await postData("Debit
 export const showWithIds = async (params: any) => await postData("Debit/showWithIds", params);
 export const exportDebitKH = async (params: any) => await getDataV3("Debit/excel/congnokh", params);
 export const exportDebitKHVer1 = async (params: any) => await getDataV3("Debit/excel/congnokh_v1", params);
+export const listDebitDoiTruNCC = async (params: any) => await getData("Debit/congnodoitruncc", params);
+export const listDebitDoiTruKH = async (params: any) => await getData("Debit/congnodoitrukh", params);

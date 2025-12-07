@@ -65,6 +65,9 @@ import PrintDebitNoFile from "modules/Debit/screen/exports/print_debit_no_file";
 import ListChuyenTienNoiBo from "modules/receipt/screen/index_chuyentien_noibo";
 import UpdateChuyenTienNoiBo from "modules/receipt/screen/update_chuyentien_noibo";
 import ListDebitChiTietGiaoNhan from "modules/Debit/screen/index_chitiet_giaonhan";
+import ListDebitChiTietLaiXe from "modules/Debit/screen/index_chitiet_laixe";
+import ListDoiTruCongNo from "modules/receipt/screen/index_doitru_congno";
+import UpdateDoiTruCongNo from "modules/receipt/screen/update_doitru_congno";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -149,7 +152,8 @@ const publicRoutes = [
   { path: "/receipt/ListChuyenTienNoiBo", component: ListChuyenTienNoiBo, layout: 'ListChuyenTienNoiBo' },
   { path: "/receipt/UpdateChuyenTienNoiBo", component: UpdateChuyenTienNoiBo, layout: 'UpdateChuyenTienNoiBo' },
   { path: "/receipt/detail/chuyentiennoibo/:id", component: UpdateChuyenTienNoiBo, layout: 'UpdateChuyenTienNoiBo' },
-  
+  { path: "/receipt/ListDoiTruCongNo", component: ListDoiTruCongNo, layout: 'ListDoiTruCongNo' },
+  { path: "/receipt/UpdateDoiTruCongNo", component: UpdateDoiTruCongNo, layout: 'UpdateDoiTruCongNo' },
   // Debit 
   { path: "/debit/listCuoc", component: ListCuoc, layout: 'ListCuoc' },
   { path: "/debit/listTamThu", component: ListTamThu, layout: 'ListTamThu' },
@@ -178,6 +182,8 @@ const publicRoutes = [
   { path: "/debit/ListChiTietKH", component: ListChiTietKH, layout: 'ListChiTietKH' },
   { path: "/debit/ListChiTietNCC", component: ListChiTietNCC, layout: 'ListChiTietNCC' },
   { path: "/debit/ListDebitChiTietGiaoNhan", component: ListDebitChiTietGiaoNhan, layout: 'ListDebitChiTietGiaoNhan' },
+  { path: "/debit/ListDebitChiTietLaiXe", component: ListDebitChiTietLaiXe, layout: 'ListDebitChiTietLaiXe' },
+
   
   { path: "/user/inportExcelPartner", component: UpdateImportExcel, layout: 'UpdateImportExcel' },
 

@@ -49,8 +49,8 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
       filter={filter}
       setFilter={setFilter}
       className="lg:col-9"
-      add="/receipt/UpdateChuyenTienNoiBo"
-      addName="Chuyển tiền nội bộ"
+      add="/receipt/UpdateDoiTruCongNo"
+      addName="Tạo đối trừ công nợ"
     >
       <div className="col-2">
         <MyCalendar
@@ -72,7 +72,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   );
 };
 
-export default function ListChuyenTienNoiBo() {
+export default function ListDoiTruCongNo() {
     const { handleParamUrl } = useHandleParamUrl();
     const [displayData, setDisplayData] = useState<any>();
     const [filters, setFilters] = useState({
@@ -224,9 +224,13 @@ export default function ListChuyenTienNoiBo() {
                           }
                         }}
                     />
-                    <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                    <Column field="note" header="Ghi chú" />
-                    <Column field="nguoitao" header="Người cập nhật" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                    <Column field="note" header="Ngày hạch toán" />
+                    <Column field="note" header="Khách hàng - nhà cung cấp" />
+                    <Column field="note" header="Nội dung" />
+                    <Column field="note" header="Số tiền" />
+                    <Column field="note" header="Chứng từ thu" />
+                    <Column field="note" header="Chứng từ chi" />
+                    <Column field="nguoitao" header="Người cập nhật"/>
                     <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
                 </DataTableClient>
           </div>

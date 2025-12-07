@@ -103,6 +103,33 @@ export const AddForm = (props:any) => {
         </div>
     )
 };
+export const AddFormCustom = (props:any) => {
+    const navigate = useNavigate();
+    // const permissionTool = useSelector((state:any) => state.permission).permissionTool;
+    const { checkId, title, loading, onSubmit, className, moreOptions, route,routeList,AddName, ...prop } = props;
+    return (
+        <div className={classNames("card", className)} {...prop}>
+             <form onSubmit={onSubmit}>
+                <div className="flex justify-content-between align-items-center mb-4">
+                     <div>
+                         {routeList &&<h4 className="m-0">{title}</h4>}
+                    </div>
+                    <div>
+                        {routeList &&  <Button type='button' onClick={() => navigate(routeList)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />}
+                        {<Button type='submit' loading={loading} label={AddName??"Lưu"}
+                            className="ml-2" severity="info" size="small" raised icon="pi pi-check"/>}
+                    </div>
+                </div>
+                {props.children}
+                <div className="w-full justify-content-end flex">
+                    {routeList && <Button type='button' onClick={() => navigate(routeList)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />}
+                    {<Button type='submit' loading={loading} label={AddName??"Lưu"}
+                        className="ml-2" severity="info" size="small" raised icon="pi pi-check"/>}
+                </div>
+            </form>
+        </div>
+    )
+};
 export const UpdateForm = (props:any) => {
     const navigate = useNavigate();
     const { checkId, title, loading, onSubmit, className, moreOptions, route, routeList, ButtonName, AddName,...prop } = props;

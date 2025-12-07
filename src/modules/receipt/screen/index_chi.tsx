@@ -82,7 +82,7 @@ export default function ListReceiptChi() {
          debounce: 500,
     }); 
     const { data: employees } = useListEmployeeWithState({});
-    const { data: DMExpense } = useListExpenseWithState({type:1}); // danh mục chi phí
+    const { data: DMExpense } = useListExpenseWithState({type:1,enable:1}); // danh mục chi phí
     const { data: DMBank } = useListBankWithState({type:1});
     const { data: DMQuy } = useListFundCategoryWithState({type:1});
     // ✅ Client-side pagination

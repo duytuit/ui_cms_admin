@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {  listBanhangKH, listCongNoGiaoNhan, listCongNoLaiXe, listDebit, listDebitCongNoChiTietKH, listDebitCongNoChiTietNCC, listDebitCuocTamThu, listDebitDauKyKH, listDebitDauKyNCC, listDebitDispatch, listDebitMuaBan, listDebitService, listHasDebitNoFileDispatchKH, listMuahangNCC, listNoDebitNoFileDispatchKH } from '../api';
+import {  listBanhangKH, listCongNoGiaoNhan, listCongNoLaiXe, listDebit, listDebitCongNoChiTietKH, listDebitCongNoChiTietNCC, listDebitCuocTamThu, listDebitDauKyKH, listDebitDauKyNCC, listDebitDispatch, listDebitDoiTruKH, listDebitDoiTruNCC, listDebitMuaBan, listDebitService, listHasDebitNoFileDispatchKH, listMuahangNCC, listNoDebitNoFileDispatchKH } from '../api';
 
 export const useListDebit = ({ params, debounce = 500 }: any) => {
     const [data, setData] = useState<any>([]);
@@ -311,6 +311,66 @@ export const useListCongNoLaiXe = ({ params, debounce = 500 }: any) => {
 
     useEffect(() => {
         if (!params || Object.keys(params).length === 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
+
+    return { data, loading, error, refresh: fetchData };
+};
+export const useListDebitDoiTruNCC = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listDebitDoiTruNCC({ ...params });
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        // ❌ Không gọi API khi chưa có supplierDetailId
+        if (!params || !params.supplierDetailId || params.supplierDetailId <= 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
+
+    return { data, loading, error, refresh: fetchData };
+};
+export const useListDebitDoiTruKH = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listDebitDoiTruKH({ ...params });
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        // ❌ Không gọi API khi chưa có customerDetailId
+        if (!params || !params.customerDetailId || params.customerDetailId <= 0) {
             setData([]);
             return;
         }
