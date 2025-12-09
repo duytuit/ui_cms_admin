@@ -15,6 +15,7 @@ import { useListContractFileHasDebitService, useListContractFileNotService, useL
 import UpdateDebitChiPhi from "./update_service";
 import { deleteMultiDebit, delMultiDebit } from "../api";
 import UpdateGiayHoanUng from "modules/receipt/screen/update_giay_hoanung";
+import { FilterMatchMode } from "primereact/api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator, selected ,refreshHasDebitDispatch}: any) => {
@@ -112,6 +113,25 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selected ,refreshHasDeb
 export default function ListContractFileBangKe() {
     const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
     const { handleParamUrl } = useHandleParamUrl();
+     const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        code_receipt: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        accounting_date: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        sofile: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        fullname_giaonhan: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        lydochi: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        total_amount: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        vat_rate: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        total_with_vat: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        tenquy: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        hinhthuc: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        stk: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        chutk: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        nganhang: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        note: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        nguoitao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        });
     const [selectedDebitServiceRows, setSelectedDebitServiceRows] = useState<any[]>([]);
     const [displayDebitServiceData, setDisplayDebitServiceData] = useState<any[]>([]);
     const [selectedDetail, setSelectedDetail] = useState<any[]>([]);
@@ -210,7 +230,24 @@ export default function ListContractFileBangKe() {
         setDisplayData(mapped);
         setDisplayDebitServiceData(mappedDebitService);
     }, [first, rows, data,debitService, paramsPaginator,listCustomer]);
- 
+    const getSumColumn = (field: string) => {
+        const filtered = (displayDebitServiceData ?? []).filter((item: any) => {
+            return Object.entries(filters).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
+
+        const sum = filtered.reduce((acc: number, item: any) => {
+            const raw = item[field]?.toString() ?? "0";
+            const val = parseFloat(raw.replace(/[^0-9.-]/g, "")) || 0; // giữ lại dấu âm
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
     return (
       <>
         <div className="card">
@@ -415,11 +452,31 @@ export default function ListContractFileBangKe() {
                                         <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="receipt_total" body={(row: any) => Helper.formatCurrency(row.receipt_total.toString())} header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumHQ" body={(row: any) => Helper.formatCurrency(row.sumHQ.toString())} header="Tổng phí HQ" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumCH" body={(row: any) => Helper.formatCurrency(row.sumCH.toString())} header="Tổng phí CH" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumCuoc" body={(row: any) => Helper.formatCurrency(row.sumCuoc.toString())} header="Tiền cược" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="phaiTra" body={(row: any) => Helper.formatCurrency(row.phaiTra.toString())} header="Phải thanh toán" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="receipt_total" body={(row: any) => Helper.formatCurrency(row.receipt_total.toString())} 
+                                            header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" 
+                                            footer={getSumColumn("receipt_total")}
+                                            footerStyle={{ fontWeight: "bold" }}
+                                        />
+                                        <Column field="sumHQ" body={(row: any) => Helper.formatCurrency(row.sumHQ.toString())}
+                                          header="Tổng phí HQ" filter showFilterMenu={false} filterMatchMode="contains" 
+                                          footer={getSumColumn("sumHQ")}
+                                          footerStyle={{ fontWeight: "bold" }}
+                                         />
+                                        <Column field="sumCH" body={(row: any) => Helper.formatCurrency(row.sumCH.toString())} 
+                                          header="Tổng phí CH" filter showFilterMenu={false} filterMatchMode="contains" 
+                                          footer={getSumColumn("sumCH")}
+                                          footerStyle={{ fontWeight: "bold" }}
+                                        />
+                                        <Column field="sumCuoc" body={(row: any) => Helper.formatCurrency(row.sumCuoc.toString())} 
+                                          header="Tiền cược" filter showFilterMenu={false} filterMatchMode="contains" 
+                                          footer={getSumColumn("sumCuoc")}
+                                          footerStyle={{ fontWeight: "bold" }}
+                                        />
+                                        <Column field="phaiTra" body={(row: any) => Helper.formatCurrency(row.phaiTra.toString())} 
+                                          header="Phải thanh toán" filter showFilterMenu={false} filterMatchMode="contains"
+                                          footer={getSumColumn("phaiTra")}
+                                          footerStyle={{ fontWeight: "bold" }}
+                                        />
                                         <Column field="employee" header="Tên giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />

@@ -35,7 +35,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             add="/receipt/updateReceiptChiGiaoNhan"
             addName="Phiếu chi giao nhận"
             addOne="/receipt/updateReceiptChiNoiBo"
-            addOneName="Phiếu chi nội bộ"
+            addOneName="Phiếu chi"
         >
         </GridForm>
     );
