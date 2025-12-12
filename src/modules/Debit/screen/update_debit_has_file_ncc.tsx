@@ -9,14 +9,12 @@ import { Button, Column, DataTable, Dialog, Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { classNames } from "primereact/utils";
-import { showWithDebitContractFile } from "modules/ContractFile/api";
+import { ShowWithDebitHasNCC } from "modules/ContractFile/api";
 import { useListPartnerDetail, useListSupplierDetailWithState } from "modules/partner/service";
-import { useListServiceCategoryWithState } from "modules/categories/service";
 import { updateDebitFileGia } from "../api";
-import UpdateConfirmService from "./update_confirm_service";
 import ViewConfirmService from "./view_confirm_service";
 import { useListEmployeeWithState } from "modules/employee/service";
-export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () => void }) {
+export default function UpdateDebitHasFileNCC({ id, onClose }: { id: any; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({});
   const [visible, setVisible] = useState(false);
@@ -52,7 +50,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
   };
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    setLoading(true);
+   // setLoading(true);
     let _file_info = {
       FileInfoId: infos.id,
       fileNumber: infos.fileNumber,
@@ -61,7 +59,9 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
       DebitDtos: debitDetail,
       Chiphikhac: productDebit
     };
-    fetchDataSubmit(_file_info);
+    console.log(_file_info);
+    
+   /// fetchDataSubmit(_file_info);
   };
   async function fetchDataSubmit(debitDetail: any) {
     if (id) {
@@ -85,7 +85,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
     try {
       setLoading(true);
 
-      const res = await showWithDebitContractFile({ id });
+      const res = await ShowWithDebitHasNCC({ id });
       const detail = res.data.data;
       if (!detail) return;
 
@@ -257,51 +257,6 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                   )}
                   footerStyle={{ fontWeight: "bold" }}
                 />
-               <Column
-                  field="price"
-                  header="Giá bán"
-                  body={(_: any, opt: any) => {
-                    const row = debitDetail[opt.rowIndex];
-                    if (row.type === 0) {
-                      return (
-                        <Input
-                          className="w-full input-sm"
-                          id={`price-${opt.rowIndex}`}
-                          value={Helper.formatCurrency((row.price || 0).toString())}
-                          onChange={(e: any) => {
-                            // Lấy giá trị mới từ Input
-                            const rawValue = e.target.value.replace(/\D/g, "");
-                            const numericValue = parseInt(rawValue, 10) || 0;
-
-                            const updated = [...debitDetail];
-
-                            // ✅ Tính lại thanh_tien luôn khi thay đổi giá
-                            const vatValue = Number(row.vat) || 0;
-                            const qty = Number(row.quantity) || 1;
-                            const thanh_tien = Math.round(numericValue * qty * (1 + vatValue / 100));
-
-                            updated[opt.rowIndex] = { 
-                              ...row, 
-                              price: numericValue,
-                              thanh_tien:thanh_tien
-                            };
-                            setDebitDetail(updated);
-                          }}
-                          label=""
-                        />
-                      );
-                    } else {
-                      return Helper.formatCurrency(row.price?.toString() || "0");
-                    }
-                  }}
-                  footer={Helper.formatCurrency(
-                    debitDetail
-                      .reduce((sum, item) => sum + (item.price || 0), 0)
-                      .toString()
-                  )}
-                  footerStyle={{ fontWeight: "bold" }}
-                />
-
                 <Column
                   header="VAT"
                   body={(_: any, opt: any) => (
@@ -318,9 +273,9 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
 
                         // ✅ Chuyển price về số nguyên, loại bỏ ký tự không phải số
                         const rawPrice =
-                          typeof row.price === "string"
-                            ? parseInt(row.price.replace(/\D/g, ""), 10) || 0
-                            : Number(row.price) || 0;
+                          typeof row.purchasePrice === "string"
+                            ? parseInt(row.purchasePrice.replace(/\D/g, ""), 10) || 0
+                            : Number(row.purchasePrice) || 0;
 
                         // ✅ Nếu có quantity thì nhân thêm, mặc định là 1
                         const qty = Number(row.quantity) || 1;
@@ -346,12 +301,12 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                   body={(_: any, opt: any) => {
                     const row = debitDetail[opt.rowIndex];
                     // Chuyển price về số thực, giữ decimal
-                    const price = typeof row.price === "string"
-                      ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
-                      : Number(row.price) || 0;
+                    const purchasePrice = typeof row.purchasePrice === "string"
+                      ? parseFloat(row.purchasePrice.replace(/[^0-9.]/g, "")) || 0
+                      : Number(row.purchasePrice) || 0;
                     const vat = Number(row.vat) || 0;
                     // Tính thành tiền
-                    const thanh_tien = Math.round(price * (1 + vat / 100));
+                    const thanh_tien = Math.round(purchasePrice * (1 + vat / 100));
                     // ✅ Cập nhật luôn vào state
                     if (row.thanh_tien !== thanh_tien) {
                       const updated = [...debitDetail];
@@ -363,12 +318,12 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                   footer={Helper.formatCurrency(
                     debitDetail
                       .reduce((sum, item) => {
-                        const price = typeof item.price === "string"
-                          ? parseFloat(item.price.replace(/[^0-9.]/g, "")) || 0
-                          : Number(item.price) || 0;
+                        const purchasePrice = typeof item.purchasePrice === "string"
+                          ? parseFloat(item.purchasePrice.replace(/[^0-9.]/g, "")) || 0
+                          : Number(item.purchasePrice) || 0;
 
                         const vat = Number(item.vat) || 0;
-                        return Math.round(sum + price * (1 + vat / 100));
+                        return Math.round(sum + purchasePrice * (1 + vat / 100));
                       }, 0)
                       .toString()
                   )}
@@ -376,17 +331,17 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                 />
 
                 <Column
-                  field="bill"
-                  header="Hóa đơn"
+                  field="purchaseNote"
+                  header="Ghi chú"
                   body={(_: any, opt: any) => (
                     <Input
                       className="w-full input-sm"
-                      value={debitDetail[opt.rowIndex].bill || ""}
+                      value={debitDetail[opt.rowIndex].purchaseNote || ""}
                       onChange={(e: any) => {
                         const updated = [...debitDetail];
                         updated[opt.rowIndex] = {
                           ...updated[opt.rowIndex],
-                          bill: e.target.value,
+                          purchaseNote: e.target.value,
                         };
                         setDebitDetail(updated);
                       }}
@@ -442,31 +397,6 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                     label="Giá mua"
                   />
                 </div>
-                 <div className="field col-1">
-                  <InputForm
-                    className="w-full"
-                    id="debit_price"
-                    value={newDebit.price}
-                    onChange={(e: any) =>
-                      setNewDebit({
-                        ...newDebit,
-                        price: Helper.formatCurrency(e.target.value),
-                      })
-                    }
-                    label="Giá bán"
-                  />
-                </div>
-                <div className="field col-2">
-                  <InputForm
-                    className="w-full"
-                    id="debit_bill"
-                    value={newDebit.bill}
-                    onChange={(e: any) =>
-                      setNewDebit({ ...newDebit, bill: e.target.value })
-                    }
-                    label="Hóa đơn"
-                  />
-                </div>
                 <div className="field col-2">
                   <InputForm
                     className="w-full"
@@ -486,7 +416,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                     severity="success"
                     raised
                     onClick={() => {
-                      if (!newDebit.name)
+                      if (!newDebit.name || !newDebit.purchasePrice || newDebit.purchasePrice <= 0 || !newDebit.SupplierDetailId)
                       return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin chi phí khác" }));
                       // convert price về số khi push
                       const numericpurchasePrice = parseInt(newDebit.purchasePrice.replace(/\D/g, ""), 10)|| 0
@@ -516,16 +446,6 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                       )}
                       footerStyle={{ fontWeight: "bold" }}
                     />
-                  <Column
-                      field="price"
-                      header="Giá bán"
-                      body={(row: any) => Helper.formatCurrency(row.price?.toString() || "0")}
-                      footer={Helper.formatCurrency(
-                        productDebit.reduce((sum:any, item:any) => sum + (item.price || 0), 0).toString()
-                      )}
-                      footerStyle={{ fontWeight: "bold" }}
-                    />
-
                     <Column
                       field="vat"
                       header="VAT"
@@ -543,9 +463,9 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
 
                             // ✅ Chuyển price về số nguyên, loại bỏ ký tự không phải số
                             const rawPrice =
-                              typeof row.price === "string"
-                                ? parseInt(row.price.replace(/\D/g, ""), 10) || 0
-                                : Number(row.price) || 0;
+                              typeof row.purchasePrice === "string"
+                                ? parseInt(row.purchasePrice.replace(/\D/g, ""), 10) || 0
+                                : Number(row.purchasePrice) || 0;
 
                             // ✅ Nếu có quantity thì nhân thêm, mặc định là 1
                             const qty = Number(row.quantity) || 1;
@@ -571,12 +491,12 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                       body={(_: any, opt: any) => {
                         const row = productDebit[opt.rowIndex];
                         // Chuyển price về số thực, giữ decimal
-                        const price = typeof row.price === "string"
-                          ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
-                          : Number(row.price) || 0;
+                        const purchasePrice = typeof row.purchasePrice === "string"
+                          ? parseFloat(row.purchasePrice.replace(/[^0-9.]/g, "")) || 0
+                          : Number(row.purchasePrice) || 0;
                         const vat = Number(row.vat) || 0;
                         // Tính thành tiền
-                        const thanh_tien = Math.round(price * (1 + vat / 100));
+                        const thanh_tien = Math.round(purchasePrice * (1 + vat / 100));
                         // ✅ Cập nhật luôn vào state
                         if (row.thanh_tien !== thanh_tien) {
                           const updated = [...productDebit];
@@ -588,21 +508,16 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
                       footer={Helper.formatCurrency(
                         productDebit
                           .reduce((sum:any, item:any) => {
-                            const price = typeof item.price === "string"
-                              ? parseFloat(item.price.replace(/[^0-9.]/g, "")) || 0
-                              : Number(item.price) || 0;
+                            const purchasePrice = typeof item.purchasePrice === "string"
+                              ? parseFloat(item.purchasePrice.replace(/[^0-9.]/g, "")) || 0
+                              : Number(item.purchasePrice) || 0;
 
                             const vat = Number(item.vat) || 0;
-                            return Math.round(sum + price * (1 + vat / 100));
+                            return Math.round(sum + purchasePrice * (1 + vat / 100));
                           }, 0)
                           .toString()
                       )}
                       footerStyle={{ fontWeight: "bold" }}
-                    />
-
-                    <Column
-                      field="bill"
-                      header="Hóa đơn"
                     />
                     <Column
                       field="note"
@@ -634,25 +549,25 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
               value={Helper.formatCurrency((debitDetail
                 .reduce((sum, item) => {
                   // Chuyển price về số thực, giữ decimal
-                  const price = typeof item.price === "string"
-                    ? parseFloat(item.price.replace(/[^0-9.]/g, "")) || 0
-                    : Number(item.price) || 0;
+                  const purchasePrice = typeof item.purchasePrice === "string"
+                    ? parseFloat(item.purchasePrice.replace(/[^0-9.]/g, "")) || 0
+                    : Number(item.purchasePrice) || 0;
 
                   const vat = Number(item.vat) || 0;
 
-                  return Math.round(sum + price * (1 + vat / 100));
+                  return Math.round(sum + purchasePrice * (1 + vat / 100));
                 }, 0)
                 +
                 productDebit
                 .reduce((sum, item) => {
                   // Chuyển price về số thực, giữ decimal
-                  const price = typeof item.price === "string"
-                    ? parseFloat(item.price.replace(/[^0-9.]/g, "")) || 0
-                    : Number(item.price) || 0;
+                  const purchasePrice = typeof item.purchasePrice === "string"
+                    ? parseFloat(item.purchasePrice.replace(/[^0-9.]/g, "")) || 0
+                    : Number(item.purchasePrice) || 0;
 
                   const vat = Number(item.vat) || 0;
 
-                  return Math.round(sum + price * (1 + vat / 100));
+                  return Math.round(sum + purchasePrice * (1 + vat / 100));
                 }, 0))
                 .toString()
               )}

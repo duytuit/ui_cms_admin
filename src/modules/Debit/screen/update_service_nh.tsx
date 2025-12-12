@@ -312,6 +312,7 @@ export default function UpdateDebitNangHa({ id, onClose ,price }: { id: any; onC
                   header="Thao tác"
                   body={(_: any, opt: any) => (
                     <Button
+                      type='button'
                       icon="pi pi-trash"
                       severity="danger"
                       text

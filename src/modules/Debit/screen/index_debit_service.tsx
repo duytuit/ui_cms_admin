@@ -115,6 +115,9 @@ export default function ListContractFileBangKe() {
     const { handleParamUrl } = useHandleParamUrl();
      const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
         code_receipt: { value: null, matchMode: FilterMatchMode.CONTAINS },
         accounting_date: { value: null, matchMode: FilterMatchMode.CONTAINS },
         sofile: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -358,6 +361,8 @@ export default function ListContractFileBangKe() {
                                         }}
                                         loading={loading}
                                         dataKey="id"
+                                        filters={filters}
+                                        onFilter={(e:any) => setFilters(e.filters)}
                                         title="Tài khoản"
                                         filterDisplay="row"
                                         className={classNames("Custom-DataTableClient")}

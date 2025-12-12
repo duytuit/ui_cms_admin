@@ -141,6 +141,7 @@ export default function UpdateBanHang() {
                     </div>
                   <div className="field col-6">
                      <Dropdown
+                     filter
                       value={infos.customerDetailId}
                       optionValue="value"
                       optionLabel="label"

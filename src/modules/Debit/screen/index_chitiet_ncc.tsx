@@ -8,7 +8,7 @@ import { useListSupplierDetailWithState } from "modules/partner/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import { useListDebitCongNoChiTietNCC } from "../service";
+import { useListDebitCongNoChiTietNCC, useListDebitDuNoDKNCC } from "../service";
 import { TypeDebitDKKH } from "utils";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
@@ -23,7 +23,9 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
     toDate: Helper.toDayString(),
   });
   const [visible, setVisible] = useState(false);
+   const [dunoDK, setdunoDK] = useState<number>(0);
   const { data: supplierDetails } = useListSupplierDetailWithState({ status: 2});
+  const { data:dunoDKNCC, loading: loadingDNDKNCC } = useListDebitDuNoDKNCC({ params: {..._paramsPaginator}});
   // --- chuyển sang options bằng useMemo ---
   const supplierOptions = useMemo(() => {
     if (!Array.isArray(supplierDetails)) return [];
@@ -50,7 +52,12 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
       fromDate: filter.fromDate,
       toDate: filter.toDate,
     }));
-  }, [filter]);
+     console.log(dunoDKNCC);
+    setdunoDK(0)
+    if(dunoDKNCC && dunoDKNCC[0]){
+        setdunoDK(dunoDKNCC[0].total_debit - dunoDKNCC[0].total_receipt)
+    }
+  }, [dunoDKNCC,filter]);
 
   return (
     <>
@@ -80,7 +87,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
             className={classNames("w-full", "p-inputtext", "input-sm")}
           />
         </div>
-        <div className="col-6">
+        <div className="col-4">
           <Dropdown
             filter
             showClear
@@ -93,6 +100,9 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
             className={classNames("dropdown-input-sm", "p-dropdown-sm")}
           />
         </div>
+         <div className="col-2">
+             <div><b>Dư nợ đầu kỳ: {dunoDK ? Helper.formatCurrency(dunoDK.toString()):0}</b></div>
+         </div>
       </GridForm>
       <Dialog
             position="top"
@@ -265,14 +275,14 @@ useEffect(() => {
             supplierAbb: sup?.partners?.abbreviation || "",
             userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
             typeKH: _typeKH?.name || "",
-            thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5) ? thanh_tien : 0,
-            thanhtien_ch: (row.type === 2 || row.type === 3 || row.type === 6) ? thanh_tien : 0,
-            dathu_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5) ? row.receipt_total : 0,
-            dathu_ch: (row.type === 2 || row.type === 3 || row.type === 6) ? row.receipt_total : 0,
-            conlai_dv_view: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5) ? thanh_tien - row.receipt_total : 0,
-            conlai_ch_view: (row.type === 2 || row.type === 3 || row.type === 6) ? thanh_tien - row.receipt_total : 0,
-            conlai_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5) ? thanh_tien - row.receipt_total : 0,
-            conlai_ch: (row.type === 2 || row.type === 3 || row.type === 6) ? thanh_tien - row.receipt_total : 0,
+            thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien : 0,
+            thanhtien_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien : 0,
+            dathu_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? row.receipt_total : 0,
+            dathu_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? row.receipt_total : 0,
+            conlai_dv_view: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien - row.receipt_total : 0,
+            conlai_ch_view: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien - row.receipt_total : 0,
+            conlai_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien - row.receipt_total : 0,
+            conlai_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien - row.receipt_total : 0,
             conlai_tong: thanh_tien - row.receipt_total
         };
     });
@@ -477,7 +487,7 @@ useEffect(() => {
           />
           <Column 
            body={(row:any, options:any) => {
-            if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){
+            if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10){
               const purchase_price = typeof row.purchase_price === "string"
                 ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
                 : Number(row.purchase_price) || 0;
@@ -516,7 +526,7 @@ useEffect(() => {
           <Column 
            
            body={(row:any, options:any) => {
-             if(row.type === 2 || row.type === 3 || row.type === 6){
+             if(row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11){
               const purchase_price = typeof row.purchase_price === "string"
                 ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
                 : Number(row.purchase_price) || 0;

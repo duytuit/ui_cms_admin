@@ -293,6 +293,7 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                   header="Thao tác"
                   body={(_: any, opt: any) => (
                     <Button
+                      type='button'
                       icon="pi pi-trash"
                       severity="danger"
                       text
@@ -427,6 +428,7 @@ export default function UpdateDebitChiPhi({ id, onClose ,price }: { id: any; onC
                   header="Thao tác"
                   body={(_: any, opt: any) => (
                     <Button
+                      type='button'
                       icon="pi pi-trash"
                       severity="danger"
                       text

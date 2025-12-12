@@ -72,16 +72,16 @@ const model = [{
             category_id: 1,
             sort: 1,
           },
-           {
+          {
             id: 1,
-            name: 'Debit NCC các lô hàng không lập file',
-            route: '/page-two',
+            name: 'Debit các lô hàng NCC',
+            route: '/debit/ListDebitNCC',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
             status: 1,
             category_id: 1,
-            sort: 1,
+            sort: 1
           },
           {
             id: 1,

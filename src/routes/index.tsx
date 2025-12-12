@@ -68,6 +68,7 @@ import ListDebitChiTietGiaoNhan from "modules/Debit/screen/index_chitiet_giaonha
 import ListDebitChiTietLaiXe from "modules/Debit/screen/index_chitiet_laixe";
 import ListDoiTruCongNo from "modules/receipt/screen/index_doitru_congno";
 import UpdateDoiTruCongNo from "modules/receipt/screen/update_doitru_congno";
+import ListDebitNCC from "modules/Debit/screen/index_debit_ncc";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -184,7 +185,8 @@ const publicRoutes = [
   { path: "/debit/ListDebitChiTietGiaoNhan", component: ListDebitChiTietGiaoNhan, layout: 'ListDebitChiTietGiaoNhan' },
   { path: "/debit/ListDebitChiTietLaiXe", component: ListDebitChiTietLaiXe, layout: 'ListDebitChiTietLaiXe' },
 
-  
+  { path: "/debit/ListDebitNCC", component: ListDebitNCC, layout: 'ListDebitNCC' },
+
   { path: "/user/inportExcelPartner", component: UpdateImportExcel, layout: 'UpdateImportExcel' },
 
   //{ path: "/debit/detail/:id", component: UpdateDebit, layout: 'UpdateDebit' },

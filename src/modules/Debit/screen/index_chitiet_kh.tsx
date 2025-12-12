@@ -1,16 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, DataTableClient, DateBody, } from "components/common/DataTable";
-import { Calendar, CalendarY, Dropdown, GridForm, Input, } from "components/common/ListForm";
+import { useEffect, useMemo, useState } from "react";
+import { Column, DataTableClient, DateBody, } from "components/common/DataTable";
+import { Dropdown, GridForm, Input, } from "components/common/ListForm";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { useListCustomerDetailWithState } from "modules/partner/service";
-import { useListUserWithState } from "modules/user/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import { useListDebitCongNoChiTietKH, useListDebitCuocTamThu, useListDebitDauKyKH } from "../service";
-import { useListContractFileWithState } from "modules/ContractFile/service";
-import { deleteDebit, exportDebitKH, exportDebitKHVer1 } from "../api";
+import { useListDebitCongNoChiTietKH, useListDebitDuNoDKKH } from "../service";
+import { exportDebitKH, exportDebitKHVer1 } from "../api";
 import { TypeDebitDKKH } from "utils";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
@@ -19,13 +17,14 @@ import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setSelectedRows}: any) => {
-   const { handleParamUrl } = useHandleParamUrl();
+  const { handleParamUrl } = useHandleParamUrl();
   const [filter, setFilter] = useState({
     name: "",
     customerDetailId: "",
     fromDate: Helper.lastWeekString(),
     toDate: Helper.toDayString(),
   });
+  const [dunoDK, setdunoDK] = useState<number>(0);
   const [visible, setVisible] = useState(false);
   const { data: customerDetails } = useListCustomerDetailWithState({ status: 1});
   // --- chuyển sang options bằng useMemo ---
@@ -45,6 +44,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
       _setSelectedRows([])
       refresh?.(); 
   };
+  const { data:dunoDKKH, loading: loadingDNDKKH } = useListDebitDuNoDKKH({ params: {..._paramsPaginator}});
   useEffect(() => {
     // Mỗi khi filter thay đổi => cập nhật params
     _setParamsPaginator((prev: any) => ({
@@ -54,7 +54,12 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
       fromDate: filter.fromDate,
       toDate: filter.toDate,
     }));
-  }, [filter]);
+    console.log(dunoDKKH);
+    setdunoDK(0)
+    if(dunoDKKH && dunoDKKH[0]){
+        setdunoDK(dunoDKKH[0].total_debit - dunoDKKH[0].total_receipt)
+    }
+  }, [dunoDKKH,filter]);
   async function ExportExcelCongNoKH(){
     const respo = await exportDebitKH(Helper.convertObjectToQueryString(_paramsPaginator));
     const url = window.URL.createObjectURL(new Blob([respo.data]));
@@ -116,7 +121,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
             className={classNames("w-full", "p-inputtext", "input-sm")}
           />
         </div>
-        <div className="col-6">
+        <div className="col-4">
           <Dropdown
             filter
             showClear
@@ -129,6 +134,9 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
             className={classNames("dropdown-input-sm", "p-dropdown-sm")}
           />
         </div>
+         <div className="col-2">
+             <div><b>Dư nợ đầu kỳ: {dunoDK ? Helper.formatCurrency(dunoDK.toString()):0}</b></div>
+         </div>
       </GridForm>
       <Dialog
             position="top"

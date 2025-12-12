@@ -139,6 +139,7 @@ export default function UpdateMuaHang() {
                     </div>
                   <div className="field col-6">
                      <Dropdown
+                      filter
                       value={infos.supplierDetailId}
                       optionValue="value"
                       optionLabel="label"

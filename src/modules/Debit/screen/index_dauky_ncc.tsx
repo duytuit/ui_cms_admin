@@ -13,6 +13,7 @@ import { useListDebitCuocTamThu, useListDebitDauKyKH, useListDebitDauKyNCC } fro
 import { useListContractFileWithState } from "modules/ContractFile/service";
 import { deleteDebit } from "../api";
 import { TypeDebitDKKH, TypeDebitDKNCC } from "utils";
+import { FilterMatchMode } from "primereact/api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -109,11 +110,34 @@ export default function ListDauKyNcc() {
     render: false,
     keyword: "",
   });
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        type: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        });
   const { data, loading, error, refresh } = useListDebitDauKyNCC({
     params: paramsPaginator,
     debounce: 500,
   });
+ const getSumColumn = (field: string) => {
+        const filtered = (displayData??[]).filter((item: any) => {
+            return Object.entries(filters).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
 
+        const sum = filtered.reduce((acc: any, item: any) => {
+            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
   // ✅ Client-side pagination
   useEffect(() => {
     if (!data) return;
@@ -153,6 +177,8 @@ export default function ListDauKyNcc() {
             setFirst(e.first);
             setRows(e.rows);
           }}
+          filters={filters}
+          onFilter={(e:any) => setFilters(e.filters)}
           loading={loading}
           dataKey="id"
           title="Tài khoản"
@@ -208,7 +234,12 @@ export default function ListDauKyNcc() {
           <Column field="customerName" header="Nhà cung cấp" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="type" header="Loại dịch vụ" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="price"   body={(row: any) => Helper.formatCurrency(row.price.toString())} header="Số tiền" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="purchase_price"
+           body={(row: any) => Helper.formatCurrency(row.purchase_price.toString())}
+           header="Số tiền" filter showFilterMenu={false} filterMatchMode="contains"
+           footer={getSumColumn("purchase_price")}
+           footerStyle={{ fontWeight: "bold" }}
+            />
           <Column field="name" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="userName" header="Người thực hiện" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />

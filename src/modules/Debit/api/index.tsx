@@ -3,6 +3,8 @@ import { getData, getDataV3, postData, postDataList } from "lib/request";
 export const listDebit = async (params: any) => await getData("Debit", params);
 export const listMuahangNCC = async (params: any) => await getData("Debit/muahangNCC", params);
 export const listBanhangKH = async (params: any) => await getData("Debit/banhangKH", params);
+export const listNoDebitNoFileNCC= async (params: any) => await getData("Debit/noDebitNoFileNCC", params);
+export const listHasDebitNoFileNCC= async (params: any) => await getData("Debit/hasDebitNoFileNCC", params);
 export const listNoDebitNoFileDispatchKH = async (params: any) => await getData("Debit/noDebitNoFileDispatchKH", params);
 export const listHasDebitNoFileDispatchKH= async (params: any) => await getData("Debit/hasDebitNoFileDispatchKH", params);
 export const listDebitCongNoChiTietKH = async (params: any) => await getData("Debit/congnochitietkh", params);
@@ -50,3 +52,7 @@ export const exportDebitKH = async (params: any) => await getDataV3("Debit/excel
 export const exportDebitKHVer1 = async (params: any) => await getDataV3("Debit/excel/congnokh_v1", params);
 export const listDebitDoiTruNCC = async (params: any) => await getData("Debit/congnodoitruncc", params);
 export const listDebitDoiTruKH = async (params: any) => await getData("Debit/congnodoitrukh", params);
+export const listDebitDuNoDKKH = async (params: any) => await getData("Debit/GetObjectDebitDuNoDKKHAsync", params);
+export const listDebitDuNoDKNCC = async (params: any) => await getData("Debit/GetObjectDebitDuNoDKNCCAsync", params);
+export const listNoDebitNCC = async (params: any) => await getData("Debit/GetObjectNoDebitNCCAsync", params);
+export const listHasDebitNCC = async (params: any) => await getData("Debit/GetObjectHasDebitNCCAsync", params);

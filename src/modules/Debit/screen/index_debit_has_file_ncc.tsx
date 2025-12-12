@@ -11,14 +11,12 @@ import { Button, Checkbox, DataTable, Dialog, Tag } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { useListContractFileHasDebitNangHa, useListContractFileHasDebitService, useListContractFileHasFileGia, useListContractFileNotDebitNangHa, useListContractFileNotFileGia, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
-import {  deleteMultiDebit } from "../api";
-import UpdateDebitNangHa from "./update_service_nh";
+import { useListHasDebitHasFileNCC, useListNoDebitHasFileNCC } from "modules/ContractFile/service";
+import { deleteMultiDebit } from "../api";
 import UpdateFileGia from "./update_debit_file_gia";
-import { Link } from "react-router-dom";
 import UpdateVATFileGia from "./update_vat_file_gia";
 import UpdateXuatHoaDon from "./update_xuat_hoadon";
-import { FilterMatchMode } from "primereact/api";
+import UpdateDebitHasFileNCC from "./update_debit_has_file_ncc";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFileGia,_setSelectedRows}: any) => {
@@ -60,8 +58,8 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFil
             filter={filter}
             setFilter={setFilter}
             className="lg:col-9"
-            openDialogAdd={()=>openDialogAdd()}
-            openDialogAddName="Xuất hóa đơn"
+            // openDialogAdd={()=>openDialogAdd()}
+            // openDialogAddName="Xuất hóa đơn"
         >
             <div className="col-2">
                 <Input
@@ -114,7 +112,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFil
     );
 };
 
-export default function ListFileGia() {
+export default function ListDebitHasFileNCC() {
     const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
     const { handleParamUrl } = useHandleParamUrl();
     const [selectedFileGiaRows, setSelectedFileGiaRows] = useState<any[]>([]);
@@ -136,14 +134,8 @@ export default function ListFileGia() {
       keyword: "",
       EmployeeId:employeeInfo?.id
     });
-    const [filters, setFilters] = useState({
-        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-        customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    });
-    const { data, loading, error, refresh } = useListContractFileNotFileGia({ params: paramsPaginator, debounce: 500,});
-    const { data: listFileGia, refresh:refreshHasFileGia } = useListContractFileHasFileGia({ params: {...paramsPaginator,},debounce: 500,});
+    const { data, loading, error, refresh } = useListNoDebitHasFileNCC({ params: paramsPaginator, debounce: 500,});
+    const { data: listFileGia, refresh:refreshHasFileGia } = useListHasDebitHasFileNCC({ params: {...paramsPaginator,},debounce: 500,});
     const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
     const { data: listUser } = useListUserWithState({});
     const { data: listEmployee } = useListEmployeeWithState({});
@@ -219,23 +211,7 @@ export default function ListFileGia() {
         setDisplayData(mapped);
         setDisplayFileGia(mappedDebitFileGia);
     }, [first, rows, data,listFileGia, paramsPaginator,listCustomer]);
-    const getSumColumn = (field: string) => {
-        const filtered = (displayFileGia??[]).filter((item: any) => {
-            return Object.entries(filters).every(([key, f]: [string, any]) => {
-                const value = f?.value?.toString().toLowerCase() ?? "";
-                if (!value) return true;
-                const cell = item[key]?.toString().toLowerCase() ?? "";
-                return cell.includes(value);
-            });
-        });
-
-        const sum = filtered.reduce((acc: any, item: any) => {
-            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
-            return acc + val;
-        }, 0);
-
-        return Helper.formatCurrency(sum.toString());
-    };
+ 
     return (
       <>
         <div className="card">
@@ -253,7 +229,7 @@ export default function ListFileGia() {
                           }}
                         >
                           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                            <b>Bảng chưa tạo file giá</b>
+                            <b>Công nợ ncc chưa tạo</b>
                                 <DataTableClient
                                 rowHover
                                 value={displayData}
@@ -312,7 +288,7 @@ export default function ListFileGia() {
                               style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                                 <b>Bảng theo dõi file giá</b>
+                                 <b>Công nợ ncc đã tạo</b>
                                   <DataTableClient
                                       rowHover
                                       value={displayFileGia}
@@ -322,8 +298,6 @@ export default function ListFileGia() {
                                       }}
                                       loading={loading}
                                       dataKey="id"
-                                      filters={filters}
-                                      onFilter={(e:any) => setFilters(e.filters)}
                                       title="Tài khoản"
                                       filterDisplay="row"
                                       className={classNames("Custom-DataTableClient")}
@@ -432,18 +406,9 @@ export default function ListFileGia() {
                                             }
                                           } filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="sales" header="Tên Sales" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumMua" body={(row: any) => Helper.formatCurrency(row.sumMua.toString())} 
-                                          footer={getSumColumn("sumMua")}
-                                          footerStyle={{ fontWeight: "bold" }}
-                                          header="Tổng mua" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumBan" body={(row: any) => Helper.formatCurrency(row.sumBan.toString())}
-                                            footer={getSumColumn("sumBan")}
-                                            footerStyle={{ fontWeight: "bold" }}
-                                            header="Tổng bán" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="loiNhuan" body={(row: any) => Helper.formatCurrency(row.loiNhuan.toString())} 
-                                            footer={getSumColumn("loiNhuan")}
-                                            footerStyle={{ fontWeight: "bold" }}
-                                            header="Lợi nhuận" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="sumMua" body={(row: any) => Helper.formatCurrency(row.sumMua.toString())}  header="Tổng mua" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="sumBan" body={(row: any) => Helper.formatCurrency(row.sumBan.toString())}  header="Tổng bán" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="loiNhuan" body={(row: any) => Helper.formatCurrency(row.loiNhuan.toString())}  header="Lợi nhuận" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Người duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Thời gian duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Lý do duyệt" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -460,7 +425,7 @@ export default function ListFileGia() {
                               style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                                <b>Chi tiết file giá</b>
+                                <b>Chi tiết công nợ ncc</b>
                                   <DataTable 
                                     rowHover
                                     scrollable
@@ -496,25 +461,13 @@ export default function ListFileGia() {
          <Dialog
             position="top"
             dismissableMask
-            header="Tạo file giá"
+            header="Tạo công nợ nhà cung cấp"
             visible={visible}
             onHide={() => setVisible(false)}
             style={{ width: "78vw" }}
           >
             <p className="m-0">
-              {selectedId && <UpdateFileGia id={selectedId} onClose={handleModalClose} ></UpdateFileGia>}
-            </p>
-          </Dialog>
-           <Dialog
-            position="top"
-            dismissableMask
-            header="Sửa VAT file giá"
-            visible={visibleEdit}
-            onHide={() => setVisibleEdit(false)}
-            style={{ width: "78vw" }}
-          >
-            <p className="m-0">
-              {selectedIdEdit && <UpdateVATFileGia id={selectedIdEdit} onClose={handleModalEditClose} ></UpdateVATFileGia>}
+              {selectedId && <UpdateDebitHasFileNCC id={selectedId} onClose={handleModalClose} ></UpdateDebitHasFileNCC>}
             </p>
           </Dialog>
       </>
