@@ -85,7 +85,7 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
     infos.overnightFee   = toInt(infos.overnightFee);
     infos.penaltyFee     = toInt(infos.penaltyFee);
     infos.goodsFee       = toInt(infos.goodsFee);
-    infos.fileInfoId= type == 0? infos.id :infos.fileInfo.id;
+    infos.fileInfoId= type == 0? infos.id :infos.fileInfo?.id;
     infos.data = JSON.stringify(infos);
     infos.vehicleNumber = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleLabel : infos.vehicleNumber
     let info = {

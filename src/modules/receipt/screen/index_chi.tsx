@@ -4,14 +4,15 @@ import { GridForm } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
 import { classNames } from "primereact/utils";
-import { useListReceipt, useListReceiptChi } from "../service";
+import { useListReceiptChi } from "../service";
 import { deleteReceipt } from "../api";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
 import { Helper } from "utils/helper";
-import { formOfPayment, typeReceipt } from "utils";
+import { formOfPayment, TypeDoiTuong, typeReceipt } from "utils";
 import { useListContractFileWithState } from "modules/ContractFile/service";
 import { FilterMatchMode } from "primereact/api";
+import { useListPartnerDetailWithState } from "modules/partner/service";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -34,7 +35,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             className="lg:col-9"
             add="/receipt/updateReceiptChiGiaoNhan"
             addName="Phiếu chi giao nhận"
-            addOne="/receipt/updateReceiptChiNoiBo"
+            addOne="/receipt/UpdateReceiptChi"
             addOneName="Phiếu chi"
         >
         </GridForm>
@@ -85,13 +86,12 @@ export default function ListReceiptChi() {
     const { data: DMExpense } = useListExpenseWithState({type:1,enable:1}); // danh mục chi phí
     const { data: DMBank } = useListBankWithState({type:1});
     const { data: DMQuy } = useListFundCategoryWithState({type:1});
+    const { data: listPartner } = useListPartnerDetailWithState({});
     // ✅ Client-side pagination
     useEffect(() => {
         if (!data) return;
         handleParamUrl(paramsPaginator);
         const mapped = (data?.data || []).map((row: any) => {
-                        const _employee = employees.find((x: any) => x.id === row.employee_id);
-                        const _fullname_giaonhan = `${_employee?.last_name ?? ""} ${ _employee?.first_name ?? ""}`.trim();
                         const _lydochi = DMExpense.find((x: any) => x.id === row.income_expense_category_id);
                         const _tenquy = DMQuy.find((x: any) => x.id === row.fund_id);
                         const _bank = DMBank.find((x: any) => x.id === row.bank_id);
@@ -99,9 +99,23 @@ export default function ListReceiptChi() {
                         const _nguoitao = employees.find((x: any) => x.user_id === row.created_by);
                         const _sofile = ContractFile.find((x: any) => x.id === row.file_info_id);
                         const _typeReceipt = typeReceipt.find((x: any) => x.typeReceipt === row.type_receipt);
+                        let tendoituong='';
+
+                        if(row.object === 0 || row.object === 1){ //khách hàng,ncc
+                              const partner = listPartner.find((x: any) => x.id === row.object_id);
+                              tendoituong = partner?.partners?.abbreviation || ""
+                        }else{
+                            if(row.object === 2){
+                                 const _employee = employees.find((x: any) => x.id === row.object_id);
+                                tendoituong = `${_employee?.last_name ?? ""} ${ _employee?.first_name ?? ""}`.trim();
+                            }else{
+                                const _employee = employees.find((x: any) => x.id === row.employee_id);
+                                tendoituong = `${_employee?.last_name ?? ""} ${ _employee?.first_name ?? ""}`.trim();
+                             }
+                        }
                         return {
                             ...row,
-                            fullname_giaonhan : _fullname_giaonhan,
+                            tendoituong : tendoituong,
                             lydochi : _lydochi?.name,
                             tenquy: _tenquy?.fund_name,
                             stk: _bank?.account_number,
@@ -163,7 +177,7 @@ export default function ListReceiptChi() {
                         if(row.type_receipt == 8){
                             return ActionBody(
                                 row,
-                                "/receipt/detail/chinoibo",
+                                "/receipt/detail/chi",
                                 { route: "/receipt/delete", action: deleteReceipt },
                                 paramsPaginator,
                                 setParamsPaginator
@@ -191,7 +205,10 @@ export default function ListReceiptChi() {
                     filterMatchMode="contains"
                 />
                 <Column field="sofile" header="Số file" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="fullname_giaonhan" header="Người giao nhận" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                <Column header="Đối tượng"
+                  body={(row: any) => TypeDoiTuong.find((x:any) => x.value === row.object)?.name || "NV"} 
+                 filter showFilterMenu={false}  filterMatchMode="contains"/>
+                <Column field="tendoituong" header="Tên đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="lydochi" header="Lý do chi" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="bill" header="Số hóa đơn" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
