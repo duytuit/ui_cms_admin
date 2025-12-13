@@ -462,6 +462,7 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
               <div className="field col-8">
                 <InputForm className="w-full"
                   id="note"
+                  value={infos.note}
                   onChange={(e: any) =>
                     setInfos({ ...infos, note: e.target.value })
                   }
