@@ -4,7 +4,7 @@ import { useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, refreshObject} from "utils";
 import { useDispatch } from "react-redux";
-import { updateBillCustomerFileNoFile } from "../api";
+import { updateBillCustomerFileNoFile, updateBillDebitNCC } from "../api";
 import { Panel } from "components/uiCore";
 import { Helper } from "utils/helper";
 import { MyCalendar } from "components/common/MyCalendar";
@@ -21,7 +21,7 @@ export default function UpdateXuatHoaDonNCC({ ids, onClose }: { ids: any; onClos
     fetchDataSubmit(infos);
   };
   async function fetchDataSubmit(info: any) {
-      const response = await updateBillCustomerFileNoFile(info);
+      const response = await updateBillDebitNCC(info);
       if (response) setLoading(false);
       if (response.status === 200) {
         if (response.data.status) {

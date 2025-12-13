@@ -39,9 +39,12 @@ export const updateVATDebitFileGia = async (params: any) => await postData("Debi
 export const updateVATDebitNoFile = async (params: any) => await postData("Debit/updateVATDebitNoFile", params);
 export const updateBillCustomerFileGia = async (params: any) => await postData("Debit/updateBillCustomerFileGia", params);
 export const updateBillCustomerFileNoFile = async (params: any) => await postData("Debit/updateBillDebitNoFile", params);
+export const updateBillDebitNCC = async (params: any) => await postData("Debit/updateBillDebitNCC", params);
 export const confirmFileGia = async (params: any) => await postData("Debit/confirmFileGia", params);
 export const updateStatusDebit = async (params: any) => await postData("Debit/update/status", params);
 export const confirmDebitNoFileDispatchKH = async (params: any) => await postData("Debit/confirmDebitNoFileDispatchKH", params);
+export const updateDebitNCC = async (params: any) => await postData("Debit/updateDebitNCC", params);
+export const deleteDebitNCC = async (params: any) => await postData("Debit/deleteDebitNCC", params);
 export const confirmChiPhiHaiQuan = async (params: any) => await postData("Debit/confirmChiPhiHaiQuan", params);
 export const addDebitMuaHangNCC = async (params: any) => await postData("Debit/create/muahang", params);
 export const addDebitBanHangKH = async (params: any) => await postData("Debit/create/banhang", params);

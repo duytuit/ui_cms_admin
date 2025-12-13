@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import { Helper } from "utils/helper";
 import { MyCalendar } from "components/common/MyCalendar";
 import { classNames } from "primereact/utils";
-import { confirmDebitNoFileDispatchKH } from "../api";
+import { confirmDebitNoFileDispatchKH, updateDebitNCC } from "../api";
 export default function UpdateDebitNCC({ debits, onClose}: { debits: any, onClose: () => void }) {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
@@ -20,13 +20,13 @@ export default function UpdateDebitNCC({ debits, onClose}: { debits: any, onClos
   const handleSubmit = (e: any) => {
     e.preventDefault();
     infos.Data = JSON.stringify(debitRows);
-    // setLoading(true);
-    // fetchDataSubmit(infos);
+    setLoading(true);
+    fetchDataSubmit(infos);
     console.log(infos);
     
   };
   async function fetchDataSubmit(info: any) {
-    const response = await confirmDebitNoFileDispatchKH(info);
+    const response = await updateDebitNCC(info);
     if (response) setLoading(false);
     if (response.status === 200) {
       if (response.data.status) {

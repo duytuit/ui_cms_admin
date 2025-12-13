@@ -12,7 +12,7 @@ import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useListContractFileWithState } from "modules/ContractFile/service";
 import { useListHasDebitNCC, useListHasDebitNoFileDispatchKH, useListHasDebitNoFileNCC, useListNoDebitNCC, useListNoDebitNoFileDispatchKH, useListNoDebitNoFileNCC } from "../service";
-import { updateDebitToStatusDichVu } from "../api";
+import { deleteDebitNCC, delMultiDebit, updateDebitToStatusDichVu } from "../api";
 import { FilterMatchMode } from "primereact/api";
 import UpdateDebitNCC from "./update_debit_ncc";
 import UpdateXuatHoaDonNCC from "./update_xuat_hoadon_no_file_ncc";
@@ -98,7 +98,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,selected,refresh,refresh
           filter
           showClear
           value={filter.supplierDetailId}
-          options={supplierDetails}
+          options={supplierOptions}
           onChange={(e: any) =>
             setFilter({ ...filter, supplierDetailId: e.target.value })
           }
@@ -425,14 +425,13 @@ export default function ListDebitNCC() {
                                 if(row.cf_status_confirm == 1){
                                                                                 
                                 }else{
-                                  return ActionBody(
-                                      row,
-                                      null,
-                                      { route: "/Debit/updateDebitToStatusDichVu", action: updateDebitToStatusDichVu },
-                                      paramsPaginator,
-                                      setParamsPaginator,
-                                      null,null,null,() => openDialogEdit(row.id)
-                                  );
+                                   return ActionBody(
+                                        row,
+                                        null,
+                                        { route: "Debit/deleteDebitNCC", action: deleteDebitNCC },
+                                        paramsPaginator,
+                                        setParamsPaginator
+                                    );
                                 }
                               }}
                             style={{ width: "6em" }}
@@ -456,8 +455,8 @@ export default function ListDebitNCC() {
                           <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplierName" header="Nhà cung cấp" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplierAbb" header="Tên viết tắt NCC" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="cus_bill" header="Số hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="cus_bill_date" body={(e: any) => DateBody(e.cus_bill_date)} header="Ngày xuất hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="sup_bill" header="Số hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="sup_bill_date" body={(e: any) => DateBody(e.sup_bill_date)} header="Ngày xuất hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="purchase_price" header="Số tiền" 
                               footer={getSumColumn("purchase_price")}
                               footerStyle={{ fontWeight: "bold" }}
