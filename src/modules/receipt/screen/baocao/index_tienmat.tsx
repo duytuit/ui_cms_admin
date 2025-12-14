@@ -16,25 +16,25 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,dunoDK}: any) => {
   const [filter, setFilter] = useState({
     name: "",
     customerDetailId: "",
-    bankId: "",
+    fundId: "",
     fromDate: Helper.lastWeekString(),
     toDate: Helper.toDayString(),
   });
-  const { data: DMBank } = useListBankWithState({type:1});
-    const DMBankOptions = useMemo(() => {
-        if (!Array.isArray(DMBank)) return [];
-        return DMBank.map((x: any) => ({
-          label: `${x.account_number} - ${x.account_holder}`,
-          value: x.id,
-        }));
-      }, [DMBank]);
+   const { data: DMQuy } = useListFundCategoryWithState({type:1});
+   const DMQuyOptions = useMemo(() => {
+       if (!Array.isArray(DMQuy)) return [];
+       return DMQuy.map((x: any) => ({
+         label: x?.fund_name ?? "(không tên)",
+         value: x.id,
+       }));
+     }, [DMQuy]);
   useEffect(() => {
     // Mỗi khi filter thay đổi => cập nhật params
     _setParamsPaginator((prev: any) => ({
       ...prev,
       keyword: filter.name,
       customerDetailId: filter.customerDetailId,
-      bankId: filter.bankId,
+      fundId: filter.fundId,
       fromDate: filter.fromDate,
       toDate: filter.toDate,
     }));
@@ -68,12 +68,12 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,dunoDK}: any) => {
               <Dropdown
                 filter
                 showClear
-                value={filter.bankId}
-                options={DMBankOptions}
+                value={filter.fundId}
+                options={DMQuyOptions}
                 onChange={(e: any) =>
-                  setFilter({ ...filter, bankId: e.target.value })
+                  setFilter({ ...filter, fundId: e.target.value })
                 }
-                label="Tài khoản"
+                label="Quỹ"
                 className={classNames("dropdown-input-sm", "p-dropdown-sm")}
               />
             </div>
@@ -84,7 +84,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,dunoDK}: any) => {
   );
 };
 
-export default function ListBaoCaoTaiKhoan() {
+export default function ListBaoCaoTienMat() {
   const { handleParamUrl } = useHandleParamUrl();
   const [filters, setFilters] = useState({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -92,13 +92,15 @@ export default function ListBaoCaoTaiKhoan() {
       });
   const [displayData, setDisplayData] = useState<any[]>([]);
    const [dunoDK, setdunoDK] = useState<number>(0);
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(20);
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
     pageSize: 20,
     first: 0,
     render: false,
     keyword: "",
-    FormOfPayment:2
+    FormOfPayment:1
   });
   const { data: employees } = useListEmployeeWithState({});
   const { data: DMExpense } = useListExpenseWithState({type:1,enable:1}); // danh mục chi phí
@@ -113,8 +115,7 @@ export default function ListBaoCaoTaiKhoan() {
     params: paramsPaginator,
     debounce: 500,
   });
-  // ✅ Client-side pagination
-  useEffect(() => {
+   useEffect(() => {
     if (!data) return;
     handleParamUrl(paramsPaginator);
     setdunoDK(0)
@@ -208,7 +209,6 @@ export default function ListBaoCaoTaiKhoan() {
             tableStyle={{ minWidth: "1600px" }} 
         >
             <Column field="accounting_date" header="Ngày hạch toán" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-            <Column field="stk" header="Số tài khoản" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="code_receipt" header="Số phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="note" header="Diễn giải" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="tendoituong" header="Đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
