@@ -149,24 +149,23 @@ export default function ListDebitNCC() {
   const [rows, setRows] = useState(20);
   const [selectedIdEdit, setSelectedIdEdit] = useState<any>();
   const [visibleEdit, setVisibleEdit] = useState(false);
+  const [noDebitfilters, setNoDebitfilters] = useState({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  supplierName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  supplierAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
   const [filters, setFilters] = useState({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  code_receipt: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  accounting_date: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  sofile: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  fullname_giaonhan: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  lydochi: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  total_amount: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  vat_rate: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  total_with_vat: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  tenquy: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  hinhthuc: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  stk: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  chutk: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  nganhang: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  note: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  nguoitao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  supplierName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  supplierAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
   const {data: partners } = useListPartnerDetailWithState({});
   const [paramsPaginator, setParamsPaginator] = useState({
@@ -206,6 +205,23 @@ export default function ListDebitNCC() {
 
         return Helper.formatCurrency(sum.toString());
     };
+     const getSumColumnNoDebit = (field: string) => {
+        const filtered = (displayData??[]).filter((item: any) => {
+            return Object.entries(noDebitfilters).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
+
+        const sum = filtered.reduce((acc: any, item: any) => {
+            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
   // ✅ Client-side pagination
   useEffect(() => {
     if (!data) return;
@@ -217,7 +233,7 @@ export default function ListDebitNCC() {
       const _fileContract = contractFile.find((x: any) => x.id === row.file_info_id);
       return {
         ...row,
-        file_number : _fileContract?.file_number,
+        file_number : _fileContract?.file_number || "không file",
         so_cont : _fileContract?.container_code,
         customerName: cus?.partners?.name || "",
         customerAbb: cus?.partners?.abbreviation || "",
@@ -234,13 +250,12 @@ export default function ListDebitNCC() {
         return {
           ...row,
           purchase_price: Helper.formatCurrency(row.purchase_price?.toString() || "0"),
-          file_number : _fileContract?.file_number,
+          file_number : _fileContract?.file_number || "không file",
           so_cont : _fileContract?.container_code,
           customerName:_customer?.partners?.name || "",
           customerAbb:_customer?.partners?.abbreviation || "",
           supplierName:_supplier?.partners?.name || "",
           supplierAbb:_supplier?.partners?.abbreviation || "",
-          price: Helper.formatCurrency(row.price?.toString() || "0"),
           thanh_tien: Helper.formatCurrency(thanh_tien.toString() || "0"),
         };
     });
@@ -282,6 +297,8 @@ export default function ListDebitNCC() {
                           setRows(e.rows);
                         }}
                         loading={loading}
+                        filters={noDebitfilters}
+                        onFilter={(e:any) => setNoDebitfilters(e.filters)}
                         dataKey="id"
                         title="Tài khoản"
                         filterDisplay="row"
@@ -341,6 +358,8 @@ export default function ListDebitNCC() {
                           <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="purchase_price" header="Cước mua"
                            body={(row: any) => Helper.formatCurrency(row.purchase_price.toString())}
+                            footer={getSumColumnNoDebit("purchase_price")}
+                            footerStyle={{ fontWeight: "bold" }}
                            filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -375,6 +394,8 @@ export default function ListDebitNCC() {
                         dataKey="id"
                         title="Tài khoản"
                         filterDisplay="row"
+                        filters={filters}
+                        onFilter={(e:any) => setFilters(e.filters)}
                         className={classNames("Custom-DataTableClient")}
                         scrollable
                         scrollHeight="flex"

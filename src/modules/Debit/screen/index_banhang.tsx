@@ -10,6 +10,7 @@ import { Helper } from "utils/helper";
 import { useListBanhangKH, useListDebitMuaBan, useListMuahangNCC } from "../service";
 import { FilterMatchMode } from "primereact/api";
 import { deleteReceipt } from "modules/receipt/api";
+import { deleteDebit } from "../api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -130,11 +131,13 @@ export default function ListBanHang() {
     const mapped = (data?.data || []).map((row: any) => {
       const cus = customers.find((x: any) => x.id === row.customer_detail_id);
       const _user = employees.find((x: any) => x.user_id === row.updated_by);
+       const thanh_tien = Math.round(row.price * (1 + row.vat / 100));
       return {
         ...row,
         customerName: cus?.partners?.name || "",
         customerAbb: cus?.partners?.abbreviation || "",
         userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
+        thanh_tien:thanh_tien
       };
     });
     setDisplayData(mapped);
@@ -170,21 +173,26 @@ export default function ListBanHang() {
             <Column
                 header="Thao tác"
                 body={(row: any) => {
-                   
+                    return ActionBody(
+                                row,
+                                "/debit/detailBanHang",
+                                { route: "/debit/delete", action: deleteDebit },
+                                paramsPaginator,
+                                setParamsPaginator
+                            );
                 }}
             />
             <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-            <Column field="code_receipt" header="Số phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="sofile" header="Đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="fullname_giaonhan" header="Tên đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="fullname_giaonhan" header="Tên viết tắt" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="total_amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                  footer={getSumColumn("total_amount")}
+            <Column field="dispatch_code" header="Số phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="customerName" header="Tên đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="price" header="Số tiền"  body={(row: any) => Helper.formatCurrency(row.price.toString())} filter showFilterMenu={false}  filterMatchMode="contains"
+                  footer={getSumColumn("price")}
                   footerStyle={{ fontWeight: "bold" }}
             />
-            <Column field="vat_rate" header="VAT" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="total_with_vat" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                  footer={getSumColumn("total_with_vat")}
+            <Column field="vat" header="VAT" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="thanh_tien" header="Thành tiền"  body={(row: any) => Helper.formatCurrency(row.thanh_tien.toString())} filter showFilterMenu={false}  filterMatchMode="contains"
+                  footer={getSumColumn("thanh_tien")}
                   footerStyle={{ fontWeight: "bold" }}
             />
             <Column field="note" header="Diễn giải" />

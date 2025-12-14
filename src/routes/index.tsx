@@ -70,6 +70,7 @@ import ListDoiTruCongNo from "modules/receipt/screen/index_doitru_congno";
 import UpdateDoiTruCongNo from "modules/receipt/screen/update_doitru_congno";
 import ListDebitNCC from "modules/Debit/screen/index_debit_ncc";
 import UpdateReceiptChi from "modules/receipt/screen/update_chi";
+import ListBaoCaoTaiKhoan from "modules/receipt/screen/baocao/index_taikhoan";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -158,6 +159,7 @@ const publicRoutes = [
   { path: "/receipt/detail/chuyentiennoibo/:id", component: UpdateChuyenTienNoiBo, layout: 'UpdateChuyenTienNoiBo' },
   { path: "/receipt/ListDoiTruCongNo", component: ListDoiTruCongNo, layout: 'ListDoiTruCongNo' },
   { path: "/receipt/UpdateDoiTruCongNo", component: UpdateDoiTruCongNo, layout: 'UpdateDoiTruCongNo' },
+  { path: "/receipt/ListBaoCaoTaiKhoan", component: ListBaoCaoTaiKhoan, layout: 'ListBaoCaoTaiKhoan' },
   // Debit 
   { path: "/debit/listCuoc", component: ListCuoc, layout: 'ListCuoc' },
   { path: "/debit/listTamThu", component: ListTamThu, layout: 'ListTamThu' },

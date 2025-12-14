@@ -130,7 +130,7 @@ export default function ListMuaHang() {
     const mapped = (data?.data || []).map((row: any) => {
       const cus = suppliers.find((x: any) => x.id === row.supplier_detail_id);
       const _user = employees.find((x: any) => x.user_id === row.updated_by);
-      const thanh_tien = Math.round(row.price * (1 + row.vat / 100));
+      const thanh_tien = Math.round(row.purchase_price * (1 + row.purchase_vat / 100));
       return {
         ...row,
         supplierName: cus?.partners?.name || "",
@@ -186,12 +186,12 @@ export default function ListMuaHang() {
             <Column field="dispatch_code" header="Số phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="supplierName" header="Tên đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="supplierAbb" header="Tên viết tắt" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="price" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                  footer={getSumColumn("price")}
+            <Column field="purchase_price"  body={(row: any) => Helper.formatCurrency(row.purchase_price.toString())} header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                  footer={getSumColumn("purchase_price")}
                   footerStyle={{ fontWeight: "bold" }}
             />
-            <Column field="vat" header="VAT" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="thanh_tien" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+            <Column field="purchase_vat" header="VAT" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="thanh_tien" header="Thành tiền" body={(row: any) => Helper.formatCurrency(row.thanh_tien.toString())}  filter showFilterMenu={false}  filterMatchMode="contains"
                   footer={getSumColumn("thanh_tien")}
                   footerStyle={{ fontWeight: "bold" }}
             />

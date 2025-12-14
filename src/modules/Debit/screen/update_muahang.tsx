@@ -101,8 +101,8 @@ export default function UpdateMuaHang() {
         showDebit({ id: id }).then(res => {
           const detail = res.data.data
           if (detail) {
-              const thanhtien = Math.round(detail.price * (1 + detail.vat / 100));
-               detail.price = Helper.formatCurrency(detail.price.toString())
+              const thanhtien = Math.round(detail.purchase_price * (1 + detail.purchase_vat / 100));
+               detail.purchase_price = Helper.formatCurrency(detail.purchase_price.toString())
             let info = {
               ...detail, status: detail.status === 0 ? true : false,thanhtien:Helper.formatCurrency(thanhtien.toString())
             };
@@ -154,13 +154,13 @@ export default function UpdateMuaHang() {
                   </div>
                    <div className="field col-4">
                     <InputForm className="w-full"
-                      id="price"
-                      value={infos.price}
+                      id="purchase_price"
+                      value={infos.purchase_price}
                       onChange={(e: any) =>
                          {
-                           setInfos({ ...infos, price: Helper.formatCurrency(e.target.value )})
-                           const thanhtien  = parseInt(e.target.value.replace(/\D/g, ""),10) + ( infos.vat ? ( parseInt(e.target.value.replace(/\D/g, ""),10) * infos.vat ) / 100 : 0  );
-                           setInfos({ ...infos, price: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
+                           setInfos({ ...infos, purchase_price: Helper.formatCurrency(e.target.value )})
+                           const thanhtien  = parseInt(e.target.value.replace(/\D/g, ""),10) + ( infos.purchase_vat ? ( parseInt(e.target.value.replace(/\D/g, ""),10) * infos.purchase_vat ) / 100 : 0  );
+                           setInfos({ ...infos, purchase_price: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                          }
                       }
                       label="Số tiền"
@@ -169,7 +169,7 @@ export default function UpdateMuaHang() {
                   </div>
                    <div className="field col-4">
                    <Dropdown
-                      value={infos.vat}
+                      value={infos.purchase_vat}
                       optionValue="vat"
                       optionLabel="name"
                       options={VatDebit}
@@ -177,11 +177,10 @@ export default function UpdateMuaHang() {
                       className="w-full p-inputtext-sm"
                       onChange={(e: any) =>
                           {
-                            const priceStr = String(infos.price ?? "");
+                            const priceStr = String(infos.purchase_price ?? "");
                             const numeric = parseInt(priceStr.replace(/\D/g, ""), 10);
-                             setInfos({ ...infos, vat: e.value })
-                             const thanhtien  = numeric + ( e.value ? ( numeric * e.value ) / 100 : 0  );
-                             setInfos({ ...infos, vat: e.value, thanhtien : Helper.formatCurrency(thanhtien.toString()) })
+                            const thanhtien  = numeric + ( e.value ? ( numeric * e.value ) / 100 : 0  );
+                            setInfos({ ...infos, purchase_vat: e.value, thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                           }
                       }
                       required

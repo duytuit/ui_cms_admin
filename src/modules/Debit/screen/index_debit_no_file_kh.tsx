@@ -150,24 +150,23 @@ export default function ListDebitNoFileKH() {
   const [rows, setRows] = useState(20);
   const [selectedIdEdit, setSelectedIdEdit] = useState<any>();
   const [visibleEdit, setVisibleEdit] = useState(false);
+   const [noDebitfilters, setNoDebitfilters] = useState({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  supplierName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  supplierAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
   const [filters, setFilters] = useState({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  code_receipt: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  accounting_date: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  sofile: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  fullname_giaonhan: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  lydochi: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  total_amount: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  vat_rate: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  total_with_vat: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  tenquy: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  hinhthuc: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  stk: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  chutk: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  nganhang: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  note: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  nguoitao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  supplierName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  supplierAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
   const {data: partners } = useListPartnerDetailWithState({});
   const [paramsPaginator, setParamsPaginator] = useState({
@@ -190,7 +189,24 @@ export default function ListDebitNoFileKH() {
       refresh?.(); 
       refreshDebitDispatch?.(); // reload debitDispatch
     };
-  const getSumColumn = (field: string) => {
+  const getSumColumnNoDebit = (field: string) => {
+        const filtered = (displayData??[]).filter((item: any) => {
+            return Object.entries(filters).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
+
+        const sum = filtered.reduce((acc: any, item: any) => {
+            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
+      const getSumColumn = (field: string) => {
         const filtered = (displayDebitDispatchData??[]).filter((item: any) => {
             return Object.entries(filters).every(([key, f]: [string, any]) => {
                 const value = f?.value?.toString().toLowerCase() ?? "";
@@ -305,6 +321,8 @@ export default function ListDebitNoFileKH() {
                         dataKey="id"
                         title="Tài khoản"
                         filterDisplay="row"
+                        filters={noDebitfilters}
+                        onFilter={(e:any) => setNoDebitfilters(e.filters)}
                         className={classNames("Custom-DataTableClient")}
                         scrollable
                         scrollHeight="flex"
@@ -360,8 +378,12 @@ export default function ListDebitNoFileKH() {
                           <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="purchase_price" header="Cước mua"
                            body={(row: any) => Helper.formatCurrency(row.purchase_price.toString())}
+                            footer={getSumColumnNoDebit("purchase_price")}
+                              footerStyle={{ fontWeight: "bold" }}
                            filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="price" header="Cước bán"
+                              footer={getSumColumnNoDebit("price")}
+                              footerStyle={{ fontWeight: "bold" }}
                            body={(row: any) => Helper.formatCurrency(row.price.toString())}
                            filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="driver_fee" header="Lái xe thu cước"
@@ -417,6 +439,8 @@ export default function ListDebitNoFileKH() {
                         dataKey="id"
                         title="Tài khoản"
                         filterDisplay="row"
+                        filters={filters}
+                        onFilter={(e:any) => setFilters(e.filters)}
                         className={classNames("Custom-DataTableClient")}
                         scrollable
                         scrollHeight="flex"

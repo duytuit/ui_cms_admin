@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ActionBody, Column, TimeBody, DataTableClient, DateBody, } from "components/common/DataTable";
-import { GridForm } from "components/common/ListForm";
+import { Dropdown, GridForm } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
@@ -11,30 +11,32 @@ import { FilterMatchMode } from "primereact/api";
 import { deleteReceipt } from "modules/receipt/api";
 import { deleteDebit } from "modules/Debit/api";
 import { useListMuahangNCC } from "modules/Debit/service";
+import { useListBankWithState } from "modules/categories/service";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   const [filter, setFilter] = useState({
     name: "",
     customerDetailId: "",
+    bankId: "",
     fromDate: Helper.lastWeekString(),
     toDate: Helper.toDayString(),
   });
-  const { data: customerDetails } = useListCustomerDetailWithState({ status: 1});
-  // --- chuyển sang options bằng useMemo ---
-  const customerOptions = useMemo(() => {
-    if (!Array.isArray(customerDetails)) return [];
-    return customerDetails.map((x: any) => ({
-      label: x?.partners?.abbreviation ?? "(không tên)",
-      value: x.id,
-    }));
-  }, [customerDetails]);
+  const { data: DMBank } = useListBankWithState({type:1});
+    const DMBankOptions = useMemo(() => {
+        if (!Array.isArray(DMBank)) return [];
+        return DMBank.map((x: any) => ({
+          label: `${x.account_number} - ${x.account_holder}`,
+          value: x.id,
+        }));
+      }, [DMBank]);
   useEffect(() => {
     // Mỗi khi filter thay đổi => cập nhật params
     _setParamsPaginator((prev: any) => ({
       ...prev,
       keyword: filter.name,
       customerDetailId: filter.customerDetailId,
+      bankId: filter.bankId,
       fromDate: filter.fromDate,
       toDate: filter.toDate,
     }));
@@ -47,7 +49,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
       filter={filter}
       setFilter={setFilter}
       className="lg:col-9"
-       add="/debit/UpdateMuaHang"
     >
       <div className="col-2">
         <MyCalendar
@@ -65,6 +66,22 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
           className={classNames("w-full", "p-inputtext", "input-sm")}
         />
       </div>
+         <div className="col-4">
+              <Dropdown
+                filter
+                showClear
+                value={filter.bankId}
+                options={DMBankOptions}
+                onChange={(e: any) =>
+                  setFilter({ ...filter, bankId: e.target.value })
+                }
+                label="Tài khoản"
+                className={classNames("dropdown-input-sm", "p-dropdown-sm")}
+              />
+            </div>
+            <div className="col-4">
+            
+            </div>
     </GridForm>
   );
 };
@@ -74,21 +91,6 @@ export default function ListBaoCaoTaiKhoan() {
   const [filters, setFilters] = useState({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       code_receipt: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      accounting_date: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      sofile: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      fullname_giaonhan: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      lydochi: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      total_amount: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      vat_rate: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      total_with_vat: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      tenquy: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      hinhthuc: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      stk: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      chutk: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      nganhang: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      note: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      nguoitao: { value: null, matchMode: FilterMatchMode.CONTAINS },
       });
   const [displayData, setDisplayData] = useState<any[]>([]);
   const [first, setFirst] = useState(0);
@@ -152,16 +154,7 @@ export default function ListBaoCaoTaiKhoan() {
 
          <DataTableClient
             rowHover
-            value={displayData}
-            paginator
-            rows={rows}
-            first={first}
-            totalRecords={displayData?.length || 0}
-            currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
-            onPage={(e: any) => {
-                setFirst(e.first);
-                setRows(e.rows);
-            }}
+            value={[]}
             filters={filters}
             onFilter={(e:any) => setFilters(e.filters)}
             loading={loading}
@@ -169,36 +162,16 @@ export default function ListBaoCaoTaiKhoan() {
             className={classNames("Custom-DataTableClient")}
             tableStyle={{ minWidth: "1600px" }} 
         >
-            <Column
-                header="Thao tác"
-                style={{width:"100px"}}
-                body={(row: any) => {
-                    return ActionBody(
-                        row,
-                        "/debit/detailMuaHang",
-                        { route: "/debit/delete", action: deleteDebit },
-                        paramsPaginator,
-                        setParamsPaginator
-                    );
-                }}
-            />
-            <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+            <Column field="accounting_date" header="Ngày hạch toán" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+            <Column field="dispatch_code" header="Số tài khoản" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="dispatch_code" header="Số phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="supplierName" header="Tên đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="supplierAbb" header="Tên viết tắt" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="price" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                  footer={getSumColumn("price")}
-                  footerStyle={{ fontWeight: "bold" }}
-            />
-            <Column field="vat" header="VAT" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="thanh_tien" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                  footer={getSumColumn("thanh_tien")}
-                  footerStyle={{ fontWeight: "bold" }}
-            />
-            <Column field="note" header="Diễn giải" />
-            <Column field="userName" header="Người cập nhật" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
-            
+            <Column field="supplierName" header="Diễn giải" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="supplierAbb" header="Đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="supplierAbb" header="Tên quỹ" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="supplierAbb" header="Lý do" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="supplierAbb" header="Thu" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="supplierAbb" header="Chi" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="supplierAbb" header="Tồn" filter showFilterMenu={false}  filterMatchMode="contains"/>
         </DataTableClient>
       </div>
     </>
