@@ -11,9 +11,7 @@ import { Helper } from "utils/helper";
 import { classNames } from "primereact/utils";
 import { showWithDebitContractFile } from "modules/ContractFile/api";
 import { useListPartnerDetail, useListSupplierDetailWithState } from "modules/partner/service";
-import { useListServiceCategoryWithState } from "modules/categories/service";
 import { updateDebitFileGia } from "../api";
-import UpdateConfirmService from "./update_confirm_service";
 import ViewConfirmService from "./view_confirm_service";
 import { useListEmployeeWithState } from "modules/employee/service";
 export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () => void }) {

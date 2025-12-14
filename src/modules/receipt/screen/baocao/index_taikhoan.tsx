@@ -171,10 +171,15 @@ export default function ListBaoCaoTaiKhoan() {
       });
 
       // 2️⃣ sort DESC để hiển thị
-      withTon.sort((a: any, b: any) =>
-          new Date(b.accounting_date).getTime() -
-          new Date(a.accounting_date).getTime()
-      );
+      withTon.sort((a: any, b: any) => {
+          const dateDiff =
+              new Date(b.accounting_date).getTime() -
+              new Date(a.accounting_date).getTime();
+
+          if (dateDiff !== 0) return dateDiff;
+
+          return b.id - a.id; // 👈 tie-break bằng id
+      });
       console.log(withTon);
       setDisplayData(withTon);
   }
