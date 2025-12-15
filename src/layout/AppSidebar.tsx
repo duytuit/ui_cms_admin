@@ -428,7 +428,7 @@ const model = [{
           }
         ]
       },
-      {
+       {
         id: 5,
         name: 'Quỹ - Ngân Hàng',
         sort: 1,
@@ -437,88 +437,51 @@ const model = [{
         deleted_at: null,
         updated_at: null,
         icon: 'pi pi-home',
+        route: '/page-two',
         items: [
           {
-            id: 1,
-            name: 'Tiền mặt',
-            route: '/page-two',
-            created_at: '2023-05-29 14:14:02',
-            updated_at: null,
-            deleted_at: null,
-            status: 1,
-            category_id: 1,
-            sort: 1,
-            items: [
-              {
-                id: 1,
-                name: 'Phiếu thu',
-                route: '/receipt/ListReceiptThu',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              },
-              {
-                id: 1,
-                name: 'Phiếu chi',
-                route: '/receipt/ListReceiptChi',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              },
-            ]
-          },
-          {
-            id: 1,
-            name: 'Tiền gửi ngân hàng',
-            route: '/page-two',
-            created_at: '2023-05-29 14:14:02',
-            updated_at: null,
-            deleted_at: null,
-            status: 1,
-            category_id: 1,
-            sort: 1,
-            items: [
-              {
-                id: 1,
-                name: 'Giấy báo có',
-                route: '/page-two',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              },
-              {
-                id: 1,
-                name: 'Ủy nhiệm chi',
-                route: '/page-two',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              }
-            ]
-          },
-          {
               id: 5,
-              name: 'Chuyển tiền nội bộ',
+              name: 'Số dư tài khoản',
+              route: '/receipt/ListDauKyTaiKhoan',
+              category_id:1,
               sort: 1,
               status: 1,
               created_at: '2023-06-01 10:04:39',
               deleted_at: null,
               updated_at: null,
+          },
+          {
+            id: 1,
+            name: 'Phiếu thu',
+            route: '/receipt/ListReceiptThu',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
+            id: 1,
+            name: 'Phiếu chi',
+            route: '/receipt/ListReceiptChi',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+           {
+              id: 4,
+              name: 'Chuyển tiền nội bộ',
               route: '/receipt/ListChuyenTienNoiBo',
+              sort: 1,
+              status: 1,
+              created_at: '2023-06-01 10:04:39',
+              deleted_at: null,
+              updated_at: null,
           }
-         
         ]
       },
       {

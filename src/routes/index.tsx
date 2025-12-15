@@ -72,6 +72,8 @@ import ListDebitNCC from "modules/Debit/screen/index_debit_ncc";
 import UpdateReceiptChi from "modules/receipt/screen/update_chi";
 import ListBaoCaoTaiKhoan from "modules/receipt/screen/baocao/index_taikhoan";
 import ListBaoCaoTienMat from "modules/receipt/screen/baocao/index_tienmat";
+import ListDauKyTaiKhoan from "modules/receipt/screen/index_dauky_taikhoan";
+import UpdateDauKyTaiKhoan from "modules/receipt/screen/update_dauky_taikhoan";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -162,6 +164,9 @@ const publicRoutes = [
   { path: "/receipt/UpdateDoiTruCongNo", component: UpdateDoiTruCongNo, layout: 'UpdateDoiTruCongNo' },
   { path: "/receipt/ListBaoCaoTaiKhoan", component: ListBaoCaoTaiKhoan, layout: 'ListBaoCaoTaiKhoan' },
   { path: "/receipt/ListBaoCaoTienMat", component: ListBaoCaoTienMat, layout: 'ListBaoCaoTienMat' },
+  { path: "/receipt/ListDauKyTaiKhoan", component: ListDauKyTaiKhoan, layout: 'ListDauKyTaiKhoan' },
+  { path: "/receipt/UpdateDauKyTaiKhoan", component: UpdateDauKyTaiKhoan, layout: 'UpdateDauKyTaiKhoan' },
+  { path: "/receipt/ListDauKyTaiKhoan/detail/:id", component: UpdateDauKyTaiKhoan, layout: 'UpdateDauKyTaiKhoan' },
   // Debit 
   { path: "/debit/listCuoc", component: ListCuoc, layout: 'ListCuoc' },
   { path: "/debit/listTamThu", component: ListTamThu, layout: 'ListTamThu' },

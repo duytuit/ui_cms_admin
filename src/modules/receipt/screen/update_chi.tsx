@@ -255,6 +255,7 @@ export default function UpdateReceiptChi() {
                   </div>
                   <div className="field col-6">
                      <Dropdown
+                      filter
                       value={infos.objectId}
                       optionValue="value"
                       optionLabel="label"
