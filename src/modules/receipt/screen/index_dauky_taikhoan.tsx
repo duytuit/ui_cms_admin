@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { ActionBody, Column, TimeBody, DataTableClient, DateBody, } from "components/common/DataTable";
-import { Dropdown, GridForm, Input, } from "components/common/ListForm";
+import { GridForm, } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { useListCustomerDetailWithState } from "modules/partner/service";
-import { Checkbox } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import { TypeDebitDKKH } from "utils";
+import { formOfPayment } from "utils";
 import { FilterMatchMode } from "primereact/api";
-import { useListDebitDauKyKH } from "modules/Debit/service";
-import { deleteDebit } from "modules/Debit/api";
+import { useGetSoDuDauKyAsync } from "../service";
+import { useListBankWithState, useListExpenseWithState, useListFundCategoryWithState } from "modules/categories/service";
+import { deleteReceipt } from "../api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -51,15 +51,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
       add="/receipt/UpdateDauKyTaiKhoan"
     >
       <div className="col-2">
-        <Input
-          value={filter.name}
-          onChange={(e: any) => setFilter({ ...filter, name: e.target.value })}
-          label="Tìm kiếm"
-          size="small"
-          className={classNames("input-sm")}
-        />
-      </div>
-      <div className="col-2">
         <MyCalendar
           dateFormat="dd/mm/yy"
           value={filter.fromDate}
@@ -75,19 +66,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
           className={classNames("w-full", "p-inputtext", "input-sm")}
         />
       </div>
-      <div className="col-6">
-        <Dropdown
-          filter
-          showClear
-          value={filter.customerDetailId}
-          options={customerOptions}
-          onChange={(e: any) =>
-            setFilter({ ...filter, customerDetailId: e.target.value })
-          }
-          label="Khách hàng"
-          className={classNames("dropdown-input-sm", "p-dropdown-sm")}
-        />
-      </div>
     </GridForm>
   );
 };
@@ -101,11 +79,12 @@ export default function ListDauKyTaiKhoan() {
       name: { value: null, matchMode: FilterMatchMode.CONTAINS },
       type: { value: null, matchMode: FilterMatchMode.CONTAINS },
       });
-  const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [displayData, setDisplayData] = useState<any[]>([]);
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(20);
-  const { data: customers } = useListCustomerDetailWithState({status: 1});
+  const { data: DMExpense } = useListExpenseWithState({type:1,enable:1}); // danh mục chi phí
+  const { data: DMBank } = useListBankWithState({type:1});
+  const { data: DMQuy } = useListFundCategoryWithState({type:1});
   const { data: employees } = useListEmployeeWithState({});
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
@@ -114,7 +93,7 @@ export default function ListDauKyTaiKhoan() {
     render: false,
     keyword: "",
   });
-  const { data, loading, error, refresh } = useListDebitDauKyKH({
+  const { data, loading, error, refresh } = useGetSoDuDauKyAsync({
     params: paramsPaginator,
     debounce: 500,
   });
@@ -139,20 +118,25 @@ export default function ListDauKyTaiKhoan() {
   useEffect(() => {
     if (!data) return;
     handleParamUrl(paramsPaginator);
-    const mapped = (data?.data || []).map((row: any) => {
-      const cus = customers.find((x: any) => x.id === row.customer_detail_id);
-      const _user = employees.find((x: any) => x.user_id === row.updated_by);
-      const _type = TypeDebitDKKH.find((x: any) => x.value === row.type);
-      return {
-        ...row,
-        customerName: cus?.partners?.name || "",
-        customerAbb: cus?.partners?.abbreviation || "",
-        userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
-        type: _type?.name || "",
-      };
-    });
-    setDisplayData(mapped);
-  }, [first, rows, data, paramsPaginator, customers]);
+     const mapped = (data?.data || []).map((row: any) => {
+              const _tenquy = DMQuy.find((x: any) => x.id === row.fund_id);
+              const _bank = DMBank.find((x: any) => x.id === row.bank_id);
+              const _hinhthuc = formOfPayment.find((x: any) => x.value === row.form_of_payment);
+              const _nguoitao = employees.find((x: any) => x.user_id === row.created_by);
+              return {
+                  ...row,
+                  tenquy: _tenquy?.fund_name,
+                  stk: _bank?.account_number,
+                  chutk: _bank?.account_holder,
+                  nganhang: _bank?.bank_name,
+                  hinhthuc: _hinhthuc?.name,
+                  nguoitao: `${_nguoitao?.last_name ?? ""} ${_nguoitao?.first_name ?? ""}`.trim(),
+                  amount: Helper.formatCurrency(row.amount.toString()),
+                  total: Helper.formatCurrency(row.total.toString()),
+              };
+          });
+          setDisplayData(mapped);
+     }, [employees,DMExpense,DMBank,DMQuy,first, rows, data, paramsPaginator]);
 
   return (
     <>
@@ -162,84 +146,63 @@ export default function ListDauKyTaiKhoan() {
           _setParamsPaginator={setParamsPaginator}
         />
 
-        <DataTableClient
-          rowHover
-          value={displayData}
-          paginator
-          rows={rows}
-          first={first}
-          totalRecords={data?.total}
-          currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
-          onPage={(e: any) => {
-            setFirst(e.first);
-            setRows(e.rows);
-          }}
-          filters={filters}
-          onFilter={(e:any) => setFilters(e.filters)}
-          loading={loading}
-          dataKey="id"
-          title="Tài khoản"
-          filterDisplay="row"
-          className={classNames("Custom-DataTableClient")}
-          scrollable
-          tableStyle={{ minWidth: "1600px" }} // ép bảng rộng hơn để có scroll ngang
-        >
-          {/* Custom checkbox column */}
-          <Column
-            header={
-              <Checkbox
-                checked={
-                  selectedRows.length === displayData.length &&
-                  displayData.length > 0
-                }
-                onChange={(e: any) => {
-                  if (e.checked) setSelectedRows(displayData.map((d) => d.id));
-                  else setSelectedRows([]);
-                }}
-              />
-            }
-            body={(rowData: any) => (
-              <Checkbox
-                className="p-checkbox-sm"
-                checked={selectedRows.includes(rowData.id)}
-                onChange={(e: any) => {
-                  if (e.checked)
-                    setSelectedRows((prev) => [...prev, rowData.id]);
-                  else
-                    setSelectedRows((prev) =>
-                      prev.filter((id) => id !== rowData.id)
-                    );
-                }}
-                onClick={(e: any) => e.stopPropagation()} // ⚡ chặn row click
-              />
-            )}
-            style={{ width: "3em" }}
-          />
-          <Column header="Thao tác" 
-           body={(row: any) => {
-              return ActionBody(
-                    row,
-                    "/debit/detailDauKyKh",
-                    { route: "/debit/delete", action: deleteDebit },
-                    paramsPaginator,
-                    setParamsPaginator
-                );
+         <DataTableClient
+            rowHover
+            value={displayData}
+            paginator
+            rows={rows}
+            first={first}
+            totalRecords={displayData?.length || 0}
+            currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
+            onPage={(e: any) => {
+                setFirst(e.first);
+                setRows(e.rows);
             }}
-           style={{ width: "6em" }} 
-          />
-          <Column field="accounting_date" header="Ngày hạch toán" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="type" header="Loại dịch vụ" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="price"   
-           body={(row: any) => Helper.formatCurrency(row.price.toString())}
-            footer={getSumColumn("price")}
-            footerStyle={{ fontWeight: "bold" }}
-           header="Số tiền" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="name" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="userName" header="Người thực hiện" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
-
+            filters={filters}
+            onFilter={(e:any) => setFilters(e.filters)}
+            loading={loading}
+            filterDisplay="row"
+            className={classNames("Custom-DataTableClient")}
+            tableStyle={{ minWidth: "2000px" }} 
+        >
+            <Column
+                header="Thao tác"
+                body={(row: any) => {
+                      return ActionBody(
+                            row,
+                            "/receipt/ListDauKyTaiKhoan/detail",
+                            { route: "/receipt/delete", action: deleteReceipt },
+                            paramsPaginator,
+                            setParamsPaginator
+                        );
+                }}
+                style={{ width: "6em" }}
+            />
+            <Column
+                field="accounting_date"
+                header="Ngày chứng từ"
+                body={(e: any) => DateBody(e.accounting_date)}
+                filter
+                showFilterMenu={false}
+                filterMatchMode="contains"
+            />
+            <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                  footer={getSumColumn("amount")}
+                  footerStyle={{ fontWeight: "bold" }}
+            />
+            <Column field="total" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                  footer={getSumColumn("total")}
+                  footerStyle={{ fontWeight: "bold" }}
+            />
+            <Column field="tenquy" header="Quỹ" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="hinhthuc" header="Hình thức" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="stk" header="STK" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="chutk" header="Tên tài khoản" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="nganhang" header="Ngân hàng" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column field="note" header="Ghi chú" />
+            <Column field="nguoitao" header="Người cập nhật" filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
         </DataTableClient>
       </div>
     </>

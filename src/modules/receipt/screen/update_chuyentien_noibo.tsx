@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { formOfPayment, listToast, refreshObject } from "utils";
-import { showReceipt, addReceiptChiGiaoNhan, updateReceiptChiGiaoNhan } from "../api";
+import { showReceipt, addReceiptChiGiaoNhan, updateReceiptChiGiaoNhan, updateChuyentiennoibo, addChuyentiennoibo, showChuyenTienNoiBo } from "../api";
 import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { classNames } from "primereact/utils";
@@ -16,23 +16,29 @@ import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithS
 export default function UpdateChuyenTienNoiBo() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
-  const [bankSelect, setBankSelect] = useState<any>({});
+  const [bankFromSelect, setBankFromSelect] = useState<any>({});
+  const [bankToSelect, setBankToSelect] = useState<any>({});
   const [infos, setInfos] = useState<any>({accountingDate:Helper.toDayString() });
+  const [from, setFrom] = useState<any>({formOfPayment:1});
+  const [to, setTo] = useState<any>({formOfPayment:1 });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    infos.ChuyenTu = from;
+    infos.ChuyenDen = to;
     let info = {
-      ...infos, amount: parseInt(infos.amount.replace(/\D/g, ""), 10),thanhtien: parseInt(infos.thanhtien.replace(/\D/g, ""), 10), status: infos.status ? 0 : 1,
+      ...infos, amount: parseInt(infos.amount.replace(/\D/g, ""), 10),
      data:JSON.stringify(infos)
     };
+    console.log(info);
     setLoading(true);
     fetchDataSubmit(info);
   };
   async function fetchDataSubmit(info: any) {
    
      if (info.id) {
-         const response = await updateReceiptChiGiaoNhan(info);
+         const response = await updateChuyentiennoibo(info);
        if (response) setLoading(false);
        if (response.status === 200) {
          if (response.data.status) {
@@ -51,7 +57,7 @@ export default function UpdateChuyenTienNoiBo() {
            showToast({ ...listToast[1], detail: response.data.message })
          );
      } else {
-       const response = await addReceiptChiGiaoNhan(info);
+       const response = await addChuyentiennoibo(info);
        if (response) setLoading(false);
        if (response.status === 200) {
          if (response.data.status) {
@@ -88,24 +94,25 @@ export default function UpdateChuyenTienNoiBo() {
          value: x.id,
        }));
      }, [DMBank]);
-  function GetBank(id:Number){
+  function GetBankFrom(id:Number){
      const selected = DMBank.find((x: any) => x.id === id);
-     setBankSelect(selected || {});
+     setBankFromSelect(selected || {});
+  }
+  function GetBankTo(id:Number){
+     const selected = DMBank.find((x: any) => x.id === id);
+     setBankToSelect(selected || {});
   }
   
   useEffect(() => {
       if (id) {
-        showReceipt({ id: id, type: CategoryEnum.country }).then(res => {
+        showChuyenTienNoiBo({ id: id }).then(res => {
           const detail = res.data.data
           if (detail) {
-            GetBank(detail.bankId)
-            detail.amount = Helper.formatCurrency(detail.receiptDetails[0].amount.toString())
-            detail.thanhtien =Helper.formatCurrency((detail.receiptDetails[0].amount + (detail.receiptDetails[0].amount * detail.receiptDetails[0].vat/100)).toString())
+            const amount = Helper.formatCurrency( detail.price.toString())
             let info = {
-              ...detail, status: detail.status === 0 ? true : false,
+              ...detail,amount
             };
             setInfos(info)
-            
           }
         }).catch(err => {
           //setHasError(true)
@@ -155,18 +162,6 @@ export default function UpdateChuyenTienNoiBo() {
                         ...infos,
                         amount: Helper.formatCurrency(e.target.value),
                       });
-                      const thanhtien =
-                        parseInt(e.target.value.replace(/\D/g, ""), 10) +
-                        (infos.vat
-                          ? (parseInt(e.target.value.replace(/\D/g, ""), 10) *
-                              infos.vat) /
-                            100
-                          : 0);
-                      setInfos({
-                        ...infos,
-                        amount: Helper.formatCurrency(e.target.value),
-                        thanhtien: Helper.formatCurrency(thanhtien.toString()),
-                      });
                     }}
                     label="Số tiền"
                     required
@@ -195,16 +190,16 @@ export default function UpdateChuyenTienNoiBo() {
                               className="flex align-items-center"
                             >
                               <RadioButton
-                                inputId={`payment_${item.value}`}
+                                inputId={`payment_from_${item.value}`}
                                 name="formOfPayment"
                                 value={item.value}
                                 onChange={(e: any) =>
-                                  setInfos({ ...infos, formOfPayment: e.value })
+                                  setFrom({ ...from, formOfPayment: e.value })
                                 }
-                                checked={infos.formOfPayment == item.value}
+                                checked={from.formOfPayment == item.value}
                               />
                               <label
-                                htmlFor={`payment_${item.value}`}
+                                htmlFor={`payment_from_${item.value}`}
                                 className="ml-2"
                               >
                                 {item.name}
@@ -214,48 +209,48 @@ export default function UpdateChuyenTienNoiBo() {
                         </div>
                       </div>
                       <div className="field col-6">
-                        <div className="formgrid grid">
+                         {from.formOfPayment == 2 && (<div className="formgrid grid">
                           <div className="col-12">
                             <Dropdown
-                              value={infos.bankId}
+                              value={from.bankId}
                               optionValue="value"
                               optionLabel="label"
                               options={DMBankOptions}
                               label="Tài khoản ngân hàng"
                               className="w-full p-inputtext-sm"
                               onChange={(e: any) => {
-                                setInfos({ ...infos, bankId: e.value });
-                                GetBank(e.value);
+                                setFrom({ ...from, bankId: e.value });
+                                GetBankFrom(e.value);
                               }}
                             />
                           </div>
                           <div className="col-12">
                             <div className="mt-4">
                               <b>Số tài khoản:</b>
-                              {bankSelect.account_number}
+                              {bankFromSelect.account_number}
                             </div>
                             <div className="mt-4">
                               <b>Chủ tài khoản:</b>
-                              {bankSelect.bank_name}
+                              {bankFromSelect.bank_name}
                             </div>
                             <div className="mt-4">
                               <b>Chi nhánh:</b>
-                              {bankSelect.branch_name}
+                              {bankFromSelect.branch_name}
                             </div>
                           </div>
-                        </div>
-                        {infos.formOfPayment == 1 && (
+                        </div> )}
+                        {from.formOfPayment == 1 && (
                           <div className="formgrid grid">
                             <div className="field col-12">
                               <Dropdown
-                                value={infos.fundId}
+                                value={from.fundId}
                                 optionValue="value"
                                 optionLabel="label"
                                 options={DMQuyOptions}
                                 label="Loại quỹ"
                                 className="w-full p-inputtext-sm"
                                 onChange={(e: any) =>
-                                  setInfos({ ...infos, fundId: e.value })
+                                  setFrom({ ...from, fundId: e.value })
                                 }
                               />
                             </div>
@@ -277,16 +272,16 @@ export default function UpdateChuyenTienNoiBo() {
                               className="flex align-items-center"
                             >
                               <RadioButton
-                                inputId={`payment_${item.value}`}
+                                inputId={`payment_to_${item.value}`}
                                 name="formOfPayment"
                                 value={item.value}
                                 onChange={(e: any) =>
-                                  setInfos({ ...infos, formOfPayment: e.value })
+                                  setTo({ ...to, formOfPayment: e.value })
                                 }
-                                checked={infos.formOfPayment == item.value}
+                                checked={to.formOfPayment == item.value}
                               />
                               <label
-                                htmlFor={`payment_${item.value}`}
+                                htmlFor={`payment_to_${item.value}`}
                                 className="ml-2"
                               >
                                 {item.name}
@@ -296,48 +291,48 @@ export default function UpdateChuyenTienNoiBo() {
                         </div>
                       </div>
                       <div className="field col-6">
-                        <div className="formgrid grid">
+                         {to.formOfPayment == 2 && (<div className="formgrid grid">
                           <div className="col-12">
                             <Dropdown
-                              value={infos.bankId}
+                              value={to.bankId}
                               optionValue="value"
                               optionLabel="label"
                               options={DMBankOptions}
                               label="Tài khoản ngân hàng"
                               className="w-full p-inputtext-sm"
                               onChange={(e: any) => {
-                                setInfos({ ...infos, bankId: e.value });
-                                GetBank(e.value);
+                                setTo({ ...to, bankId: e.value });
+                                GetBankTo(e.value);
                               }}
                             />
                           </div>
                           <div className="col-12">
                             <div className="mt-4">
                               <b>Số tài khoản:</b>
-                              {bankSelect.account_number}
+                              {bankToSelect.account_number}
                             </div>
                             <div className="mt-4">
                               <b>Chủ tài khoản:</b>
-                              {bankSelect.bank_name}
+                              {bankToSelect.bank_name}
                             </div>
                             <div className="mt-4">
                               <b>Chi nhánh:</b>
-                              {bankSelect.branch_name}
+                              {bankToSelect.branch_name}
                             </div>
                           </div>
-                        </div>
-                        {infos.formOfPayment == 1 && (
+                        </div>)}
+                        {to.formOfPayment == 1 && (
                           <div className="formgrid grid">
                             <div className="field col-12">
                               <Dropdown
-                                value={infos.fundId}
+                                value={to.fundId}
                                 optionValue="value"
                                 optionLabel="label"
                                 options={DMQuyOptions}
                                 label="Loại quỹ"
                                 className="w-full p-inputtext-sm"
                                 onChange={(e: any) =>
-                                  setInfos({ ...infos, fundId: e.value })
+                                  setTo({ ...to, fundId: e.value })
                                 }
                               />
                             </div>

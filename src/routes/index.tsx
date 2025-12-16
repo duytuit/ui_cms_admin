@@ -159,7 +159,7 @@ const publicRoutes = [
   { path: "/receipt/detail/chigiaonhan/:id", component: UpdateReceiptChiGiaoNhan, layout: 'UpdateReceiptChiGiaoNhan' },
   { path: "/receipt/ListChuyenTienNoiBo", component: ListChuyenTienNoiBo, layout: 'ListChuyenTienNoiBo' },
   { path: "/receipt/UpdateChuyenTienNoiBo", component: UpdateChuyenTienNoiBo, layout: 'UpdateChuyenTienNoiBo' },
-  { path: "/receipt/detail/chuyentiennoibo/:id", component: UpdateChuyenTienNoiBo, layout: 'UpdateChuyenTienNoiBo' },
+  { path: "/receipt/chuyentiennoibo/detail/:id", component: UpdateChuyenTienNoiBo, layout: 'UpdateChuyenTienNoiBo' },
   { path: "/receipt/ListDoiTruCongNo", component: ListDoiTruCongNo, layout: 'ListDoiTruCongNo' },
   { path: "/receipt/UpdateDoiTruCongNo", component: UpdateDoiTruCongNo, layout: 'UpdateDoiTruCongNo' },
   { path: "/receipt/ListBaoCaoTaiKhoan", component: ListBaoCaoTaiKhoan, layout: 'ListBaoCaoTaiKhoan' },

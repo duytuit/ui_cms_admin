@@ -7,7 +7,7 @@ import { classNames } from "primereact/utils";
 import { useListReceipt, useListReceiptThu } from "../service";
 import { deleteReceipt, showReceipt } from "../api";
 import { useListEmployeeWithState } from "modules/employee/service";
-import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
+import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { Helper } from "utils/helper";
 import { formOfPayment, typeReceipt } from "utils";
 import { useListContractFileWithState } from "modules/ContractFile/service";
@@ -138,7 +138,7 @@ export default function ListReceiptThu() {
          debounce: 500,
     }); 
     const { data: employees } = useListEmployeeWithState({});
-    const { data: DMExpense } = useListExpenseWithState({type:1,enable:1}); // danh mục chi phí
+    const { data: DMExpense } = useListIncomeExpenseWithState({}); 
     const { data: DMBank } = useListBankWithState({type:1});
     const { data: DMQuy } = useListFundCategoryWithState({type:1});
     // ✅ Client-side pagination
@@ -148,7 +148,7 @@ export default function ListReceiptThu() {
         const mapped = (data?.data || []).map((row: any) => {
                         const _employee = employees.find((x: any) => x.id === row.employee_id);
                         const _fullname_giaonhan = `${_employee?.last_name ?? ""} ${ _employee?.first_name ?? ""}`.trim();
-                        const _lydochi = DMExpense.find((x: any) => x.id === row.income_expense_category_id);
+                        const _lydo = DMExpense.find((x: any) => x.id === row.income_expense_category_id);
                         const _tenquy = DMQuy.find((x: any) => x.id === row.fund_id);
                         const _bank = DMBank.find((x: any) => x.id === row.bank_id);
                         const _hinhthuc = formOfPayment.find((x: any) => x.value === row.form_of_payment);
@@ -158,7 +158,7 @@ export default function ListReceiptThu() {
                         return {
                             ...row,
                             fullname_giaonhan : _fullname_giaonhan,
-                            lydochi : _lydochi?.name,
+                            lydo : _lydo?.name,
                             tenquy: _tenquy?.fund_name,
                             stk: _bank?.account_number,
                             chutk: _bank?.account_holder,
@@ -273,8 +273,8 @@ export default function ListReceiptThu() {
                                     footer={getSumColumn("total")}
                                     footerStyle={{ fontWeight: "bold" }}
                                 />
+                                <Column field="lydo" header="Lý do" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column field="tenquy" header="Quỹ" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                                <Column field="typeReceipt" header="Kiểu phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column field="hinhthuc" header="Hình thức" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column field="stk" header="STK" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column field="chutk" header="Tên tài khoản" filter showFilterMenu={false}  filterMatchMode="contains"/>

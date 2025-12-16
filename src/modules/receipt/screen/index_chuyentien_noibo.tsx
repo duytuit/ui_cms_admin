@@ -1,19 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
-import { ActionBody, Column, TimeBody, DataTableClient } from "components/common/DataTable";
+import { Column, TimeBody, DataTableClient, DateBody, ActionBody } from "components/common/DataTable";
 import { GridForm } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { CategoryEnum } from "utils/type.enum";
 import { classNames } from "primereact/utils";
-import { useListReceiptThu } from "../service";
-import { deleteReceipt, showReceipt } from "../api";
+import { useGetChuyenTienNoiBoAsync } from "../service";
 import { useListEmployeeWithState } from "modules/employee/service";
-import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
 import { Helper } from "utils/helper";
-import { formOfPayment, typeReceipt } from "utils";
-import { useListContractFileWithState } from "modules/ContractFile/service";
 import { FilterMatchMode } from "primereact/api";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { MyCalendar } from "components/common/MyCalendar";
+import { deleteChuyentiennoibo } from "../api";
 
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   const [filter, setFilter] = useState({
@@ -77,78 +73,39 @@ export default function ListChuyenTienNoiBo() {
     const [displayData, setDisplayData] = useState<any>();
     const [filters, setFilters] = useState({
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    code_receipt: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    accounting_date: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    sofile: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    fullname_giaonhan: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    lydochi: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    total_amount: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    vat_rate: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    total_with_vat: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    tenquy: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    hinhthuc: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    stk: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    chutk: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    nganhang: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    note: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    nguoitao: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
-    const [selectedDetail, setSelectedDetail] = useState<any>(null);
     const [paramsPaginator, setParamsPaginator] = useState({
         pageNum: 1,
         pageSize: 20,
         first: 0,
         render: false,
-        type: CategoryEnum.country,
         keyword: "",
     });
-    const { data, loading, error, refresh } = useListReceiptThu({
+    const { data, loading, error, refresh } = useGetChuyenTienNoiBoAsync({
         params: {...paramsPaginator},
         debounce: 500,
     });
-    const { data: ContractFile } = useListContractFileWithState({
-         params: {f:"abc"},
-         debounce: 500,
-    }); 
     const { data: employees } = useListEmployeeWithState({});
-    const { data: DMExpense } = useListExpenseWithState({type:1,enable:1}); // danh mục chi phí
-    const { data: DMBank } = useListBankWithState({type:1});
-    const { data: DMQuy } = useListFundCategoryWithState({type:1});
     // ✅ Client-side pagination
     useEffect(() => {
         if (!data) return;
         handleParamUrl(paramsPaginator);
         const mapped = (data?.data || []).map((row: any) => {
-                        const _employee = employees.find((x: any) => x.id === row.employee_id);
-                        const _fullname_giaonhan = `${_employee?.last_name ?? ""} ${ _employee?.first_name ?? ""}`.trim();
-                        const _lydochi = DMExpense.find((x: any) => x.id === row.income_expense_category_id);
-                        const _tenquy = DMQuy.find((x: any) => x.id === row.fund_id);
-                        const _bank = DMBank.find((x: any) => x.id === row.bank_id);
-                        const _hinhthuc = formOfPayment.find((x: any) => x.value === row.form_of_payment);
+                        const receipt_a = row.receipts.find((x:any) => x.income_expense_category_id ===26)
+                        const receipt_b = row.receipts.find((x:any) => x.income_expense_category_id ===27)
                         const _nguoitao = employees.find((x: any) => x.user_id === row.created_by);
-                        const _sofile = ContractFile.find((x: any) => x.id === row.file_info_id);
-                        const _typeReceipt = typeReceipt.find((x: any) => x.typeReceipt === row.type_receipt);
                         return {
                             ...row,
-                            fullname_giaonhan : _fullname_giaonhan,
-                            lydochi : _lydochi?.name,
-                            tenquy: _tenquy?.fund_name,
-                            stk: _bank?.account_number,
-                            chutk: _bank?.account_holder,
-                            nganhang: _bank?.bank_name,
-                            hinhthuc: _hinhthuc?.name,
-                            nguoitao: `${_nguoitao?.last_name ?? ""} ${_nguoitao?.first_name ?? ""}`.trim(),
-                            sofile:_sofile?.file_number,
-                            amount: Helper.formatCurrency(row.amount.toString()),
-                            total: Helper.formatCurrency(row.total.toString()),
-                            typeReceipt: _typeReceipt?.name || "",
+                              price: Helper.formatCurrency(row.price.toString()),
+                           code_receipt_a:receipt_a?.code_receipt,  
+                           code_receipt_b:receipt_b?.code_receipt,
+                          nguoitao: `${_nguoitao?.last_name ?? ""} ${_nguoitao?.first_name ?? ""}`.trim()
                         };
                      });
         setDisplayData(mapped);
-    }, [ContractFile,employees,DMExpense,DMBank,DMQuy,first, rows, data, paramsPaginator]);
+    }, [employees,first, rows, data, paramsPaginator]);
     const getSumColumn = (field: string) => {
         const filtered = (displayData??[]).filter((item: any) => {
             return Object.entries(filters).every(([key, f]: [string, any]) => {
@@ -166,33 +123,12 @@ export default function ListChuyenTienNoiBo() {
 
         return Helper.formatCurrency(sum.toString());
     };
-    function getDetail(id:any){
-        showReceipt({ id: id}).then(res => {
-            const detail = res.data.data
-            if (detail) {
-                let receiptDetails = detail.receiptDetails;
-                if (receiptDetails && receiptDetails.length > 0) {
-                  let data = JSON.parse(detail.data);
-                    let debits = JSON.parse(data.Debits);
-                    if (debits && debits.length > 0) {
-                        receiptDetails = receiptDetails.map((x: any) => ({
-                            ...x,
-                            debit: debits.find((y: any) => y.id == x.debitId) || null,
-                        }));
-                        setSelectedDetail(receiptDetails);
-                    }
-                }
-            }
-            }).catch(err => {
-            //setHasError(true)
-            }).finally();
-    }
     return (
           <div className="card">
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
              <DataTableClient
                     rowHover
-                    value={[]}
+                    value={displayData}
                     paginator
                     rows={rows}
                     first={first}
@@ -208,23 +144,34 @@ export default function ListChuyenTienNoiBo() {
                     filterDisplay="row"
                     className={classNames("Custom-DataTableClient")}
                     scrollable
-                    tableStyle={{ minWidth: "2000px" }} // ép bảng rộng hơn để có scroll ngang
+                    tableStyle={{ minWidth: "1000px" }} // ép bảng rộng hơn để có scroll ngang
                 >
                     <Column
                     header="Thao tác"
                     body={(row: any) => {
-                          if(row.type_receipt !== 3){
-                              return ActionBody(
-                                  row,
-                                  null,
-                                  { route: "/receipt/delete", action: deleteReceipt },
-                                  paramsPaginator,
-                                  setParamsPaginator
-                              );
-                          }
+                       return ActionBody(
+                              row,
+                              "/receipt/chuyentiennoibo/detail",
+                              { route: "/receipt/chuyentiennoibo/delete", action: deleteChuyentiennoibo },
+                              paramsPaginator,
+                              setParamsPaginator
+                          );
                         }}
                     />
-                    <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                     <Column
+                        field="accounting_date"
+                        header="Ngày chứng từ"
+                        body={(e: any) => DateBody(e.accounting_date)}
+                        filter
+                        showFilterMenu={false}
+                        filterMatchMode="contains"
+                    />
+                    <Column field="code_receipt_a" header="Phiếu chuyển từ" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                    <Column field="code_receipt_b" header="Phiếu chuyển đến" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                    <Column field="price" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                        footer={getSumColumn("price")}
+                        footerStyle={{ fontWeight: "bold" }}
+                    />
                     <Column field="note" header="Ghi chú" />
                     <Column field="nguoitao" header="Người cập nhật" filter showFilterMenu={false}  filterMatchMode="contains"/>
                     <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />

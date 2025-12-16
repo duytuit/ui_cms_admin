@@ -7,7 +7,7 @@ import { classNames } from "primereact/utils";
 import { useListReceiptChi } from "../service";
 import { deleteReceipt } from "../api";
 import { useListEmployeeWithState } from "modules/employee/service";
-import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
+import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { Helper } from "utils/helper";
 import { formOfPayment, TypeDoiTuong, typeReceipt } from "utils";
 import { useListContractFileWithState } from "modules/ContractFile/service";
@@ -83,7 +83,7 @@ export default function ListReceiptChi() {
          debounce: 500,
     }); 
     const { data: employees } = useListEmployeeWithState({});
-    const { data: DMExpense } = useListExpenseWithState({type:1,enable:1}); // danh mục chi phí
+    const { data: DMExpense } = useListIncomeExpenseWithState({}); 
     const { data: DMBank } = useListBankWithState({type:1});
     const { data: DMQuy } = useListFundCategoryWithState({type:1});
     const { data: listPartner } = useListPartnerDetailWithState({});

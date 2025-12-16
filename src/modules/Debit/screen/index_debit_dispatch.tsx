@@ -137,9 +137,19 @@ export default function ListCreateDispatch() {
   });
     const [filters, setFilters] = useState({  
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-     file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
-     customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-     customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      dispatch_code: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      sales: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      so_cont: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      declaration: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      customer_vehicle_type: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      supplier_vehicle_type: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      vehicle_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      driver: { value: null, matchMode: FilterMatchMode.CONTAINS },
      });
   const { data, loading, error, refresh } = useListContractFileNotDispatch({params: paramsPaginator,debounce: 500,});
   const { data: debitDispatch, refresh:refreshDebitDispatch  } = useListDebitDispatch({params: {...paramsPaginator}, debounce: 500,});
@@ -179,16 +189,21 @@ export default function ListCreateDispatch() {
       const _fileContract = contractFile.find((x: any) => x.id === row.file_info_id);
       const _customer = partners.find((x: any) => x.id === row.customer_detail_id);
       const _supplier = partners.find((x: any) => x.id === row.supplier_detail_id);
+      const _driver = employeeOptions.find((x: any) => x.id === row.employee_driver_id);
       console.log("partners",_customer?.partners?.abbreviation);
       
       return {
         ...row,
         file_number : _fileContract?.file_number|| "không file",
         so_cont : _fileContract?.container_code,
+        bill : _fileContract?.bill,
+        sales : _fileContract?.sales,
+        declaration : _fileContract?.declaration,
         customerName:_customer?.partners?.name || "",
         customerAbb:_customer?.partners?.abbreviation || "",
         supplierName:_supplier?.partners?.name || "",
         supplierAbb:_supplier?.partners?.abbreviation || "",
+        driver : `${_driver?.last_name ?? ""} ${_driver?.first_name ?? ""}`.trim(),
       };
     });
     setDisplayData(mapped);
@@ -438,7 +453,7 @@ export default function ListCreateDispatch() {
                           <Column field="supplierName" header="Nhà cung cấp" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplierAbb" header="Tên viết tắt NCC" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="vehicle_number" header="Biển số xe" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="declaration_quantity" header="Lái xe" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="driver" header="Lái xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="TTHQ" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Điểm trả hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="meal_fee" body={(row: any) => Helper.formatCurrency(row.meal_fee.toString())} 

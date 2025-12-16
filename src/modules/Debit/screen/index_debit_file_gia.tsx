@@ -141,6 +141,11 @@ export default function ListFileGia() {
         file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
         customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
         customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        sales: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        container_code: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        declaration: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        debit_cus_bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
     const { data, loading, error, refresh } = useListContractFileNotFileGia({ params: paramsPaginator, debounce: 500,});
     const { data: listFileGia, refresh:refreshHasFileGia } = useListContractFileHasFileGia({ params: {...paramsPaginator,},debounce: 500,});
@@ -203,6 +208,7 @@ export default function ListFileGia() {
             const _sumBan = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_price || 0), 0);
             const cf_status_confirm = row.debits.find((x: any) => x.cf_status_confirm === 0);
             const _userUpdate = listEmployee.find((x: any) => x.user_id === row.cf_updated_by);
+
             return {
               ...row,
               customerName: _customer?.partners?.name || "",
@@ -213,6 +219,7 @@ export default function ListFileGia() {
               loiNhuan:_sumBan-_sumMua,
               cf_status_confirm:cf_status_confirm ? 0 : 1,
               userUpdate: `${_userUpdate?.last_name ?? ""} ${_userUpdate?.first_name ?? ""}`.trim(),
+              debit_cus_bill :  (row.debits && row.debits.length > 0) ?  row.debits[0]?.debit_cus_bill || "":""
             };
           });
          console.log(mappedDebitFileGia);
@@ -414,15 +421,11 @@ export default function ListFileGia() {
                                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="bill" header="Số bill" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="declaration" header="Số tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Số hóa đơn"  body={(e: any) => 
-                                          {
-                                            if(e.debits && e.debits.length > 0){
-                                                return e.debits[0]?.debit_cus_bill || "";
-                                              }
-                                          }
-                                        } filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="debit_cus_bill" header="Số hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Ngày hóa đơn"
                                           body={(e: any) =>
                                             {

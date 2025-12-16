@@ -12,6 +12,7 @@ import { Dropdown, Input } from "components/common/ListForm";
 import { formOfPayment, listToast, refreshObject, TypeDebitDKKH, VatDebit } from "utils";
 import { addDebitDauKyKH, showDebit, updateDebitDauKyVaMuaBan } from "modules/Debit/api";
 import { useListBankWithState, useListExpenseWithState, useListFundCategoryWithState } from "modules/categories/service";
+import { addSodudauky, showReceipt, updateSodudauky } from "../api";
 export default function UpdateDauKyTaiKhoan() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
@@ -45,12 +46,12 @@ export default function UpdateDauKyTaiKhoan() {
      }, [DMBank]);
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    infos.price = Helper.toInt(infos.price)
+    infos.amount = Helper.toInt(infos.amount)
     let info = {
       ...infos,
      data:JSON.stringify(infos)
     };
-    setLoading(true);
+   setLoading(true);
     fetchDataSubmit(info);
   };
     function GetBank(id:Number){
@@ -60,7 +61,7 @@ export default function UpdateDauKyTaiKhoan() {
   async function fetchDataSubmit(info: any) {
    
      if (info.id) {
-         const response = await updateDebitDauKyVaMuaBan(info);
+         const response = await updateSodudauky(info);
        if (response) setLoading(false);
        if (response.status === 200) {
          if (response.data.status) {
@@ -79,7 +80,7 @@ export default function UpdateDauKyTaiKhoan() {
            showToast({ ...listToast[1], detail: response.data.message })
          );
      } else {
-       const response = await addDebitDauKyKH(info);
+       const response = await addSodudauky(info);
        if (response) setLoading(false);
        if (response.status === 200) {
          if (response.data.status) {
@@ -101,20 +102,21 @@ export default function UpdateDauKyTaiKhoan() {
   };
   useEffect(() => {
       if (id) {
-        showDebit({ id: id, }).then(res => {
-          const detail = res.data.data
-          if (detail) {
-            detail.price = Helper.formatCurrency(detail.price.toString())
-            let info = {
-              ...detail
-            };
-            setInfos(info)
-          }
-        }).catch(err => {
-          //setHasError(true)
-        });
-      }
-      
+        showReceipt({ id: id}).then(res => {
+            const detail = res.data.data
+            if (detail) {
+              GetBank(detail.bankId)
+              detail.amount = Helper.formatCurrency(detail.receiptDetails[0].amount.toString())
+              let info = {
+                ...detail
+              };
+              setInfos(info)
+              
+            }
+          }).catch(err => {
+            //setHasError(true)
+          });
+        }
     }, [id])
   return (
     <>
@@ -165,8 +167,6 @@ export default function UpdateDauKyTaiKhoan() {
                       onChange={(e: any) =>
                          {
                            setInfos({ ...infos, amount: Helper.formatCurrency(e.target.value )})
-                           const thanhtien  = parseInt(e.target.value.replace(/\D/g, ""),10) + ( infos.vat ? ( parseInt(e.target.value.replace(/\D/g, ""),10) * infos.vat ) / 100 : 0  );
-                           setInfos({ ...infos, amount: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                          }
                       }
                       label="Số tiền"
