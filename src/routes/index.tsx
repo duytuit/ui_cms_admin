@@ -74,6 +74,7 @@ import ListBaoCaoTaiKhoan from "modules/receipt/screen/baocao/index_taikhoan";
 import ListBaoCaoTienMat from "modules/receipt/screen/baocao/index_tienmat";
 import ListDauKyTaiKhoan from "modules/receipt/screen/index_dauky_taikhoan";
 import UpdateDauKyTaiKhoan from "modules/receipt/screen/update_dauky_taikhoan";
+import ListBaoCaoLoiNhuan from "modules/receipt/screen/index_baocao_loinhuan";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -167,6 +168,7 @@ const publicRoutes = [
   { path: "/receipt/ListDauKyTaiKhoan", component: ListDauKyTaiKhoan, layout: 'ListDauKyTaiKhoan' },
   { path: "/receipt/UpdateDauKyTaiKhoan", component: UpdateDauKyTaiKhoan, layout: 'UpdateDauKyTaiKhoan' },
   { path: "/receipt/ListDauKyTaiKhoan/detail/:id", component: UpdateDauKyTaiKhoan, layout: 'UpdateDauKyTaiKhoan' },
+  { path: "/receipt/ListBaoCaoLoiNhuan", component: ListBaoCaoLoiNhuan, layout: 'ListBaoCaoLoiNhuan' },
   // Debit 
   { path: "/debit/listCuoc", component: ListCuoc, layout: 'ListCuoc' },
   { path: "/debit/listTamThu", component: ListTamThu, layout: 'ListTamThu' },
