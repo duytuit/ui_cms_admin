@@ -9,7 +9,7 @@ import { useDispatch } from "react-redux";
 import { Helper } from "utils/helper";
 import { MyCalendar } from "components/common/MyCalendar";
 import { classNames } from "primereact/utils";
-import { confirmDebitNoFileDispatchKH, updateDebitNCC } from "../api";
+import { updateDebitNCC } from "../api";
 export default function UpdateDebitNCC({ debits, onClose}: { debits: any, onClose: () => void }) {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
@@ -90,7 +90,7 @@ export default function UpdateDebitNCC({ debits, onClose}: { debits: any, onClos
                         const vatValue = Number(e.value) || 0;
 
                           const updated = debitRows.map(row => {
-                            const total = (row.qty ?? 0) * (row.purchase_price ?? 0);
+                           const total = (row.purchase_price ?? 0) + (row.purchase_com ?? 0);
                             const totalWithVat = Math.round(total + total * vatValue / 100);
 
                             return {
@@ -117,6 +117,15 @@ export default function UpdateDebitNCC({ debits, onClose}: { debits: any, onClos
                         <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="dispatch_code" header="Mã điều xe" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="vehicle_number" header="Biển số" />
+                        <Column field="purchase_com" header="Mua Com"
+                          body={(row: any) => Helper.formatCurrency(row.purchase_com?.toString() || "0")}
+                          footer={Helper.formatCurrency(
+                            debitRows
+                              .reduce((sum, item) => sum + (item.purchase_com || 0), 0)
+                              .toString()
+                          )}
+                          footerStyle={{ fontWeight: "bold" }}
+                        />
                         <Column field="purchase_price" header="Số tiền"
                           body={(row: any) => Helper.formatCurrency(row.purchase_price?.toString() || "0")}
                           footer={Helper.formatCurrency(
@@ -146,11 +155,12 @@ export default function UpdateDebitNCC({ debits, onClose}: { debits: any, onClos
                                             typeof row.purchase_price === "string"
                                               ? parseInt(row.purchase_price.replace(/\D/g, ""), 10) || 0
                                               : Number(row.purchase_price) || 0;
-                                          // ✅ Nếu có quantity thì nhân thêm, mặc định là 1
-                                          const qty = Number(row.quantity) || 1;
-                                          // ✅ Tính thành tiền (price * qty * (1 + vat/100))
-                                          const thanh_tien = Math.round(rawPrice * qty * (1 + vatValue / 100));
-                                          
+                                          const purchaseCom =
+                                            typeof row.purchase_com === "string"
+                                              ? parseInt(row.purchase_com.replace(/\D/g, ""), 10) || 0
+                                              : Number(row.purchase_com) || 0;
+                                          const total_price = rawPrice+purchaseCom;
+                                          const thanh_tien = Math.round(total_price * (1 + vatValue / 100));
                                           updated[opt.rowIndex] = {
                                             ...row,
                                             purchase_vat: vatValue,
@@ -173,8 +183,12 @@ export default function UpdateDebitNCC({ debits, onClose}: { debits: any, onClos
                               ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
                               : Number(row.purchase_price) || 0;
                             const purchase_vat = Number(row.purchase_vat) || 0;
+                            const purchase_com = typeof row.purchase_com === "string"
+                              ? parseFloat(row.purchase_com.replace(/[^0-9.]/g, "")) || 0
+                              : Number(row.purchase_com) || 0;
+                            const total_price = purchase_price + purchase_com
                             // Tính thành tiền
-                            const thanh_tien = Math.round(purchase_price * (1 + purchase_vat / 100));
+                            const thanh_tien = Math.round(total_price * (1 + purchase_vat / 100));
                             // ✅ Cập nhật luôn vào state
                             if (row.thanh_tien !== thanh_tien) {
                               const updated = [...debitRows];
@@ -189,9 +203,12 @@ export default function UpdateDebitNCC({ debits, onClose}: { debits: any, onClos
                                 const purchase_price = typeof item.purchase_price === "string"
                                   ? parseFloat(item.purchase_price.replace(/[^0-9.]/g, "")) || 0
                                   : Number(item.purchase_price) || 0;
-
+                                const purchase_com = typeof item.purchase_com === "string"
+                                  ? parseFloat(item.purchase_com.replace(/[^0-9.]/g, "")) || 0
+                                  : Number(item.purchase_com) || 0;
+                                const total_price = purchase_price + purchase_com
                                 const purchase_vat = Number(item.purchase_vat) || 0;
-                                return Math.round(sum + purchase_price * (1 + purchase_vat / 100));
+                                return Math.round(sum + total_price * (1 + purchase_vat / 100));
                               }, 0)
                               .toString()
                           )}

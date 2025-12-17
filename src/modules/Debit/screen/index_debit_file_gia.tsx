@@ -146,6 +146,7 @@ export default function ListFileGia() {
         declaration: { value: null, matchMode: FilterMatchMode.CONTAINS },
         bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
         debit_cus_bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        cf_status_confirm: { value: null, matchMode: FilterMatchMode.EQUALS }
     });
     const { data, loading, error, refresh } = useListContractFileNotFileGia({ params: paramsPaginator, debounce: 500,});
     const { data: listFileGia, refresh:refreshHasFileGia } = useListContractFileHasFileGia({ params: {...paramsPaginator,},debounce: 500,});
@@ -189,13 +190,13 @@ export default function ListFileGia() {
          const dataArray = Array.isArray(listFileGia?.data) ? listFileGia.data : [];
          const groupedHasFileGia = Object.values(
             dataArray.reduce((acc:any, cur:any) => {
-              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number, ...rest } = cur;
+              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number,debit_total_vat, ...rest } = cur;
               if (!acc[cur.id]) {
                 acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
               }
               // chỉ gom debit nếu debitService có dữ liệu
               if (listFileGia?.data) {
-                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number});
+                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number,debit_total_vat});
                 acc[cur.id].debit_ids.push(debit_id);
               }
               return acc;
@@ -204,11 +205,11 @@ export default function ListFileGia() {
           const mappedDebitFileGia = groupedHasFileGia.map((row: any) => {
             const _customer = listCustomer?.find((x: any) => x.id === row.customer_detail_id);
             const _employee = listEmployee.find((x: any) => x.id === row.employee_id);
-            const _sumMua = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_purchase_price || 0), 0);
-            const _sumBan = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_price || 0), 0);
+            const _sumMua = row.debits.reduce((sum: number, x: any) => sum + (x.debit_purchase_price || 0), 0);
+            const _sumBan = row.debits.reduce((sum: number, x: any) => sum + (x.debit_price || 0), 0);
+            const _sumVat = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_vat || 0), 0);
             const cf_status_confirm = row.debits.find((x: any) => x.cf_status_confirm === 0);
             const _userUpdate = listEmployee.find((x: any) => x.user_id === row.cf_updated_by);
-
             return {
               ...row,
               customerName: _customer?.partners?.name || "",
@@ -216,6 +217,7 @@ export default function ListFileGia() {
               employee: `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""}`.trim(),
               sumMua:_sumMua,
               sumBan:_sumBan,
+              sumVat:_sumVat,
               loiNhuan:_sumBan-_sumMua,
               cf_status_confirm:cf_status_confirm ? 0 : 1,
               userUpdate: `${_userUpdate?.last_name ?? ""} ${_userUpdate?.first_name ?? ""}`.trim(),
@@ -243,6 +245,10 @@ export default function ListFileGia() {
 
         return Helper.formatCurrency(sum.toString());
     };
+    const statusOptions = [
+      { label: 'Đã duyệt', value: 1 },
+      { label: 'Chưa duyệt', value: 0 }
+    ];
     return (
       <>
         <div className="card">
@@ -402,22 +408,35 @@ export default function ListFileGia() {
                                             }}
                                             style={{ width: "5em" }}
                                         />
-                                        <Column header="Trạng thái" body={(row: any) => {
-                                          if(row.cf_status_confirm == 1){
-                                            return (
-                                              <>
-                                                <div className="flex justify-content-between align-items-center">
-                                                    <Button label="đã duyệt" rounded severity="success" size="small" text  />
-                                                    <a href={`/debit/print?id=${row.id}`} target="_blank" rel="noopener noreferrer">
-                                                       <Button label="In" rounded icon="pi pi-print" severity="info" size="small" text />
-                                                    </a>
-                                                 </div>
-                                              </>
-                                            )
-                                          }else{
-                                            return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
-                                          }
-                                        }} filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column
+                                          field="cf_status_confirm"
+                                          header="Trạng thái"
+                                          body={(row: any) => (
+                                              row.cf_status_confirm === 1 ? (
+                                                  <div className="flex justify-content-between align-items-center">
+                                                      <Button label="Đã duyệt" rounded severity="success" size="small" text />
+                                                      <a href={`/debit/print?id=${row.id}`} target="_blank" rel="noopener noreferrer">
+                                                          <Button label="In" rounded icon="pi pi-print" severity="info" size="small" text />
+                                                      </a>
+                                                  </div>
+                                              ) : (
+                                                  <Button label="Chưa duyệt" rounded severity="warning" size="small" text />
+                                              )
+                                          )}
+                                          filter
+                                          filterElement={(options:any) => (
+                                              <Dropdown
+                                                  value={options.value}
+                                                  options={statusOptions}
+                                                  onChange={(e:any) => {
+                                                    options.filterApplyCallback(e.value)
+                                                  }}
+                                                  placeholder="Chọn trạng thái"
+                                                  className="p-column-filter"
+                                                  showClear
+                                              />
+                                          )}
+                                          showFilterMenu={false}  style={{ width:"180px" }}/>
                                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -443,6 +462,10 @@ export default function ListFileGia() {
                                             footer={getSumColumn("sumBan")}
                                             footerStyle={{ fontWeight: "bold" }}
                                             header="Tổng bán" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="sumVat" body={(row: any) => Helper.formatCurrency(row.sumVat.toString())}
+                                            footer={getSumColumn("sumVat")}
+                                            footerStyle={{ fontWeight: "bold" }}
+                                            header="Tổng VAT" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="loiNhuan" body={(row: any) => Helper.formatCurrency(row.loiNhuan.toString())} 
                                             footer={getSumColumn("loiNhuan")}
                                             footerStyle={{ fontWeight: "bold" }}

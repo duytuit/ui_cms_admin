@@ -262,7 +262,10 @@ useEffect(() => {
         const _user = employees.find((x: any) => x.user_id === row.updated_by);
         const _typeKH = TypeDebitDKKH.find((x: any) => x.value === row.type);
         const _data = JSON.parse(row.data);
-        const thanh_tien = Math.round(row.purchase_price * (1 + row.purchase_vat / 100));
+        const total_purchase = row.purchase_price + row.purchase_com;
+        const thanh_tien_dv = Math.round(total_purchase * (1 + row.purchase_vat / 100));
+        const thanh_tien_ch = Math.round(row.purchase_price * (1 + row.purchase_vat / 100));
+        const thanh_tien = thanh_tien_dv;
 
         return {
             ...row,
@@ -275,14 +278,14 @@ useEffect(() => {
             supplierAbb: sup?.partners?.abbreviation || "",
             userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
             typeKH: _typeKH?.name || "",
-            thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien : 0,
-            thanhtien_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien : 0,
+            thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien_dv : 0,
+            thanhtien_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien_ch : 0,
             dathu_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? row.receipt_total : 0,
             dathu_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? row.receipt_total : 0,
-            conlai_dv_view: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien - row.receipt_total : 0,
-            conlai_ch_view: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien - row.receipt_total : 0,
-            conlai_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien - row.receipt_total : 0,
-            conlai_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien - row.receipt_total : 0,
+            conlai_dv_view: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien_dv - row.receipt_total : 0,
+            conlai_ch_view: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien_ch - row.receipt_total : 0,
+            conlai_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien_dv - row.receipt_total : 0,
+            conlai_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien_ch - row.receipt_total : 0,
             conlai_tong: thanh_tien - row.receipt_total
         };
     });
@@ -452,7 +455,8 @@ useEffect(() => {
               />
             }
             body={(rowData: any) => {
-              const thanh_tien = Math.round(rowData.price * (1 + rowData.vat / 100));
+              const total_purchase = rowData.purchase_price + rowData.purchase_com;
+              const thanh_tien = Math.round(total_purchase * (1 + rowData.purchase_vat / 100));
               let conlai = thanh_tien - rowData.receipt_total;
               conlai = Math.max(conlai, 0);
               if(conlai > 0){
@@ -491,8 +495,12 @@ useEffect(() => {
               const purchase_price = typeof row.purchase_price === "string"
                 ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
                 : Number(row.purchase_price) || 0;
+              const purchase_com = typeof row.purchase_com === "string"
+                ? parseFloat(row.purchase_com.replace(/[^0-9.]/g, "")) || 0
+                : Number(row.purchase_com) || 0;
               const purchase_vat = Number(row.purchase_vat) || 0;
-              const thanh_tien = Math.round(purchase_price * (1 + purchase_vat / 100));
+              const total_purchase = purchase_price + purchase_com;
+              const thanh_tien = Math.round(total_purchase * (1 + purchase_vat / 100));
               const conlai = thanh_tien - (row.receipt_total || 0);
               return (
                  <Input
@@ -530,8 +538,10 @@ useEffect(() => {
               const purchase_price = typeof row.purchase_price === "string"
                 ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
                 : Number(row.purchase_price) || 0;
+              const purchase_com = 0;
               const purchase_vat = Number(row.purchase_vat) || 0;
-              const thanh_tien = Math.round(purchase_price * (1 + purchase_vat / 100));
+              const total_purchase = purchase_price + purchase_com;
+              const thanh_tien = Math.round(total_purchase * (1 + purchase_vat / 100));
               const conlai = thanh_tien - (row.receipt_total || 0);
               return (
                  <Input

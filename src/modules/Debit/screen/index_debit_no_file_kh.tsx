@@ -152,6 +152,7 @@ export default function ListDebitNoFileKH() {
   const [visibleEdit, setVisibleEdit] = useState(false);
    const [noDebitfilters, setNoDebitfilters] = useState({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  dispatch_code: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
   customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
   customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -161,6 +162,7 @@ export default function ListDebitNoFileKH() {
   });
   const [filters, setFilters] = useState({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  dispatch_code: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
   customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
   customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -260,9 +262,12 @@ export default function ListDebitNoFileKH() {
         const _customer = partners.find((x: any) => x.id === row.customer_detail_id);
         const _supplier = partners.find((x: any) => x.id === row.supplier_detail_id);
         console.log("partners",_customer?.partners?.abbreviation);
-        const thanh_tien = Math.round(row.price * (1 + row.vat / 100));
+        const total_price = row.price + row.price_com;
+        const thanh_tien = Math.round(total_price * (1 + row.vat / 100));
         return {
           ...row,
+          purchase_com: Helper.formatCurrency(row.purchase_com?.toString() || "0"),
+          price_com: Helper.formatCurrency(row.price_com?.toString() || "0"),
           purchase_price: Helper.formatCurrency(row.purchase_price?.toString() || "0"),
           driver_fee: Helper.formatCurrency(row.driver_fee?.toString() || "0"),
           goods_fee: Helper.formatCurrency(row.goods_fee?.toString() || "0"),
@@ -522,15 +527,23 @@ export default function ListDebitNoFileKH() {
                           <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="cus_bill" header="Số hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="cus_bill_date" body={(e: any) => DateBody(e.cus_bill_date)} header="Ngày xuất hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="purchase_com" 
+                            footer={getSumColumn("purchase_com")}
+                            footerStyle={{ fontWeight: "bold" }}
+                            header="Mua Com" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="price_com"  
+                            footer={getSumColumn("price_com")}
+                            footerStyle={{ fontWeight: "bold" }}
+                            header="Bán Com" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="price" header="Số tiền" 
                               footer={getSumColumn("price")}
                               footerStyle={{ fontWeight: "bold" }}
-                          filter showFilterMenu={false} filterMatchMode="contains" />
+                              filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="vat" header="VAT" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="thanh_tien" header="Thành tiền" 
-                              footer={getSumColumn("thanh_tien")}
-                              footerStyle={{ fontWeight: "bold" }}
-                          filter showFilterMenu={false} filterMatchMode="contains" />
+                            footer={getSumColumn("thanh_tien")}
+                            footerStyle={{ fontWeight: "bold" }}
+                            filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="so_cont" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="customer_vehicle_type" header="Loại xe KH" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplier_vehicle_type" header="Loại xe NCC" filter showFilterMenu={false} filterMatchMode="contains" />

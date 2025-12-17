@@ -245,7 +245,7 @@ export default function ListReceiptThu() {
                                 <Column
                                 header="Thao tác"
                                 body={(row: any) => {
-                                      if(row.type_receipt !== 3){
+                                     if (![3, 10].includes(row.type_receipt)) {
                                           return ActionBody(
                                               row,
                                               null,
@@ -279,7 +279,7 @@ export default function ListReceiptThu() {
                                 <Column field="stk" header="STK" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column field="chutk" header="Tên tài khoản" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column field="nganhang" header="Ngân hàng" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                                <Column field="note" header="Ghi chú" />
+                                <Column field="note" header="Ghi chú" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column field="nguoitao" header="Người cập nhật" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
                             </DataTableClient>

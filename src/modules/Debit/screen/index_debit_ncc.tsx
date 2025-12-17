@@ -151,6 +151,7 @@ export default function ListDebitNCC() {
   const [noDebitfilters, setNoDebitfilters] = useState({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  dispatch_code: { value: null, matchMode: FilterMatchMode.CONTAINS },
   customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
   customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
   supplierName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -160,6 +161,7 @@ export default function ListDebitNCC() {
   const [filters, setFilters] = useState({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  dispatch_code: { value: null, matchMode: FilterMatchMode.CONTAINS },
   customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
   customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
   supplierName: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -245,10 +247,12 @@ export default function ListDebitNCC() {
         const _fileContract = contractFile.find((x: any) => x.id === row.file_info_id);
         const _customer = partners.find((x: any) => x.id === row.customer_detail_id);
         const _supplier = partners.find((x: any) => x.id === row.supplier_detail_id);
-        const thanh_tien = Math.round(row.purchase_price * (1 + row.purchase_vat / 100));
+        const total_purchase = row.purchase_price + row.purchase_com;
+        const thanh_tien = Math.round(total_purchase * (1 + row.purchase_vat / 100));
         return {
           ...row,
           purchase_price: Helper.formatCurrency(row.purchase_price?.toString() || "0"),
+          purchase_com: Helper.formatCurrency(row.purchase_com?.toString() || "0"),
           file_number : _fileContract?.file_number || "không file",
           so_cont : _fileContract?.container_code,
           customerName:_customer?.partners?.name || "",
@@ -355,6 +359,11 @@ export default function ListDebitNCC() {
                           <Column field="customer_vehicle_type" header="Loại xe KH" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplier_vehicle_type" header="Loại xe NCC" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="purchase_com" header="Mua Com"
+                            body={(row: any) => Helper.formatCurrency(row.purchase_com?.toString()||"0")}
+                            footer={getSumColumnNoDebit("purchase_com")}
+                            footerStyle={{ fontWeight: "bold" }}
+                           filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="purchase_price" header="Cước mua"
                            body={(row: any) => Helper.formatCurrency(row.purchase_price.toString())}
                             footer={getSumColumnNoDebit("purchase_price")}
@@ -477,6 +486,10 @@ export default function ListDebitNCC() {
                           <Column field="supplierAbb" header="Tên viết tắt NCC" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="sup_bill" header="Số hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="sup_bill_date" body={(e: any) => DateBody(e.sup_bill_date)} header="Ngày xuất hóa đơn" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="purchase_com" header="Mua Com" 
+                              footer={getSumColumn("purchase_com")}
+                              footerStyle={{ fontWeight: "bold" }}
+                          filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="purchase_price" header="Số tiền" 
                               footer={getSumColumn("purchase_price")}
                               footerStyle={{ fontWeight: "bold" }}

@@ -4,14 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import { Column, DataTable, Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { formOfPayment, listToast, refreshObject } from "utils";
-import { addPhieuThuKH, updateHoanUngGiaoNhan } from "../api";
+import { addPhieuThuKH } from "../api";
 import { useDispatch } from "react-redux";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { Dropdown, Input } from "components/common/ListForm";
 import { useListEmployeeWithState } from "modules/employee/service";
-import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
+import { useListBankWithState, useListFundCategoryWithState } from "modules/categories/service";
 export default function UpdatePhieuThuKH({debits, onClose}: {debits: any, onClose: () => void }) {
   const amount = debits.reduce((sum: number, item: any) => {
                   const conlai = (item.conlai_dv || 0) + (item.conlai_ch || 0);
@@ -171,27 +171,29 @@ export default function UpdatePhieuThuKH({debits, onClose}: {debits: any, onClos
                             <Column field="name" header="Nội dung"/>
                             <Column  header="Dịch vụ" 
                             body={(row: any) =>{
-                              if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){ // dịch vụ
-                                  // Chuyển price về số thực, giữ decimal
+                              if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 || row.type === 8){ // dịch vụ
                                   const price = typeof row.price === "string"
                                     ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
                                     : Number(row.price) || 0;
+                                  const price_com = typeof row.price_com === "string"
+                                    ? parseFloat(row.price_com.replace(/[^0-9.]/g, "")) || 0
+                                    : Number(row.price_com) || 0;
                                   const vat = Number(row.vat) || 0;
-                                  // Tính thành tiền
-                                  const thanh_tien = Math.round(price * (1 + vat / 100));
+                                  const total_price = price + price_com
+                                  const thanh_tien = Math.round(total_price * (1 + vat / 100));
                                   return Helper.formatCurrency(thanh_tien.toString());
                               }
                             }}/>
                             <Column  header="Chi hộ" 
                              body={(row: any) =>{
                               if(row.type === 2 || row.type === 3 || row.type === 6){
-                                  // Chuyển price về số thực, giữ decimal
                                   const price = typeof row.price === "string"
                                     ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
                                     : Number(row.price) || 0;
+                                  const price_com = 0;
                                   const vat = Number(row.vat) || 0;
-                                  // Tính thành tiền
-                                  const thanh_tien = Math.round(price * (1 + vat / 100));
+                                  const total_price = price + price_com
+                                  const thanh_tien = Math.round(total_price * (1 + vat / 100));
                                   return Helper.formatCurrency(thanh_tien.toString());
                               }
                             }}/>

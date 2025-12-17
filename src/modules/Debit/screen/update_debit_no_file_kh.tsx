@@ -10,6 +10,7 @@ import { Helper } from "utils/helper";
 import { MyCalendar } from "components/common/MyCalendar";
 import { classNames } from "primereact/utils";
 import { confirmDebitNoFileDispatchKH } from "../api";
+import { Input } from "components/common/ListForm";
 export default function UpdateDebitNoFileKH({ debits, onClose}: { debits: any, onClose: () => void }) {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
@@ -88,7 +89,7 @@ export default function UpdateDebitNoFileKH({ debits, onClose}: { debits: any, o
                         const vatValue = Number(e.value) || 0;
 
                           const updated = debitRows.map(row => {
-                            const total = (row.qty ?? 0) * (row.price ?? 0);
+                            const total = (row.price ?? 0) + (row.price_com ?? 0);
                             const totalWithVat = Math.round(total + total * vatValue / 100);
 
                             return {
@@ -115,6 +116,54 @@ export default function UpdateDebitNoFileKH({ debits, onClose}: { debits: any, o
                         <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="dispatch_code" header="Mã điều xe" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="vehicle_number" header="Biển số" />
+                        <Column header="Mua com"
+                          body={(_: any, opt: any) => {
+                            const row = debitRows[opt.rowIndex];
+                            return (
+                              <Input
+                                className="w-full input-sm"
+                                id={`purchase-com-${opt.rowIndex}`}
+                                value={Helper.formatCurrency((row.purchase_com || 0).toString())}
+                                onChange={(e: any) => {
+                                  // Lấy giá trị mới từ Input
+                                  const rawValue = e.target.value.replace(/\D/g, "");
+                                  const numericValue = parseInt(rawValue, 10) || 0;
+                                  const updated = [...debitRows];
+                                  updated[opt.rowIndex] = { 
+                                    ...row, 
+                                    purchase_com: numericValue,
+                                  };
+                                  setDebitRows(updated);
+                                }}
+                                label=""
+                              />
+                            );
+                          }}
+                         filter showFilterMenu={false} filterMatchMode="contains" />
+                         <Column header="Bán com"
+                          body={(_: any, opt: any) => {
+                            const row = debitRows[opt.rowIndex];
+                            return (
+                              <Input
+                                className="w-full input-sm"
+                                id={`price-com-${opt.rowIndex}`}
+                                value={Helper.formatCurrency((row.price_com || 0).toString())}
+                                onChange={(e: any) => {
+                                  // Lấy giá trị mới từ Input
+                                  const rawValue = e.target.value.replace(/\D/g, "");
+                                  const numericValue = parseInt(rawValue, 10) || 0;
+                                  const updated = [...debitRows];
+                                  updated[opt.rowIndex] = { 
+                                    ...row, 
+                                    price_com: numericValue,
+                                  };
+                                  setDebitRows(updated);
+                                }}
+                                label=""
+                              />
+                            );
+                          }}
+                         filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="price" header="Số tiền"
                           body={(row: any) => Helper.formatCurrency(row.price?.toString() || "0")}
                           footer={Helper.formatCurrency(
@@ -144,11 +193,13 @@ export default function UpdateDebitNoFileKH({ debits, onClose}: { debits: any, o
                                             typeof row.price === "string"
                                               ? parseInt(row.price.replace(/\D/g, ""), 10) || 0
                                               : Number(row.price) || 0;
-                                          // ✅ Nếu có quantity thì nhân thêm, mặc định là 1
-                                          const qty = Number(row.quantity) || 1;
+                                          const priceCom =
+                                            typeof row.price_com === "string"
+                                              ? parseInt(row.price_com.replace(/\D/g, ""), 10) || 0
+                                              : Number(row.price_com) || 0;
                                           // ✅ Tính thành tiền (price * qty * (1 + vat/100))
-                                          const thanh_tien = Math.round(rawPrice * qty * (1 + vatValue / 100));
-                                          
+                                          const total_price = rawPrice + priceCom
+                                          const thanh_tien = Math.round(total_price * (1 + vatValue / 100));
                                           updated[opt.rowIndex] = {
                                             ...row,
                                             vat: vatValue,
@@ -165,14 +216,21 @@ export default function UpdateDebitNoFileKH({ debits, onClose}: { debits: any, o
                           field="thanh_tien"
                           header="Thành tiền"
                           body={(_: any, opt: any) => {
-                            const row = debitRows[opt.rowIndex];
-                            // Chuyển price về số thực, giữ decimal
-                            const price = typeof row.price === "string"
-                              ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
-                              : Number(row.price) || 0;
-                            const vat = Number(row.vat) || 0;
-                            // Tính thành tiền
-                            const thanh_tien = Math.round(price * (1 + vat / 100));
+                            const updated = [...debitRows];
+                            const row = { ...updated[opt.rowIndex] };
+                            const vatValue = Number(row.vat) || 0;
+                            // ✅ Chuyển price về số nguyên, loại bỏ ký tự không phải số
+                            const rawPrice =
+                              typeof row.price === "string"
+                                ? parseInt(row.price.replace(/\D/g, ""), 10) || 0
+                                : Number(row.price) || 0;
+                            const priceCom =
+                              typeof row.price_com === "string"
+                                ? parseInt(row.price_com.replace(/\D/g, ""), 10) || 0
+                                : Number(row.price_com) || 0;
+                            // ✅ Tính thành tiền (price * qty * (1 + vat/100))
+                            const total_price = rawPrice + priceCom
+                            const thanh_tien = Math.round(total_price * (1 + vatValue / 100));
                             // ✅ Cập nhật luôn vào state
                             if (row.thanh_tien !== thanh_tien) {
                               const updated = [...debitRows];
@@ -187,15 +245,19 @@ export default function UpdateDebitNoFileKH({ debits, onClose}: { debits: any, o
                                 const price = typeof item.price === "string"
                                   ? parseFloat(item.price.replace(/[^0-9.]/g, "")) || 0
                                   : Number(item.price) || 0;
+                                const price_com = typeof item.price_com === "string"
+                                  ? parseFloat(item.price_com.replace(/[^0-9.]/g, "")) || 0
+                                  : Number(item.price_com) || 0;
 
                                 const vat = Number(item.vat) || 0;
-                                return Math.round(sum + price * (1 + vat / 100));
+                                const total_price = price + price_com
+                                return Math.round(sum + total_price * (1 + vat / 100));
                               }, 0)
                               .toString()
                           )}
                           footerStyle={{ fontWeight: "bold" }}
                         />
-                        <Column header="Phí com" filter showFilterMenu={false} filterMatchMode="contains" />
+                        
                         <Column field="supplierAbb" header="Nhà cung cấp" filter showFilterMenu={false} filterMatchMode="contains" />
                         </DataTable>
                   </div>

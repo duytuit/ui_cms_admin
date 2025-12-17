@@ -54,7 +54,7 @@ export default function ListReceiptChi() {
     lydochi: { value: null, matchMode: FilterMatchMode.CONTAINS },
     bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
     total_amount: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    vat_rate: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    tendoituong: { value: null, matchMode: FilterMatchMode.CONTAINS },
     total_with_vat: { value: null, matchMode: FilterMatchMode.CONTAINS },
     tenquy: { value: null, matchMode: FilterMatchMode.CONTAINS },
     hinhthuc: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -63,6 +63,7 @@ export default function ListReceiptChi() {
     nganhang: { value: null, matchMode: FilterMatchMode.CONTAINS },
     note: { value: null, matchMode: FilterMatchMode.CONTAINS },
     nguoitao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    typeDoiTuong: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
@@ -99,6 +100,7 @@ export default function ListReceiptChi() {
                         const _nguoitao = employees.find((x: any) => x.user_id === row.created_by);
                         const _sofile = ContractFile.find((x: any) => x.id === row.file_info_id);
                         const _typeReceipt = typeReceipt.find((x: any) => x.typeReceipt === row.type_receipt);
+                         const _typeDoiTuong = TypeDoiTuong.find((x:any) => x.value === row.object)?.name || "NV"
                         let tendoituong='';
 
                         if(row.object === 0 || row.object === 1){ //khách hàng,ncc
@@ -127,6 +129,7 @@ export default function ListReceiptChi() {
                             amount: Helper.formatCurrency(row.amount.toString()),
                             total: Helper.formatCurrency(row.total.toString()),
                             typeReceipt: _typeReceipt?.name || "",
+                            typeDoiTuong: _typeDoiTuong,
                         };
                      });
         setDisplayData(mapped);
@@ -205,9 +208,7 @@ export default function ListReceiptChi() {
                     filterMatchMode="contains"
                 />
                 <Column field="sofile" header="Số file" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column header="Đối tượng"
-                  body={(row: any) => TypeDoiTuong.find((x:any) => x.value === row.object)?.name || "NV"} 
-                 filter showFilterMenu={false}  filterMatchMode="contains"/>
+                <Column field="typeDoiTuong" header="Đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="tendoituong" header="Tên đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="lydochi" header="Lý do chi" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="bill" header="Số hóa đơn" filter showFilterMenu={false}  filterMatchMode="contains"/>
@@ -225,7 +226,7 @@ export default function ListReceiptChi() {
                 <Column field="stk" header="STK" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="chutk" header="Tên tài khoản" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="nganhang" header="Ngân hàng" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="note" header="Ghi chú" />
+                <Column field="note" header="Ghi chú" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="nguoitao" header="Người cập nhật" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
                

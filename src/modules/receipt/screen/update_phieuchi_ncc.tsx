@@ -172,26 +172,28 @@ export default function UpdatePhieuChiNCC({debits, onClose}: {debits: any, onClo
                             <Column  header="Dịch vụ" 
                             body={(row: any) =>{
                               if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){ // dịch vụ
-                                  // Chuyển price về số thực, giữ decimal
                                   const purchase_price = typeof row.purchase_price === "string"
                                     ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
                                     : Number(row.purchase_price) || 0;
+                                  const purchase_com = typeof row.purchase_com === "string"
+                                    ? parseFloat(row.purchase_com.replace(/[^0-9.]/g, "")) || 0
+                                    : Number(row.purchase_com) || 0;
                                   const purchase_vat = Number(row.purchase_vat) || 0;
-                                  // Tính thành tiền
-                                  const thanh_tien = Math.round(purchase_price * (1 + purchase_vat / 100));
+                                  const total_purchase = purchase_price + purchase_com;
+                                  const thanh_tien = Math.round(total_purchase * (1 + purchase_vat / 100));
                                   return Helper.formatCurrency(thanh_tien.toString());
                               }
                             }}/>
                             <Column  header="Chi hộ" 
                              body={(row: any) =>{
                               if(row.type === 2 || row.type === 3 || row.type === 6){
-                                  // Chuyển price về số thực, giữ decimal
                                   const purchase_price = typeof row.purchase_price === "string"
                                     ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
                                     : Number(row.purchase_price) || 0;
+                                  const purchase_com = 0;
                                   const purchase_vat = Number(row.purchase_vat) || 0;
-                                  // Tính thành tiền
-                                  const thanh_tien = Math.round(purchase_price * (1 + purchase_vat / 100));
+                                  const total_purchase = purchase_price + purchase_com;
+                                  const thanh_tien = Math.round(total_purchase * (1 + purchase_vat / 100));
                                   return Helper.formatCurrency(thanh_tien.toString());
                               }
                             }}/>

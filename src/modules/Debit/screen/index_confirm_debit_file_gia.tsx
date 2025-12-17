@@ -10,10 +10,10 @@ import { Button, Checkbox, DataTable, Dialog, Tag } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { useListContractFileHasFileGia } from "modules/ContractFile/service";
-import UpdateFileGia from "./update_debit_file_gia";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { typeDebit } from "utils";
+import { statusOptions, typeDebit } from "utils";
 import UpdateConfirmFileGia from "./update_confirm_debit_file_gia";
+import { FilterMatchMode } from "primereact/api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -90,8 +90,6 @@ export default function ListConfirmFileGia() {
     const [selectedFileGiaRows, setSelectedFileGiaRows] = useState<any[]>([]);
     const [displayFileGia, setDisplayFileGia] = useState<any[]>([]);
     const [selectedDetail, setSelectedDetail] = useState<any[]>([]);
-    const [selectedRows, setSelectedRows] = useState<any[]>([]);
-    const [displayData, setDisplayData] = useState<any[]>([]);
     const [selectedId, setSelectedId] = useState<any>();
     const [cfStatusConfirm, setCfStatusConfirm] = useState<any>();
     const [visible, setVisible] = useState(false);
@@ -105,9 +103,20 @@ export default function ListConfirmFileGia() {
       keyword: "",
       EmployeeId:employeeInfo?.id
     });
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        sales: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        container_code: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        declaration: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        debit_cus_bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        cf_status_confirm: { value: null, matchMode: FilterMatchMode.EQUALS }
+    });
     const { data: listFileGia,loading, refresh:refreshHasFileGia } = useListContractFileHasFileGia({ params: {...paramsPaginator,},debounce: 500,});
     const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
-    const { data: listUser } = useListUserWithState({});
     const { data: listEmployee } = useListEmployeeWithState({});
     const openDialogAdd = (id:number,cf_status_confirm:any) => {
         setSelectedId(id);
@@ -181,6 +190,8 @@ export default function ListConfirmFileGia() {
                                   setRows(e.rows);
                                 }}
                                 loading={loading}
+                                filters={filters}
+                                onFilter={(e:any) => setFilters(e.filters)}
                                 dataKey="id"
                                 title="Tài khoản"
                                 filterDisplay="row"
@@ -231,13 +242,30 @@ export default function ListConfirmFileGia() {
                                         return <Button icon="pi pi-eye" rounded outlined className="mr-2"  onClick={() =>  openDialogAdd(row.id,row.cf_status_confirm)} />
                                       }}
                                   />
-                                  <Column header="Trạng thái" body={(row: any) => {
-                                    if(row.cf_status_confirm == 1){
-                                      return <Button label="đã duyệt" rounded severity="success" size="small" text  />
-                                    }else{
-                                      return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
-                                    }
-                                  }} filter showFilterMenu={false} filterMatchMode="contains" />
+                                  <Column
+                                    field="cf_status_confirm"
+                                    header="Trạng thái"
+                                    body={(row: any) => (
+                                        row.cf_status_confirm === 1 ? (
+                                             <Button label="Đã duyệt" rounded severity="success" size="small" text />
+                                        ) : (
+                                            <Button label="Chưa duyệt" rounded severity="warning" size="small" text />
+                                        )
+                                    )}
+                                    filter
+                                    filterElement={(options:any) => (
+                                        <Dropdown
+                                            value={options.value}
+                                            options={statusOptions}
+                                            onChange={(e:any) => {
+                                              options.filterApplyCallback(e.value)
+                                            }}
+                                            placeholder="Chọn trạng thái"
+                                            className="p-column-filter"
+                                            showClear
+                                        />
+                                    )}
+                                    showFilterMenu={false}  style={{ width:"180px" }}/>
                                   <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                   <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                   <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />

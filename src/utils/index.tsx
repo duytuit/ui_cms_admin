@@ -269,6 +269,10 @@ export const typeReceipt = [
      typeReceipt:8,
      name:"Chi Nội Bộ"
    },
+   {
+     typeReceipt:10,
+     name:"Chuyển tiền nội bộ"
+   },
 ];
 export const VatDebit = [
    {
@@ -316,3 +320,7 @@ export const formOfPayment = [
 //   0: "Chi phí hải quan",
 //   1: "Chi phí chi hộ"
 // };
+export const statusOptions = [
+  { label: 'Đã duyệt', value: 1 },
+  { label: 'Chưa duyệt', value: 0 }
+];

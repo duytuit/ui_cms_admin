@@ -4,7 +4,7 @@ import { Calendar, CalendarY, Dropdown, GridForm, Input } from "components/commo
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
-import { loaiToKhai, typeDebit } from "utils";
+import { loaiToKhai, statusOptions, typeDebit } from "utils";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
 import { Button, Checkbox, DataTable, Dialog } from "components/uiCore";
@@ -19,6 +19,7 @@ import UpdateConfirmService from "./update_confirm_service";
 import { log } from "console";
 import { showWithDebitContractFile } from "modules/ContractFile/api";
 import UpdateConfirmManagerService from "./update_confirm_manager_service";
+import { FilterMatchMode } from "primereact/api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator, selected ,refreshHasDebitDispatch}: any) => {
@@ -121,8 +122,6 @@ export default function ListConfirmContractFileBangKe() {
     const [displayDebitServiceData, setDisplayDebitServiceData] = useState<any[]>([]);
     const [selectedDetail, setSelectedDetail] = useState<any[]>([]);
     const [selectedDebits, setSelectedDebits] = useState<any[]>([]);
-    const [selectedId, setSelectedId] = useState<any>();
-    const [price, setPrice] = useState(0);
     const [visible, setVisible] = useState(false);
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
@@ -132,6 +131,18 @@ export default function ListConfirmContractFileBangKe() {
       first: 0,
       render: false,
       keyword: "",
+    });
+    const [filters, setFilters] = useState({
+        global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        sales: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        container_code: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        declaration: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        debit_cus_bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        cf_status_confirm: { value: null, matchMode: FilterMatchMode.EQUALS }
     });
     const { data: debitService, loading, refresh:refreshHasDebitDispatch } = useListContractFileHasDebitService({ params: {...paramsPaginator,},debounce: 500,});
     const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
@@ -224,6 +235,8 @@ export default function ListConfirmContractFileBangKe() {
                                         dataKey="id"
                                         title="Tài khoản"
                                         filterDisplay="row"
+                                        filters={filters}
+                                        onFilter={(e:any) => setFilters(e.filters)}
                                         className={classNames("Custom-DataTableClient")}
                                         scrollable
                                         scrollHeight="flex"
@@ -235,49 +248,36 @@ export default function ListConfirmContractFileBangKe() {
                                           
                                         }}
                                       >
-                                        {/* <Column
-                                            header={
-                                              <Checkbox
-                                                checked={
-                                                  selectedDebitServiceRows.length === displayDebitServiceData.length &&
-                                                  displayDebitServiceData.length > 0
-                                                }
-                                                onChange={(e: any) => {
-                                                  if (e.checked) setSelectedDebitServiceRows(displayDebitServiceData.map((d) => d.id));
-                                                  else setSelectedDebitServiceRows([]);
-                                                }}
-                                              />
-                                            }
-                                            body={(rowData: any) => (
-                                              <Checkbox
-                                                className="p-checkbox-sm"
-                                                checked={selectedDebitServiceRows.includes(rowData.id)}
-                                                onChange={(e: any) => {
-                                                  if (e.checked)
-                                                    setSelectedDebitServiceRows((prev) => [...prev, rowData.id]);
-                                                  else
-                                                    setSelectedDebitServiceRows((prev) =>
-                                                      prev.filter((id) => id !== rowData.id)
-                                                    );
-                                                }}
-                                                onClick={(e: any) => e.stopPropagation()} // ⚡ chặn row click
-                                              />
-                                            )}
-                                            style={{ width: "3em" }}
-                                          /> */}
                                         <Column
                                           header="Thao tác"
                                           body={(row: any) => {
                                               return <Button icon="pi pi-eye" rounded outlined className="mr-2"  onClick={() =>  openDialogAdd(row)} />
                                           }}
                                         />
-                                        <Column header="Trạng thái" body={(row: any) => {
-                                          if(row.cf_status_confirm == 1){
-                                            return <Button label="đã duyệt" rounded severity="success" size="small" text  />
-                                          }else{
-                                            return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
-                                          }
-                                        }} filter showFilterMenu={false} filterMatchMode="contains" />
+                                         <Column
+                                          field="cf_status_confirm"
+                                          header="Trạng thái"
+                                          body={(row: any) => (
+                                              row.cf_status_confirm === 1 ? (
+                                                    <Button label="Đã duyệt" rounded severity="success" size="small" text />
+                                              ) : (
+                                                  <Button label="Chưa duyệt" rounded severity="warning" size="small" text />
+                                              )
+                                          )}
+                                          filter
+                                          filterElement={(options:any) => (
+                                              <Dropdown
+                                                  value={options.value}
+                                                  options={statusOptions}
+                                                  onChange={(e:any) => {
+                                                    options.filterApplyCallback(e.value)
+                                                  }}
+                                                  placeholder="Chọn trạng thái"
+                                                  className="p-column-filter"
+                                                  showClear
+                                              />
+                                          )}
+                                          showFilterMenu={false}  style={{ width:"180px" }}/>
                                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
