@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { GridForm } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
-import { useGetChuyenTienNoiBoAsync } from "../service";
-import { useListEmployeeWithState } from "modules/employee/service";
+import { useGetObjectBaoCaoDoanhThuAsync } from "../service";
 import { Helper } from "utils/helper";
 import { FilterMatchMode } from "primereact/api";
 import { useListCustomerDetailWithState } from "modules/partner/service";
@@ -68,9 +67,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
 export default function ListBaoCaoLoiNhuan() {
     const { handleParamUrl } = useHandleParamUrl();
     const [displayData, setDisplayData] = useState<any>();
-    const [filters, setFilters] = useState({
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    });
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
     const [paramsPaginator, setParamsPaginator] = useState({
@@ -80,29 +76,27 @@ export default function ListBaoCaoLoiNhuan() {
         render: false,
         keyword: "",
     });
-    const { data, loading, error, refresh } = useGetChuyenTienNoiBoAsync({
+    const { data, loading, error, refresh } = useGetObjectBaoCaoDoanhThuAsync({
         params: {...paramsPaginator},
         debounce: 500,
     });
-    const { data: employees } = useListEmployeeWithState({});
     // ✅ Client-side pagination
     useEffect(() => {
-        if (!data) return;
+        if (!data.extra) return;
         handleParamUrl(paramsPaginator);
-        const mapped = (data?.data || []).map((row: any) => {
-                        const receipt_a = row.receipts.find((x:any) => x.income_expense_category_id ===26)
-                        const receipt_b = row.receipts.find((x:any) => x.income_expense_category_id ===27)
-                        const _nguoitao = employees.find((x: any) => x.user_id === row.created_by);
-                        return {
-                            ...row,
-                              price: Helper.formatCurrency(row.price.toString()),
-                           code_receipt_a:receipt_a?.code_receipt,  
-                           code_receipt_b:receipt_b?.code_receipt,
-                          nguoitao: `${_nguoitao?.last_name ?? ""} ${_nguoitao?.first_name ?? ""}`.trim()
-                        };
-                     });
-        setDisplayData(mapped);
-    }, [employees,first, rows, data, paramsPaginator]);
+        const dt_hasfile_results = data.extra.dt_hasfile_results[0].total_price || 0;
+        const dt_nofile_results = data.extra.dt_nofile_results[0].total_price|| 0;
+        const cp_hasfile_results = data.extra.cp_hasfile_results[0].total_purchase_price|| 0;
+        const cp_nofile_results = data.extra.cp_nofile_results[0].total_purchase_price|| 0;
+        const cp_kinhdoanh = data.extra.cp_kinhdoanh[0].amount|| 0;
+        const doanhthu_khac = data.extra.doanhthu_khac[0].amount|| 0;
+        const loinhuantruocthue = dt_hasfile_results+dt_nofile_results+doanhthu_khac-cp_hasfile_results-cp_nofile_results-cp_kinhdoanh
+        const chiphithueTNDN =loinhuantruocthue > 0 ? (loinhuantruocthue*20)/100 :0;
+        const loinhuansauthue = loinhuantruocthue-chiphithueTNDN
+        setDisplayData({...displayData,dt_hasfile_results,dt_nofile_results,cp_hasfile_results,cp_nofile_results,cp_kinhdoanh,doanhthu_khac,loinhuantruocthue,chiphithueTNDN,loinhuansauthue})
+        console.log(displayData);
+        
+    }, [first, rows, data, paramsPaginator]);
     return (
       <div className="card">
         <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
@@ -124,42 +118,47 @@ export default function ListBaoCaoLoiNhuan() {
                             <tr>
                                 <td className="border-1 surface-border">1</td>
                                 <td className="border-1 surface-border">Doanh thu từ các lô hàng có lập file</td>
-                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>1000000</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.dt_hasfile_results.toString())}</td>
                             </tr>
                             <tr>
                                 <td className="border-1 surface-border">2</td>
                                 <td className="border-1 surface-border">Doanh thu từ các lô hàng không lập file</td>
-                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>1000000</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.dt_nofile_results.toString())}</td>
+                            </tr>
+                            <tr>
+                                <td className="border-1 surface-border">3</td>
+                                <td className="border-1 surface-border">Doanh thu khác</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.doanhthu_khac.toString())}</td>
                             </tr>
                             <tr>
                                 <td className="border-1 surface-border">3</td>
                                 <td className="border-1 surface-border">Chi phi từ các lô hàng có lập file</td>
-                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>1000000</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.cp_hasfile_results.toString())}</td>
                             </tr>
                             <tr>
                                 <td className="border-1 surface-border">4</td>
                                 <td className="border-1 surface-border">Phi vận chuyển mua ngoài không có file</td>
-                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>1000000</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.cp_nofile_results.toString())}</td>
                             </tr>
                             <tr>
                                 <td className="border-1 surface-border">5</td>
                                 <td className="border-1 surface-border">Phi kinh doanh</td>
-                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>1000000</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.cp_kinhdoanh.toString())}</td>
                             </tr>
                             <tr>
                                 <td className="border-1 surface-border">6</td>
                                 <td className="border-1 surface-border">Lợi nhuận trước thuế</td>
-                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>1000000</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.loinhuantruocthue.toString())}</td>
                             </tr>
                             <tr>
                                 <td className="border-1 surface-border">7</td>
                                 <td className="border-1 surface-border">Chi phi thuế TNDN</td>
-                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>1000000</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.chiphithueTNDN.toString())}</td>
                             </tr>
                             <tr>
                                 <td className="border-1 surface-border">8</td>
                                 <td className="border-1 surface-border">Lợi nhuận sau thuế TNDN</td>
-                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>1000000</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.loinhuansauthue.toString())}</td>
                             </tr>
                         </tbody>
                       </table>

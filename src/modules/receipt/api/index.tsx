@@ -3,6 +3,7 @@ import { getData, postData } from "lib/request";
 export const listReceipt = (params:any) => getData("receipt", params);
 export const listReceiptThu = (params:any) => getData("receipt/phieuthu", params);
 export const listReceiptChi = (params:any) => getData("receipt/phieuchi", params);
+export const GetObjectBaoCaoDoanhThuAsync = (params:any) => getData("Debit/GetObjectBaoCaoDoanhThuAsync", params);
 export const GetSoDuDauKyAsync = (params:any) => getData("receipt/GetSoDuDauKyAsync", params);
 export const GetChuyenTienNoiBoAsync = (params:any) => getData("receipt/GetChuyenTienNoiBoAsync", params);
 export const listReceiptSoQuy = (params:any) => getData("receipt/soquy", params);
