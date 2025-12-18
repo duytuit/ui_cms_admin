@@ -4,7 +4,6 @@ import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { useGetObjectBaoCaoDoanhThuAsync } from "../service";
 import { Helper } from "utils/helper";
-import { FilterMatchMode } from "primereact/api";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Panel } from "components/uiCore";
@@ -82,19 +81,60 @@ export default function ListBaoCaoLoiNhuan() {
     });
     // ✅ Client-side pagination
     useEffect(() => {
-        if (!data.extra) return;
-        handleParamUrl(paramsPaginator);
-        const dt_hasfile_results = data.extra.dt_hasfile_results[0].total_price || 0;
-        const dt_nofile_results = data.extra.dt_nofile_results[0].total_price|| 0;
-        const cp_hasfile_results = data.extra.cp_hasfile_results[0].total_purchase_price|| 0;
-        const cp_nofile_results = data.extra.cp_nofile_results[0].total_purchase_price|| 0;
-        const cp_kinhdoanh = data.extra.cp_kinhdoanh[0].amount|| 0;
-        const doanhthu_khac = data.extra.doanhthu_khac[0].amount|| 0;
-        const loinhuantruocthue = dt_hasfile_results+dt_nofile_results+doanhthu_khac-cp_hasfile_results-cp_nofile_results-cp_kinhdoanh
-        const chiphithueTNDN =loinhuantruocthue > 0 ? (loinhuantruocthue*20)/100 :0;
-        const loinhuansauthue = loinhuantruocthue-chiphithueTNDN
-        setDisplayData({...displayData,dt_hasfile_results,dt_nofile_results,cp_hasfile_results,cp_nofile_results,cp_kinhdoanh,doanhthu_khac,loinhuantruocthue,chiphithueTNDN,loinhuansauthue})
-        console.log(displayData);
+         if (!data?.extra) return;
+
+          handleParamUrl(paramsPaginator);
+
+          const extra = data.extra;
+
+          const roundMoney = (v?: number) => Math.round(v ?? 0);
+
+          const dt_hasfile_results =
+            roundMoney(extra.dt_hasfile_results?.[0]?.total_price);
+
+          const dt_nofile_results =
+            roundMoney(extra.dt_nofile_results?.[0]?.total_price);
+
+          const cp_hasfile_results =
+            roundMoney(extra.cp_hasfile_results?.[0]?.total_purchase_price);
+
+          const cp_nofile_results =
+            roundMoney(extra.cp_nofile_results?.[0]?.total_purchase_price);
+
+          const cp_kinhdoanh =
+            roundMoney(extra.cp_kinhdoanh?.[0]?.amount);
+
+          const doanhthu_khac =
+            roundMoney(extra.doanhthu_khac?.[0]?.amount);
+
+          const loinhuantruocthue = roundMoney(
+            dt_hasfile_results +
+            dt_nofile_results +
+            doanhthu_khac -
+            cp_hasfile_results -
+            cp_nofile_results -
+            cp_kinhdoanh
+          );
+
+          const chiphithueTNDN = roundMoney(
+            loinhuantruocthue > 0 ? loinhuantruocthue * 0.2 : 0
+          );
+
+          const loinhuansauthue = roundMoney(
+            loinhuantruocthue - chiphithueTNDN
+          );
+
+          setDisplayData({
+            dt_hasfile_results,
+            dt_nofile_results,
+            cp_hasfile_results,
+            cp_nofile_results,
+            cp_kinhdoanh,
+            doanhthu_khac,
+            loinhuantruocthue,
+            chiphithueTNDN,
+            loinhuansauthue,
+          });
         
     }, [first, rows, data, paramsPaginator]);
     return (
