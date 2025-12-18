@@ -14,9 +14,9 @@ import { Helper } from "utils/helper";
 import { Dropdown, Input } from "components/common/ListForm";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { useListPartnerDetail } from "modules/partner/service";
-import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
+import { useListBankWithState, useListFundCategoryWithState, useListIncomeWithState } from "modules/categories/service";
 import { DropDownTree } from "components/common/DropDownTree";
-export default function UpdateReceiptChi() {
+export default function UpdateReceiptThu() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [employeeInfo, setEmployeeInfo] = useState<any>({});
@@ -27,8 +27,8 @@ export default function UpdateReceiptChi() {
   const navigate = useNavigate();
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    infos.typeReceipt = 8
-    infos.prefixCode = "PC"
+    infos.typeReceipt = 9;
+    infos.prefixCode = "PT";
     let info = {
       ...infos, amount: parseInt(infos.amount.replace(/\D/g, ""), 10),thanhtien: parseInt(infos.thanhtien.replace(/\D/g, ""), 10), status: infos.status ? 0 : 1,
      data:JSON.stringify(infos)
@@ -47,7 +47,7 @@ export default function UpdateReceiptChi() {
            dispatch(
              showToast({ ...listToast[0], detail: response.data.message })
            );
-           navigate("/receipt/ListReceiptChi");
+           navigate("/receipt/ListReceiptThu");
          } else {
            dispatch(
              showToast({ ...listToast[2], detail: response.data.message })
@@ -66,7 +66,7 @@ export default function UpdateReceiptChi() {
            dispatch(
              showToast({ ...listToast[0], detail: response.data.message })
            );
-           navigate("/receipt/ListReceiptChi");
+           navigate("/receipt/ListReceiptThu");
          } else {
            dispatch(
              showToast({ ...listToast[2], detail: response.data.message })
@@ -86,15 +86,15 @@ export default function UpdateReceiptChi() {
          value: x.id,
        }));
      }, [DMQuy]);
-   const { data: DMExpense } = useListExpenseWithState({type:1,enable:1}); // danh mục chi phí
-   const DMExpenseOptions = useMemo(() => {
-       if (!Array.isArray(DMExpense)) return [];
-       return DMExpense.map((x: any) => ({
+   const { data: DMIncome } = useListIncomeWithState({type:0,enable:1}); // danh mục thu
+   const DMIncomeOptions = useMemo(() => {
+       if (!Array.isArray(DMIncome)) return [];
+       return DMIncome.map((x: any) => ({
          id: x.id,
          name:  x?.name ?? "(không tên)",
          parent_id: x.parent_id,
        }));
-     }, [DMExpense]);
+     }, [DMIncome]);
    const { data: DMBank } = useListBankWithState({type:1});
    const DMBankOptions = useMemo(() => {
        if (!Array.isArray(DMBank)) return [];
@@ -195,10 +195,10 @@ export default function UpdateReceiptChi() {
         className="w-full"
         style={{ margin: "0 auto" }}
         checkId={infos.id}
-        title="phiếu chi"
+        title="phiếu thu"
         loading={loading}
         onSubmit={handleSubmit}
-        routeList="/receipt/ListReceiptChi"
+        routeList="/receipt/ListReceiptThu"
         route={Number(id) ? "/receipt/update" : "/receipt/create"}
       >
         <div className="field">
@@ -287,8 +287,8 @@ export default function UpdateReceiptChi() {
                   <div className="field col-12">
                      <DropDownTree
                       value={infos.incomeExpenseCategoryId}
-                      data={DMExpenseOptions}
-                      label="Lý do chi"
+                      data={DMIncomeOptions}
+                      label="Lý do thu"
                       disableParent={false}
                       className="w-full p-inputtext-sm"
                       onChange={(e: any) =>

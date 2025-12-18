@@ -75,6 +75,7 @@ import ListBaoCaoTienMat from "modules/receipt/screen/baocao/index_tienmat";
 import ListDauKyTaiKhoan from "modules/receipt/screen/index_dauky_taikhoan";
 import UpdateDauKyTaiKhoan from "modules/receipt/screen/update_dauky_taikhoan";
 import ListBaoCaoLoiNhuan from "modules/receipt/screen/index_baocao_loinhuan";
+import UpdateReceiptThu from "modules/receipt/screen/update_thu";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -152,6 +153,8 @@ const publicRoutes = [
   { path: "/receipt/ListReceiptChi", component: ListReceiptChi, layout: 'ListReceiptChi' },
   { path: "/receipt/listChiPhiGiaoNhan", component: ListChiPhiGiaoNhan, layout: 'ListChiPhiGiaoNhan' },
   { path: "/receipt/listViewChiPhiGiaoNhan", component: ListViewChiPhiGiaoNhan, layout: 'ListViewChiPhiGiaoNhan' },
+  { path: "/receipt/UpdateReceiptThu", component: UpdateReceiptThu, layout: 'UpdateReceiptThu' },
+  { path: "/receipt/detail/thu/:id", component: UpdateReceiptThu, layout: 'UpdateReceiptThu' },
   { path: "/receipt/UpdateReceiptChi", component: UpdateReceiptChi, layout: 'UpdateReceiptChi' },
   { path: "/receipt/detail/chi/:id", component: UpdateReceiptChi, layout: 'UpdateReceiptChi' },
   { path: "/receipt/updateReceiptChiNoiBo", component: UpdateReceiptChiNoiBo, layout: 'UpdateReceiptChiNoiBo' },

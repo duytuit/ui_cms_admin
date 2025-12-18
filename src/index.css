@@ -176,3 +176,31 @@ display: none !important;
         margin-right: auto !important;
     }
 }
+/* Thụt lề theo cấp */
+.dropdown-item.level-0 {
+  padding-left: 8px;
+  font-weight: 600;
+}
+
+.dropdown-item.level-1 {
+  padding-left: 28px;
+}
+
+.dropdown-item.level-2 {
+  padding-left: 48px;
+}
+
+/* Node cha */
+.dropdown-item.parent-item {
+  color: #1f2937;
+}
+
+/* Node con */
+.dropdown-item.leaf-item {
+  color: #374151;
+}
+
+/* Disable click node cha (tuỳ chọn) */
+.p-dropdown-item.p-disabled {
+  opacity: 0.6;
+}

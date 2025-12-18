@@ -13,11 +13,13 @@ import * as XLSX from 'xlsx';
 import { FileUpload } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
+import { DropDownTree } from "components/common/DropDownTree";
 export default function UpdateImportExcel() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [infos, setInfos] = useState<any>({ type: CategoryEnum.country });
   const [rows, setRows] = useState([]);
+  const [value, setValue] = useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSelect = (e:any) => {
@@ -75,8 +77,23 @@ export default function UpdateImportExcel() {
             ]
         }
     ];
+    const data = [
+  { id: 1, name: 'Thiết bị điện', parent_id: 0 },
+  { id: 2, name: 'Ổ cắm', parent_id: 1 },
+  { id: 3, name: 'Ổ cắm âm tường', parent_id: 2 },
+  { id: 4, name: 'Công tắc', parent_id: 1 }
+];
+
+
   return (
     <>
+        <DropDownTree
+          data={data}
+          value={value}
+          onChange={(e:any) => setValue(e.value)}
+          label="Danh mục"
+          disableParent={false}
+        />
        <div>
             <h3>Đọc Excel bằng PrimeReact FileUpload</h3>
 

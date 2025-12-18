@@ -147,6 +147,7 @@ export default function ListCreateDispatch() {
       bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
       customer_vehicle_type: { value: null, matchMode: FilterMatchMode.CONTAINS },
       supplier_vehicle_type: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      cf_status_file_confirm: { value: null, matchMode: FilterMatchMode.CONTAINS },
       name: { value: null, matchMode: FilterMatchMode.CONTAINS },
       vehicle_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
       driver: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -191,7 +192,14 @@ export default function ListCreateDispatch() {
       const _supplier = partners.find((x: any) => x.id === row.supplier_detail_id);
       const _driver = employeeOptions.find((x: any) => x.id === row.employee_driver_id);
       console.log("partners",_customer?.partners?.abbreviation);
-      
+      let _cf_status_file_confirm=0
+      if(row.cf_status_confirm == 1 && row.file_info_id !=null){
+        _cf_status_file_confirm = 1
+      }else if(row.cf_status_confirm == 0 && row.file_info_id !=null){
+        _cf_status_file_confirm = 0
+      }else{
+        _cf_status_file_confirm = 2
+      }
       return {
         ...row,
         file_number : _fileContract?.file_number|| "không file",
@@ -204,6 +212,7 @@ export default function ListCreateDispatch() {
         supplierName:_supplier?.partners?.name || "",
         supplierAbb:_supplier?.partners?.abbreviation || "",
         driver : `${_driver?.last_name ?? ""} ${_driver?.first_name ?? ""}`.trim(),
+        cf_status_file_confirm : _cf_status_file_confirm,
       };
     });
     setDisplayData(mapped);
@@ -248,6 +257,11 @@ export default function ListCreateDispatch() {
 
         return Helper.formatCurrency(sum.toString());
     };
+      const statusOptions = [
+      { label: 'Không file', value: 2 },
+      { label: 'Đã duyệt', value: 1 },
+      { label: 'Chưa duyệt', value: 0 }
+    ];
   return (
     <>
       <div className="card">
@@ -416,15 +430,32 @@ export default function ListCreateDispatch() {
                               }}
                               style={{width:"6em"}}
                           />
-                          <Column header="Trạng thái" body={(row: any) => {
-                            if(row.cf_status_confirm == 1 && row.file_info_id !=null){
-                              return <Button label="đã duyệt" rounded severity="success" size="small" text  />
-                            }else if(row.cf_status_confirm == 0 && row.file_info_id !=null){
-                              return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
-                            }else{
-                              return <Button label="không file" rounded severity="success" size="small" text  />
-                            }
-                          }} filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column
+                            field="cf_status_file_confirm"
+                            header="Trạng thái"
+                             body={(row: any) => {
+                              if(row.cf_status_file_confirm === 1){
+                                return <Button label="đã duyệt" rounded severity="success" size="small" text  />
+                              }else if(row.cf_status_file_confirm ===0){
+                                return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
+                              }else{
+                                return <Button label="không file" rounded severity="success" size="small" text  />
+                              }
+                            }}
+                            filter
+                            filterElement={(options:any) => (
+                                <Dropdown
+                                    value={options.value}
+                                    options={statusOptions}
+                                    onChange={(e:any) => {
+                                      options.filterApplyCallback(e.value)
+                                    }}
+                                    placeholder="Chọn trạng thái"
+                                    className="p-column-filter"
+                                    showClear
+                                />
+                            )}
+                            showFilterMenu={false}  style={{ width:"180px" }}/>
                           <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="dispatch_code" header="Mã điều xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />

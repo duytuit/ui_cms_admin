@@ -53,6 +53,8 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
       filter={filter}
       setFilter={setFilter}
       className="lg:col-9"
+      add="/receipt/UpdateReceiptThu"
+      addName="Phiếu thu"
     >
       <div className="col-2">
         <Input
@@ -245,16 +247,27 @@ export default function ListReceiptThu() {
                                 <Column
                                 header="Thao tác"
                                 body={(row: any) => {
-                                     if (![3, 10].includes(row.type_receipt)) {
+                                     if ([9].includes(row.type_receipt)) {
                                           return ActionBody(
                                               row,
-                                              null,
+                                              "/receipt/detail/thu",
                                               { route: "/receipt/delete", action: deleteReceipt },
                                               paramsPaginator,
                                               setParamsPaginator
                                           );
+                                      }else{
+                                        if (![3, 10].includes(row.type_receipt)) {
+                                            return ActionBody(
+                                                row,
+                                                null,
+                                                { route: "/receipt/delete", action: deleteReceipt },
+                                                paramsPaginator,
+                                                setParamsPaginator
+                                            );
+                                        }
                                       }
                                     }}
+                                  style={{width:"6em"}}
                                 />
                                 <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column
