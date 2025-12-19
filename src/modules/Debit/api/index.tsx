@@ -36,12 +36,14 @@ export const updateVATDebitFileGia = async (params: any) => await postData("Debi
 export const updateVATDebitNoFile = async (params: any) => await postData("Debit/updateVATDebitNoFile", params);
 export const updateBillCustomerFileGia = async (params: any) => await postData("Debit/updateBillCustomerFileGia", params);
 export const updateBillCustomerFileNoFile = async (params: any) => await postData("Debit/updateBillDebitNoFile", params);
+export const updateDebitBanHangKH = async (params: any) => await postData("Debit/update/banhang", params);
+//===== end ===========
+export const updateDebitDauKyVaMuaBan = async (params: any) => await postData("Debit/update/daukyvamuaban", params);
+// cập nhật debit nhà cung cấp
 export const updateBillDebitNCC = async (params: any) => await postData("Debit/updateBillDebitNCC", params);
-export const updateStatusDebit = async (params: any) => await postData("Debit/update/status", params);
 export const updateDebitNCC = async (params: any) => await postData("Debit/updateDebitNCC", params);
 export const updateDebitMuaHangNCC = async (params: any) => await postData("Debit/update/muahang", params);
-export const updateDebitBanHangKH = async (params: any) => await postData("Debit/update/banhang", params);
-export const updateDebitDauKyVaMuaBan = async (params: any) => await postData("Debit/update/daukyvamuaban", params);
+//===== end ===========
 // confirm debit
 export const confirmFileGia = async (params: any) => await postData("Debit/confirmFileGia", params);
 export const confirmDebitNoFileDispatchKH = async (params: any) => await postData("Debit/confirmDebitNoFileDispatchKH", params);
