@@ -177,6 +177,15 @@ export default function ListReceiptChi() {
                 <Column
                    header="Thao tác"
                    body={(row: any) => {
+                        if(row.type_receipt == 7){
+                            return ActionBody(
+                                row,
+                                null,
+                                { route: "/receipt/delete", action: deleteReceipt },
+                                paramsPaginator,
+                                setParamsPaginator
+                            );
+                        }
                         if(row.type_receipt == 8){
                             return ActionBody(
                                 row,

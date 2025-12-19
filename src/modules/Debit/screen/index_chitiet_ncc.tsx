@@ -141,7 +141,8 @@ export default function ListChiTietNCC() {
       declaration: "",
       dispatch_code: "",
       name: "",
-      file_bill: ""
+      file_bill: "",
+      cont: ""
   });
   const { data, loading, error, refresh } = useListDebitCongNoChiTietNCC({
     params: paramsPaginator,
@@ -173,6 +174,16 @@ export default function ListChiTietNCC() {
          <Input
             value={filters.bill}
             onChange={(e:any) => setFilters({ ...filters, bill: e.target.value })}
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );
+    const contHeader = (
+     <div className="py-1">
+         <Input
+            value={filters.cont}
+            onChange={(e:any) => setFilters({ ...filters, cont: e.target.value })}
             size="small"
             className={classNames("input-sm")}
           />
@@ -227,6 +238,7 @@ const applyFilters = (rows: any[]) => {
             (f.supplierAbb ? row.supplierAbb?.toLowerCase().includes(f.supplierAbb.toLowerCase()) : true) &&
             (f.fileNumber ? row.fileNumber?.toLowerCase().includes(f.fileNumber.toLowerCase()) : true) &&
             (f.bill ? row.bill?.toLowerCase().includes(f.bill.toLowerCase()) : true) &&
+            (f.cont ? row.cont?.toLowerCase().includes(f.cont.toLowerCase()) : true) &&
             (f.declaration ? row.declaration?.toLowerCase().includes(f.declaration.toLowerCase()) : true) &&
             (f.dispatch_code ? row.dispatch_code?.toLowerCase().includes(f.dispatch_code.toLowerCase()) : true) &&
             (f.name ? row.name?.toLowerCase().includes(f.name.toLowerCase()) : true) &&
@@ -272,8 +284,9 @@ useEffect(() => {
             fileNumber: _data?.fileNumber || "không file",
             declaration: _data?.declaration || "",
             dispatch_code: row.type === 1 ? row.dispatch_code : "",
-            bill: _data?.bill || "",
+            bill: row?.sup_bill || "",
             file_bill: _data?.bill || "",
+            cont: _data?.containerCode || "",
             supplierName: sup?.partners?.name || "",
             supplierAbb: sup?.partners?.abbreviation || "",
             userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
@@ -300,7 +313,7 @@ useEffect(() => {
                 <Column rowSpan={2} />
                 <Column header="Ngày hạch toán" rowSpan={2} />
                 <Column header="Nhà cung cấp" headerClassName="my-title-center" rowSpan={2} />
-                <Column header="Chứng từ" headerClassName="my-title-center" colSpan={6} />
+                <Column header="Chứng từ" headerClassName="my-title-center" colSpan={7} />
                 <Column header="Nợ" headerClassName="my-title-center" colSpan={2} />
                 <Column header="Đã thu" headerClassName="my-title-center" colSpan={2} />
                 <Column frozen alignFrozen="right" className="font-bold"  header="Còn lại" headerClassName="my-title-center" colSpan={3} />
@@ -309,6 +322,7 @@ useEffect(() => {
             <Row>
                 <Column header="Số file"/>
                 <Column header="Số bill"/>
+                <Column header="Số cont"/>
                 <Column header="Số tờ khai"/>
                 <Column header="Mã điều xe"/>
                 <Column style={{width: "250px"}} header="Nội dung"/>
@@ -329,11 +343,12 @@ useEffect(() => {
                 <Column />
                 <Column header={supplierAbbHeader}/>
                 <Column header={fileNumberHeader}/>
-                <Column header={billHeader}/>
+                <Column header={fileBillHeader}/>
+                <Column header={contHeader}/>
                 <Column header={declarationHeader}/>
                 <Column header={dispatchCodeHeader}/>
                 <Column header={nameHeader}/>
-                <Column header={fileBillHeader}/>
+                <Column header={billHeader}/>
                 <Column />
                 <Column />
                 <Column />
@@ -382,11 +397,12 @@ useEffect(() => {
           <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="supplierAbb" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="fileNumber" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="bill" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="file_bill" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="cont" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="declaration" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="dispatch_code" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="name" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="file_bill" filter showFilterMenu={false} filterMatchMode="contains" />
+          <Column field="bill" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column // dịch vụ
             body={(row: any) =>{
               return Helper.formatCurrency(row.thanhtien_dv.toString());

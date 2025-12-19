@@ -54,17 +54,18 @@ export default function UpdateContractFile() {
       .then(res => {
         const detail = res.data.data;
         if (detail) {
-           const _employeeIds = detail.fileInfoDetails.map((x:any)=> { return x.employeeId} )
-           detail.employeeIds = _employeeIds
+          const _employeeIds = detail.fileInfoDetails.map((x:any)=> { return x.employeeId} )
+          detail.employeeIds = _employeeIds   
           setInfos({
             ...detail,
             status: detail.status === 0 ? true : false,
+            checkDebit:detail.debits.length >0?true:false
           });
         }
       })
     .finally(() => setLoading(false));
 
-  }, []);
+  }, [id]);
 
   // ===== SUBMIT =====
   const handleSubmit = (e: any) => {
@@ -171,6 +172,7 @@ export default function UpdateContractFile() {
                   label="Khách hàng"
                   className="w-full"
                   required
+                  disabled={infos.checkDebit}
                 />
               </div>
                <div className="field col-3">
@@ -307,6 +309,7 @@ export default function UpdateContractFile() {
                   filter
                   label="Tên giao nhận"
                   className="w-full"
+                   disabled={infos.checkDebit}
                 />
               </div>
               <div className="field col-12">

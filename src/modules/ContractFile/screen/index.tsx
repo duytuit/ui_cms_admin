@@ -256,7 +256,25 @@ export default function ListContractFile() {
             )}
             style={{ width: "3em" }}
           />
-          <Column header="Thao tác" body={(e: any) => ActionBody(e, "/ContractFile/detail", { route: "/ContractFile/delete", action: deleteContractFile }, paramsPaginator, setParamsPaginator)} style={{ width: "6em" }} />
+          <Column header="Thao tác" body={(e: any) => {
+            if (e.debits == null) {
+              return ActionBody(
+                    e,
+                    "/ContractFile/detail",
+                    { route: "/ContractFile/delete", action: deleteContractFile },
+                    paramsPaginator,
+                    setParamsPaginator
+                );
+            } else {
+               return ActionBody(
+                    e,
+                    "/ContractFile/detail",
+                    null,
+                    paramsPaginator,
+                    setParamsPaginator
+                );
+            }
+          }} style={{ width: "6em" }} />
           <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
           <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />

@@ -248,6 +248,7 @@ export default function ListReceiptThu() {
                                 header="Thao tác"
                                 body={(row: any) => {
                                      if ([9].includes(row.type_receipt)) {
+                                         // 9: thu khác có thể sửa được
                                           return ActionBody(
                                               row,
                                               "/receipt/detail/thu",
@@ -257,6 +258,8 @@ export default function ListReceiptThu() {
                                           );
                                       }else{
                                         if (![3, 10].includes(row.type_receipt)) {
+                                            // 3: thu hoàn ứng giao nhận
+                                            // 10: chuyển tiền nội bộ
                                             return ActionBody(
                                                 row,
                                                 null,
