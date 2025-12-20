@@ -9,7 +9,7 @@ import { Button, Column, DataTable, Dialog, Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { classNames } from "primereact/utils";
-import { showWithDebitContractFile } from "modules/ContractFile/api";
+import { ShowWithDebitConfirmAsync, showWithDebitContractFile } from "modules/ContractFile/api";
 import { useListPartnerDetail, useListSupplierDetailWithState } from "modules/partner/service";
 import { useListServiceCategoryWithState } from "modules/categories/service";
 import { updateDebitFileGia, updateVATDebitFileGia } from "../api";
@@ -82,7 +82,7 @@ export default function UpdateVATFileGia({ id, onClose }: { id: any; onClose: ()
     try {
       setLoading(true);
 
-      const res = await showWithDebitContractFile({ id });
+      const res = await ShowWithDebitConfirmAsync({ id });
       const detail = res.data.data;
       if (!detail) return;
 

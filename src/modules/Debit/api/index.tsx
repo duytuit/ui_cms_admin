@@ -37,9 +37,10 @@ export const updateVATDebitNoFile = async (params: any) => await postData("Debit
 export const updateBillCustomerFileGia = async (params: any) => await postData("Debit/updateBillCustomerFileGia", params);
 export const updateBillCustomerFileNoFile = async (params: any) => await postData("Debit/updateBillDebitNoFile", params);
 export const updateDebitBanHangKH = async (params: any) => await postData("Debit/update/banhang", params);
+export const updateDebitDauKyKH = async (params: any) => await postData("Debit/update/daukykh", params);
 //===== end ===========
-export const updateDebitDauKyVaMuaBan = async (params: any) => await postData("Debit/update/daukyvamuaban", params);
 // cập nhật debit nhà cung cấp
+export const updateDebitDauKyNCC = async (params: any) => await postData("Debit/update/daukyncc", params);
 export const updateBillDebitNCC = async (params: any) => await postData("Debit/updateBillDebitNCC", params);
 export const updateDebitNCC = async (params: any) => await postData("Debit/updateDebitNCC", params);
 export const updateDebitMuaHangNCC = async (params: any) => await postData("Debit/update/muahang", params);

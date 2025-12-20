@@ -11,7 +11,7 @@ import { Helper } from "utils/helper";
 import { Dropdown, Input } from "components/common/ListForm";
 import { useListPartnerDetail } from "modules/partner/service";
 import { listToast, refreshObject, TypeDebitDKNCC } from "utils";
-import { addDebitDauKyKH, addDebitDauKyNCC, showDebit, updateDebitDauKyVaMuaBan } from "../api";
+import { addDebitDauKyKH, addDebitDauKyNCC, showDebit, updateDebitDauKyNCC } from "../api";
 export default function UpdateDauKyNCC() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
@@ -39,7 +39,7 @@ export default function UpdateDauKyNCC() {
   async function fetchDataSubmit(info: any) {
    
      if (info.id) {
-         const response = await updateDebitDauKyVaMuaBan(info);
+         const response = await updateDebitDauKyNCC(info);
        if (response) setLoading(false);
        if (response.status === 200) {
          if (response.data.status) {

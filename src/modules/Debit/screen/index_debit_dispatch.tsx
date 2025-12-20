@@ -456,7 +456,7 @@ export default function ListCreateDispatch() {
                                 />
                             )}
                             showFilterMenu={false}  style={{ width:"180px" }}/>
-                          <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="service_date" header="Ngày điều xe" body={(e: any) => DateBody(e.service_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="dispatch_code" header="Mã điều xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
