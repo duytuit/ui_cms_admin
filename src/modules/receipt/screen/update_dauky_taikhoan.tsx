@@ -8,9 +8,8 @@ import { useDispatch } from "react-redux";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
-import { Dropdown, Input } from "components/common/ListForm";
-import { formOfPayment, listToast, refreshObject, TypeDebitDKKH, VatDebit } from "utils";
-import { addDebitDauKyKH, showDebit, updateDebitDauKyVaMuaBan } from "modules/Debit/api";
+import { Dropdown } from "components/common/ListForm";
+import { formOfPayment, listToast, refreshObject } from "utils";
 import { useListBankWithState, useListExpenseWithState, useListFundCategoryWithState } from "modules/categories/service";
 import { addSodudauky, showReceipt, updateSodudauky } from "../api";
 export default function UpdateDauKyTaiKhoan() {

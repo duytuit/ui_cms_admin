@@ -1,5 +1,5 @@
 
-import { AddForm, InputForm, UpdateForm } from "components/common/AddForm";
+import { InputForm, UpdateForm } from "components/common/AddForm";
 import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, loaiToKhai, refreshObject, typeDebit, VatDebit } from "utils";
@@ -9,10 +9,9 @@ import { Button, Column, DataTable, Dialog, Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { classNames } from "primereact/utils";
-import { ShowWithDebitConfirmAsync, showWithDebitContractFile } from "modules/ContractFile/api";
+import { ShowWithDebitConfirmAsync } from "modules/ContractFile/api";
 import { useListPartnerDetail, useListSupplierDetailWithState } from "modules/partner/service";
-import { useListServiceCategoryWithState } from "modules/categories/service";
-import { confirmFileGia, updateDebitFileGia } from "../api";
+import { confirmFileGia } from "../api";
 import UpdateConfirmService from "./update_confirm_service";
 export default function UpdateConfirmFileGia({ id, status, onClose }: { id: any, status:any, onClose: () => void }) {
   const [loading, setLoading] = useState(false);
@@ -243,7 +242,6 @@ export default function UpdateConfirmFileGia({ id, status, onClose }: { id: any,
                   header="Giá bán"
                   body={(_: any, opt: any) => {
                     const row = debitDetail[opt.rowIndex];
-                    if (row.type === 0) {
                       return (
                         <Input
                           className="w-full input-sm"
@@ -270,10 +268,7 @@ export default function UpdateConfirmFileGia({ id, status, onClose }: { id: any,
                           }}
                           label=""
                         />
-                      );
-                    } else {
-                      return Helper.formatCurrency(row.price?.toString() || "0");
-                    }
+                      )
                   }}
                   footer={Helper.formatCurrency(
                     debitDetail
@@ -467,7 +462,7 @@ export default function UpdateConfirmFileGia({ id, status, onClose }: { id: any,
                     severity="success"
                     raised
                     onClick={() => {
-                      if (!newDebit.name || !newDebit.price || newDebit.price <= 0 || !newDebit.purchasePrice || newDebit.purchasePrice <= 0)
+                      if (!newDebit.name)
                       return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin chi phí khác" }));
                       // convert price về số khi push
                       const numericpurchasePrice = parseInt(newDebit.purchasePrice.replace(/\D/g, ""), 10);

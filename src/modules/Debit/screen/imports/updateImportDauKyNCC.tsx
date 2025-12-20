@@ -9,7 +9,7 @@ import { CategoryEnum } from "utils/type.enum";
 import * as XLSX from 'xlsx';
 import { FileUpload } from "primereact/fileupload";
 import { addPartner, showPartner } from "modules/partner/api";
-import { updateDebitDauKyVaMuaBan, addDebitDauKyKH, importDebitDauKyKH, importDebitDauKyNCC } from "modules/Debit/api";
+import { addDebitDauKyKH, importDebitDauKyKH, importDebitDauKyNCC } from "modules/Debit/api";
 import { Helper } from "utils/helper";
 import { Button, Column, DataTable } from "components/uiCore";
 export default function UpdateImportDauKyNCC() {
