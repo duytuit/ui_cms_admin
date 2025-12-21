@@ -15,12 +15,12 @@ import { addDebitMuaHangNCC, showDebit, updateDebitMuaHangNCC } from "../api";
 export default function UpdateMuaHang() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
-  const [infos, setInfos] = useState<any>({vat:0,typeDoiTuong:0,accountingDate:Helper.toDayString(),formOfPayment:1 });
+  const [infos, setInfos] = useState<any>({purchaseVat:0,typeDoiTuong:0,accountingDate:Helper.toDayString(),formOfPayment:1 });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    infos.price = Helper.toInt(infos.price)
+    infos.purchasePrice = Helper.toInt(infos.purchasePrice)
     let info = {
       ...infos,
      data:JSON.stringify(infos)
@@ -101,8 +101,8 @@ export default function UpdateMuaHang() {
         showDebit({ id: id }).then(res => {
           const detail = res.data.data
           if (detail) {
-              const thanhtien = Math.round(detail.purchase_price * (1 + detail.purchase_vat / 100));
-               detail.purchase_price = Helper.formatCurrency(detail.purchase_price.toString())
+              const thanhtien = Math.round(detail.purchasePrice * (1 + detail.purchaseVat / 100));
+               detail.purchasePrice = Helper.formatCurrency(detail.purchasePrice.toString())
             let info = {
               ...detail, status: detail.status === 0 ? true : false,thanhtien:Helper.formatCurrency(thanhtien.toString())
             };
@@ -154,13 +154,13 @@ export default function UpdateMuaHang() {
                   </div>
                    <div className="field col-4">
                     <InputForm className="w-full"
-                      id="purchase_price"
-                      value={infos.purchase_price}
+                      id="purchasePrice"
+                      value={infos.purchasePrice}
                       onChange={(e: any) =>
                          {
-                           setInfos({ ...infos, purchase_price: Helper.formatCurrency(e.target.value )})
-                           const thanhtien  = parseInt(e.target.value.replace(/\D/g, ""),10) + ( infos.purchase_vat ? ( parseInt(e.target.value.replace(/\D/g, ""),10) * infos.purchase_vat ) / 100 : 0  );
-                           setInfos({ ...infos, purchase_price: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
+                           setInfos({ ...infos, purchasePrice: Helper.formatCurrency(e.target.value )})
+                           const thanhtien  = parseInt(e.target.value.replace(/\D/g, ""),10) + ( infos.purchaseVat ? ( parseInt(e.target.value.replace(/\D/g, ""),10) * infos.purchaseVat ) / 100 : 0  );
+                           setInfos({ ...infos, purchasePrice: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                          }
                       }
                       label="Số tiền"
@@ -169,7 +169,7 @@ export default function UpdateMuaHang() {
                   </div>
                    <div className="field col-4">
                    <Dropdown
-                      value={infos.purchase_vat}
+                      value={infos.purchaseVat}
                       optionValue="vat"
                       optionLabel="name"
                       options={VatDebit}
@@ -177,10 +177,10 @@ export default function UpdateMuaHang() {
                       className="w-full p-inputtext-sm"
                       onChange={(e: any) =>
                           {
-                            const priceStr = String(infos.purchase_price ?? "");
+                            const priceStr = String(infos.purchasePrice ?? "");
                             const numeric = parseInt(priceStr.replace(/\D/g, ""), 10);
                             const thanhtien  = numeric + ( e.value ? ( numeric * e.value ) / 100 : 0  );
-                            setInfos({ ...infos, purchase_vat: e.value, thanhtien : Helper.formatCurrency(thanhtien.toString()) })
+                            setInfos({ ...infos, purchaseVat: e.value, thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                           }
                       }
                       required

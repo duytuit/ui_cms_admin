@@ -141,7 +141,7 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
              const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
              detail.partnerName = partner?.label
              console.log(detail);
-             
+             detail.serviceDate = detail.accountingDate;
           let info = {
             ...detail, status: detail.status === 0 ? true : false,
             loaiToKhai:_loaiToKhai?.name,
@@ -254,9 +254,9 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
             <div className="formgrid grid">
               <div className="field col-4">
                 <MyCalendar dateFormat="dd/mm/yy"
-                  value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
+                  value={Helper.formatDMYLocal(infos.serviceDate ? infos.serviceDate : '')} // truyền nguyên ISO string
                   onChange={(e: any) =>
-                    setInfos({ ...infos, accountingDate: e })}
+                    setInfos({ ...infos, serviceDate: e })}
                   className={classNames("w-full", "p-inputtext", "input-form-sm")} />
               </div>
                <div className="field col-8">
