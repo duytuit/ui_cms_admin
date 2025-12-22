@@ -1,5 +1,5 @@
 
-import { AddForm, AddFormCustom } from "components/common/AddForm";
+import { AddFormCustom } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { Checkbox, Column, DataTable} from "components/uiCore";
@@ -13,12 +13,15 @@ import { Dropdown, GridForm, Input } from "components/common/ListForm";
 import { useGetPartnerKHAndNCCDetail, useListCustomerDetailWithState, useListSupplierDetailWithState } from "modules/partner/service";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useListDebitDoiTruKH, useListDebitDoiTruNCC } from "modules/Debit/service";
-import { DateBody } from "components/common/DataTable";
-const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
+import { DataTableClient, DateBody } from "components/common/DataTable";
+import { MyCalendar } from "components/common/MyCalendar";
+import { FilterMatchMode } from "primereact/api";
+const Header = ({ _setParamsPaginator, _paramsPaginator,_setSelectedRows,_setSelectedNCCRows }: any) => {
   const [filter, setFilter] = useState({
      supplierDetailId: 0,
      customerDetailId: 0,
-     partnerId:0
+     partnerId:0,
+     accountingDate:_paramsPaginator.accountingDate
   });
 
   const { data: parnertDetails } = useGetPartnerKHAndNCCDetail({params:{a:"abc"}});
@@ -34,6 +37,8 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   }, [parnertDetails]);
 
   function getPartnerDetail(partnerId: number) {
+      _setSelectedRows([])
+      _setSelectedNCCRows([])
      const supplier =  supplierDetails.find((x:any)=>x.partner_id == partnerId)
      const customer =  customerDetails.find((x:any)=>x.partner_id == partnerId)
      if(customer && supplier){
@@ -68,6 +73,23 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
           className={classNames("w-full","dropdown-input-sm", "p-dropdown-sm")}
         />
       </div>
+      <div className="col-2">
+          <MyCalendar
+            dateFormat="dd/mm/yy"
+            value={Helper.formatDMYLocal(
+              filter.accountingDate ? filter.accountingDate : ""
+            )} // truyền nguyên ISO string
+            onChange={(e: any) =>
+              setFilter({ ...filter, accountingDate: e })
+            }
+            className={classNames(
+              "w-full",
+              "p-inputtext",
+              "input-form-sm",
+              "calendar-sm"
+            )}
+          />
+      </div>
     </GridForm>
   );
 };
@@ -78,19 +100,36 @@ export default function UpdateDoiTruCongNo() {
   const [selectedNCCRows, setSelectedNCCRows] = useState<any[]>([]);
   const [displayDataKH, setDisplayDataKH] = useState<any>([]);
   const [displayDataNCC, setDisplayDataNCC] = useState<any>([]);
-  const [filterKH, setFilterKH] = useState({});
-  const [filterNCC, setFilterNCC] = useState({});
+  const [filterKH, setFilterKH] = useState({
+     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+     name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+     fileNumber: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
+  const [filterNCC, setFilterNCC] = useState({
+     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+     name: { value: null, matchMode: FilterMatchMode.CONTAINS },
+     fileNumber: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  });
   const [activeSide, setActiveSide] = useState<'KH' | 'NCC' | null>(null);
-  const [paramsPaginator, setParamsPaginator] = useState({supplierDetailId: 0,customerDetailId:0});
-  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,accountingDate:Helper.toDayString(),formOfPayment:1,incomeExpenseCategoryId:15 });
+  const [paramsPaginator, setParamsPaginator] = useState({supplierDetailId: 0,customerDetailId:0,accountingDate:Helper.toDayString()});
+  const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,formOfPayment:1,incomeExpenseCategoryId:15 });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    const sumKH = selectedRows.reduce((s, r) => s + (+r.conlai_tong || 0), 0);
+    const sumNCC = selectedNCCRows.reduce((s, r) => s + (+r.conlai_tong || 0), 0);
+    if(sumKH == 0 || sumNCC == 0 || sumKH !== sumNCC){
+      dispatch(showToast({ ...listToast[2], detail: "Chưa được chọn hoặc bị lệch. Hãy kiểm tra lại"  }));
+      return
+    } 
+    infos.accountingDate = paramsPaginator.accountingDate
+    infos.debitThu = selectedRows
+    infos.debitChi = selectedNCCRows
     let info = {
       ...infos
     };
-
+    console.log(info);
   };
   async function fetchDataSubmit(info: any) {
    
@@ -186,12 +225,18 @@ export default function UpdateDoiTruCongNo() {
     };
   useEffect(() => {
            const mapped = (debitDoiTruKH?.data || []).map((row: any) => {
+                  let _fileNumber='';
+                  if(row.data){
+                      const data = JSON.parse(row.data)
+                      _fileNumber = data?.fileNumber
+                  }
                   const total_price = row.price + row.price_com;
                   const thanh_tien_dv = Math.round(total_price * (1 + row.vat / 100));
                   const thanh_tien_ch = Math.round(row.price * (1 + row.vat / 100));
                   const thanh_tien = thanh_tien_dv;
                 return {
                     ...row,
+                    fileNumber:_fileNumber,
                     thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 || row.type === 8) ? thanh_tien_dv : 0,
                     thanhtien_ch: (row.type === 2 || row.type === 3 || row.type === 6) ? thanh_tien_ch : 0,
                     dathu_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 || row.type === 8) ? row.receipt_total : 0,
@@ -206,12 +251,18 @@ export default function UpdateDoiTruCongNo() {
             });
             setDisplayDataKH(mapped);
             const mappedNCC = (debitDoiTruNCC?.data || []).map((row: any) => {
+                let _fileNumber='';
+                if(row.data){
+                    const data = JSON.parse(row.data)
+                    _fileNumber = data?.fileNumber
+                }
                 const total_purchase = row.purchase_price + row.purchase_com;
                 const thanh_tien_dv = Math.round(total_purchase * (1 + row.purchase_vat / 100));
                 const thanh_tien_ch = Math.round(row.purchase_price * (1 + row.purchase_vat / 100));
                 const thanh_tien = thanh_tien_dv;
                 return {
                     ...row,
+                    fileNumber:_fileNumber,
                     thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien_dv : 0,
                     thanhtien_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien_ch : 0,
                     dathu_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? row.receipt_total : 0,
@@ -237,7 +288,7 @@ export default function UpdateDoiTruCongNo() {
       setDisplayDataKH,
       setDisplayDataNCC
     );
-  }, [selectedRows, selectedNCCRows]);
+  }, [selectedRows,selectedNCCRows]);
 const canBangBuTru = (
   listKH: any[],
   listNCC: any[],
@@ -266,7 +317,7 @@ const canBangBuTru = (
      console.log("sumNCC",sumNCC);
     newKH = newKH.map((kh: any) => {
       if (!selectedKHds.has(kh.id)) return kh;
-      if (tienCon <= 0) return { ...kh, conlai_tong: 0 };
+      if (tienCon <= 0) return { ...kh, conlai_tong: kh.conlai };
       const mucToiDa = Number(kh.conlai_tong) || 0;
       const bu = Math.min(tienCon, mucToiDa);
       tienCon -= bu;
@@ -275,6 +326,12 @@ const canBangBuTru = (
         conlai_tong: bu
       };
     });
+     newNCC = newNCC.map((ncc: any) => {
+       return {
+        ...ncc,
+        conlai_tong: ncc.conlai
+      };
+     })
   }
   if (activeSide === 'NCC') {
   // thì lấy sum tổng các check list của khách hàng hạch toán cho ncc, kh không được tích thì không làm gì
@@ -282,7 +339,7 @@ const canBangBuTru = (
      console.log("sumKH",sumKH);
     newNCC = newNCC.map((ncc: any) => {
       if (!selectedNCCIds.has(ncc.id)) return ncc;
-      if (tienCon <= 0) return { ...ncc, conlai_tong: 0 };
+      if (tienCon <= 0) return { ...ncc, conlai_tong: ncc.conlai };
       const mucToiDa = Number(ncc.conlai_tong) || 0;
       const bu = Math.min(tienCon, mucToiDa);
       tienCon -= bu;
@@ -291,8 +348,13 @@ const canBangBuTru = (
         conlai_tong: bu
       };
     });
+     newKH = newKH.map((kh: any) => {
+       return {
+        ...kh,
+        conlai_tong: kh.conlai
+      };
+     })
   }
-
   // 🔥 CẬP NHẬT STATE
   setKH(newKH);
   setNCC(newNCC);
@@ -307,7 +369,7 @@ const canBangBuTru = (
         title="Đối trừ công nợ"
         loading={loading}
         onSubmit={handleSubmit}
-        routeList="/receipt/ListChuyenTienNoiBo"
+        routeList="/receipt/ListDoiTruCongNo"
         route={Number(id) ? "/receipt/update" : "/receipt/create"}
         AddName="Bù trừ công nợ"
       >
@@ -315,6 +377,8 @@ const canBangBuTru = (
            <Header
           _paramsPaginator={paramsPaginator}
           _setParamsPaginator={setParamsPaginator}
+          _setSelectedRows={setSelectedRows}
+          _setSelectedNCCRows={setSelectedNCCRows}
         />
                <div style={{ height: 'calc(100vh - 8rem)' }}>
                  <Splitter layout="vertical" style={{ height: '100%', width: '100%' }}>
@@ -325,27 +389,21 @@ const canBangBuTru = (
                     >
                       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                          <b>Chứng từ phải thu</b>
-                             <DataTable 
+                             <DataTableClient 
                                 rowHover
                                 scrollable
                                 scrollHeight="flex"
                                 style={{ flex: 1 }}
                                 className={classNames("Custom-DataTableClient")}
                                 value={displayDataKH}
+                                filterDisplay="row"
+                                filters={filterKH}
+                                onFilter={(e:any) => setFilterKH(e.filters)}
                                 >
-                                 <Column 
-                                  header="STT" 
-                                  body={(rowData:any, options:any) => options.rowIndex + 1}
-                                />
                                 <Column field="accounting_date" header="Ngày hạch toán" body={(e: any) => DateBody(e.accounting_date)} />
-                                <Column header="Số file" body={(row: any) => {
-                                      if(row.data){
-                                          const data = JSON.parse(row.data)
-                                          return data?.fileNumber
-                                      }
-                                }} />
+                                <Column field="fileNumber" header="Số file"  filter showFilterMenu={false} filterMatchMode="contains"/>
                                 <Column field="bill_cus" header="Số hóa đơn" />
-                                <Column field="name" header="Nội dung" />
+                                <Column field="name" header="Nội dung" filter showFilterMenu={false} filterMatchMode="contains"/>
                                 <Column field="thanhtien_dv" body={(row: any) =>{
                                   return Helper.formatCurrency(row.thanhtien_dv.toString());
                                 }}  header="Dịch vụ phát sinh" style={{ textAlign: 'right' }}/>
@@ -359,20 +417,6 @@ const canBangBuTru = (
                                   return Helper.formatCurrency(row.conlai_ch_view.toString());
                                 }} header="Chi hộ chưa thu" style={{ textAlign: 'right' }}/>
                                 <Column
-                                header={
-                                  <Checkbox
-                                    checked={
-                                      selectedRows.length === displayDataKH.length &&
-                                      displayDataKH.length > 0
-                                    } 
-                                    onChange={(e: any) => {
-                                      if (e.checked) setSelectedRows([...displayDataKH]); // lưu nguyên object
-                                      else {
-                                        setSelectedRows([]);
-                                      }
-                                    }}
-                                  />
-                                }
                                 body={(rowData: any) => {
                                   const total_price = rowData.price + rowData.price_com;
                                   const thanh_tien = Math.round(total_price * (1 + rowData.vat / 100));
@@ -406,37 +450,17 @@ const canBangBuTru = (
                                 style={{ width: "3em", textAlign: 'center'}}
                               />
                                 <Column field="conlai_tong" 
-                                body={(row:any, options:any) => {
-                                  const isChecked = selectedRows.some(r => r.id === row.id); // check theo id
-                                  if(isChecked){
-                                      return (
-                                        <Input
-                                          className="w-full input-sm"
-                                          value={Helper.formatCurrency(String(row.conlai_tong))}
-                                          onChange={(e: any) => {
-                                            const newValue = parseInt(e.target.value.replace(/\D/g, ""), 10);
-                      
-                                            setDisplayDataKH((prev:any) => {
-                                              // Tạo mảng displayData mới
-                                              const updated = [...prev];
-                                              updated[options.rowIndex] = {
-                                                ...updated[options.rowIndex],
-                                                conlai_tong: newValue
-                                              };
-                      
-                                              return updated;
-                                            });
-                                          }}
-                                        />
-                                    );
-                                  }
-                                 
-                                }}
-                                 header="Số tiền bù trừ" style={{ textAlign: 'right' }} 
-                                 footer={getSumColumnKH("conlai_tong")}
-                                 footerStyle={{ fontWeight: "bold" }}
+                                  body={(row:any, options:any) => {
+                                    const isChecked = selectedRows.some(r => r.id === row.id); // check theo id
+                                    if(isChecked){
+                                        return Helper.formatCurrency(String(row.conlai_tong))
+                                    }
+                                  }}
+                                  header="Số tiền bù trừ" style={{ textAlign: 'right' }} 
+                                  footer={getSumColumnKH("conlai_tong")}
+                                  footerStyle={{ fontWeight: "bold" }}
                                  />
-                            </DataTable>
+                            </DataTableClient>
                       </div>
                     </SplitterPanel>
                     <SplitterPanel
@@ -446,27 +470,21 @@ const canBangBuTru = (
                     >
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                           <b>Chứng từ phải trả</b>
-                            <DataTable 
+                            <DataTableClient 
                                 rowHover
                                 scrollable
                                 scrollHeight="flex"
                                 style={{ flex: 1 }}
                                 value={displayDataNCC}
+                                filters={filterNCC}
+                                filterDisplay="row"
+                                onFilter={(e:any) => setFilterNCC(e.filters)}
                                 className={classNames("Custom-DataTableClient")}
                                 >
-                                  <Column 
-                                  header="STT" 
-                                  body={(rowData:any, options:any) => options.rowIndex + 1}
-                                />
                                 <Column field="accounting_date" header="Ngày hạch toán" body={(e: any) => DateBody(e.accounting_date)} />
-                                <Column header="Số file" body={(row: any) => {
-                                      if(row.data){
-                                          const data = JSON.parse(row.data)
-                                          return data?.fileNumber
-                                      }
-                                }} />
+                                <Column field="fileNumber" header="Số file"  filter showFilterMenu={false} filterMatchMode="contains"/>
                                 <Column field="bill_cus" header="Số hóa đơn" />
-                                <Column field="name" header="Nội dung" />
+                                <Column field="name" header="Nội dung" filter showFilterMenu={false} filterMatchMode="contains"/>
                                 <Column field="thanhtien_dv" body={(row: any) =>{
                                   return Helper.formatCurrency(row.thanhtien_dv.toString());
                                 }}  header="Dịch vụ phát sinh" style={{ textAlign: 'right' }}/>
@@ -480,21 +498,6 @@ const canBangBuTru = (
                                   return Helper.formatCurrency(row.conlai_ch_view.toString());
                                 }} header="Chi hộ chưa thu" style={{ textAlign: 'right' }}/>
                                 <Column
-                                header={
-                                  <Checkbox
-                                    checked={
-                                      selectedNCCRows.length === displayDataNCC.length &&
-                                      displayDataNCC.length > 0
-                                    } 
-                                    onChange={(e: any) => {
-                                      if (e.checked) setSelectedNCCRows([...displayDataNCC]); // lưu nguyên object
-                                      else {
-                                         setSelectedNCCRows([]);
-                                      }
-
-                                    }}
-                                  />
-                                }
                                 body={(rowData: any) => {
                                   const total_purchase = rowData.purchase_price + rowData.purchase_com;
                                   const thanh_tien = Math.round(total_purchase * (1 + rowData.purchase_vat / 100));
@@ -529,36 +532,17 @@ const canBangBuTru = (
                                 style={{ width: "3em", textAlign: 'center'}}
                               />
                                 <Column field="conlai_tong" 
-                                body={(row:any, options:any) => {
-                                  const isChecked = selectedNCCRows.some(r => r.id === row.id); // check theo id
-                                  if(isChecked){
-                                  return (
-                                      <Input
-                                        className="w-full input-sm"
-                                        value={Helper.formatCurrency(String(row.conlai_tong))}
-                                        onChange={(e: any) => {
-                                          const newValue = parseInt(e.target.value.replace(/\D/g, ""), 10);
-                    
-                                          setDisplayDataNCC((prev:any) => {
-                                            // Tạo mảng displayData mới
-                                            const updated = [...prev];
-                                            updated[options.rowIndex] = {
-                                              ...updated[options.rowIndex],
-                                              conlai_tong: newValue
-                                            };
-                    
-                                            return updated;
-                                          });
-                                        }}
-                                      />
-                                  );
-                                }
-                                }}
-                                 header="Số tiền bù trừ" style={{ textAlign: 'right' }} 
-                                 footer={getSumColumnNCC("conlai_tong")}
-                                 footerStyle={{ fontWeight: "bold" }}
-                                 />
-                            </DataTable>
+                                  body={(row:any, options:any) => {
+                                    const isChecked = selectedNCCRows.some(r => r.id === row.id);
+                                    if(isChecked){
+                                      return Helper.formatCurrency(String(row.conlai_tong))
+                                    }
+                                  }}
+                                  header="Số tiền bù trừ" style={{ textAlign: 'right' }} 
+                                  footer={getSumColumnNCC("conlai_tong")}
+                                  footerStyle={{ fontWeight: "bold" }}
+                                />
+                            </DataTableClient>
                         </div>
                     </SplitterPanel>
                  </Splitter>

@@ -144,6 +144,10 @@ display: none !important;
     appearance: none;
     border-radius: 6px;
 }
+.calendar-sm{
+    font-size: 1.2rem !important;
+    padding: 0.14rem 0.35625rem !important;
+}
 .p-dialog .p-dialog-header {
     padding: 0.5rem 1rem;
 }
