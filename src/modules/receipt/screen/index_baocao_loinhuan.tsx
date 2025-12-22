@@ -123,7 +123,10 @@ export default function ListBaoCaoLoiNhuan() {
           const loinhuansauthue = roundMoney(
             loinhuantruocthue - chiphithueTNDN
           );
-
+         //====================================
+         const dt_ch_hasfile_results = roundMoney(extra.dt_ch_hasfile_results?.[0]?.total_price);
+         const cp_ch_hasfile_results = roundMoney(extra.cp_ch_hasfile_results?.[0]?.total_purchase_price);
+         const loinhuanchiho = roundMoney( dt_ch_hasfile_results - cp_ch_hasfile_results );
           setDisplayData({
             dt_hasfile_results,
             dt_nofile_results,
@@ -134,6 +137,9 @@ export default function ListBaoCaoLoiNhuan() {
             loinhuantruocthue,
             chiphithueTNDN,
             loinhuansauthue,
+            dt_ch_hasfile_results,
+            cp_ch_hasfile_results,
+            loinhuanchiho,
           });
         
     }, [first, rows, data, paramsPaginator]);
@@ -199,6 +205,39 @@ export default function ListBaoCaoLoiNhuan() {
                                 <td className="border-1 surface-border">8</td>
                                 <td className="border-1 surface-border">Lợi nhuận sau thuế TNDN</td>
                                 <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.loinhuansauthue.toString())}</td>
+                            </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                  <h3 style={{ textAlign: "center",textTransform: 'uppercase' }}>
+                    Chi hộ
+                </h3>
+                <div className="flex justify-content-center">
+                  <div className="col-6">
+                    <div className="formgrid grid">
+                      <table className="w-full border-1 surface-border border-collapse">
+                        <thead>
+                           <th className="font-bold" style={{width:"80px"}}>STT</th>
+                           <th className="text-center font-bold">Chi tiêu</th>
+                           <th className="text-center font-bold">Số tiền</th>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="border-1 surface-border">1</td>
+                                <td className="border-1 surface-border">Khoản thu từ chi hộ</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.dt_ch_hasfile_results.toString())}</td>
+                            </tr>
+                            <tr>
+                                <td className="border-1 surface-border">2</td>
+                                <td className="border-1 surface-border">Khoản chi từ chi hộ</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.cp_ch_hasfile_results.toString())}</td>
+                            </tr>
+                            <tr>
+                                <td className="border-1 surface-border">3</td>
+                                <td className="border-1 surface-border">Lợi nhuận từ chi hộ</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.loinhuanchiho.toString())}</td>
                             </tr>
                         </tbody>
                       </table>
