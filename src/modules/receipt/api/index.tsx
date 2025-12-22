@@ -30,3 +30,4 @@ export const updateSodudauky = (params:any) => postData("receipt/update/sodudauk
 export const addChuyentiennoibo = (params:any) => postData("receipt/create/chuyentiennoibo", params);
 export const updateChuyentiennoibo = (params:any) => postData("receipt/update/chuyentiennoibo", params);
 export const deleteChuyentiennoibo = (params:any) => postData("receipt/delete/chuyentiennoibo", params);
+export const AddDoiTruCongNo = (params:any) => postData("receipt/create/doitrucongno", params);

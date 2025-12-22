@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Checkbox, Column, DataTable} from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { listToast, refreshObject } from "utils";
-import { addReceiptChiGiaoNhan, updateReceiptChiGiaoNhan } from "../api";
+import { AddDoiTruCongNo, addReceiptChiGiaoNhan, updateReceiptChiGiaoNhan } from "../api";
 import { useDispatch } from "react-redux";
 import { classNames } from "primereact/utils";
 import { Helper } from "utils/helper";
@@ -21,7 +21,8 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,_setSelectedRows,_setSel
      supplierDetailId: 0,
      customerDetailId: 0,
      partnerId:0,
-     accountingDate:_paramsPaginator.accountingDate
+     accountingDate:_paramsPaginator.accountingDate,
+     customerName:""
   });
 
   const { data: parnertDetails } = useGetPartnerKHAndNCCDetail({params:{a:"abc"}});
@@ -42,7 +43,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,_setSelectedRows,_setSel
      const supplier =  supplierDetails.find((x:any)=>x.partner_id == partnerId)
      const customer =  customerDetails.find((x:any)=>x.partner_id == partnerId)
      if(customer && supplier){
-       setFilter({...filter,partnerId:partnerId,supplierDetailId:supplier.id,customerDetailId:customer.id})
+       setFilter({...filter,partnerId:partnerId,supplierDetailId:supplier.id,customerDetailId:customer.id,customerName:customer?.partners?.name})
      }
   }
   useEffect(() => {
@@ -111,7 +112,7 @@ export default function UpdateDoiTruCongNo() {
      fileNumber: { value: null, matchMode: FilterMatchMode.CONTAINS },
   });
   const [activeSide, setActiveSide] = useState<'KH' | 'NCC' | null>(null);
-  const [paramsPaginator, setParamsPaginator] = useState({supplierDetailId: 0,customerDetailId:0,accountingDate:Helper.toDayString()});
+  const [paramsPaginator, setParamsPaginator] = useState({supplierDetailId: 0,customerDetailId:0,customerName:"",accountingDate:Helper.toDayString()});
   const [infos, setInfos] = useState<any>({vat:0,type_doi_tuong:0,formOfPayment:1,incomeExpenseCategoryId:15 });
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -124,54 +125,35 @@ export default function UpdateDoiTruCongNo() {
       return
     } 
     infos.accountingDate = paramsPaginator.accountingDate
-    infos.debitThu = selectedRows
-    infos.debitChi = selectedNCCRows
+    infos.customerDetailId = paramsPaginator.customerDetailId
+    infos.customerName = paramsPaginator.customerName
+    infos.debitThu = JSON.stringify(selectedRows)
+    infos.debitChi = JSON.stringify(selectedNCCRows)
+    infos.Price = sumNCC
     let info = {
       ...infos
     };
-    console.log(info);
+    fetchDataSubmit(info);
   };
   async function fetchDataSubmit(info: any) {
-   
-     if (info.id) {
-         const response = await updateReceiptChiGiaoNhan(info);
-       if (response) setLoading(false);
-       if (response.status === 200) {
-         if (response.data.status) {
-           setInfos({ ...refreshObject(infos), status: true });
-           dispatch(
-             showToast({ ...listToast[0], detail: response.data.message })
-           );
-           navigate("/receipt/ListChuyenTienNoiBo");
-         } else {
-           dispatch(
-             showToast({ ...listToast[2], detail: response.data.message })
-           );
-         }
-       } else
-         dispatch(
-           showToast({ ...listToast[1], detail: response.data.message })
-         );
-     } else {
-       const response = await addReceiptChiGiaoNhan(info);
-       if (response) setLoading(false);
-       if (response.status === 200) {
-         if (response.data.status) {
-           setInfos({ ...refreshObject(infos), status: true });
-           dispatch(
-             showToast({ ...listToast[0], detail: response.data.message })
-           );
-           navigate("/receipt/ListChuyenTienNoiBo");
-         } else {
-           dispatch(
-             showToast({ ...listToast[2], detail: response.data.message })
-           );
-         }
-       } else
-         dispatch(
-           showToast({ ...listToast[1], detail: response.data.message })
-         );
-     }
+      const response = await AddDoiTruCongNo(info);
+      if (response) setLoading(false);
+      if (response.status === 200) {
+        if (response.data.status) {
+          setInfos({ ...refreshObject(infos), status: true });
+          dispatch(
+            showToast({ ...listToast[0], detail: response.data.message })
+          );
+          navigate("/receipt/ListDoiTruCongNo");
+        } else {
+          dispatch(
+            showToast({ ...listToast[2], detail: response.data.message })
+          );
+        }
+      } else
+        dispatch(
+          showToast({ ...listToast[1], detail: response.data.message })
+        );
   };
   const { data:debitDoiTruNCC, loading: loadingNCC } = useListDebitDoiTruNCC({ params: {...paramsPaginator}});
   const { data:debitDoiTruKH, loading: loadingKH } = useListDebitDoiTruKH({ params: {...paramsPaginator}});
@@ -278,86 +260,110 @@ export default function UpdateDoiTruCongNo() {
             setDisplayDataNCC(mappedNCC);
             
     }, [debitDoiTruNCC,debitDoiTruKH,paramsPaginator])
-  useEffect(() => {
-    if (selectedRows.length === 0 && selectedNCCRows.length === 0) return;
+    const isSameData = (a: any[], b: any[]) => {
+  if (a.length !== b.length) return false;
+  return a.every((x, i) =>
+    x.id === b[i].id &&
+    Number(x.conlai_tong) === Number(b[i].conlai_tong)
+  );
+};
+useEffect(() => {
+  if (!activeSide) return;
+  if (selectedRows.length === 0 && selectedNCCRows.length === 0) return;
 
-    canBangBuTru(
-      selectedRows,
-      selectedNCCRows,
-      activeSide,
-      setDisplayDataKH,
-      setDisplayDataNCC
-    );
-  }, [selectedRows,selectedNCCRows]);
+  const { newKH, newNCC } = canBangBuTru(
+    selectedRows,
+    selectedNCCRows,
+    activeSide,
+    displayDataKH,
+    displayDataNCC
+  );
+
+  // 🔥 CHỈ UPDATE KHI THAY ĐỔI
+  if (!isSameData(displayDataKH, newKH)) {
+    setDisplayDataKH(newKH);
+  }
+
+  if (!isSameData(displayDataNCC, newNCC)) {
+    setDisplayDataNCC(newNCC);
+  }
+
+  // sync selected KH
+  const nextSelectedKH = selectedRows.map(r => {
+    const found = newKH.find(x => x.id === r.id);
+    return found ? { ...r, conlai_tong: found.conlai_tong } : r;
+  });
+
+  if (!isSameData(selectedRows, nextSelectedKH)) {
+    setSelectedRows(nextSelectedKH);
+  }
+
+  // sync selected NCC
+  const nextSelectedNCC = selectedNCCRows.map(r => {
+    const found = newNCC.find(x => x.id === r.id);
+    return found ? { ...r, conlai_tong: found.conlai_tong } : r;
+  });
+
+  if (!isSameData(selectedNCCRows, nextSelectedNCC)) {
+    setSelectedNCCRows(nextSelectedNCC);
+  }
+
+}, [selectedRows, selectedNCCRows, activeSide]);
 const canBangBuTru = (
   listKH: any[],
   listNCC: any[],
   activeSide: 'KH' | 'NCC' | null,
-  setKH: Function,
-  setNCC: Function
+  displayKH: any[],
+  displayNCC: any[]
 ) => {
-  console.log(activeSide);
-  
-  const sumKH = listKH.reduce(
-    (s, r) => s + (Number(r.conlai) || 0),
-    0
-  );
+  const sumKH = listKH.reduce((s, r) => s + (+r.conlai || 0), 0);
+  const sumNCC = listNCC.reduce((s, r) => s + (+r.conlai || 0), 0);
 
-  const sumNCC = listNCC.reduce(
-    (s, r) => s + (Number(r.conlai) || 0),
-    0
-  );
-  let newKH = displayDataKH.map((r:any) => ({ ...r }));
-  let newNCC = displayDataNCC.map((r:any) => ({ ...r }));
-  const selectedKHds = new Set(listKH.map((x:any) => x.id));
-  const selectedNCCIds = new Set(listNCC.map((x:any) => x.id));
+  let newKH = displayKH.map(r => ({ ...r }));
+  let newNCC = displayNCC.map(r => ({ ...r }));
+
+  const selectedKHIds = new Set(listKH.map(x => x.id));
+  const selectedNCCIds = new Set(listNCC.map(x => x.id));
+
   if (activeSide === 'KH') {
-  // thì lấy sum tổng các check list của nhà cung cấp hạch toán cho khách hàng, ncc không được tích thì không làm gì
-     let tienCon = sumNCC; // lấy tiền NCC
-     console.log("sumNCC",sumNCC);
-    newKH = newKH.map((kh: any) => {
-      if (!selectedKHds.has(kh.id)) return kh;
+    let tienCon = sumNCC;
+
+    newKH = newKH.map(kh => {
+      if (!selectedKHIds.has(kh.id)) return kh;
       if (tienCon <= 0) return { ...kh, conlai_tong: kh.conlai };
-      const mucToiDa = Number(kh.conlai_tong) || 0;
-      const bu = Math.min(tienCon, mucToiDa);
+
+      const bu = Math.min(tienCon, kh.conlai);
       tienCon -= bu;
-      return {
-        ...kh,
-        conlai_tong: bu
-      };
+
+      return { ...kh, conlai_tong: bu };
     });
-     newNCC = newNCC.map((ncc: any) => {
-       return {
-        ...ncc,
-        conlai_tong: ncc.conlai
-      };
-     })
+
+    newNCC = newNCC.map(ncc => ({
+      ...ncc,
+      conlai_tong: ncc.conlai
+    }));
   }
+
   if (activeSide === 'NCC') {
-  // thì lấy sum tổng các check list của khách hàng hạch toán cho ncc, kh không được tích thì không làm gì
-     let tienCon = sumKH; // lấy tiền KH
-     console.log("sumKH",sumKH);
-    newNCC = newNCC.map((ncc: any) => {
+    let tienCon = sumKH;
+
+    newNCC = newNCC.map(ncc => {
       if (!selectedNCCIds.has(ncc.id)) return ncc;
       if (tienCon <= 0) return { ...ncc, conlai_tong: ncc.conlai };
-      const mucToiDa = Number(ncc.conlai_tong) || 0;
-      const bu = Math.min(tienCon, mucToiDa);
+
+      const bu = Math.min(tienCon, ncc.conlai);
       tienCon -= bu;
-      return {
-        ...ncc,
-        conlai_tong: bu
-      };
+
+      return { ...ncc, conlai_tong: bu };
     });
-     newKH = newKH.map((kh: any) => {
-       return {
-        ...kh,
-        conlai_tong: kh.conlai
-      };
-     })
+
+    newKH = newKH.map(kh => ({
+      ...kh,
+      conlai_tong: kh.conlai
+    }));
   }
-  // 🔥 CẬP NHẬT STATE
-  setKH(newKH);
-  setNCC(newNCC);
+
+  return { newKH, newNCC };
 };
   return (
     <>

@@ -84,7 +84,7 @@ export default function ListChuyenTienNoiBo() {
         keyword: "",
     });
     const { data, loading, error, refresh } = useGetChuyenTienNoiBoAsync({
-        params: {...paramsPaginator},
+        params: {...paramsPaginator,type:0},
         debounce: 500,
     });
     const { data: employees } = useListEmployeeWithState({});
@@ -133,6 +133,8 @@ export default function ListChuyenTienNoiBo() {
                     rows={rows}
                     first={first}
                     totalRecords={data?.total}
+                    filters={filters}
+                    onFilter={(e:any) => setFilters(e.filters)}
                     currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
                     onPage={(e: any) => {
                       setFirst(e.first);

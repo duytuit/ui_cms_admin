@@ -178,6 +178,7 @@ export default function ListReceiptChi() {
                    header="Thao tác"
                    body={(row: any) => {
                         if(row.type_receipt == 7){
+                            // 7: chi nhà cung cấp
                             return ActionBody(
                                 row,
                                 null,
@@ -187,6 +188,7 @@ export default function ListReceiptChi() {
                             );
                         }
                         if(row.type_receipt == 8){
+                            // 8: chi khác
                             return ActionBody(
                                 row,
                                 "/receipt/detail/chi",
@@ -196,6 +198,7 @@ export default function ListReceiptChi() {
                             );
                         }
                         if(row.type_receipt == 1){
+                            // 1: chi giao nhận
                             return ActionBody(
                                 row,
                                 "/receipt/detail/chigiaonhan",

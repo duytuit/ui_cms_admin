@@ -257,7 +257,7 @@ export default function ListReceiptThu() {
                                               setParamsPaginator
                                           );
                                       }else{
-                                        if (![3, 10].includes(row.type_receipt)) {
+                                        if (![3, 10,11].includes(row.type_receipt)) {
                                             // 3: thu hoàn ứng giao nhận
                                             // 10: chuyển tiền nội bộ
                                             return ActionBody(
