@@ -7,6 +7,7 @@ export const listNoDebitNoFileNCC= async (params: any) => await getData("Debit/n
 export const listHasDebitNoFileNCC= async (params: any) => await getData("Debit/hasDebitNoFileNCC", params);
 export const listNoDebitNoFileDispatchKH = async (params: any) => await getData("Debit/noDebitNoFileDispatchKH", params);
 export const listHasDebitNoFileDispatchKH= async (params: any) => await getData("Debit/hasDebitNoFileDispatchKH", params);
+export const listDebitCongNoTongHopKH = async (params: any) => await getData("Debit/congnotonghopkh", params);
 export const listDebitCongNoChiTietKH = async (params: any) => await getData("Debit/congnochitietkh", params);
 export const listDebitCongNoChiTietNCC = async (params: any) => await getData("Debit/congnochitietncc", params);
 export const listCongNoGiaoNhan = async (params: any) => await getData("Debit/congNoGiaoNhan", params);

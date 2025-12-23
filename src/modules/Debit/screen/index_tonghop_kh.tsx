@@ -9,7 +9,7 @@ import { useListUserWithState } from "modules/user/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import { useListDebitCuocTamThu, useListDebitDauKyKH } from "../service";
+import { useListDebitCongNoTongHopKH, useListDebitCuocTamThu, useListDebitDauKyKH } from "../service";
 import { useListContractFileWithState } from "modules/ContractFile/service";
 import { deleteDebit } from "../api";
 import { TypeDebitDKKH } from "utils";
@@ -101,7 +101,7 @@ export default function ListTongHopKH() {
     render: false,
     keyword: "",
   });
-  const { data, loading, error, refresh } = useListDebitDauKyKH({
+  const { data, loading, error, refresh } = useListDebitCongNoTongHopKH({
     params: paramsPaginator,
     debounce: 500,
   });
@@ -110,19 +110,8 @@ export default function ListTongHopKH() {
   useEffect(() => {
     if (!data) return;
     handleParamUrl(paramsPaginator);
-    const mapped = (data?.data || []).map((row: any) => {
-      const cus = customers.find((x: any) => x.id === row.customer_detail_id);
-      const _user = employees.find((x: any) => x.user_id === row.updated_by);
-      const _type = TypeDebitDKKH.find((x: any) => x.value === row.type);
-      return {
-        ...row,
-        customerName: cus?.partners?.name || "",
-        customerAbb: cus?.partners?.abbreviation || "",
-        userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
-        type: _type?.name || "",
-      };
-    });
-    setDisplayData(mapped);
+    console.log(data);
+    
   }, [first, rows, data, paramsPaginator, customers]);
   const headerGroup = (
         <ColumnGroup>
