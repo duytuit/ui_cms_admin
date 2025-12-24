@@ -1,20 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, DataTableClient, DateBody, } from "components/common/DataTable";
-import { Calendar, CalendarY, Dropdown, GridForm, Input, } from "components/common/ListForm";
+import { useEffect, useMemo, useState } from "react";
+import { Column, DataTableClient,} from "components/common/DataTable";
+import { Dropdown, GridForm,Input } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { useListCustomerDetailWithState } from "modules/partner/service";
-import { useListUserWithState } from "modules/user/service";
-import { Checkbox, Dialog } from "components/uiCore";
-import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import { useListDebitCongNoTongHopKH, useListDebitCuocTamThu, useListDebitDauKyKH } from "../service";
-import { useListContractFileWithState } from "modules/ContractFile/service";
-import { deleteDebit } from "../api";
-import { TypeDebitDKKH } from "utils";
+import { useListDebitCongNoTongHopKH } from "../service";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
+import { Splitter } from "primereact/splitter";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -88,12 +83,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
 
 export default function ListTongHopKH() {
   const { handleParamUrl } = useHandleParamUrl();
-  const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [displayData, setDisplayData] = useState<any[]>([]);
-  const [first, setFirst] = useState(0);
-  const [rows, setRows] = useState(20);
-  const { data: customers } = useListCustomerDetailWithState({status: 1});
-  const { data: employees } = useListEmployeeWithState({});
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
     pageSize: 20,
@@ -105,14 +95,59 @@ export default function ListTongHopKH() {
     params: paramsPaginator,
     debounce: 500,
   });
+    const [filters, setFilters] = useState({
+      abbreviation:""
+  });
+      // --- Header template with filter ---
+    const customerAbbHeader = (
+       <div className="py-1">
+           <Input
+              value={filters.abbreviation}
+              onChange={(e:any) => setFilters({ ...filters, abbreviation: e.target.value })}
+              size="small"
+              className={classNames("input-sm")}
+            />
+       </div>
+    );
+    // --- Filter dữ liệu dựa vào input ---
+const applyFilters = (rows: any[]) => {
+    return rows.filter((row) => {
+        const f = filters;
+          return (
+            (f.abbreviation ? row.abbreviation?.toLowerCase().includes(f.abbreviation.toLowerCase()) : true)
+        );
+    });
+};
+ const getSumColumn = (field: string) => {
+        const filtered = (displayData??[]).filter((item: any) => {
+            return Object.entries(filters).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
 
+        const sum = filtered.reduce((acc: any, item: any) => {
+            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
   // ✅ Client-side pagination
   useEffect(() => {
     if (!data) return;
     handleParamUrl(paramsPaginator);
-    console.log(data);
+         const mapped = (data || []).map((row: any) => {
+                    return {
+                        ...row,
+                    };
+                });
+          const filtered = applyFilters(mapped);
+    setDisplayData(filtered);
     
-  }, [first, rows, data, paramsPaginator, customers]);
+  }, [data, paramsPaginator,filters]);
   const headerGroup = (
         <ColumnGroup>
             <Row>
@@ -135,6 +170,19 @@ export default function ListTongHopKH() {
                 <Column header="CHCK" />
                 <Column header="Còn lại" />
             </Row>
+             <Row>
+                <Column />
+                <Column header={customerAbbHeader} headerClassName="my-title-center"/>
+                <Column />
+                <Column />
+                <Column />
+                <Column />
+                <Column />
+                <Column />
+                <Column />
+                <Column />
+                <Column />
+            </Row>
         </ColumnGroup>
     );
   return (
@@ -144,40 +192,92 @@ export default function ListTongHopKH() {
           _paramsPaginator={paramsPaginator}
           _setParamsPaginator={setParamsPaginator}
         />
-
-        <DataTableClient
-          rowHover
-          value={displayData}
-          paginator
-          rows={rows}
-          first={first}
-          totalRecords={data?.total}
-          currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
-          onPage={(e: any) => {
-            setFirst(e.first);
-            setRows(e.rows);
-          }}
-          headerColumnGroup={headerGroup}
-          loading={loading}
-          dataKey="id"
-          title="Tài khoản"
-          filterDisplay="row"
-          className={classNames("Custom-DataTableClient")}
-          scrollable
-          tableStyle={{ minWidth: "1600px" }} // ép bảng rộng hơn để có scroll ngang
-        >
-          <Column field="customerName" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb"  filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb"  filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb"  filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb"  filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb"  filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb"  filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb"  filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb"  filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb"  filter showFilterMenu={false} filterMatchMode="contains" />
-
-        </DataTableClient>
+        <div style={{ height: 'calc(100vh - 8rem)' }}>
+          <Splitter style={{ height: '100%', width: '100%' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                  <DataTableClient
+                    rowHover
+                    value={displayData}
+                    currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
+                    headerColumnGroup={headerGroup}
+                    loading={loading}
+                    dataKey="id"
+                    title="Tài khoản"
+                    filterDisplay="row"
+                    className={classNames("Custom-DataTableClient")}
+                    scrollable
+                    scrollHeight="flex"
+                    style={{ flex: 1 }}
+                    tableStyle={{ minWidth: "1600px" }} // ép bảng rộng hơn để có scroll ngang
+                  >
+                    <Column field="abbreviation"  filter showFilterMenu={false} filterMatchMode="contains" />
+                    <Column field="dvdk"  
+                      body={(row: any) =>{
+                          return Helper.formatCurrency(row.dvdk.toString());
+                      }} 
+                      footer={getSumColumn("dvdk")}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
+                    <Column field="chdk"  
+                      body={(row: any) =>{
+                          return Helper.formatCurrency(row.chdk.toString());
+                      }} 
+                      footer={getSumColumn("chdk")}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
+                    <Column field="dvtk"  
+                      body={(row: any) =>{
+                          return Helper.formatCurrency(row.dvtk.toString());
+                      }} 
+                      footer={getSumColumn("dvtk")}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
+                    <Column field="chtk"  
+                      body={(row: any) =>{
+                          return Helper.formatCurrency(row.chtk.toString());
+                      }} 
+                      footer={getSumColumn("chtk")}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
+                    <Column field="ttdvtk"  
+                      body={(row: any) =>{
+                          return Helper.formatCurrency(row.ttdvtk.toString());
+                      }} 
+                      footer={getSumColumn("ttdvtk")}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
+                    <Column field="ttchtk"  
+                      body={(row: any) =>{
+                          return Helper.formatCurrency(row.ttchtk.toString());
+                      }} 
+                      footer={getSumColumn("ttchtk")}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
+                    <Column field="dvck"  
+                      body={(row: any) =>{
+                          return Helper.formatCurrency(row.dvck.toString());
+                      }} 
+                      footer={getSumColumn("dvck")}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
+                    <Column field="chck"  
+                      body={(row: any) =>{
+                          return Helper.formatCurrency(row.chck.toString());
+                      }} 
+                      footer={getSumColumn("chck")}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
+                    <Column field="ck" 
+                      body={(row: any) =>{
+                          return Helper.formatCurrency(row.ck.toString());
+                      }} 
+                      footer={getSumColumn("ck")}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
+                  </DataTableClient>
+              </div>
+            </Splitter>
+        </div>
       </div>
     </>
   );

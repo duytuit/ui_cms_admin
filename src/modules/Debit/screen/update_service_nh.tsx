@@ -273,11 +273,11 @@ export default function UpdateDebitNangHa({ id, onClose ,price }: { id: any; onC
                   severity="success"
                   raised
                   onClick={() => {
-                    if (!newNangHa.serviceId || !newNangHa.purchasePrice || newNangHa.purchasePrice <= 0)
+                    if (!newNangHa.serviceId)
                       return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin nâng hạ" }));
 
                     // convert price về số khi push
-                    const numericPrice = parseInt(newNangHa.purchasePrice.replace(/\D/g, ""), 10);
+                    const numericPrice = parseInt(newNangHa.purchasePrice.replace(/\D/g, ""), 10) || 0;
 
                     setProductNangHa([
                       ...productNangHa,
