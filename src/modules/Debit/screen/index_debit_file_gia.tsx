@@ -221,7 +221,7 @@ export default function ListFileGia() {
               loiNhuan:_sumBan-_sumMua,
               cf_status_confirm:cf_status_confirm ? 0 : 1,
               userUpdate: `${_userUpdate?.last_name ?? ""} ${_userUpdate?.first_name ?? ""}`.trim(),
-              debit_cus_bill :  (row.debits && row.debits.length > 0) ?  row.debits[0]?.debit_cus_bill || "":""
+              debit_cus_bill :  (row.debits && row.debits.length > 0) ?  row.debits[0]?.debit_cus_bill || "chưa hd":"chưa hd"
             };
           });
          console.log(mappedDebitFileGia);

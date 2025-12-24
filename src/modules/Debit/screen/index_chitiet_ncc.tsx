@@ -13,6 +13,7 @@ import { TypeDebitDKKH } from "utils";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import UpdatePhieuChiNCC from "modules/receipt/screen/update_phieuchi_ncc";
+import { Splitter } from "primereact/splitter";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setSelectedRows}: any) => {
@@ -372,223 +373,222 @@ useEffect(() => {
           refresh={refresh}
           _setSelectedRows={setSelectedRows}
         />
-
-        <DataTableClient
-          rowHover
-          value={displayData}
-          paginator
-          rows={rows}
-          first={first}
-          totalRecords={data?.total}
-          currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
-          onPage={(e: any) => {
-            setFirst(e.first);
-            setRows(e.rows);
-          }}
-          headerColumnGroup={headerGroup}
-          loading={loading}
-          dataKey="id"
-          title="Tài khoản"
-          filterDisplay="row"
-          className={classNames("Custom-DataTableClient")}
-          scrollable
-          tableStyle={{ minWidth: "2000px" }} // ép bảng rộng hơn để có scroll ngang
-        >
-          <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="supplierAbb" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="fileNumber" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="file_bill" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="cont" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="declaration" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="dispatch_code" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="name" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="bill" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column // dịch vụ
-            body={(row: any) =>{
-              return Helper.formatCurrency(row.thanhtien_dv.toString());
-            }} 
-            footer={getSumColumn("thanhtien_dv")}
-            footerStyle={{ fontWeight: "bold" }}
-          />
-          <Column // chi hộ
-            body={(row: any) =>{
-              return Helper.formatCurrency(row.thanhtien_ch.toString());
-            }} 
-            footer={getSumColumn("thanhtien_ch")}
-            footerStyle={{ fontWeight: "bold" }}
-          />
-          <Column 
-            body={(row: any) =>{
-              return Helper.formatCurrency(row.dathu_dv.toString());
-            }}
-          />
-          <Column 
-            body={(row: any) =>{
-              return Helper.formatCurrency(row.dathu_ch.toString());
-            }} 
-          />
-          <Column  // còn dịch vụ
-            body={(row: any) =>{
-                  return Helper.formatCurrency(row.conlai_dv_view.toString());
-            }} 
-            footer={getSumColumn("conlai_dv_view")}
-            footerStyle={{ fontWeight: "bold" }}
-            frozen 
-            alignFrozen="right" 
-            className="font-bold" 
-            />
-          <Column  // còn chi hộ
-            body={(row: any) =>{
-                return Helper.formatCurrency(row.conlai_ch_view.toString());
-            }} 
-            footer={getSumColumn("conlai_ch_view")}
-            footerStyle={{ fontWeight: "bold" }}
-            frozen 
-            alignFrozen="right" 
-            className="font-bold" 
-          />
-          <Column // còn lại tổng
-            body={(row: any) =>{
-                return Helper.formatCurrency(row.conlai_tong.toString());
-            }} 
-            footer={getSumColumn("conlai_tong")}
-            footerStyle={{ fontWeight: "bold" }}
-            frozen 
-            alignFrozen="right" 
-            className="font-bold"
-          />
-          <Column
-            header={
-              <Checkbox
-                checked={
-                  selectedRows.length === displayData.length &&
-                  displayData.length > 0
-                }
-                onChange={(e: any) => {
-                  if (e.checked) setSelectedRows([...displayData]); // lưu nguyên object
-                  else setSelectedRows([]);
-                }}
-              />
-            }
-            body={(rowData: any) => {
-              const total_purchase = rowData.purchase_price + rowData.purchase_com;
-              const thanh_tien = Math.round(total_purchase * (1 + rowData.purchase_vat / 100));
-              let conlai = thanh_tien - rowData.receipt_total;
-              conlai = Math.max(conlai, 0);
-              if(conlai > 0){
-                const isChecked = selectedRows.some(r => r.id === rowData.id); // check theo id
-                return (
-                  <Checkbox
-                    className="p-checkbox-sm"
-                    checked={isChecked}
-                    onChange={(e: any) => {
-                      setSelectedRows(prev => {
-                        if (e.checked) {
-                          // add row: lấy object mới nhất từ displayData
-                          const rowFromDisplay = displayData.find(d => d.id === rowData.id);
-                          if (!prev.some(r => r.id === rowData.id) && rowFromDisplay) {
-                            return [...prev, rowFromDisplay];
+        <div style={{ height: 'calc(100vh - 8rem)' }}>
+            <Splitter style={{ height: '100%', width: '100%' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <DataTableClient
+                        rowHover
+                        value={displayData}
+                        currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
+                        headerColumnGroup={headerGroup}
+                        loading={loading}
+                        dataKey="id"
+                        title="Tài khoản"
+                        filterDisplay="row"
+                        className={classNames("Custom-DataTableClient")}
+                        scrollable
+                        scrollHeight="flex"
+                        style={{ flex: 1 }}
+                        tableStyle={{ minWidth: "2200px" }} // ép bảng rộng hơn để có scroll ngang
+                      >
+                        <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="supplierAbb" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="fileNumber" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="file_bill" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="cont" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="declaration" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="dispatch_code" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="name" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="bill" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column // dịch vụ
+                          body={(row: any) =>{
+                            return Helper.formatCurrency(row.thanhtien_dv.toString());
+                          }} 
+                          footer={getSumColumn("thanhtien_dv")}
+                          footerStyle={{ fontWeight: "bold" }}
+                        />
+                        <Column // chi hộ
+                          body={(row: any) =>{
+                            return Helper.formatCurrency(row.thanhtien_ch.toString());
+                          }} 
+                          footer={getSumColumn("thanhtien_ch")}
+                          footerStyle={{ fontWeight: "bold" }}
+                        />
+                        <Column 
+                          body={(row: any) =>{
+                            return Helper.formatCurrency(row.dathu_dv.toString());
+                          }}
+                        />
+                        <Column 
+                          body={(row: any) =>{
+                            return Helper.formatCurrency(row.dathu_ch.toString());
+                          }} 
+                        />
+                        <Column  // còn dịch vụ
+                          body={(row: any) =>{
+                                return Helper.formatCurrency(row.conlai_dv_view.toString());
+                          }} 
+                          footer={getSumColumn("conlai_dv_view")}
+                          footerStyle={{ fontWeight: "bold" }}
+                          frozen 
+                          alignFrozen="right" 
+                          className="font-bold" 
+                          />
+                        <Column  // còn chi hộ
+                          body={(row: any) =>{
+                              return Helper.formatCurrency(row.conlai_ch_view.toString());
+                          }} 
+                          footer={getSumColumn("conlai_ch_view")}
+                          footerStyle={{ fontWeight: "bold" }}
+                          frozen 
+                          alignFrozen="right" 
+                          className="font-bold" 
+                        />
+                        <Column // còn lại tổng
+                          body={(row: any) =>{
+                              return Helper.formatCurrency(row.conlai_tong.toString());
+                          }} 
+                          footer={getSumColumn("conlai_tong")}
+                          footerStyle={{ fontWeight: "bold" }}
+                          frozen 
+                          alignFrozen="right" 
+                          className="font-bold"
+                        />
+                        <Column
+                          header={
+                            <Checkbox
+                              checked={
+                                selectedRows.length === displayData.length &&
+                                displayData.length > 0
+                              }
+                              onChange={(e: any) => {
+                                if (e.checked) setSelectedRows([...displayData]); // lưu nguyên object
+                                else setSelectedRows([]);
+                              }}
+                            />
                           }
-                          return prev;
-                        } else {
-                          // remove row
-                          return prev.filter(r => r.id !== rowData.id);
-                        }
-                      });
-                    }}
-                    onClick={(e: any) => e.stopPropagation()}
-                  />
-                );
-              }
-            }}
-            style={{ width: "3em" }}
-            frozen
-            alignFrozen="right"
-          />
-          <Column 
-           body={(row:any, options:any) => {
-            if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10){
-              const purchase_price = typeof row.purchase_price === "string"
-                ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
-                : Number(row.purchase_price) || 0;
-              const purchase_com = typeof row.purchase_com === "string"
-                ? parseFloat(row.purchase_com.replace(/[^0-9.]/g, "")) || 0
-                : Number(row.purchase_com) || 0;
-              const purchase_vat = Number(row.purchase_vat) || 0;
-              const total_purchase = purchase_price + purchase_com;
-              const thanh_tien = Math.round(total_purchase * (1 + purchase_vat / 100));
-              const conlai = thanh_tien - (row.receipt_total || 0);
-              return (
-                 <Input
-                    className="w-full input-sm"
-                    value={Helper.formatCurrency(String(row.conlai_dv > 0 ? row.conlai_dv : conlai))}
-                    onChange={(e: any) => {
-                      const newValue = parseInt(e.target.value.replace(/\D/g, ""), 10);
+                          body={(rowData: any) => {
+                            const total_purchase = rowData.purchase_price + rowData.purchase_com;
+                            const thanh_tien = Math.round(total_purchase * (1 + rowData.purchase_vat / 100));
+                            let conlai = thanh_tien - rowData.receipt_total;
+                            conlai = Math.max(conlai, 0);
+                            if(conlai > 0){
+                              const isChecked = selectedRows.some(r => r.id === rowData.id); // check theo id
+                              return (
+                                <Checkbox
+                                  className="p-checkbox-sm"
+                                  checked={isChecked}
+                                  onChange={(e: any) => {
+                                    setSelectedRows(prev => {
+                                      if (e.checked) {
+                                        // add row: lấy object mới nhất từ displayData
+                                        const rowFromDisplay = displayData.find(d => d.id === rowData.id);
+                                        if (!prev.some(r => r.id === rowData.id) && rowFromDisplay) {
+                                          return [...prev, rowFromDisplay];
+                                        }
+                                        return prev;
+                                      } else {
+                                        // remove row
+                                        return prev.filter(r => r.id !== rowData.id);
+                                      }
+                                    });
+                                  }}
+                                  onClick={(e: any) => e.stopPropagation()}
+                                />
+                              );
+                            }
+                          }}
+                          style={{ width: "3em" }}
+                          frozen
+                          alignFrozen="right"
+                        />
+                        <Column 
+                        body={(row:any, options:any) => {
+                          if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10){
+                            const purchase_price = typeof row.purchase_price === "string"
+                              ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
+                              : Number(row.purchase_price) || 0;
+                            const purchase_com = typeof row.purchase_com === "string"
+                              ? parseFloat(row.purchase_com.replace(/[^0-9.]/g, "")) || 0
+                              : Number(row.purchase_com) || 0;
+                            const purchase_vat = Number(row.purchase_vat) || 0;
+                            const total_purchase = purchase_price + purchase_com;
+                            const thanh_tien = Math.round(total_purchase * (1 + purchase_vat / 100));
+                            const conlai = thanh_tien - (row.receipt_total || 0);
+                            return (
+                              <Input
+                                  className="w-full input-sm"
+                                  value={Helper.formatCurrency(String(row.conlai_dv > 0 ? row.conlai_dv : conlai))}
+                                  onChange={(e: any) => {
+                                    const newValue = parseInt(e.target.value.replace(/\D/g, ""), 10);
 
-                      setDisplayData(prev => {
-                        // Tạo mảng displayData mới
-                        const updated = [...prev];
-                        updated[options.rowIndex] = {
-                          ...updated[options.rowIndex],
-                          conlai_dv: newValue
-                        };
+                                    setDisplayData(prev => {
+                                      // Tạo mảng displayData mới
+                                      const updated = [...prev];
+                                      updated[options.rowIndex] = {
+                                        ...updated[options.rowIndex],
+                                        conlai_dv: newValue
+                                      };
 
-                        // Đồng bộ selectedRows: nếu row đang chọn, cập nhật object mới
-                        setSelectedRows(prevSelected =>
-                          prevSelected.map(sel =>
-                            sel.id === row.id ? { ...updated[options.rowIndex] } : sel
-                          )
-                        );
+                                      // Đồng bộ selectedRows: nếu row đang chọn, cập nhật object mới
+                                      setSelectedRows(prevSelected =>
+                                        prevSelected.map(sel =>
+                                          sel.id === row.id ? { ...updated[options.rowIndex] } : sel
+                                        )
+                                      );
 
-                        return updated;
-                      });
-                    }}
-                  />
-              );
-            }
-          }} frozen alignFrozen="right" className="font-bold"/>
-          <Column 
-           
-           body={(row:any, options:any) => {
-             if(row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11){
-              const purchase_price = typeof row.purchase_price === "string"
-                ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
-                : Number(row.purchase_price) || 0;
-              const purchase_com = 0;
-              const purchase_vat = Number(row.purchase_vat) || 0;
-              const total_purchase = purchase_price + purchase_com;
-              const thanh_tien = Math.round(total_purchase * (1 + purchase_vat / 100));
-              const conlai = thanh_tien - (row.receipt_total || 0);
-              return (
-                 <Input
-                    className="w-full input-sm"
-                    value={Helper.formatCurrency(String(row.conlai_ch > 0 ? row.conlai_ch : conlai))}
-                    onChange={(e: any) => {
-                      const newValue = parseInt(e.target.value.replace(/\D/g, ""), 10);
+                                      return updated;
+                                    });
+                                  }}
+                                />
+                            );
+                          }
+                        }} frozen alignFrozen="right" className="font-bold"/>
+                        <Column 
+                        
+                        body={(row:any, options:any) => {
+                          if(row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11){
+                            const purchase_price = typeof row.purchase_price === "string"
+                              ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
+                              : Number(row.purchase_price) || 0;
+                            const purchase_com = 0;
+                            const purchase_vat = Number(row.purchase_vat) || 0;
+                            const total_purchase = purchase_price + purchase_com;
+                            const thanh_tien = Math.round(total_purchase * (1 + purchase_vat / 100));
+                            const conlai = thanh_tien - (row.receipt_total || 0);
+                            return (
+                              <Input
+                                  className="w-full input-sm"
+                                  value={Helper.formatCurrency(String(row.conlai_ch > 0 ? row.conlai_ch : conlai))}
+                                  onChange={(e: any) => {
+                                    const newValue = parseInt(e.target.value.replace(/\D/g, ""), 10);
 
-                      setDisplayData(prev => {
-                        // Tạo mảng displayData mới
-                        const updated = [...prev];
-                        updated[options.rowIndex] = {
-                          ...updated[options.rowIndex],
-                          conlai_ch: newValue
-                        };
+                                    setDisplayData(prev => {
+                                      // Tạo mảng displayData mới
+                                      const updated = [...prev];
+                                      updated[options.rowIndex] = {
+                                        ...updated[options.rowIndex],
+                                        conlai_ch: newValue
+                                      };
 
-                        // Đồng bộ selectedRows: nếu row đang chọn, cập nhật object mới
-                        setSelectedRows(prevSelected =>
-                          prevSelected.map(sel =>
-                            sel.id === row.id ? { ...updated[options.rowIndex] } : sel
-                          )
-                        );
+                                      // Đồng bộ selectedRows: nếu row đang chọn, cập nhật object mới
+                                      setSelectedRows(prevSelected =>
+                                        prevSelected.map(sel =>
+                                          sel.id === row.id ? { ...updated[options.rowIndex] } : sel
+                                        )
+                                      );
 
-                        return updated;
-                      });
-                    }}
-                  />
-              );
-            }
-          }} frozen alignFrozen="right" className="font-bold"/>
-        </DataTableClient>
+                                      return updated;
+                                    });
+                                  }}
+                                />
+                            );
+                          }
+                        }} frozen alignFrozen="right" className="font-bold"/>
+                </DataTableClient>
+                </div>
+            </Splitter>
+        </div>
       </div>
     </>
   );

@@ -13,18 +13,24 @@ import { formOfPayment, TypeDoiTuong, typeReceipt } from "utils";
 import { useListContractFileWithState } from "modules/ContractFile/service";
 import { FilterMatchMode } from "primereact/api";
 import { useListPartnerDetailWithState } from "modules/partner/service";
+import { Splitter, SplitterPanel } from "primereact/splitter";
+import { MyCalendar } from "components/common/MyCalendar";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
-    const [filter, setFilter] = useState({ name: "" });
+    const [filter, setFilter] = useState({
+        fromDate: Helper.lastWeekString(),
+        toDate: Helper.toDayString(),
+    });
 
     useEffect(() => {
         // Mỗi khi filter thay đổi => cập nhật params
         _setParamsPaginator((prev: any) => ({
             ...prev,
-            keyword: filter.name,
+            fromDate: filter.fromDate,
+            toDate: filter.toDate,
         }));
-    }, [filter.name]);
+    }, [filter]);
 
     return (
         <GridForm
@@ -38,6 +44,22 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             addOne="/receipt/UpdateReceiptChi"
             addOneName="Phiếu chi"
         >
+            <div className="col-2">
+                <MyCalendar
+                    dateFormat="dd/mm/yy"
+                    value={filter.fromDate}
+                    onChange={(e: any) => setFilter({ ...filter, fromDate: e })}
+                    className={classNames("w-full", "p-inputtext", "input-sm")}
+                />
+                </div>
+                <div className="col-2">
+                <MyCalendar
+                    dateFormat="dd/mm/yy"
+                    value={filter.toDate}
+                    onChange={(e: any) => setFilter({ ...filter, toDate: e })}
+                    className={classNames("w-full", "p-inputtext", "input-sm")}
+                />
+            </div>
         </GridForm>
     );
 };
@@ -154,95 +176,111 @@ export default function ListReceiptChi() {
     return (
         <div className="card">
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
-
-            <DataTableClient
-                rowHover
-                value={displayData}
-                paginator
-                rows={rows}
-                first={first}
-                totalRecords={displayData?.length || 0}
-                currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
-                onPage={(e: any) => {
-                    setFirst(e.first);
-                    setRows(e.rows);
-                }}
-                filters={filters}
-                onFilter={(e:any) => setFilters(e.filters)}
-                loading={loading}
-                filterDisplay="row"
-                className={classNames("Custom-DataTableClient")}
-                tableStyle={{ minWidth: "2000px" }} 
-            >
-                <Column
-                   header="Thao tác"
-                   body={(row: any) => {
-                        if(row.type_receipt == 7){
-                            // 7: chi nhà cung cấp
-                            return ActionBody(
-                                row,
-                                null,
-                                { route: "/receipt/delete", action: deleteReceipt },
-                                paramsPaginator,
-                                setParamsPaginator
-                            );
-                        }
-                        if(row.type_receipt == 8){
-                            // 8: chi khác
-                            return ActionBody(
-                                row,
-                                "/receipt/detail/chi",
-                                { route: "/receipt/delete", action: deleteReceipt },
-                                paramsPaginator,
-                                setParamsPaginator
-                            );
-                        }
-                        if(row.type_receipt == 1){
-                            // 1: chi giao nhận
-                            return ActionBody(
-                                row,
-                                "/receipt/detail/chigiaonhan",
-                                { route: "/receipt/delete", action: deleteReceipt },
-                                paramsPaginator,
-                                setParamsPaginator
-                            );
-                        }
-                    }}
-                    style={{ width: "6em" }}
-                />
-                <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column
-                    field="accounting_date"
-                    header="Ngày chứng từ"
-                    body={(e: any) => DateBody(e.accounting_date)}
-                    filter
-                    showFilterMenu={false}
-                    filterMatchMode="contains"
-                />
-                <Column field="sofile" header="Số file" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="typeDoiTuong" header="Đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="tendoituong" header="Tên đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="lydochi" header="Lý do chi" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="bill" header="Số hóa đơn" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                     footer={getSumColumn("amount")}
-                     footerStyle={{ fontWeight: "bold" }}
-                />
-                <Column field="total" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                     footer={getSumColumn("total")}
-                     footerStyle={{ fontWeight: "bold" }}
-                />
-                <Column field="tenquy" header="Quỹ" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="typeReceipt" header="Kiểu phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="hinhthuc" header="Hình thức" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="stk" header="STK" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="chutk" header="Tên tài khoản" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="nganhang" header="Ngân hàng" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="note" header="Ghi chú" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="nguoitao" header="Người cập nhật" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
-               
-            </DataTableClient>
+              <div style={{ height: 'calc(100vh - 8rem)' }}>
+                             <Splitter layout="vertical" style={{ height: '100%', width: '100%' }}>
+                                <SplitterPanel
+                                  size={75}
+                                  minSize={10}
+                                  style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+                                >
+                                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                    <DataTableClient
+                                        rowHover
+                                        value={displayData}
+                                        currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
+                                        filters={filters}
+                                        onFilter={(e:any) => setFilters(e.filters)}
+                                        loading={loading}
+                                        filterDisplay="row"
+                                        scrollable
+                                        scrollHeight="flex"
+                                        style={{ flex: 1 }}
+                                        className={classNames("Custom-DataTableClient")}
+                                        tableStyle={{ minWidth: "2000px" }} 
+                                    >
+                                        <Column
+                                        header="Thao tác"
+                                        body={(row: any) => {
+                                                if(row.type_receipt == 7){
+                                                    // 7: chi nhà cung cấp
+                                                    return ActionBody(
+                                                        row,
+                                                        null,
+                                                        { route: "/receipt/delete", action: deleteReceipt },
+                                                        paramsPaginator,
+                                                        setParamsPaginator
+                                                    );
+                                                }
+                                                if(row.type_receipt == 8){
+                                                    // 8: chi khác
+                                                    return ActionBody(
+                                                        row,
+                                                        "/receipt/detail/chi",
+                                                        { route: "/receipt/delete", action: deleteReceipt },
+                                                        paramsPaginator,
+                                                        setParamsPaginator
+                                                    );
+                                                }
+                                                if(row.type_receipt == 1){
+                                                    // 1: chi giao nhận
+                                                    return ActionBody(
+                                                        row,
+                                                        "/receipt/detail/chigiaonhan",
+                                                        { route: "/receipt/delete", action: deleteReceipt },
+                                                        paramsPaginator,
+                                                        setParamsPaginator
+                                                    );
+                                                }
+                                            }}
+                                            style={{ width: "6em" }}
+                                        />
+                                        <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column
+                                            field="accounting_date"
+                                            header="Ngày chứng từ"
+                                            body={(e: any) => DateBody(e.accounting_date)}
+                                            filter
+                                            showFilterMenu={false}
+                                            filterMatchMode="contains"
+                                        />
+                                        <Column field="sofile" header="Số file" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="typeDoiTuong" header="Đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="tendoituong" header="Tên đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="lydochi" header="Lý do chi" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="bill" header="Số hóa đơn" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                                            footer={getSumColumn("amount")}
+                                            footerStyle={{ fontWeight: "bold" }}
+                                        />
+                                        <Column field="total" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                                            footer={getSumColumn("total")}
+                                            footerStyle={{ fontWeight: "bold" }}
+                                        />
+                                        <Column field="tenquy" header="Quỹ" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="typeReceipt" header="Kiểu phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="hinhthuc" header="Hình thức" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="stk" header="STK" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="chutk" header="Tên tài khoản" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="nganhang" header="Ngân hàng" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="note" header="Ghi chú" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column field="nguoitao" header="Người cập nhật" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                                        <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
+                                    
+                                    </DataTableClient>
+                                  </div>
+                                </SplitterPanel>
+                                <SplitterPanel
+                                  size={25}
+                                  minSize={10}
+                                  style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+                                >
+                                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                                      <b>Chi tiết phiếu chi</b>
+                                    </div>
+                                </SplitterPanel>
+                             </Splitter>
+                        </div>
+          
         </div>
     );
 }
