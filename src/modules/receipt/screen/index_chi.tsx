@@ -201,35 +201,37 @@ export default function ListReceiptChi() {
                                         <Column
                                         header="Thao tác"
                                         body={(row: any) => {
-                                                if(row.type_receipt == 7){
-                                                    // 7: chi nhà cung cấp
-                                                    return ActionBody(
-                                                        row,
-                                                        null,
-                                                        { route: "/receipt/delete", action: deleteReceipt },
-                                                        paramsPaginator,
-                                                        setParamsPaginator
-                                                    );
-                                                }
-                                                if(row.type_receipt == 8){
-                                                    // 8: chi khác
-                                                    return ActionBody(
-                                                        row,
-                                                        "/receipt/detail/chi",
-                                                        { route: "/receipt/delete", action: deleteReceipt },
-                                                        paramsPaginator,
-                                                        setParamsPaginator
-                                                    );
-                                                }
-                                                if(row.type_receipt == 1){
-                                                    // 1: chi giao nhận
-                                                    return ActionBody(
-                                                        row,
-                                                        "/receipt/detail/chigiaonhan",
-                                                        { route: "/receipt/delete", action: deleteReceipt },
-                                                        paramsPaginator,
-                                                        setParamsPaginator
-                                                    );
+                                                if(row.min_status === null || row.min_status === 0){ // check cho trường hợp chi giao nhận
+                                                    if(row.type_receipt == 7){
+                                                        // 7: chi nhà cung cấp
+                                                        return ActionBody(
+                                                            row,
+                                                            null,
+                                                            { route: "/receipt/delete", action: deleteReceipt },
+                                                            paramsPaginator,
+                                                            setParamsPaginator
+                                                        );
+                                                    }
+                                                    if(row.type_receipt == 8){
+                                                        // 8: chi khác
+                                                        return ActionBody(
+                                                            row,
+                                                            "/receipt/detail/chi",
+                                                            { route: "/receipt/delete", action: deleteReceipt },
+                                                            paramsPaginator,
+                                                            setParamsPaginator
+                                                        );
+                                                    }
+                                                    if(row.type_receipt == 1){
+                                                        // 1: chi giao nhận
+                                                        return ActionBody(
+                                                            row,
+                                                            "/receipt/detail/chigiaonhan",
+                                                            { route: "/receipt/delete", action: deleteReceipt },
+                                                            paramsPaginator,
+                                                            setParamsPaginator
+                                                        );
+                                                    }
                                                 }
                                             }}
                                             style={{ width: "6em" }}

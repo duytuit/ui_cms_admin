@@ -34,6 +34,8 @@ import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import UpdateDebitChiPhi from "modules/Debit/screen/update_service";
 import UpdateDebit from "modules/Debit/screen/update_debit";
+import { Splitter } from "primereact/splitter";
+import { FilterMatchMode } from "primereact/api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -122,6 +124,17 @@ export default function ListContractFile() {
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(20);
   const { data: customers } = useListCustomerDetailWithState({status: 1});
+    const [filters, setFilters] = useState({
+          global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          feature: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          type: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          declaration_type: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          occurrence: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          business: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          listEmployee: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          });
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
     pageSize: 20,
@@ -195,8 +208,25 @@ export default function ListContractFile() {
       };
     });
     setDisplayData(mapped);
-  }, [employeeOptions,first, rows, data, paramsPaginator, customers]);
+  }, [employeeOptions, data, paramsPaginator, customers]);
+    const getSumColumn = (field: string) => {
+        const filtered = (displayData ?? []).filter((item: any) => {
+            return Object.entries(filters).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
 
+        const sum = filtered.reduce((acc: number, item: any) => {
+            const raw = item[field]?.toString() ?? "0";
+            const val = parseFloat(raw.replace(/[^0-9.-]/g, "")) || 0; // giữ lại dấu âm
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
   return (
     <>
       <div className="card">
@@ -204,99 +234,104 @@ export default function ListContractFile() {
           _paramsPaginator={paramsPaginator}
           _setParamsPaginator={setParamsPaginator}
         />
+        <div style={{ height: 'calc(100vh - 8rem)' }}>
+          <Splitter style={{ height: '100%', width: '100%' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <DataTableClient
+                rowHover
+                value={displayData}
+                currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
+                loading={loading}
+                dataKey="id"
+                title="Tài khoản"
+                filterDisplay="row"
+                filters={filters}
+                onFilter={(e:any) => setFilters(e.filters)}
+                className={classNames("Custom-DataTableClient")}
+                scrollable
+                scrollHeight="flex"
+                style={{ flex: 1 }}
+                tableStyle={{ minWidth: "2900px" }} // ép bảng rộng hơn để có scroll ngang
+              >
+                {/* Custom checkbox column */}
+                <Column
+                  header={
+                    <Checkbox
+                      checked={
+                        selectedRows.length === displayData.length &&
+                        displayData.length > 0
+                      }
+                      onChange={(e: any) => {
+                        if (e.checked) setSelectedRows(displayData.map((d) => d.id));
+                        else setSelectedRows([]);
+                      }}
+                    />
+                  }
+                  body={(rowData: any) => (
+                    <Checkbox
+                      className="p-checkbox-sm"
+                      checked={selectedRows.includes(rowData.id)}
+                      onChange={(e: any) => {
+                        if (e.checked)
+                          setSelectedRows((prev) => [...prev, rowData.id]);
+                        else
+                          setSelectedRows((prev) =>
+                            prev.filter((id) => id !== rowData.id)
+                          );
+                      }}
+                      onClick={(e: any) => e.stopPropagation()} // ⚡ chặn row click
+                    />
+                  )}
+                  style={{ width: "3em" }}
+                />
+                <Column header="Thao tác" body={(e: any) => {
+                  if (e.debits == null) {
+                    return ActionBody(
+                          e,
+                          "/ContractFile/detail",
+                          { route: "/ContractFile/delete", action: deleteContractFile },
+                          paramsPaginator,
+                          setParamsPaginator
+                      );
+                  } else {
+                    return ActionBody(
+                          e,
+                          "/ContractFile/detail",
+                          null,
+                          paramsPaginator,
+                          setParamsPaginator
+                      );
+                  }
+                }} style={{ width: "6em" }} />
+                <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="bill" header="Bill" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="declaration" header="Số tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="sales" header="Tên sales" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="listEmployee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column body={(row: any) => Helper.formatCurrency(row.sumAmount.toString())} 
+                  header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" 
+                  footer={getSumColumn("sumAmount")}
+                  footerStyle={{ fontWeight: "bold" }}
+                 />
+                <Column field="feature" header="Tính chất" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="type" header="Loại hàng" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="declaration_quantity" header="Số lượng tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="declaration_type" header="Loại tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="business" header="Nghiệp vụ" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="occurrence" header="Phát sinh" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="userName" header="Người thực hiện" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
 
-        <DataTableClient
-          rowHover
-          value={displayData}
-          paginator
-          rows={rows}
-          first={first}
-          totalRecords={data?.total}
-          currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
-          onPage={(e: any) => {
-            setFirst(e.first);
-            setRows(e.rows);
-          }}
-          loading={loading}
-          dataKey="id"
-          title="Tài khoản"
-          filterDisplay="row"
-          className={classNames("Custom-DataTableClient")}
-          scrollable
-          tableStyle={{ minWidth: "2900px" }} // ép bảng rộng hơn để có scroll ngang
-        >
-          {/* Custom checkbox column */}
-          <Column
-            header={
-              <Checkbox
-                checked={
-                  selectedRows.length === displayData.length &&
-                  displayData.length > 0
-                }
-                onChange={(e: any) => {
-                  if (e.checked) setSelectedRows(displayData.map((d) => d.id));
-                  else setSelectedRows([]);
-                }}
-              />
-            }
-            body={(rowData: any) => (
-              <Checkbox
-                className="p-checkbox-sm"
-                checked={selectedRows.includes(rowData.id)}
-                onChange={(e: any) => {
-                  if (e.checked)
-                    setSelectedRows((prev) => [...prev, rowData.id]);
-                  else
-                    setSelectedRows((prev) =>
-                      prev.filter((id) => id !== rowData.id)
-                    );
-                }}
-                onClick={(e: any) => e.stopPropagation()} // ⚡ chặn row click
-              />
-            )}
-            style={{ width: "3em" }}
-          />
-          <Column header="Thao tác" body={(e: any) => {
-            if (e.debits == null) {
-              return ActionBody(
-                    e,
-                    "/ContractFile/detail",
-                    { route: "/ContractFile/delete", action: deleteContractFile },
-                    paramsPaginator,
-                    setParamsPaginator
-                );
-            } else {
-               return ActionBody(
-                    e,
-                    "/ContractFile/detail",
-                    null,
-                    paramsPaginator,
-                    setParamsPaginator
-                );
-            }
-          }} style={{ width: "6em" }} />
-          <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="bill" header="Bill" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="declaration" header="Số tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="sales" header="Tên sales" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="listEmployee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column body={(row: any) => Helper.formatCurrency(row.sumAmount.toString())}  header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="feature" header="Tính chất" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="type" header="Loại hàng" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="declaration_quantity" header="Số lượng tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="declaration_type" header="Loại tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="business" header="Nghiệp vụ" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="occurrence" header="Phát sinh" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="userName" header="Người thực hiện" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
-
-        </DataTableClient>
+              </DataTableClient>
+            </div>
+          </Splitter>
+        </div>
       </div>
     </>
   );
