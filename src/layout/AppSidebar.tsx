@@ -311,7 +311,7 @@ const model = [{
                 {
                   id: 1,
                   name: 'Công nợ tổng hợp NCC',
-                  route: '/debit/ListTongHopKH',
+                  route: '/debit/ListTongHopNCC',
                   created_at: '2023-05-29 14:14:02',
                   updated_at: null,
                   deleted_at: null,

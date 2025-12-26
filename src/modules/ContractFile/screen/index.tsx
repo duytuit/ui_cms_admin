@@ -134,6 +134,11 @@ export default function ListContractFile() {
           occurrence: { value: null, matchMode: FilterMatchMode.CONTAINS },
           business: { value: null, matchMode: FilterMatchMode.CONTAINS },
           listEmployee: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          sales: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          container_code: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          note: { value: null, matchMode: FilterMatchMode.CONTAINS },
           });
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,

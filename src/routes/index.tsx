@@ -76,6 +76,7 @@ import ListDauKyTaiKhoan from "modules/receipt/screen/index_dauky_taikhoan";
 import UpdateDauKyTaiKhoan from "modules/receipt/screen/update_dauky_taikhoan";
 import ListBaoCaoLoiNhuan from "modules/receipt/screen/index_baocao_loinhuan";
 import UpdateReceiptThu from "modules/receipt/screen/update_thu";
+import ListTongHopNCC from "modules/Debit/screen/index_tonghop_ncc";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -196,6 +197,7 @@ const publicRoutes = [
   { path: "/debit/printNoFile", component: PrintDebitNoFile,  layout: null, public: true  },
 
   //công nợ khách hàng
+  { path: "/debit/ListTongHopNCC", component: ListTongHopNCC, layout: 'ListTongHopNCC' },
   { path: "/debit/ListTongHopKH", component: ListTongHopKH, layout: 'ListTongHopKH' },
   { path: "/debit/ListChiTietKH", component: ListChiTietKH, layout: 'ListChiTietKH' },
   { path: "/debit/ListChiTietNCC", component: ListChiTietNCC, layout: 'ListChiTietNCC' },
