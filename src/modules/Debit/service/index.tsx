@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {  listBanhangKH, listCongNoGiaoNhan, listCongNoLaiXe, listDebit, listDebitCongNoChiTietKH, listDebitCongNoChiTietNCC, listDebitCongNoTongHopKH, listDebitCongNoTongHopNCC, listDebitCuocTamThu, listDebitDauKyKH, listDebitDauKyNCC, listDebitDispatch, listDebitDoiTruKH, listDebitDoiTruNCC, listDebitDuNoDKKH, listDebitDuNoDKNCC, listDebitMuaBan, listDebitService, listHasDebitNCC, listHasDebitNoFileDispatchKH, listHasDebitNoFileNCC, listMuahangNCC, listNoDebitNCC, listNoDebitNoFileDispatchKH, listNoDebitNoFileNCC } from '../api';
+import {  listBanhangKH, listCongNoGiaoNhan, listCongNoLaiXe, listDebit, listDebitCongNoChiTietKH, listDebitCongNoChiTietNCC, listDebitCongNoTongHopKH, listDebitCongNoTongHopNCC, listDebitCuoc, listDebitDauKyKH, listDebitDauKyNCC, listDebitDispatch, listDebitDoiTruKH, listDebitDoiTruNCC, listDebitDuNoDKKH, listDebitDuNoDKNCC, listDebitMuaBan, listDebitService, listDebitTamThu, listHasDebitNCC, listHasDebitNoFileDispatchKH, listHasDebitNoFileNCC, listMuahangNCC, listNoDebitNCC, listNoDebitNoFileDispatchKH, listNoDebitNoFileNCC } from '../api';
 
 export const useListDebit = ({ params, debounce = 500 }: any) => {
     const [data, setData] = useState<any>([]);
@@ -88,7 +88,7 @@ export const useListDebitService = ({ params, debounce = 500 }: any) => {
 
     return { data, loading, error, refresh: fetchData };
 };
-export const useListDebitCuocTamThu = ({ params, debounce = 500 }: any) => {
+export const useListDebitTamThu = ({ params, debounce = 500 }: any) => {
     const [data, setData] = useState<any>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
@@ -97,7 +97,36 @@ export const useListDebitCuocTamThu = ({ params, debounce = 500 }: any) => {
         try {
             setLoading(true);
             setError(null);
-            const res = await listDebitCuocTamThu({ ...params });
+            const res = await listDebitTamThu({ ...params });
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!params || Object.keys(params).length === 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
+
+    return { data, loading, error, refresh: fetchData };
+};
+export const useListDebitCuoc = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await listDebitCuoc({ ...params });
             setData(res?.data?.data || []);
         } catch (err) {
             setError(err);

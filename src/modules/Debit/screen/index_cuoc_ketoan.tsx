@@ -10,7 +10,7 @@ import { Button, Checkbox } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { useListContractFileWithState } from "modules/ContractFile/service";
-import { useListDebitTamThu } from "../service";
+import { useListDebitCuoc } from "../service";
 import { Splitter } from "primereact/splitter";
 import { FilterMatchMode } from "primereact/api";
 import { listToast, statusServiceDebit } from "utils";
@@ -46,9 +46,9 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,_selectedRows,_setSelect
       toDate: filter.toDate,
     }));
   }, [filter]);
-  async function NhanPhieuCuoc(){
+  async function BanGiaoPhieuCuoc(){
      console.log(_selectedRows);
-      const res = await updateServiceStatus({ ids: _selectedRows, serviceStatus: 2 });
+      const res = await updateServiceStatus({ ids: _selectedRows, serviceStatus: 1 });
       if (res.status === 200) {
         if (res.data.status) {
           dispatch(
@@ -66,9 +66,9 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,_selectedRows,_setSelect
           showToast({ ...listToast[1], detail: res.data.message })
         );
   }
-  async function HuyNhanPhieuCuoc(){
+  async function HuyBanGiaoPhieuCuoc(){
      console.log(_selectedRows);
-      const res = await updateServiceStatus({ ids: _selectedRows, serviceStatus: 1 });
+      const res = await updateServiceStatus({ ids: _selectedRows, serviceStatus: 0 });
       if (res.status === 200) {
         if (res.data.status) {  
           dispatch(
@@ -88,14 +88,14 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,_selectedRows,_setSelect
   }
   const items = [
     {
-        label: 'Nhận phiếu cược',
+        label: 'Bàn giao phiếu cược',
         icon: "pi pi-check-square",
-        command: () => NhanPhieuCuoc()
+        command: () => BanGiaoPhieuCuoc()
     },
     {
-        label: 'Hủy nhận phiếu cược',
+        label: 'Hủy bàn giao phiếu cược',
         icon: "pi pi-times-circle",
-        command: () => HuyNhanPhieuCuoc()
+        command: () => HuyBanGiaoPhieuCuoc()
     }
   ];
   return (
@@ -142,7 +142,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,_selectedRows,_setSelect
   );
 };
 
-export default function ListTamThu() {
+export default function ListCuocKeToan() {
   const { handleParamUrl } = useHandleParamUrl();
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [displayData, setDisplayData] = useState<any[]>([]);
@@ -164,8 +164,8 @@ export default function ListTamThu() {
     render: false,
     keyword: "",
   });
-  const { data, loading, error, refresh } = useListDebitTamThu({
-    params: {...paramsPaginator},
+  const { data, loading, error, refresh } = useListDebitCuoc({
+    params: {...paramsPaginator,ServiceId:19},
     debounce: 500,
   });
   const { data: listContractFile } = useListContractFileWithState({});
@@ -248,14 +248,14 @@ export default function ListTamThu() {
                     <Column
                      
                        header={(rowData: any) => {
-                        const _selectableRows = displayData.filter(row => row.service_status >= 1);
+                        const _selectableRows = displayData.filter(row => row.service_status < 2);
                         return (
                           <Checkbox
                             checked={
                                 selectedRows.length > 0 && selectedRows.length === _selectableRows.length
                             }
                             onChange={(e: any) => {
-                              const _selectableRows = displayData.filter(row => row.service_status >= 1);
+                              const _selectableRows = displayData.filter(row => row.service_status < 2);
                               if (e.checked) setSelectedRows([..._selectableRows.map((d) => d.id)]);
                               else setSelectedRows([]);
                             }}
@@ -264,7 +264,7 @@ export default function ListTamThu() {
                       }}
                       body={(rowData: any) =>{
                         const isChecked = selectedRows.findIndex(id => id === rowData.id) !== -1;
-                        if(rowData.service_status >= 1){
+                        if(rowData.service_status < 2){
                             return (<Checkbox
                             className="p-checkbox-sm"
                             checked={isChecked}

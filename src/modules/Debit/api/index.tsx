@@ -17,7 +17,8 @@ export const listDebitMuaBan = async (params: any) => await getData("Debit/muaba
 export const listDebitDauKyKH = async (params: any) => await getData("Debit/daukykh", params);
 export const listDebitDauKyNCC = async (params: any) => await getData("Debit/daukyncc", params);
 export const listDebitDispatch = async (params: any) => await getData("Debit/dispatch", params);
-export const listDebitCuocTamThu = async (params: any) => await getData("Debit/cuoctamthu", params);
+export const listDebitTamThu = async (params: any) => await getData("Debit/cuoctamthu", params);
+export const listDebitCuoc = async (params: any) => await getData("Debit/phicuoc", params);
 export const listDebitService = async (params: any) => await getData("Debit/service", params);
 export const showDebit = async (params: any) => await getData("Debit/show", params);
 export const ShowWithFileInfoAsync = async (params: any) => await getData("Debit/ShowWithFileInfoAsync", params);
@@ -33,6 +34,7 @@ export const deleteDebitNCC = async (params: any) => await postData("Debit/delet
 // cập nhật debit khách hàng
 export const updateDebitToStatusDichVu = async (params: any) => await postData("Debit/updateDebitToStatusDichVu", params);
 export const updateDebit = async (params: any) => await postData("Debit/updateDebit", params);
+export const updateServiceStatus = async (params: any) => await postData("Debit/updateServiceStatus", params);
 export const updateDebitFileGia = async (params: any) => await postData("Debit/updateFileGia", params);
 export const updateVATDebitFileGia = async (params: any) => await postData("Debit/updateVATFileGia", params);
 export const updateVATDebitNoFile = async (params: any) => await postData("Debit/updateVATDebitNoFile", params);
@@ -64,6 +66,7 @@ export const addDebitMuaHangNCC = async (params: any) => await postData("Debit/c
 export const addDebitBanHangKH = async (params: any) => await postData("Debit/create/banhang", params);
 export const showWithIds = async (params: any) => await postData("Debit/showWithIds", params);
 export const exportDebitKH = async (params: any) => await getDataV3("Debit/excel/congnokh", params);
+export const exportDebitNCC = async (params: any) => await getDataV3("Debit/excel/congnoncc_v1", params);
 export const exportDebitKHVer1 = async (params: any) => await getDataV3("Debit/excel/congnokh_v1", params);
 export const listDebitDoiTruNCC = async (params: any) => await getData("Debit/congnodoitruncc", params);
 export const listDebitDoiTruKH = async (params: any) => await getData("Debit/congnodoitrukh", params);

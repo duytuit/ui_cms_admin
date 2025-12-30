@@ -324,3 +324,8 @@ export const statusOptions = [
   { label: 'Đã duyệt', value: 1 },
   { label: 'Chưa duyệt', value: 0 }
 ];
+export const statusServiceDebit = [
+  { label: 'Chưa bàn giao', value: 0 },
+  { label: 'Đã bàn giao', value: 1 },
+  { label: 'Đã duyệt', value: 2 }
+];

@@ -83,6 +83,28 @@ const model = [{
             category_id: 1,
             sort: 1
           },
+           {
+            id: 1,
+            name: 'Phiếu cược',
+            route: '/debit/ListCuocKeToan',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
+            id: 1,
+            name: 'Phiếu tạm thu',
+            route: '/debit/ListTamThuKeToan',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
           {
             id: 1,
             name: 'Số dư đầu kỳ',
@@ -156,7 +178,7 @@ const model = [{
           },
           {
             id: 1,
-            name: 'Bảng tạm thu',
+            name: 'Danh sách tạm thu',
             route: '/debit/listTamThu',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,

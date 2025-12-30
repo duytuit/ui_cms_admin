@@ -1,19 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Column, DataTableClient, DateBody, } from "components/common/DataTable";
-import { Dropdown, GridForm, Input, } from "components/common/ListForm";
+import { GridForm, Input} from "components/common/ListForm";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import { useListCongNoGiaoNhan, useListCongNoLaiXe, useListDebitCongNoChiTietKH } from "../service";
-import { exportDebitKH, exportDebitKHVer1 } from "../api";
+import { useListCongNoLaiXe } from "../service";
 import { TypeDebitDKKH } from "utils";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
-import UpdatePhieuThuKH from "modules/receipt/screen/update_phieuthu_kh";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
+import { Splitter } from "primereact/splitter";
+import UpdatePhieuThuLaiXe from "modules/receipt/screen/update_phieuthu_laixe";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setSelectedRows}: any) => {
@@ -44,38 +44,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
       toDate: filter.toDate,
     }));
   }, [filter]);
-  async function ExportExcelCongNoKH(){
-    const respo = await exportDebitKH(Helper.convertObjectToQueryString(_paramsPaginator));
-    const url = window.URL.createObjectURL(new Blob([respo.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'cong_no_chi_tiet_kh.xlsx'); // or any other extension
-    document.body.appendChild(link);
-    link.click();
-    link?.parentNode?.removeChild(link);  
-  }
-  async function ExportExcelCongNoKHVer1(){
-    const respo = await exportDebitKHVer1(Helper.convertObjectToQueryString(_paramsPaginator));
-    const url = window.URL.createObjectURL(new Blob([respo.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'cong_no_chi_tiet_kh_ver1.xlsx'); // or any other extension
-    document.body.appendChild(link);
-    link.click();
-    link?.parentNode?.removeChild(link);  
-  }
- const items = [
-        {
-            label: 'Công nợ chi tiết',
-            icon: "pi pi-file-export",
-            command: () => ExportExcelCongNoKH()
-        },
-        {
-            icon: "pi pi-file-export",
-            label: 'Công nợ chi tiết 1',
-            command: () => ExportExcelCongNoKHVer1()
-        }
-    ];
   return (
     <>
       <GridForm
@@ -105,6 +73,17 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
           />
         </div>
       </GridForm>
+       <Dialog
+        position="top"
+        dismissableMask
+        visible={visible}
+        onHide={() => setVisible(false)}
+        style={{ width: "70vw", top:"30px" }}
+      >
+        <p className="m-0">
+          {selected && <UpdatePhieuThuLaiXe debits={selected} onClose={handleModalClose} ></UpdatePhieuThuLaiXe>}
+        </p>
+      </Dialog>
     </>
   );
 };
@@ -113,10 +92,8 @@ export default function ListDebitChiTietLaiXe() {
   const { handleParamUrl } = useHandleParamUrl();
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [displayData, setDisplayData] = useState<any[]>([]);
-  const [first, setFirst] = useState(0);
-  const [rows, setRows] = useState(10);
-  const { data: customers } = useListCustomerDetailWithState({status: 1});
-  const { data: employees } = useListEmployeeWithState({});
+  const {data: customers } = useListCustomerDetailWithState({status: 1});
+  const {data: employees } = useListEmployeeWithState({});
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
     pageSize: 20,
@@ -137,17 +114,6 @@ export default function ListDebitChiTietLaiXe() {
     params: paramsPaginator,
     debounce: 500,
   });
-    // --- Header template with filter ---
-  const customerAbbHeader = (
-     <div className="py-1">
-         <Input
-            value={filters.customerAbb}
-            onChange={(e:any) => setFilters({ ...filters, customerAbb: e.target.value })}
-            size="small"
-            className={classNames("input-sm")}
-          />
-     </div>
-  );
     const fileNumberHeader = (
      <div className="py-1">
          <Input
@@ -158,51 +124,12 @@ export default function ListDebitChiTietLaiXe() {
           />
      </div>
   );
-    const billHeader = (
-     <div className="py-1">
-         <Input
-            value={filters.bill}
-            onChange={(e:any) => setFilters({ ...filters, bill: e.target.value })}
-            size="small"
-            className={classNames("input-sm")}
-          />
-     </div>
-  );
-    const declarationHeader = (
-     <div className="py-1">
-         <Input
-            value={filters.declaration}
-            onChange={(e:any) => setFilters({ ...filters, declaration: e.target.value })}
-            size="small"
-            className={classNames("input-sm")}
-          />
-     </div>
-  );
-    const dispatchCodeHeader = (
-     <div className="py-1">
-         <Input
-            value={filters.dispatch_code}
-            onChange={(e:any) => setFilters({ ...filters, dispatch_code: e.target.value })}
-            size="small"
-            className={classNames("input-sm")}
-          />
-     </div>
-  );
+  
     const nameHeader = (
      <div className="py-1">
          <Input
             value={filters.name}
             onChange={(e:any) => setFilters({ ...filters, name: e.target.value })}
-            size="small"
-            className={classNames("input-sm")}
-          />
-     </div>
-  );
-  const fileBillHeader = (
-     <div className="py-1">
-         <Input
-            value={filters.file_bill}
-            onChange={(e:any) => setFilters({ ...filters, file_bill: e.target.value })}
             size="small"
             className={classNames("input-sm")}
           />
@@ -252,7 +179,7 @@ useEffect(() => {
         const _laixe = employees.find((x: any) => x.id === row.employee_driver_id);
         const _typeKH = TypeDebitDKKH.find((x: any) => x.value === row.type);
         const _data = JSON.parse(row.data);
-        const thanh_tien = Math.round(row.price * (1 + row.vat / 100));
+        const thanh_tien = Math.round(row.driver_fee);
         return {
             ...row,
             fileNumber: _data?.fileNumber || "không file",
@@ -280,7 +207,7 @@ useEffect(() => {
     const filtered = applyFilters(mapped);
     setDisplayData(filtered);
 
-}, [first, rows, data, paramsPaginator, filters, customers, employees]);
+}, [data, paramsPaginator, filters, customers, employees]);
   const headerGroup = (
         <ColumnGroup>
             <Row>
@@ -296,23 +223,23 @@ useEffect(() => {
             <Row>
                 <Column header="Số file"/>
                 <Column style={{width: "250px"}} header="Nội dung"/>
-                <Column style={{width: "150px"}} header="Dịch vụ"/>
-                <Column style={{width: "150px"}} header="Chi hộ"/>
-                <Column header="Dịch vụ"/>
-                <Column header="Chi hộ"/>
-                <Column style={{width: "150px"}} frozen alignFrozen="right" className="font-bold" header="Dịch vụ" />
-                <Column style={{width: "150px"}} frozen alignFrozen="right" className="font-bold" header="Chi hộ" />
+                <Column style={{width: "150px"}} header="Cước"/>
+                <Column style={{width: "150px"}} header="Tạm ứng"/>
+                <Column header="Cước"/>
+                <Column header="Tạm ứng"/>
+                <Column style={{width: "150px"}} frozen alignFrozen="right" className="font-bold" header="Cước" />
+                <Column style={{width: "150px"}} frozen alignFrozen="right" className="font-bold" header="Tạm ứng" />
                 <Column style={{width: "150px"}} frozen alignFrozen="right" className="font-bold" header="Còn lại" />
                 <Column style={{width: "10px"}} frozen alignFrozen="right" className="font-bold" header="" />
-                <Column style={{width: "140px"}} frozen alignFrozen="right" className="font-bold" header="Số thu dịch vụ" />
-                <Column style={{width: "140px"}} frozen alignFrozen="right" className="font-bold" header="Số thu chi hộ" />
+                <Column style={{width: "140px"}} frozen alignFrozen="right" className="font-bold" header="Số Thu Cước" />
+                <Column style={{width: "140px"}} frozen alignFrozen="right" className="font-bold" header="Số Thu Tạm Ứng" />
             </Row>
              <Row>
                 <Column />
                 <Column />
                 <Column />
-                <Column header={fileNumberHeader}/>
-                <Column header={nameHeader}/>
+                <Column header={fileNumberHeader} headerClassName="my-title-center"/>
+                <Column header={nameHeader} headerClassName="my-title-center"/>
                 <Column />
                 <Column />
                 <Column /> 
@@ -336,211 +263,207 @@ useEffect(() => {
           refresh={refresh}
           _setSelectedRows={setSelectedRows}
         />
-
-        <DataTableClient
-          rowHover
-          value={displayData}
-          paginator
-          rows={rows}
-          first={first}
-          totalRecords={data?.total}
-          currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
-          onPage={(e: any) => {
-            setFirst(e.first);
-            setRows(e.rows);
-          }}
-          headerColumnGroup={headerGroup}
-          loading={loading}
-          dataKey="id"
-          title="Tài khoản"
-          filterDisplay="row"
-          className={classNames("Custom-DataTableClient")}
-          scrollable
-          tableStyle={{ minWidth: "2000px" }} // ép bảng rộng hơn để có scroll ngang
-        >
-          <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="userLaiXe" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="fileNumber" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column field="name" filter showFilterMenu={false} filterMatchMode="contains" />
-          <Column // dịch vụ
-            body={(row: any) =>{
-              return Helper.formatCurrency(row.thanhtien_dv.toString());
-            }} 
-            footer={getSumColumn("thanhtien_dv")}
-            footerStyle={{ fontWeight: "bold" }}
-          />
-          <Column // chi hộ
-            body={(row: any) =>{
-              return Helper.formatCurrency(row.thanhtien_ch.toString());
-            }} 
-            footer={getSumColumn("thanhtien_ch")}
-            footerStyle={{ fontWeight: "bold" }}
-          />
-          <Column 
-            body={(row: any) =>{
-              return Helper.formatCurrency(row.dathu_dv.toString());
-            }}
-          />
-          <Column 
-            body={(row: any) =>{
-              return Helper.formatCurrency(row.dathu_ch.toString());
-            }} 
-          />
-          <Column  // còn dịch vụ
-            body={(row: any) =>{
-                  return Helper.formatCurrency(row.conlai_dv_view.toString());
-            }} 
-            footer={getSumColumn("conlai_dv_view")}
-            footerStyle={{ fontWeight: "bold" }}
-            frozen 
-            alignFrozen="right" 
-            className="font-bold" 
-            />
-          <Column  // còn chi hộ
-            body={(row: any) =>{
-                return Helper.formatCurrency(row.conlai_ch_view.toString());
-            }} 
-            footer={getSumColumn("conlai_ch_view")}
-            footerStyle={{ fontWeight: "bold" }}
-            frozen 
-            alignFrozen="right" 
-            className="font-bold" 
-          />
-          <Column // còn lại tổng
-            body={(row: any) =>{
-                return Helper.formatCurrency(row.conlai_tong.toString());
-            }} 
-            footer={getSumColumn("conlai_tong")}
-            footerStyle={{ fontWeight: "bold" }}
-            frozen 
-            alignFrozen="right" 
-            className="font-bold"
-          />
-          <Column
-            header={
-              <Checkbox
-                checked={
-                  selectedRows.length === displayData.length &&
-                  displayData.length > 0
-                }
-                onChange={(e: any) => {
-                  if (e.checked) setSelectedRows([...displayData]); // lưu nguyên object
-                  else setSelectedRows([]);
-                }}
-              />
-            }
-            body={(rowData: any) => {
-              const thanh_tien = Math.round(rowData.price * (1 + rowData.vat / 100));
-              let conlai = thanh_tien - rowData.receipt_total;
-              conlai = Math.max(conlai, 0);
-              if(conlai > 0){
-                const isChecked = selectedRows.some(r => r.id === rowData.id); // check theo id
-                return (
-                  <Checkbox
-                    className="p-checkbox-sm"
-                    checked={isChecked}
-                    onChange={(e: any) => {
-                      setSelectedRows(prev => {
-                        if (e.checked) {
-                          // add row: lấy object mới nhất từ displayData
-                          const rowFromDisplay = displayData.find(d => d.id === rowData.id);
-                          if (!prev.some(r => r.id === rowData.id) && rowFromDisplay) {
-                            return [...prev, rowFromDisplay];
+        <div style={{ height: 'calc(100vh - 8rem)' }}>
+            <Splitter style={{ height: '100%', width: '100%' }}>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                <DataTableClient
+                    rowHover
+                    value={displayData}
+                    headerColumnGroup={headerGroup}
+                    loading={loading}
+                    dataKey="id"
+                    title="Tài khoản"
+                    filterDisplay="row"
+                    className={classNames("Custom-DataTableClient")}
+                    scrollable
+                    tableStyle={{ minWidth: "2000px" }} // ép bảng rộng hơn để có scroll ngang
+                  >
+                    <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                    <Column field="userLaiXe" filter showFilterMenu={false} filterMatchMode="contains" />
+                    <Column field="fileNumber" filter showFilterMenu={false} filterMatchMode="contains" />
+                    <Column field="name" filter showFilterMenu={false} filterMatchMode="contains" />
+                    <Column // dịch vụ
+                      body={(row: any) =>{
+                        return Helper.formatCurrency(row.thanhtien_dv.toString());
+                      }} 
+                      footer={getSumColumn("thanhtien_dv")}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
+                    <Column // chi hộ
+                      body={(row: any) =>{
+                        return Helper.formatCurrency(row.thanhtien_ch.toString());
+                      }} 
+                      footer={getSumColumn("thanhtien_ch")}
+                      footerStyle={{ fontWeight: "bold" }}
+                    />
+                    <Column 
+                      body={(row: any) =>{
+                        return Helper.formatCurrency(row.dathu_dv.toString());
+                      }}
+                    />
+                    <Column 
+                      body={(row: any) =>{
+                        return Helper.formatCurrency(row.dathu_ch.toString());
+                      }} 
+                    />
+                    <Column  // còn dịch vụ
+                      body={(row: any) =>{
+                            return Helper.formatCurrency(row.conlai_dv_view.toString());
+                      }} 
+                      footer={getSumColumn("conlai_dv_view")}
+                      footerStyle={{ fontWeight: "bold" }}
+                      frozen 
+                      alignFrozen="right" 
+                      className="font-bold" 
+                      />
+                    <Column  // còn chi hộ
+                      body={(row: any) =>{
+                          return Helper.formatCurrency(row.conlai_ch_view.toString());
+                      }} 
+                      footer={getSumColumn("conlai_ch_view")}
+                      footerStyle={{ fontWeight: "bold" }}
+                      frozen 
+                      alignFrozen="right" 
+                      className="font-bold" 
+                    />
+                    <Column // còn lại tổng
+                      body={(row: any) =>{
+                          return Helper.formatCurrency(row.conlai_tong.toString());
+                      }} 
+                      footer={getSumColumn("conlai_tong")}
+                      footerStyle={{ fontWeight: "bold" }}
+                      frozen 
+                      alignFrozen="right" 
+                      className="font-bold"
+                    />
+                    <Column
+                      header={
+                        <Checkbox
+                          checked={
+                            selectedRows.length === displayData.length &&
+                            displayData.length > 0
                           }
-                          return prev;
-                        } else {
-                          // remove row
-                          return prev.filter(r => r.id !== rowData.id);
+                          onChange={(e: any) => {
+                            if (e.checked) setSelectedRows([...displayData]); // lưu nguyên object
+                            else setSelectedRows([]);
+                          }}
+                        />
+                      }
+                      body={(rowData: any) => {
+                        const thanh_tien = Math.round(rowData.price * (1 + rowData.vat / 100));
+                        let conlai = thanh_tien - rowData.receipt_total;
+                        conlai = Math.max(conlai, 0);
+                        if(conlai > 0){
+                          const isChecked = selectedRows.some(r => r.id === rowData.id); // check theo id
+                          return (
+                            <Checkbox
+                              className="p-checkbox-sm"
+                              checked={isChecked}
+                              onChange={(e: any) => {
+                                setSelectedRows(prev => {
+                                  if (e.checked) {
+                                    // add row: lấy object mới nhất từ displayData
+                                    const rowFromDisplay = displayData.find(d => d.id === rowData.id);
+                                    if (!prev.some(r => r.id === rowData.id) && rowFromDisplay) {
+                                      return [...prev, rowFromDisplay];
+                                    }
+                                    return prev;
+                                  } else {
+                                    // remove row
+                                    return prev.filter(r => r.id !== rowData.id);
+                                  }
+                                });
+                              }}
+                              onClick={(e: any) => e.stopPropagation()}
+                            />
+                          );
                         }
-                      });
-                    }}
-                    onClick={(e: any) => e.stopPropagation()}
-                  />
-                );
-              }
-            }}
-            style={{ width: "3em" }}
-            frozen
-            alignFrozen="right"
-          />
-          <Column 
-           body={(row:any, options:any) => {
-            if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){
-              const price = typeof row.price === "string"
-                ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
-                : Number(row.price) || 0;
-              const vat = Number(row.vat) || 0;
-              const thanh_tien = Math.round(price * (1 + vat / 100));
-              const conlai = thanh_tien - (row.receipt_total || 0);
-              return (
-                 <Input
-                    className="w-full input-sm"
-                    value={Helper.formatCurrency(String(row.conlai_dv > 0 ? row.conlai_dv : conlai))}
-                    onChange={(e: any) => {
-                      const newValue = parseInt(e.target.value.replace(/\D/g, ""), 10);
+                      }}
+                      style={{ width: "3em" }}
+                      frozen
+                      alignFrozen="right"
+                    />
+                    <Column 
+                    body={(row:any, options:any) => {
+                      if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){
+                        const price = typeof row.price === "string"
+                          ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
+                          : Number(row.price) || 0;
+                        const vat = Number(row.vat) || 0;
+                        const thanh_tien = Math.round(price * (1 + vat / 100));
+                        const conlai = thanh_tien - (row.receipt_total || 0);
+                        return (
+                          <Input
+                              className="w-full input-sm"
+                              value={Helper.formatCurrency(String(row.conlai_dv > 0 ? row.conlai_dv : conlai))}
+                              onChange={(e: any) => {
+                                const newValue = parseInt(e.target.value.replace(/\D/g, ""), 10);
 
-                      setDisplayData(prev => {
-                        // Tạo mảng displayData mới
-                        const updated = [...prev];
-                        updated[options.rowIndex] = {
-                          ...updated[options.rowIndex],
-                          conlai_dv: newValue
-                        };
+                                setDisplayData(prev => {
+                                  // Tạo mảng displayData mới
+                                  const updated = [...prev];
+                                  updated[options.rowIndex] = {
+                                    ...updated[options.rowIndex],
+                                    conlai_dv: newValue
+                                  };
 
-                        // Đồng bộ selectedRows: nếu row đang chọn, cập nhật object mới
-                        setSelectedRows(prevSelected =>
-                          prevSelected.map(sel =>
-                            sel.id === row.id ? { ...updated[options.rowIndex] } : sel
-                          )
+                                  // Đồng bộ selectedRows: nếu row đang chọn, cập nhật object mới
+                                  setSelectedRows(prevSelected =>
+                                    prevSelected.map(sel =>
+                                      sel.id === row.id ? { ...updated[options.rowIndex] } : sel
+                                    )
+                                  );
+
+                                  return updated;
+                                });
+                              }}
+                            />
                         );
+                      }
+                    }} frozen alignFrozen="right" className="font-bold"/>
+                    <Column 
+                    
+                    body={(row:any, options:any) => {
+                      if(row.type === 2 || row.type === 3 || row.type === 6){
+                        const price = typeof row.price === "string"
+                          ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
+                          : Number(row.price) || 0;
+                        const vat = Number(row.vat) || 0;
+                        const thanh_tien = Math.round(price * (1 + vat / 100));
+                        const conlai = thanh_tien - (row.receipt_total || 0);
+                        return (
+                          <Input
+                              className="w-full input-sm"
+                              value={Helper.formatCurrency(String(row.conlai_ch > 0 ? row.conlai_ch : conlai))}
+                              onChange={(e: any) => {
+                                const newValue = parseInt(e.target.value.replace(/\D/g, ""), 10);
 
-                        return updated;
-                      });
-                    }}
-                  />
-              );
-            }
-          }} frozen alignFrozen="right" className="font-bold"/>
-          <Column 
-           
-           body={(row:any, options:any) => {
-             if(row.type === 2 || row.type === 3 || row.type === 6){
-              const price = typeof row.price === "string"
-                ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
-                : Number(row.price) || 0;
-              const vat = Number(row.vat) || 0;
-              const thanh_tien = Math.round(price * (1 + vat / 100));
-              const conlai = thanh_tien - (row.receipt_total || 0);
-              return (
-                 <Input
-                    className="w-full input-sm"
-                    value={Helper.formatCurrency(String(row.conlai_ch > 0 ? row.conlai_ch : conlai))}
-                    onChange={(e: any) => {
-                      const newValue = parseInt(e.target.value.replace(/\D/g, ""), 10);
+                                setDisplayData(prev => {
+                                  // Tạo mảng displayData mới
+                                  const updated = [...prev];
+                                  updated[options.rowIndex] = {
+                                    ...updated[options.rowIndex],
+                                    conlai_ch: newValue
+                                  };
 
-                      setDisplayData(prev => {
-                        // Tạo mảng displayData mới
-                        const updated = [...prev];
-                        updated[options.rowIndex] = {
-                          ...updated[options.rowIndex],
-                          conlai_ch: newValue
-                        };
+                                  // Đồng bộ selectedRows: nếu row đang chọn, cập nhật object mới
+                                  setSelectedRows(prevSelected =>
+                                    prevSelected.map(sel =>
+                                      sel.id === row.id ? { ...updated[options.rowIndex] } : sel
+                                    )
+                                  );
 
-                        // Đồng bộ selectedRows: nếu row đang chọn, cập nhật object mới
-                        setSelectedRows(prevSelected =>
-                          prevSelected.map(sel =>
-                            sel.id === row.id ? { ...updated[options.rowIndex] } : sel
-                          )
+                                  return updated;
+                                });
+                              }}
+                            />
                         );
-
-                        return updated;
-                      });
-                    }}
-                  />
-              );
-            }
-          }} frozen alignFrozen="right" className="font-bold"/>
-        </DataTableClient>
+                      }
+                    }} frozen alignFrozen="right" className="font-bold"/>
+                  </DataTableClient>
+              </div>
+            </Splitter>
+        </div>
       </div>
     </>
   );

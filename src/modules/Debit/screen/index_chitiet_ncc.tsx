@@ -14,6 +14,7 @@ import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import UpdatePhieuChiNCC from "modules/receipt/screen/update_phieuchi_ncc";
 import { Splitter } from "primereact/splitter";
+import { exportDebitNCC } from "../api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setSelectedRows}: any) => {
@@ -59,7 +60,23 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
         setdunoDK(dunoDKNCC[0].total_debit - dunoDKNCC[0].total_receipt)
     }
   }, [dunoDKNCC,filter]);
-
+  async function ExportExcelCongNoNCC(){
+    const respo = await exportDebitNCC(Helper.convertObjectToQueryString(_paramsPaginator));
+    const url = window.URL.createObjectURL(new Blob([respo.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'cong_no_chi_tiet_ncc.xlsx'); // or any other extension
+    document.body.appendChild(link);
+    link.click();
+    link?.parentNode?.removeChild(link);  
+  }
+  const items = [
+        {
+            label: 'Công nợ chi tiết',
+            icon: "pi pi-file-export",
+            command: () => ExportExcelCongNoNCC()
+        }
+  ];
   return (
     <>
       <GridForm
@@ -70,6 +87,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
         className="lg:col-9"
         openDialogAdd={()=>openDialogAdd()}
         openDialogAddName="Lập phiếu chi"
+        MenuItems={items}
       >
         <div className="col-2">Ngày công nợ</div>
         <div className="col-2">

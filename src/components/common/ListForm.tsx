@@ -73,7 +73,7 @@ export const Dropdown = (props:any) => {
 
 export const GridForm = (props:any) => {
     const menuRight = useRef<Menu>(null);
-    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam, add ,addName, addOne,addOneName, openDialogAdd, openDialogAddName, openDialogAddOne, openDialogAddNameOne, MenuItems} = props;
+    const { paramsPaginator, setParamsPaginator, filter, handleFilter ,defaultParam, add ,addName, addOne,addOneName, openDialogAdd, openDialogAddName, openDialogAddOne, openDialogAddNameOne, MenuItems , MenuName,MenuIcon} = props;
     const handleClear = (e:any) => {
         setParamsPaginator(defaultParam);
         refreshObject(filter)
@@ -134,8 +134,8 @@ export const GridForm = (props:any) => {
                             <Menu model={MenuItems} popup ref={menuRight} id="popup_menu_right" />
                             <Button 
                                 type="button"
-                                label="Export"
-                                icon="pi pi-file-export"
+                                label={MenuName??"Export"}
+                                icon={MenuIcon??"pi pi-file-export"}
                                 severity="info" 
                                 size="small" 
                                 onClick={(e:any) => menuRight.current?.toggle(e)}

@@ -9,7 +9,7 @@ import { useListUserWithState } from "modules/user/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import { useListDebitCuocTamThu, useListDebitDauKyKH, useListDebitDauKyNCC } from "../service";
+import { useListDebitDauKyKH, useListDebitDauKyNCC } from "../service";
 import { useListContractFileWithState } from "modules/ContractFile/service";
 import { deleteDebit } from "../api";
 import { TypeDebitDKKH, TypeDebitDKNCC } from "utils";
