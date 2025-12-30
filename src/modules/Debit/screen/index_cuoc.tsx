@@ -287,9 +287,15 @@ export default function ListCuoc() {
                       header="Trạng thái"
                         body={(row: any) => {
                         if(row.service_status === 2){
-                          return <Button label="đã duyệt" rounded severity="success" size="small" text  />
+                          return <Button label="đã nhận phiếu" rounded severity="success" size="small" text  />
                         }else if(row.service_status === 1){
-                          return <Button label="đã bàn giao" rounded severity="warning" size="small" text  />
+                          return <Button label="đã bàn giao phiếu" rounded severity="warning" size="small" text  />
+                        }else if(row.service_status === 3){
+                          return <Button label="đã hoàn trả" rounded severity="info" size="small" text  />
+                        }else if(row.service_status === 4){
+                          return <Button label="đã hoàn tiền" rounded severity="help" size="small" text  />
+                        }else if(row.service_status === 5){
+                          return <Button label="đã hoàn cược" rounded severity="info" size="small" text  />
                         }else{
                           return <Button label="chưa bàn giao" rounded severity="secondary" size="small" text  />
                         }

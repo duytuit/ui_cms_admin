@@ -326,6 +326,9 @@ export const statusOptions = [
 ];
 export const statusServiceDebit = [
   { label: 'Chưa bàn giao', value: 0 },
-  { label: 'Đã bàn giao', value: 1 },
-  { label: 'Đã duyệt', value: 2 }
+  { label: 'Đã bàn giao phiếu', value: 1 },
+  { label: 'Đã nhận phiếu', value: 2 },
+  { label: 'Đã hoàn trả phiếu tạm thu', value: 3 },
+  { label: 'Đã hoàn tiền phiếu tạm thu', value: 4 },
+  { label: 'Đã hoàn cược', value: 5 }
 ];
