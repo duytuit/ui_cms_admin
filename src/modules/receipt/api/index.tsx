@@ -31,3 +31,7 @@ export const addChuyentiennoibo = (params:any) => postData("receipt/create/chuye
 export const updateChuyentiennoibo = (params:any) => postData("receipt/update/chuyentiennoibo", params);
 export const deleteChuyentiennoibo = (params:any) => postData("receipt/delete/chuyentiennoibo", params);
 export const AddDoiTruCongNo = (params:any) => postData("receipt/create/doitrucongno", params);
+export const AddHoanTraTamThu = (params:any) => postData("receipt/create/hoantratamthu", params);
+export const HuyHoanTraTamThu = (params:any) => postData("receipt/create/huyhoantratamthu", params);
+export const AddThuGiaoNhan = (params:any) => postData("receipt/create/thugiaonhan", params);
+export const AddThuLaiXe = (params:any) => postData("receipt/create/thulaixe", params);

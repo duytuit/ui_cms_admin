@@ -301,7 +301,7 @@ export const TypeDoiTuong = [
      value:1,
      name:"Nhà cung cấp"
    },
-    {
+   {
      value:2,
      name:"Nhân viên"
    }
@@ -328,7 +328,7 @@ export const statusServiceDebit = [
   { label: 'Chưa bàn giao', value: 0 },
   { label: 'Đã bàn giao phiếu', value: 1 },
   { label: 'Đã nhận phiếu', value: 2 },
-  { label: 'Đã hoàn trả phiếu tạm thu', value: 3 },
-  { label: 'Đã hoàn tiền phiếu tạm thu', value: 4 },
+  { label: 'Đã hoàn trả', value: 3 },
+  { label: 'Đã hoàn tiền', value: 4 },
   { label: 'Đã hoàn cược', value: 5 }
 ];

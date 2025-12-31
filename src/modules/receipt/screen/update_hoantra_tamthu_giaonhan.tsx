@@ -1,15 +1,12 @@
 
-import { InputForm, UpdateForm } from "components/common/AddForm";
+import { UpdateForm } from "components/common/AddForm";
 import { useEffect, useMemo, useState } from "react";
 import { Column, DataTable, Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
-import { formOfPayment, listToast, refreshObject } from "utils";
-import { addPhieuThuKH } from "../api";
+import { listToast, refreshObject } from "utils";
+import { AddHoanTraTamThu, HuyHoanTraTamThu } from "../api";
 import { useDispatch } from "react-redux";
-import { classNames } from "primereact/utils";
-import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
-import { Dropdown, Input } from "components/common/ListForm";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { useListBankWithState, useListFundCategoryWithState } from "modules/categories/service";
 export default function UpdateHoanTraTamThuGiaoNhan({debits, onClose}: {debits: any, onClose: () => void }) {
@@ -24,18 +21,35 @@ export default function UpdateHoanTraTamThuGiaoNhan({debits, onClose}: {debits: 
   const dispatch = useDispatch();
   const handleSubmit = (e: any) => {
     e.preventDefault();
+  };
+  async function HoanTra() {
+    infos.Debits = JSON.stringify(debits);
+    infos.amount = amount;  
+    let info = {
+      ...infos,
+      data: JSON.stringify(infos),
+    };
+    const response = await AddHoanTraTamThu(info);
+    if (response) setLoading(false);
+    if (response.status === 200) {
+      if (response.data.status) {
+        setInfos({ ...refreshObject(infos), status: true })
+        dispatch(showToast({ ...listToast[0], detail: response.data.message }));
+        onClose();
+      }
+      else {
+        dispatch(showToast({ ...listToast[2], detail: response.data.message }))
+      }
+    } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
+  };
+  async function HuyHoanTra() {
     infos.Debits = JSON.stringify(debits);
     infos.amount = amount;
     let info = {
       ...infos,
       data: JSON.stringify(infos),
     };
-    console.log(info);
-    // setLoading(true);
-    // fetchDataSubmit(info);
-  };
-  async function fetchDataSubmit(info: any) {
-    const response = await addPhieuThuKH(info);
+    const response = await HuyHoanTraTamThu(info);
     if (response) setLoading(false);
     if (response.status === 200) {
       if (response.data.status) {
@@ -85,7 +99,8 @@ export default function UpdateHoanTraTamThuGiaoNhan({debits, onClose}: {debits: 
         loading={loading}
         onSubmit={handleSubmit}
         route="/receipt/create"
-        AddName="Hoàn trả phiếu tạm thu"
+        Cancel={{Name:"Hủy hoàn trả", Action: () => HuyHoanTra()}}
+        Accept={{Name:"Hoàn trả", Action: () => HoanTra()}}
       >
         <div className="field">
           <Panel header="Thông tin">

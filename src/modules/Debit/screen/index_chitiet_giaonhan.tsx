@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Column, DataTableClient, DateBody, } from "components/common/DataTable";
-import { GridForm, Input, } from "components/common/ListForm";
+import { Dropdown, GridForm, Input, } from "components/common/ListForm";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { useListCustomerDetailWithState } from "modules/partner/service";
-import { Checkbox, Dialog } from "components/uiCore";
+import { Button, Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { useListCongNoGiaoNhan } from "../service";
-import { TypeDebitDKKH } from "utils";
+import { statusOptions, statusServiceDebit, TypeDebitDKKH } from "utils";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
@@ -28,11 +28,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
   const [debitHoanTra, setDebitHoanTra] = useState<any>([]);
   const [visibleHoanTra, setVisibleHoanTra] = useState(false);
   const [visibleThuGiaoNhan, setVisibleThuGiaoNhan] = useState(false);
-  const openHoanTra = () => {
-    console.log(selected);
-    setDebitHoanTra(selected.filter((item: any) => item.service_id === 33));
-    setVisibleHoanTra(true);
-  };
   const openThuGiaoNhan = () => {
     console.log(selected);
     setVisibleThuGiaoNhan(true);
@@ -41,6 +36,11 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
       setVisibleThuGiaoNhan(false);
       _setSelectedRows([])
       refresh?.(); 
+  };
+  const openHoanTra = () => {
+    console.log(selected);
+    setDebitHoanTra(selected.filter((item: any) => item.service_id === 33));
+    setVisibleHoanTra(true);
   };
   const CloseHoanTra = () => {
       setVisibleHoanTra(false);
@@ -134,13 +134,14 @@ export default function ListDebitChiTietGiaoNhan() {
       declaration: "",
       dispatch_code: "",
       name: "",
-      file_bill: ""
+      file_bill: "",
+      service_status:""
   });
   const { data, loading, error, refresh } = useListCongNoGiaoNhan({
     params: paramsPaginator,
     debounce: 500,
   });
-    const fileNumberHeader = (
+  const fileNumberHeader = (
      <div className="py-1">
          <Input
             value={filters.fileNumber}
@@ -150,6 +151,18 @@ export default function ListDebitChiTietGiaoNhan() {
           />
      </div>
   );
+const StatusHeader = (
+    <div className="py-1">
+        <Dropdown
+            value={filters.service_status}
+            options={statusServiceDebit}
+            onChange={(e:any) => setFilters({ ...filters, service_status: e.value })}
+            placeholder="Chọn trạng thái"
+            showClear
+            className={classNames("dropdown-input-sm", "p-dropdown-sm")}
+        />
+    </div>
+);
     const nameHeader = (
      <div className="py-1">
          <Input
@@ -171,7 +184,8 @@ const applyFilters = (rows: any[]) => {
             (f.declaration ? row.declaration?.toLowerCase().includes(f.declaration.toLowerCase()) : true) &&
             (f.dispatch_code ? row.dispatch_code?.toLowerCase().includes(f.dispatch_code.toLowerCase()) : true) &&
             (f.name ? row.name?.toLowerCase().includes(f.name.toLowerCase()) : true) &&
-            (f.file_bill ? row.file_bill?.toLowerCase().includes(f.file_bill.toLowerCase()) : true)
+            (f.file_bill ? row.file_bill?.toLowerCase().includes(f.file_bill.toLowerCase()) : true) &&
+            (f.service_status ? row.service_status === f.service_status : true)
         );
     });
 };
@@ -237,6 +251,7 @@ useEffect(() => {
             <Row>
                 <Column rowSpan={2} />
                 <Column header="Ngày hạch toán" rowSpan={2} />
+                <Column header="Trạng thái" rowSpan={2} />
                 <Column header="Giao nhận" headerClassName="my-title-center" rowSpan={2} />
                 <Column header="Chứng từ" headerClassName="my-title-center" colSpan={2} />
                 <Column header="Nợ" headerClassName="my-title-center" colSpan={2} />
@@ -261,6 +276,7 @@ useEffect(() => {
              <Row>
                 <Column />
                 <Column />
+                <Column header={StatusHeader} headerClassName="my-title-center"/>
                 <Column />
                 <Column header={fileNumberHeader} headerClassName="my-title-center"/>
                 <Column header={nameHeader} headerClassName="my-title-center"/>
@@ -305,6 +321,25 @@ useEffect(() => {
                             tableStyle={{ minWidth: "2000px" }} // ép bảng rộng hơn để có scroll ngang
                         >
                               <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                              <Column
+                                field="service_status"
+                                header="Trạng thái"
+                                  body={(row: any) => {
+                                  if(row.service_status === 2){
+                                    return <Button label="đã nhận phiếu" rounded severity="success" size="small" text  />
+                                  }else if(row.service_status === 1){
+                                    return <Button label="đã bàn giao phiếu" rounded severity="warning" size="small" text  />
+                                  }else if(row.service_status === 3){
+                                    return <Button label="đã hoàn trả" rounded severity="info" size="small" text  />
+                                  }else if(row.service_status === 4){
+                                    return <Button label="đã hoàn tiền" rounded severity="help" size="small" text  />
+                                  }else if(row.service_status === 5){
+                                    return <Button label="đã hoàn cược" rounded severity="info" size="small" text  />
+                                  }else{
+                                    return <Button label="chưa bàn giao" rounded severity="secondary" size="small" text  />
+                                  }
+                                }}  style={{ width:"180px" }}
+                              />
                               <Column field="userGiaoNhan" filter showFilterMenu={false} filterMatchMode="contains" />
                               <Column field="fileNumber" filter showFilterMenu={false} filterMatchMode="contains" />
                               <Column field="name" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -379,7 +414,7 @@ useEffect(() => {
                                   const thanh_tien = Math.round(rowData.price);
                                   let conlai = thanh_tien - rowData.receipt_total;
                                   conlai = Math.max(conlai, 0);
-                                  if(conlai > 0){
+                                  if(conlai > 0 && rowData.service_status <= 3){
                                     const isChecked = selectedRows.some(r => r.id === rowData.id); // check theo id
                                     return (
                                       <Checkbox
@@ -411,7 +446,7 @@ useEffect(() => {
                               />
                               <Column 
                               body={(row:any, options:any) => {
-                                if(row.service_id === 19){
+                                if(row.service_id === 19 && row.service_status <= 2){
                                   const price = typeof row.price === "string"
                                     ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
                                     : Number(row.price) || 0;
@@ -449,7 +484,7 @@ useEffect(() => {
                               <Column 
                               
                               body={(row:any, options:any) => {
-                                if(row.service_id === 33){
+                                if(row.service_id === 33 && row.service_status <= 2){
                                   const price = typeof row.price === "string"
                                     ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
                                     : Number(row.price) || 0;

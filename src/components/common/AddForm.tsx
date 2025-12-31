@@ -132,7 +132,7 @@ export const AddFormCustom = (props:any) => {
 };
 export const UpdateForm = (props:any) => {
     const navigate = useNavigate();
-    const { checkId, title, loading, onSubmit, className, moreOptions, route, routeList, ButtonName, AddName,...prop } = props;
+    const { checkId, title, loading, onSubmit, className, moreOptions, route, routeList, ButtonName, AddName, Cancel, Accept,...prop } = props;
     return (
         <div className={classNames("card", className)} {...prop}>
              <form onSubmit={onSubmit}>
@@ -141,6 +141,26 @@ export const UpdateForm = (props:any) => {
                     {routeList && <Button type='button' onClick={() => navigate(routeList)} label="Trở về" className="ml-2" severity="secondary" size="small" outlined />}
                     {ButtonName && <Button type='submit' loading={loading} label={ButtonName}
                         className="ml-2" severity={ButtonName == "Duyệt" ?"info": "warning"} size="small" raised icon="pi pi-check"/>}
+                    {Cancel &&
+                        <Button  
+                            type="button" 
+                            label={Cancel.Name}
+                            className="ml-2"
+                            severity="warning"
+                            size="small"
+                            raised icon="pi pi-check"
+                            onClick={() => Cancel.Action()}
+                        />}
+                    {Accept &&
+                        <Button  
+                            type="button"   
+                            label={Accept.Name}
+                            className="ml-2"
+                            severity="info"
+                            size="small"
+                            raised icon="pi pi-check"
+                            onClick={() => Accept.Action()}
+                        />}
                     {AddName && <Button type='submit' loading={loading} label={AddName}
                         className="ml-2" severity="info" size="small" raised icon="pi pi-check"/>}
                 </div>

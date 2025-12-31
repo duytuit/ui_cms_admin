@@ -350,7 +350,7 @@ useEffect(() => {
                         />
                       }
                       body={(rowData: any) => {
-                        const thanh_tien = Math.round(rowData.price * (1 + rowData.vat / 100));
+                        const thanh_tien = Math.round(rowData.driver_fee);
                         let conlai = thanh_tien - rowData.receipt_total;
                         conlai = Math.max(conlai, 0);
                         if(conlai > 0){
@@ -386,11 +386,10 @@ useEffect(() => {
                     <Column 
                     body={(row:any, options:any) => {
                       if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){
-                        const price = typeof row.price === "string"
-                          ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
-                          : Number(row.price) || 0;
-                        const vat = Number(row.vat) || 0;
-                        const thanh_tien = Math.round(price * (1 + vat / 100));
+                         const price = typeof row.driver_fee === "string"
+                          ? parseFloat(row.driver_fee.replace(/[^0-9.]/g, "")) || 0
+                          : Number(row.driver_fee) || 0;
+                        const thanh_tien = Math.round(price);
                         const conlai = thanh_tien - (row.receipt_total || 0);
                         return (
                           <Input
@@ -425,11 +424,10 @@ useEffect(() => {
                     
                     body={(row:any, options:any) => {
                       if(row.type === 2 || row.type === 3 || row.type === 6){
-                        const price = typeof row.price === "string"
-                          ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
-                          : Number(row.price) || 0;
-                        const vat = Number(row.vat) || 0;
-                        const thanh_tien = Math.round(price * (1 + vat / 100));
+                        const price = typeof row.driver_fee === "string"
+                          ? parseFloat(row.driver_fee.replace(/[^0-9.]/g, "")) || 0
+                          : Number(row.driver_fee) || 0;
+                        const thanh_tien = Math.round(price);
                         const conlai = thanh_tien - (row.receipt_total || 0);
                         return (
                           <Input

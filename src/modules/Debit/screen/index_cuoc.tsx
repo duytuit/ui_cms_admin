@@ -248,14 +248,14 @@ export default function ListCuoc() {
                     <Column
                      
                        header={(rowData: any) => {
-                        const _selectableRows = displayData.filter(row => row.service_status >= 1);
+                        const _selectableRows = displayData.filter(row => row.service_status >= 1 && row.service_status <= 2);
                         return (
                           <Checkbox
                             checked={
                                 selectedRows.length > 0 && selectedRows.length === _selectableRows.length
                             }
                             onChange={(e: any) => {
-                              const _selectableRows = displayData.filter(row => row.service_status >= 1);
+                              const _selectableRows = displayData.filter(row => row.service_status >= 1 && row.service_status <= 2);
                               if (e.checked) setSelectedRows([..._selectableRows.map((d) => d.id)]);
                               else setSelectedRows([]);
                             }}
@@ -264,7 +264,7 @@ export default function ListCuoc() {
                       }}
                       body={(rowData: any) =>{
                         const isChecked = selectedRows.findIndex(id => id === rowData.id) !== -1;
-                        if(rowData.service_status >= 1){
+                        if(rowData.service_status >= 1 && rowData.service_status <= 2){
                             return (<Checkbox
                             className="p-checkbox-sm"
                             checked={isChecked}
