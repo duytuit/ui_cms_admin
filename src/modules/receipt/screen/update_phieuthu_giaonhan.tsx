@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Column, DataTable, Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { formOfPayment, listToast, refreshObject } from "utils";
-import { addPhieuThuKH } from "../api";
+import { addPhieuThuKH, AddThuGiaoNhan } from "../api";
 import { useDispatch } from "react-redux";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
@@ -31,11 +31,11 @@ export default function UpdatePhieuThuGiaoNhan({debits, onClose}: {debits: any, 
       data: JSON.stringify(infos),
     };
     console.log(info);
-    // setLoading(true);
-    // fetchDataSubmit(info);
+    setLoading(true);
+    fetchDataSubmit(info);
   };
   async function fetchDataSubmit(info: any) {
-    const response = await addPhieuThuKH(info);
+    const response = await AddThuGiaoNhan(info);
     if (response) setLoading(false);
     if (response.status === 200) {
       if (response.data.status) {

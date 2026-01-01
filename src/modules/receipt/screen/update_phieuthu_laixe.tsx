@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Column, DataTable, Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { formOfPayment, listToast, refreshObject } from "utils";
-import { addPhieuThuKH } from "../api";
+import { addPhieuThuKH, AddThuLaiXe } from "../api";
 import { useDispatch } from "react-redux";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
@@ -31,11 +31,11 @@ export default function UpdatePhieuThuLaiXe({debits, onClose}: {debits: any, onC
       data: JSON.stringify(infos),
     };
     console.log(info);
-    // setLoading(true);
-    // fetchDataSubmit(info);
+    setLoading(true);
+    fetchDataSubmit(info);
   };
   async function fetchDataSubmit(info: any) {
-    const response = await addPhieuThuKH(info);
+    const response = await AddThuLaiXe(info);
     if (response) setLoading(false);
     if (response.status === 200) {
       if (response.data.status) {
@@ -165,13 +165,11 @@ export default function UpdatePhieuThuLaiXe({debits, onClose}: {debits: any, onC
                             <Column field="name" header="Nội dung"/>
                             <Column  header="Cước" 
                             body={(row: any) =>{
-                              if(row.service_id === 19){
-                                  const price = typeof row.price === "string"
-                                    ? parseFloat(row.price.replace(/[^0-9.]/g, "")) || 0
-                                    : Number(row.price) || 0;
+                                  const price = typeof row.driver_fee === "string"
+                                    ? parseFloat(row.driver_fee.replace(/[^0-9.]/g, "")) || 0
+                                    : Number(row.driver_fee) || 0;
                                   const thanh_tien = Math.round(price);
                                   return Helper.formatCurrency(thanh_tien.toString());
-                              }
                             }}/>
                             <Column  header="Tạm Ứng" 
                              body={(row: any) =>{
