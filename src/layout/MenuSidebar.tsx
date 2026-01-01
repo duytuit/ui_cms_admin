@@ -5,9 +5,11 @@ import { CSSTransition } from 'react-transition-group';
 import { useEffect, useState } from 'react';
 
 export default function MenuSidebar(props: any){
+    const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
     const location = useLocation();
     const [activeMenu, setActiveMenu] = useState('');
     const item = props.item;
+    const menuRender = [280].includes(employeeInfo?.user_id) ? props.item.items : Array.isArray(props.item.items) ? props.item.items.filter((x: any) => x.admin === false) : [];
     const key = props.parentKey ? props.parentKey + '-' + props.index : String(props.index);
     const active = activeMenu === key || (activeMenu && activeMenu.startsWith(key + '-')) || false;
     const permissionTool = ['/','/page-one','/page-two','/auth/login','/categories/list','/bill/list','/customer/list',"/receipt/list",'/service/list','/product/list','/post/list','/category/post/list'];
@@ -54,7 +56,7 @@ export default function MenuSidebar(props: any){
     const subMenu = item.items && item.visible !== false && (
         <CSSTransition timeout={{ enter: 1000, exit: 450 }} classNames="layout-submenu" in={props.root ? true : active} key={item.name}>
             <ul>
-                {item.items.map((child:any, i:number) => {
+                {menuRender.map((child:any, i:number) => {
                     return <MenuSidebar item={child} index={i} className={child.badgeClass} parentKey={key} key={child.name + '-' + i} />;
                 })}
             </ul>

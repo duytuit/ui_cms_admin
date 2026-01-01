@@ -3,9 +3,7 @@ import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, Data
 import { FormInput } from "components/uiCore";
 import { Calendar, CalendarY, Dropdown, GridForm, Input } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { CategoryEnum } from "utils/type.enum";
 import { classNames } from "primereact/utils";
-import { MyCalendar } from "components/common/MyCalendar";
 import { useListEmployee } from "../service";
 import { deleteEmployee } from "../api";
 
@@ -90,13 +88,15 @@ export default function ListEmployee() {
                 <Column
                     header="Thao tác"
                     body={(e: any) =>
-                        ActionBody(
-                            e,
-                            "/employee/detail",
-                            { route: "/employee/delete", action: deleteEmployee },
-                            paramsPaginator,
-                            setParamsPaginator
-                        )
+                        {
+                            return ActionBody(
+                                e,
+                                "/employee/detail",
+                                { route: "/employee/delete", action: deleteEmployee },
+                                paramsPaginator,
+                                setParamsPaginator
+                            )
+                        }
                     }
                 />
             </DataTableClient>

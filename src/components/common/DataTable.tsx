@@ -122,7 +122,7 @@ export const StatusPartnerBody = (rowData:any, actions:any ,_status:number) => {
 
 export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, openDialogAdd?:any,duplicated?:any, handleUndo?:any, openDialogEdit?:any) => {
     const dispatch = useDispatch();
-    
+    const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
     async function accept() {
         const res = await actions.action({ id: rowData.id });
         if (res.status === 200) {
@@ -131,6 +131,10 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
                 if (paramsPaginator && setParamsPaginator) {
                     setParamsPaginator({ ...paramsPaginator, render: !paramsPaginator.render });
                 };
+                if (employeeInfo && employeeInfo.id === rowData.id && actions.route === '/employee/delete'){
+                   localStorage.removeItem('token');
+                   dispatch(showToast({ ...listToast[2], detail: 'Bạn cần phải đăng nhập lại!' }));
+                }
             }else{
                 dispatch(showToast({ ...listToast[2], detail: res.data.message  }));
             }

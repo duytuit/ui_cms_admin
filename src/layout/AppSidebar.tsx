@@ -3,7 +3,7 @@ import MenuSidebar from './MenuSidebar';
 import { MenuProvider } from './context/menuContext';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { listStorage } from 'modules/storage/api';
+import { listByUserIdStorage, listStorage } from 'modules/storage/api';
 const model = [{
     items: [
       {
@@ -15,6 +15,7 @@ const model = [{
         deleted_at: null,
         updated_at: null,
         icon: 'pi pi-home',
+        admin:false,
         route: '/'
       },
       {
@@ -26,6 +27,7 @@ const model = [{
         deleted_at: null,
         updated_at: null,
         icon: 'pi pi-home',
+        admin:false,
         route: '/page-two',
         items: [
           {
@@ -153,6 +155,7 @@ const model = [{
         category_id: 1,
         sort: 1,
         icon: 'pi pi-home',
+        admin:false,
         items: [
           {
             id: 1,
@@ -211,6 +214,7 @@ const model = [{
         category_id: 1,
         sort: 1,
         icon: 'pi pi-home',
+        admin:false,
         items: [
           {
             id: 1,
@@ -247,6 +251,7 @@ const model = [{
         category_id: 1,
         sort: 1,
         icon: 'pi pi-home',
+        admin:false,
         items: [
           {
             id: 1,
@@ -283,6 +288,7 @@ const model = [{
         category_id: 1,
         sort: 1,
         icon: 'pi pi-home',
+        admin:false,
         items: [
            {
             id: 1,
@@ -400,6 +406,7 @@ const model = [{
         category_id: 1,
         sort: 1,
         icon: 'pi pi-home',
+        admin:false,
         items: [
          {
             id: 1,
@@ -425,6 +432,7 @@ const model = [{
         category_id: 1,
         sort: 1,
         icon: 'pi pi-home',
+        admin:false,
         items: [
          {
             id: 1,
@@ -470,6 +478,7 @@ const model = [{
         deleted_at: null,
         updated_at: null,
         icon: 'pi pi-home',
+        admin:false,
         route: '/page-two',
         items: [
           {
@@ -526,6 +535,7 @@ const model = [{
         deleted_at: null,
         updated_at: null,
         icon: 'pi pi-home',
+        admin:false,
         route: '/page-two',
         items: [
           {
@@ -651,6 +661,7 @@ const model = [{
         deleted_at: null,
         updated_at: null,
         icon: 'pi pi-home',
+        admin:false,
         route: '/page-two',
         items: [
           {
@@ -687,6 +698,7 @@ const model = [{
         updated_at: null,
         route: '/storage/list',
         icon: 'pi pi-home',
+        admin:true,
         items: [
           {
             id: 1,
@@ -710,6 +722,7 @@ const model = [{
         deleted_at: null,
         updated_at: null,
         icon: 'pi pi-user',
+        admin:true,
         items: [
           {
             id: 1,
@@ -754,31 +767,46 @@ export default function AppSidebar(){
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedCity, setSelectedCity] = useState<any>();
   const [data, setData] = useState<any>([]);
-  const project = localStorage.getItem('project');
-  const fetchProject = async () => {
+  const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
+  const fetchProject = async (userId:number) => {
     try {
-      const res = await listStorage({});
-      if (res?.data?.data?.data) {
-        const _data = res.data.data.data.map((item: any) => ({
-          name: item.name,
-          projectId: item.id,
-        }));
-        setData(_data);
+      if([280].includes(employeeInfo.user_id)){
+        const res = await listStorage({});
+        if (res?.data?.data?.data) {
+          const _data = res.data.data.data.map((item: any) => ({
+            name: item.name,
+            projectId: item.id,
+          }));
+          setData(_data);
+        }
+      }else{
+        const res = await listByUserIdStorage({UserId: userId});
+        if (res?.data?.data?.data) {
+          const _data = res.data.data.data.map((item: any) => ({
+            name: item.name,
+            projectId: item.id,
+          }));
+          setData(_data);
+        }
       }
     } catch (err) {} 
   };
 
   useEffect(() => {
-    fetchProject();
-  }, []);
+    if (employeeInfo){
+      fetchProject(employeeInfo.user_id);
+    }
+  }, employeeInfo);
 
   // khi data đã load xong → set selected
   useEffect(() => {
     if (data.length > 0) {
-      if (project) {
-        setSelectedCity(JSON.parse(project));
-        localStorage.setItem('project', JSON.stringify(JSON.parse(project)))
-        setSearchParams({ "projectId": JSON.parse(project).projectId})
+      const _project = JSON.parse(localStorage.getItem('project') || '{}');
+       // lấy projectId từ data
+      const dataProjectIds = data.map((x: any) => x.projectId);
+      if (_project && dataProjectIds.includes(_project.projectId)) {
+        setSelectedCity(_project);
+        setSearchParams({ "projectId": _project.projectId})
       } else {
         setSelectedCity(data[0]);
         localStorage.setItem('project', JSON.stringify(data[0]))
@@ -805,7 +833,7 @@ export default function AppSidebar(){
         />
         <label htmlFor="dropdown">Dữ liệu</label>
       </span>
-      <ul className="layout-menu">
+       <ul className="layout-menu">
         {model.map((item: any, i) => {
           return <MenuSidebar item={item} root={true} index={i} key={i} />;
         })}

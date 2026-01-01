@@ -170,7 +170,6 @@ const UpdateEmployee = () => {
                             },
                           })
                         }
-                        required
                       />
                   </div>
                  
