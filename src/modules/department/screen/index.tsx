@@ -93,7 +93,7 @@ export default function ListDepartment() {
                         return ActionBody(
                             row,
                             "/department/detail",
-                            { route: "/department/delete", action: deleteDepartment },
+                            null,
                             paramsPaginator,
                             setParamsPaginator
                         );
