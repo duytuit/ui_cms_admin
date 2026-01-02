@@ -168,8 +168,8 @@ export default function ListReceiptThu() {
                             hinhthuc: _hinhthuc?.name,
                             nguoitao: `${_nguoitao?.last_name ?? ""} ${_nguoitao?.first_name ?? ""}`.trim(),
                             sofile:_sofile?.file_number,
-                            amount: Helper.formatCurrency(row.amount.toString()),
-                            total: Helper.formatCurrency(row.total.toString()),
+                            amount: Helper.formatCurrency(row.amount?.toString() ?? '0'),
+                            total: Helper.formatCurrency(row.total?.toString() ?? '0'),
                             typeReceipt: _typeReceipt?.name || "",
                         };
                      });
