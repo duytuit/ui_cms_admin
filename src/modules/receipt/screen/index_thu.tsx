@@ -107,7 +107,7 @@ export default function ListReceiptThu() {
     accounting_date: { value: null, matchMode: FilterMatchMode.CONTAINS },
     sofile: { value: null, matchMode: FilterMatchMode.CONTAINS },
     fullname_giaonhan: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    lydochi: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    lydo: { value: null, matchMode: FilterMatchMode.CONTAINS },
     bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
     total_amount: { value: null, matchMode: FilterMatchMode.CONTAINS },
     vat_rate: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -120,8 +120,6 @@ export default function ListReceiptThu() {
     note: { value: null, matchMode: FilterMatchMode.CONTAINS },
     nguoitao: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
-    const [first, setFirst] = useState(0);
-    const [rows, setRows] = useState(20);
     const [selectedDetail, setSelectedDetail] = useState<any>(null);
     const [paramsPaginator, setParamsPaginator] = useState({
         pageNum: 1,
@@ -168,13 +166,11 @@ export default function ListReceiptThu() {
                             hinhthuc: _hinhthuc?.name,
                             nguoitao: `${_nguoitao?.last_name ?? ""} ${_nguoitao?.first_name ?? ""}`.trim(),
                             sofile:_sofile?.file_number,
-                            amount: Helper.formatCurrency(row.amount?.toString() ?? '0'),
-                            total: Helper.formatCurrency(row.total?.toString() ?? '0'),
                             typeReceipt: _typeReceipt?.name || "",
                         };
                      });
         setDisplayData(mapped);
-    }, [ContractFile,employees,DMExpense,DMBank,DMQuy,first, rows, data, paramsPaginator]);
+    }, [ContractFile,employees,DMExpense,DMBank,DMQuy, data, paramsPaginator]);
     const getSumColumn = (field: string) => {
         const filtered = (displayData??[]).filter((item: any) => {
             return Object.entries(filters).every(([key, f]: [string, any]) => {
@@ -227,12 +223,10 @@ export default function ListReceiptThu() {
                             <DataTableClient
                                 rowHover
                                 value={displayData}
-                                onPage={(e: any) => {
-                                  setFirst(e.first);
-                                  setRows(e.rows);
-                                }}
                                 loading={loading}
                                 dataKey="id"
+                                filters={filters}
+                                onFilter={(e:any) => setFilters(e.filters)}
                                 title="Tài khoản"
                                 filterDisplay="row"
                                 className={classNames("Custom-DataTableClient")}

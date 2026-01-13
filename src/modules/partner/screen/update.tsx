@@ -53,9 +53,19 @@ export default function UpdatePartner() {
     if (id) {
       showPartner({ id: id, type: CategoryEnum.country }).then(res => {
         const detail = res.data.data
+        
         if (detail) {
+          const _customer = detail.partnerDetails.find((x:any)=> x.status == 1)
+          const _supplier = detail.partnerDetails.find((x:any)=> x.status == 2)
+         
           let info = {
             ...detail, status: detail.status === 0 ? true : false,
+            customerId:_customer?.id ?? 0,
+            supplierId:_supplier?.id ?? 0,
+            customerCreditLimit:_customer?.customerCreditLimit?? 0,
+            supplierCreditLimit:_supplier?.supplierCreditLimit?? 0,
+            customerCreditLimitMonth:_customer?.customerCreditLimitMonth?? 0,
+            supplierCreditLimitMonth:_supplier?.supplierCreditLimitMonth?? 0,
           };
           setInfos(info)
         }
@@ -135,6 +145,78 @@ export default function UpdatePartner() {
                       label="Mã số thuế"
                       required
                     />
+                  </div>
+                </div>
+                 <div className="field grid">
+                  <label
+                    htmlFor="customerCreditLimit"
+                    className="col-12 mb-2 md:col-3 md:mb-0"
+                  >
+                    Nợ tối đa đối với KH theo ngày
+                  </label>
+                  <div className="col-12 md:col-9">
+                    <InputForm className="w-full"
+                        id="customerCreditLimit"
+                        value={infos.customerCreditLimit}
+                        onChange={(e: any) =>
+                          setInfos({ ...infos, customerCreditLimit: e.target.value })
+                        }
+                        label="Nợ tối đa đối với KH theo ngày"
+                      />
+                  </div>
+                </div>
+                 <div className="field grid">
+                  <label
+                    htmlFor="customerCreditLimitMonth"
+                    className="col-12 mb-2 md:col-3 md:mb-0"
+                  >
+                    Nợ tối đa đối với KH theo tháng
+                  </label>
+                  <div className="col-12 md:col-9">
+                    <InputForm className="w-full"
+                        id="customerCreditLimitMonth"
+                        value={infos.customerCreditLimitMonth}
+                        onChange={(e: any) =>
+                          setInfos({ ...infos, customerCreditLimitMonth: e.target.value })
+                        }
+                        label="Nợ tối đa đối với KH theo tháng"
+                      />
+                  </div>
+                </div>
+                 <div className="field grid">
+                  <label
+                    htmlFor="supplierCreditLimit"
+                    className="col-12 mb-2 md:col-3 md:mb-0"
+                  >
+                    Nợ tối đa đối với NCC theo ngày
+                  </label>
+                  <div className="col-12 md:col-9">
+                     <InputForm className="w-full"
+                        id="supplierCreditLimit"
+                        value={infos.supplierCreditLimit}
+                        onChange={(e: any) =>
+                          setInfos({ ...infos, supplierCreditLimit: e.target.value })
+                        }
+                        label="Nợ tối đa đối với NCC theo ngày"
+                      />
+                  </div>
+                </div>
+                  <div className="field grid">
+                  <label
+                    htmlFor="supplierCreditLimitMonth"
+                    className="col-12 mb-2 md:col-3 md:mb-0"
+                  >
+                    Nợ tối đa đối với NCC theo tháng
+                  </label>
+                  <div className="col-12 md:col-9">
+                     <InputForm className="w-full"
+                        id="supplierCreditLimitMonth"
+                        value={infos.supplierCreditLimitMonth}
+                        onChange={(e: any) =>
+                          setInfos({ ...infos, supplierCreditLimitMonth: e.target.value })
+                        }
+                        label="Nợ tối đa đối với NCC theo tháng"
+                      />
                   </div>
                 </div>
                 <div className="field grid">

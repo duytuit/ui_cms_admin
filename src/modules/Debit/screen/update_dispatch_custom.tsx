@@ -144,7 +144,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
       }
     }
   }
-   function getDetailPartner(event:any,id: number) {
+  function getDetailPartner(event:any,id: number) {
     event.preventDefault()
       let info = {
         isExternalDriver:1,

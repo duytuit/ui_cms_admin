@@ -227,4 +227,14 @@ export class Helper {
   static toInt (v: any){
      return v == null ? "" : typeof v === "number" ? v : parseInt(String(v).replace(/\D/g, ""), 10) || "";
   }
+  static diffDays = (fromDate: string | Date): number => {
+    const from = new Date(fromDate);
+    const today = new Date();
+
+    from.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    const diffTime = today.getTime() - from.getTime();
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  };
 }

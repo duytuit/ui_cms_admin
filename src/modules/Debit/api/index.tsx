@@ -21,6 +21,7 @@ export const listDebitTamThu = async (params: any) => await getData("Debit/cuoct
 export const listDebitCuoc = async (params: any) => await getData("Debit/phicuoc", params);
 export const listDebitService = async (params: any) => await getData("Debit/service", params);
 export const showDebit = async (params: any) => await getData("Debit/show", params);
+export const ShowWithPurchaseNCCAsync = async (params: any) => await getData("Debit/ShowWithPurchaseNCCAsync", params);
 export const ShowWithFileInfoAsync = async (params: any) => await getData("Debit/ShowWithFileInfoAsync", params);
 export const showDebitByFileId = async (params: any) => await getData("Debit/show/byFileId", params);
 // xóa debit khách hàng

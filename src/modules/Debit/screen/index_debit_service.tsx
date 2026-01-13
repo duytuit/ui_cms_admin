@@ -134,6 +134,8 @@ export default function ListContractFileBangKe() {
         nganhang: { value: null, matchMode: FilterMatchMode.CONTAINS },
         note: { value: null, matchMode: FilterMatchMode.CONTAINS },
         nguoitao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        re_status: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        cf_status_confirm: { value: null, matchMode: FilterMatchMode.CONTAINS },
         });
     const [selectedDebitServiceRows, setSelectedDebitServiceRows] = useState<any[]>([]);
     const [displayDebitServiceData, setDisplayDebitServiceData] = useState<any[]>([]);
@@ -225,7 +227,7 @@ export default function ListContractFileBangKe() {
               sumCH:_sumCH,
               sumHQ: _sumHQ,
               phaiTra:row.receipt_total-(_sumCH+_sumHQ),
-              cf_status_confirm:cf_status_confirm ? 0 : 1
+              cf_status_confirm:cf_status_confirm ? 0 : 1,
             };
           });
          console.log(mappedDebitService);
@@ -251,6 +253,14 @@ export default function ListContractFileBangKe() {
 
         return Helper.formatCurrency(sum.toString());
     };
+    const reStatusOption = [
+      { label: 'đã hoàn ứng', value: 1 },
+      { label: 'chưa xử lý', value: 0 }
+    ];
+    const cfStatusConfirmOption = [
+      { label: 'đã duyệt', value: 1 },
+      { label: 'chưa duyệt', value: 0 }
+    ];
     return (
       <>
         <div className="card">
@@ -439,20 +449,50 @@ export default function ListContractFileBangKe() {
                                               }
                                             }}
                                         />
-                                        <Column header="Trạng thái" body={(row: any) => {
+                                        <Column field="cf_status_confirm" header="Trạng thái" body={(row: any) => {
                                           if(row.cf_status_confirm == 1){
                                             return <Button label="đã duyệt" rounded severity="success" size="small" text  />
                                           }else{
                                             return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
                                           }
-                                        }} filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Trạng thái hoàn ứng" body={(row: any) => {
-                                          if(row.re_status == 0){
-                                            return <Button label="chưa xử lý" rounded severity="warning" size="small" text  />
-                                          }else if(row.re_status == 1){
-                                            return <Button label="đã tạo phiếu" rounded severity="success" size="small" text  />
-                                          }
-                                        }} filter showFilterMenu={false} filterMatchMode="contains" />
+                                        }} 
+                                        filter
+                                        filterElement={(options:any) => (
+                                              <Dropdown
+                                                  value={options.value}
+                                                  options={cfStatusConfirmOption}
+                                                  onChange={(e:any) => {
+                                                    options.filterApplyCallback(e.value)
+                                                  }}
+                                                  label="trạng thái"
+                                                  className="p-column-filter"
+                                                  showClear
+                                              />
+                                          )} 
+                                        showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column 
+                                          field="re_status"
+                                          header="Trạng thái hoàn ứng" body={(row: any) => {
+                                            if(row.re_status == 0){
+                                              return <Button label="chưa xử lý" rounded severity="warning" size="small" text  />
+                                            }else if(row.re_status == 1){
+                                              return <Button label="đã hoàn ứng" rounded severity="success" size="small" text  />
+                                            }
+                                          }} 
+                                          filter
+                                          filterElement={(options:any) => (
+                                              <Dropdown
+                                                  value={options.value}
+                                                  options={reStatusOption}
+                                                  onChange={(e:any) => {
+                                                    options.filterApplyCallback(e.value)
+                                                  }}
+                                                  label="trạng thái"
+                                                  className="p-column-filter"
+                                                  showClear
+                                              />
+                                          )}
+                                         showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />

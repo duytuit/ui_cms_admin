@@ -5,17 +5,15 @@ import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { typeDebit } from "utils";
-import { useListCustomerDetailWithState } from "modules/partner/service";
+import { useListCustomerDetailWithState, useListPartnerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
 import { Button, Checkbox, DataTable, Dialog, Tag } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { useListContractFileHasDebitNangHa, useListContractFileHasDebitService, useListContractFileHasFileGia, useListContractFileNotDebitNangHa, useListContractFileNotFileGia, useListContractFileNotService, useListContractFileWithState } from "modules/ContractFile/service";
-import {  deleteMultiDebit } from "../api";
-import UpdateDebitNangHa from "./update_service_nh";
+import { useListContractFileHasFileGia, useListContractFileNotFileGia} from "modules/ContractFile/service";
+import { deleteMultiDebit } from "../api";
 import UpdateFileGia from "./update_debit_file_gia";
-import { Link } from "react-router-dom";
 import UpdateVATFileGia from "./update_vat_file_gia";
 import UpdateXuatHoaDon from "./update_xuat_hoadon";
 import { FilterMatchMode } from "primereact/api";
@@ -120,7 +118,6 @@ export default function ListFileGia() {
     const [selectedFileGiaRows, setSelectedFileGiaRows] = useState<any[]>([]);
     const [displayFileGia, setDisplayFileGia] = useState<any[]>([]);
     const [selectedDetail, setSelectedDetail] = useState<any[]>([]);
-    const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [displayData, setDisplayData] = useState<any[]>([]);
     const [selectedId, setSelectedId] = useState<any>();
     const [selectedIdEdit, setSelectedIdEdit] = useState<any>();
@@ -150,7 +147,7 @@ export default function ListFileGia() {
     });
     const { data, loading, error, refresh } = useListContractFileNotFileGia({ params: paramsPaginator, debounce: 500,});
     const { data: listFileGia, refresh:refreshHasFileGia } = useListContractFileHasFileGia({ params: {...paramsPaginator,},debounce: 500,});
-    const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
+    const { data: listCustomer } = useListPartnerDetailWithState({});
     const { data: listUser } = useListUserWithState({});
     const { data: listEmployee } = useListEmployeeWithState({});
     const openDialogAdd = (id:number,price:number) => {
@@ -190,13 +187,13 @@ export default function ListFileGia() {
          const dataArray = Array.isArray(listFileGia?.data) ? listFileGia.data : [];
          const groupedHasFileGia = Object.values(
             dataArray.reduce((acc:any, cur:any) => {
-              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number,debit_total_vat, ...rest } = cur;
+              const {debit_data,supplier_detail_id,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number,debit_total_vat, ...rest } = cur;
               if (!acc[cur.id]) {
                 acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
               }
               // chỉ gom debit nếu debitService có dữ liệu
               if (listFileGia?.data) {
-                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number,debit_total_vat});
+                acc[cur.id].debits.push({debit_data,supplier_detail_id,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,debit_cus_bill,debit_cus_bill_date,debit_sup_bill,debit_sup_bill_date,debit_vehicle_number,debit_total_vat});
                 acc[cur.id].debit_ids.push(debit_id);
               }
               return acc;
@@ -299,7 +296,8 @@ export default function ListFileGia() {
                                 <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="sales" header="Tên Sales" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="declaration" header="Số bill" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="declaration" header="Số tờ khai" filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="bill" header="Số bill" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="userName" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
@@ -431,7 +429,7 @@ export default function ListFileGia() {
                                                   onChange={(e:any) => {
                                                     options.filterApplyCallback(e.value)
                                                   }}
-                                                  placeholder="Chọn trạng thái"
+                                                  label="trạng thái"
                                                   className="p-column-filter"
                                                   showClear
                                               />
@@ -501,8 +499,8 @@ export default function ListFileGia() {
                                       <Column field="debit_name" header="Chi phí" />
                                       <Column field="debit_type"  body={(row: any) => typeDebit.find((x:any) => x.type === row.debit_type)?.name || ""} header="Loại chi phí" />
                                       <Column body={(row: any) =>{
-                                          let data = JSON.parse(row.debit_data);
-                                          return data?.partner_info?.partnerLabel
+                                          const cus = listCustomer.find((x: any) => x.id === row.supplier_detail_id);
+                                          return cus?.partners?.abbreviation || ""
                                       }} header="Nhà cung cấp" />
                                       <Column field="debit_vehicle_number" header="Biển số" />
                                       <Column field="debit_purchase_price" body={(row: any) => Helper.formatCurrency(row.debit_purchase_price.toString())} header="Giá mua" />

@@ -5,7 +5,7 @@ import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import { typeDebit } from "utils";
-import { useListCustomerDetailWithState } from "modules/partner/service";
+import { useListCustomerDetailWithState, useListPartnerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
 import { Button, Checkbox, DataTable, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
@@ -107,8 +107,7 @@ export default function ListContractFileNangHa() {
     });
     const { data, loading, error, refresh } = useListContractFileNotDebitNangHa({ params: paramsPaginator, debounce: 500,});
     const { data: debitService, refresh:refreshHasDebitDispatch } = useListContractFileHasDebitNangHa({ params: {...paramsPaginator,},debounce: 500,});
-    const { data: contractFile } = useListContractFileWithState({});
-    const { data: listCustomer } = useListCustomerDetailWithState({status: 1});
+    const { data: listCustomer } = useListPartnerDetailWithState({});
     const { data: listUser } = useListUserWithState({});
     const { data: listEmployee } = useListEmployeeWithState({});
     const openDialogAdd = (id:number,price:number) => {
@@ -141,13 +140,13 @@ export default function ListContractFileNangHa() {
          const dataArray = Array.isArray(debitService?.data) ? debitService.data : [];
          const groupedHasDebitService = Object.values(
             dataArray.reduce((acc:any, cur:any) => {
-              const { debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by, ...rest } = cur;
+              const { supplier_detail_id,debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by, ...rest } = cur;
               if (!acc[cur.id]) {
                 acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
               }
               // chỉ gom debit nếu debitService có dữ liệu
               if (debitService?.data) {
-                acc[cur.id].debits.push({ debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by});
+                acc[cur.id].debits.push({ supplier_detail_id,debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by});
                 acc[cur.id].debit_ids.push(debit_id);
               }
               return acc;
@@ -380,6 +379,10 @@ export default function ListContractFileNangHa() {
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                                 <b>Chi tiết bảng kê nâng hạ</b>
                                   <DataTable rowHover value={selectedDetail}>
+                                      <Column body={(row: any) =>{
+                                          const cus = listCustomer.find((x: any) => x.id === row.supplier_detail_id);
+                                          return cus?.partners?.abbreviation || ""
+                                      }} header="Nhà cung cấp" />
                                       <Column field="debit_name" header="Chi phí" />
                                       <Column field="debit_type"  body={(row: any) => typeDebit.find((x:any) => x.type === row.debit_type)?.name || ""} header="Loại chi phí" />
                                       <Column field="debit_purchase_price" body={(row: any) => Helper.formatCurrency(row.debit_purchase_price.toString())} header="Số tiền" />

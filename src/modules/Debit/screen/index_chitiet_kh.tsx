@@ -176,7 +176,9 @@ export default function ListChiTietKH() {
       declaration: "",
       dispatch_code: "",
       name: "",
-      file_bill: ""
+      file_bill: "",
+      conlai_dv_view: "",
+      conlai_ch_view: "",
   });
   const { data, loading, error, refresh } = useListDebitCongNoChiTietKH({
     params: paramsPaginator,
@@ -253,6 +255,30 @@ export default function ListChiTietKH() {
           />
      </div>
   );
+    const phatSinhDichVuHeader = (
+     <div className="py-1">
+         <Input
+            type="text"
+            value={filters.conlai_dv_view}
+            onChange={(e:any) => setFilters({ ...filters, conlai_dv_view: e.target.value })}
+            label="><=giá trị"
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );   
+   const phatSinhChiHoHeader = (
+     <div className="py-1">
+         <Input
+            type="text"
+            value={filters.conlai_ch_view}
+            onChange={(e:any) => setFilters({ ...filters, conlai_ch_view: e.target.value })}
+            label="><=giá trị"
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );
     // --- Filter dữ liệu dựa vào input ---
 const applyFilters = (rows: any[]) => {
     return rows.filter((row) => {
@@ -265,7 +291,51 @@ const applyFilters = (rows: any[]) => {
             (f.declaration ? row.declaration?.toLowerCase().includes(f.declaration.toLowerCase()) : true) &&
             (f.dispatch_code ? row.dispatch_code?.toLowerCase().includes(f.dispatch_code.toLowerCase()) : true) &&
             (f.name ? row.name?.toLowerCase().includes(f.name.toLowerCase()) : true) &&
-            (f.file_bill ? row.file_bill?.toLowerCase().includes(f.file_bill.toLowerCase()) : true)
+            (f.file_bill ? row.file_bill?.toLowerCase().includes(f.file_bill.toLowerCase()) : true) &&
+            (f.conlai_dv_view.trim() ? (() => {
+              const input = f.conlai_dv_view.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = '>';
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              } else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case '>': return row.conlai_dv_view > num;
+                case '>=': return row.conlai_dv_view >= num;
+                case '=': case '==': return row.conlai_dv_view === num;
+                case '<=': return row.conlai_dv_view <= num;
+                case '<': return row.conlai_dv_view < num;
+                default: return row.conlai_dv_view > num;
+              }
+            })() : true)
+            &&
+            (f.conlai_ch_view.trim() ? (() => {
+              const input = f.conlai_ch_view.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = '>';
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              }
+              else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case '>': return row.conlai_ch_view > num;
+                case '>=': return row.conlai_ch_view >= num;
+                case '=': case '==': return row.conlai_ch_view === num;
+                case '<=': return row.conlai_ch_view <= num;
+                case '<': return row.conlai_ch_view < num;
+                default: return row.conlai_ch_view > num;
+              }
+            })() : true)
         );
     });
 };
@@ -372,8 +442,8 @@ useEffect(() => {
                 <Column />
                 <Column />
                 <Column /> 
-                <Column frozen alignFrozen="right" className="font-bold"/>
-                <Column frozen alignFrozen="right" className="font-bold"/>
+                <Column header={phatSinhDichVuHeader} frozen alignFrozen="right" className="font-bold"/>
+                <Column header={phatSinhChiHoHeader} frozen alignFrozen="right" className="font-bold"/>
                 <Column frozen alignFrozen="right" className="font-bold"/>
                 <Column frozen alignFrozen="right" className="font-bold"/>
                 <Column frozen alignFrozen="right" className="font-bold"/>
@@ -410,7 +480,27 @@ useEffect(() => {
                         tableStyle={{ minWidth: "2200px" }} // ép bảng rộng hơn để có scroll ngang
                       >
                         <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-                        <Column field="customerAbb" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="customerAbb"
+                          body={(rowData: any) => {
+                            if (rowData.customer_credit_limit == 0) {
+                              return rowData.customerAbb;
+                            }
+                            const days = Helper.diffDays(rowData.accounting_date);
+                            const limit = rowData.customer_credit_limit;
+                            const isOverLimit = days > limit;
+                            return (
+                              <span
+                                style={{
+                                  color: isOverLimit ? 'darkorange' : 'inherit',
+                                  fontWeight: isOverLimit ? 'bold' : 'normal',
+                                  display: 'block'
+                                }}
+                                title={`Số ngày nợ: ${days} / Giới hạn: ${limit}`}
+                              >
+                                {rowData.customerAbb}
+                              </span>
+                            );
+                          }} filter showFilterMenu={false} filterMatchMode="contains"/>
                         <Column field="fileNumber" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="bill" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="declaration" filter showFilterMenu={false} filterMatchMode="contains" />

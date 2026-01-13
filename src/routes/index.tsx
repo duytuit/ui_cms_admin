@@ -79,6 +79,7 @@ import UpdateReceiptThu from "modules/receipt/screen/update_thu";
 import ListTongHopNCC from "modules/Debit/screen/index_tonghop_ncc";
 import ListCuocKeToan from "modules/Debit/screen/index_cuoc_ketoan";
 import ListTamThuKeToan from "modules/Debit/screen/index_tamthu_ketoan";
+import ListBaoCaoLuuChuyenTienTe from "modules/receipt/screen/index_baocao_luuchuyen_tiente";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -175,6 +176,7 @@ const publicRoutes = [
   { path: "/receipt/UpdateDauKyTaiKhoan", component: UpdateDauKyTaiKhoan, layout: 'UpdateDauKyTaiKhoan' },
   { path: "/receipt/ListDauKyTaiKhoan/detail/:id", component: UpdateDauKyTaiKhoan, layout: 'UpdateDauKyTaiKhoan' },
   { path: "/receipt/ListBaoCaoLoiNhuan", component: ListBaoCaoLoiNhuan, layout: 'ListBaoCaoLoiNhuan' },
+  { path: "/receipt/ListBaoCaoLuuChuyenTienTe", component: ListBaoCaoLuuChuyenTienTe, layout: 'ListBaoCaoLuuChuyenTienTe' },
   // Debit 
   { path: "/debit/listCuoc", component: ListCuoc, layout: 'ListCuoc' },
   { path: "/debit/listTamThu", component: ListTamThu, layout: 'ListTamThu' },

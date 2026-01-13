@@ -450,7 +450,7 @@ export default function ListCreateDispatch() {
                                     onChange={(e:any) => {
                                       options.filterApplyCallback(e.value)
                                     }}
-                                    placeholder="Chọn trạng thái"
+                                    label="trạng thái"
                                     className="p-column-filter"
                                     showClear
                                 />

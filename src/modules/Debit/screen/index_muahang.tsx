@@ -186,11 +186,10 @@ export default function ListMuaHang() {
             <Column field="dispatch_code" header="Số phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="supplierName" header="Tên đối tượng" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="supplierAbb" header="Tên viết tắt" filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column field="purchase_price"  body={(row: any) => Helper.formatCurrency(row.purchase_price.toString())} header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
-                  footer={getSumColumn("purchase_price")}
+            <Column field="receipt_amount"  body={(row: any) => Helper.formatCurrency(row.receipt_amount.toString())} header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                  footer={getSumColumn("receipt_amount")}
                   footerStyle={{ fontWeight: "bold" }}
             />
-            <Column field="purchase_vat" header="VAT" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="thanh_tien" header="Thành tiền" body={(row: any) => Helper.formatCurrency(row.thanh_tien.toString())}  filter showFilterMenu={false}  filterMatchMode="contains"
                   footer={getSumColumn("thanh_tien")}
                   footerStyle={{ fontWeight: "bold" }}

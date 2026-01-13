@@ -102,6 +102,7 @@ export default function ListPartner() {
                             setParamsPaginator
                         )
                     }
+                    style={{width: '6em'}}
                 />
             </DataTableClient>
         </div>

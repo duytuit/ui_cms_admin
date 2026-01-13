@@ -397,6 +397,43 @@ const model = [{
       },
       {
         id: 1,
+        name: 'Theo dõi nhắc nợ',
+        route: '/page-two',
+        created_at: '2023-05-29 14:14:02',
+        updated_at: null,
+        deleted_at: null,
+        status: 1,
+        category_id: 1,
+        sort: 1,
+        icon: 'pi pi-home',
+        admin:false,
+        items: [
+          {
+            id: 1,
+            name: 'Nhắc nợ KH',
+            route: '/page-two',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
+            id: 1,
+            name: 'Nhắc nợ NCC',
+            route: '/page-two',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+        ]
+      },
+      {
+        id: 1,
         name: 'Thủ quỹ',
         route: '/page-two',
         created_at: '2023-05-29 14:14:02',
@@ -466,7 +503,18 @@ const model = [{
             status: 1,
             category_id: 1,
             sort: 1,
-          }
+          },
+          {
+              id: 1,
+              name: 'Báo cáo lưu chuyển tiền tệ',
+              route: '/receipt/ListBaoCaoLuuChuyenTienTe',
+              created_at: '2023-05-29 14:14:02',
+              updated_at: null,
+              deleted_at: null,
+              status: 1,
+              category_id: 1,
+              sort: 1,
+            }
         ]
       },
        {
