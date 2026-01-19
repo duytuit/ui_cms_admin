@@ -275,11 +275,11 @@ export default function ListReceiptThu() {
                                     showFilterMenu={false}
                                     filterMatchMode="contains"
                                 />
-                                <Column field="amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                                <Column field="amount" body={(row: any) => Helper.formatCurrency(row.amount.toString())}  header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
                                     footer={getSumColumn("amount")}
                                     footerStyle={{ fontWeight: "bold" }}
                                 />
-                                <Column field="total" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                                <Column field="total"  body={(row: any) => Helper.formatCurrency(row.total.toString())} header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
                                     footer={getSumColumn("total")}
                                     footerStyle={{ fontWeight: "bold" }}
                                 />

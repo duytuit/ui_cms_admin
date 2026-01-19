@@ -4,7 +4,7 @@ import { Dropdown, GridForm, Input } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
-import { typeDebit } from "utils";
+import { listToast, typeDebit } from "utils";
 import { useListCustomerDetailWithState, useListPartnerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
 import { Button, Checkbox, DataTable, Dialog, Tag } from "components/uiCore";
@@ -17,12 +17,16 @@ import UpdateFileGia from "./update_debit_file_gia";
 import UpdateVATFileGia from "./update_vat_file_gia";
 import UpdateXuatHoaDon from "./update_xuat_hoadon";
 import { FilterMatchMode } from "primereact/api";
+import { ExportXuatHoaDon } from "modules/ContractFile/api";
+import { useDispatch } from "react-redux";
+import { showToast } from "redux/features/toast";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFileGia,_setSelectedRows}: any) => {
     const [filter, setFilter] = useState({ name: "", customerDetailId: "" ,fromDate:Helper.lastWeekString(),toDate:Helper.toDayString()});
     const { data: customerDetails } = useListCustomerDetailWithState({status:1});
     const [visible, setVisible] = useState(false);
+     const dispatch = useDispatch();
     // --- chuyển sang options bằng useMemo ---
     const customerOptions = useMemo(() => {
         if (!Array.isArray(customerDetails)) return [];
@@ -39,10 +43,10 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFil
             customerDetailId : filter.customerDetailId,
             fromDate: filter.fromDate,
             toDate:filter.toDate,
+            FileInfoIds:selected
         }));
     }, [filter]);
     const openDialogAdd = () => {
-      console.log(selected);
       setVisible(true);
     };
     const handleModalClose = () => {
@@ -50,6 +54,46 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFil
         _setSelectedRows([])
         refreshHasFileGia?.(); 
     };
+   async function ExportHoaDonKH() {
+    if (!Array.isArray(selected) || selected.length === 0) {
+      dispatch(
+        showToast({
+          ...listToast[2],
+          detail: "Chưa chọn file giá",
+        })
+      );
+      return;
+    }
+
+    const params = {
+      ..._paramsPaginator,
+      FileInfoIds: selected.map(Number), // ✅ đảm bảo number[]
+    };
+
+    const respo = await ExportXuatHoaDon(
+      Helper.convertObjectToQueryString(params)
+    );
+
+    const blob = new Blob([respo.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "hoa_don_kh.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url); // ✅ tránh leak memory
+  }
+    const items = [
+          {
+              label: 'Xuất chi tiết hóa đơn',
+              icon: "pi pi-file-export",
+              command: () => ExportHoaDonKH()
+          }
+      ];
     return (
       <>
        <GridForm
@@ -60,6 +104,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFil
             className="lg:col-9"
             openDialogAdd={()=>openDialogAdd()}
             openDialogAddName="Xuất hóa đơn"
+            MenuItems={items}
         >
             <div className="col-2">
                 <Input
@@ -123,8 +168,6 @@ export default function ListFileGia() {
     const [selectedIdEdit, setSelectedIdEdit] = useState<any>();
     const [visible, setVisible] = useState(false);
     const [visibleEdit, setVisibleEdit] = useState(false);
-    const [first, setFirst] = useState(0);
-    const [rows, setRows] = useState(20);
     const [paramsPaginator, setParamsPaginator] = useState({
       pageNum: 1,
       pageSize: 20,
@@ -221,10 +264,38 @@ export default function ListFileGia() {
               debit_cus_bill :  (row.debits && row.debits.length > 0) ?  row.debits[0]?.debit_cus_bill || "chưa hd":"chưa hd"
             };
           });
-         console.log(mappedDebitFileGia);
         setDisplayData(mapped);
         setDisplayFileGia(mappedDebitFileGia);
-    }, [first, rows, data,listFileGia, paramsPaginator,listCustomer]);
+    }, [data,listFileGia, paramsPaginator,listCustomer]);
+    
+    const applyFilters = (data: any[], filters: any) => {
+      return data.filter((row) => {
+        return Object.keys(filters).every((field) => {
+          const { value, matchMode } = filters[field];
+          if (value == null || value === '') return true;
+
+          const rowValue = field === 'global'
+            ? JSON.stringify(row).toLowerCase()
+            : String(row[field] ?? '').toLowerCase();
+
+          const filterValue = String(value).toLowerCase();
+
+          switch (matchMode) {
+            case FilterMatchMode.CONTAINS:
+              return rowValue.includes(filterValue);
+
+            case FilterMatchMode.EQUALS:
+              return rowValue === filterValue;
+
+            default:
+              return true;
+          }
+        });
+      });
+    };
+    const filteredFileGia = useMemo(() => {
+      return applyFilters(displayFileGia, filters);
+    }, [displayFileGia, filters]);
     const getSumColumn = (field: string) => {
         const filtered = (displayFileGia??[]).filter((item: any) => {
             return Object.entries(filters).every(([key, f]: [string, any]) => {
@@ -267,13 +338,8 @@ export default function ListFileGia() {
                                 <DataTableClient
                                 rowHover
                                 value={displayData}
-                                onPage={(e: any) => {
-                                    setFirst(e.first);
-                                    setRows(e.rows);
-                                }}
                                 loading={loading}
                                 dataKey="id"
-                                title="Tài khoản"
                                 filterDisplay="row"
                                 className={classNames("Custom-DataTableClient")}
                                 scrollable
@@ -327,15 +393,12 @@ export default function ListFileGia() {
                                   <DataTableClient
                                       rowHover
                                       value={displayFileGia}
-                                      onPage={(e: any) => {
-                                        setFirst(e.first);
-                                        setRows(e.rows);
-                                      }}
                                       loading={loading}
                                       dataKey="id"
                                       filters={filters}
-                                      onFilter={(e:any) => setFilters(e.filters)}
-                                      title="Tài khoản"
+                                      onFilter={(e:any) => {
+                                        setFilters(e.filters)
+                                      }}
                                       filterDisplay="row"
                                       className={classNames("Custom-DataTableClient")}
                                       scrollable
@@ -352,13 +415,21 @@ export default function ListFileGia() {
                                         header={
                                           <Checkbox
                                             checked={
-                                              selectedFileGiaRows.length === displayFileGia.length &&
-                                              displayFileGia.length > 0
+                                              filteredFileGia.length > 0 &&
+                                              filteredFileGia.every((row) =>
+                                                selectedFileGiaRows.includes(row.id)
+                                              )
                                             }
                                             onChange={(e: any) => {
-                                              if (e.checked)
-                                                setSelectedFileGiaRows(displayFileGia.map((d) => d.id));
-                                              else setSelectedFileGiaRows([]);
+                                              if (e.checked) {
+                                                setSelectedFileGiaRows(
+                                                  filteredFileGia.map((d) => d.id)
+                                                );
+                                                console.log(filteredFileGia);
+                                                
+                                              } else {
+                                                setSelectedFileGiaRows([]);
+                                              }
                                             }}
                                           />
                                         }

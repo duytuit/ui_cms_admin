@@ -204,18 +204,27 @@ export default function UpdateConfirmFileGia({ id, status, onClose }: { id: any,
                     field="name"
                     header="Chi phí"
                     body={(row: any) => {
-                        if (row.type === 0) {
+                         if (row.type === 0) {
                             return (
-                                <span
-                                    onClick={() => openDialogAdd(row)}
-                                    className="cursor-pointer"
-                                    style={{ color: '#0d6efd', textDecoration: 'underline' }}
-                                >
-                                    {row.name}
-                                </span>
+                                <>
+                                 <span
+                                      onClick={() => openDialogAdd(row)}
+                                      className="cursor-pointer"
+                                      style={{ color: '#0d6efd', textDecoration: 'underline' }}
+                                  >
+                                      {row.name}
+                                  </span>
+                                  {row.note &&<div> <i>Ghi chú: {row.note}</i></div>}
+                                </>
                             );
+                        }else{
+                           return (
+                            <>
+                                <div>{row.name}</div>
+                                {row.note && <div><i>Ghi chú: {row.note}</i></div>}
+                            </>
+                           )
                         }
-                        return row.name; // hoặc return null
                     }}
                 />
                 <Column

@@ -1,6 +1,7 @@
-import { getData, postData } from "lib/request";
+import { getData, getDataV3, postData } from "lib/request";
 
 export const listContractFile = async (params: any) => await getData("ContractFile", params);
+export const ExportXuatHoaDon = async (params: any) => await getDataV3("ContractFile/excel/xuathoadon", params);
 export const listContractFileNotDispatch = async (params: any) => await getData("ContractFile/getFileNotDispatch", params);
 export const listContractFileNotService = async (params: any) => await getData("ContractFile/getFileNotService", params);
 export const listContractFileHasDebitService = async (params: any) => await getData("ContractFile/getFileHasDebitService", params);

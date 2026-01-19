@@ -1,17 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  RenderHeader,
-  StatusBody,
   ActionBody,
-  DataTable,
   Column,
   TimeBody,
   DataTableClient,
   DateBody,
 } from "components/common/DataTable";
 import {
-  Calendar,
-  CalendarY,
   Dropdown,
   GridForm,
   Input,
@@ -21,19 +16,15 @@ import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
 import {
   deleteContractFile,
-  listContractFile,
-  updateContractFile,
+  ExportXuatHoaDon,
 } from "../api";
 import { useListContractFile } from "../service";
-import { useDispatch, useSelector } from "react-redux";
 import { loaiHang, loaiToKhai, nghiepVu, phatSinh, tinhChat } from "utils";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
 import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
-import UpdateDebitChiPhi from "modules/Debit/screen/update_service";
-import UpdateDebit from "modules/Debit/screen/update_debit";
 import { Splitter } from "primereact/splitter";
 import { FilterMatchMode } from "primereact/api";
 
@@ -62,9 +53,26 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
       customerDetailId: filter.customerDetailId,
       fromDate: filter.fromDate,
       toDate: filter.toDate,
+      // Invoice:1
     }));
   }, [filter]);
-
+  async function ExportHoaDonKH(){
+      const respo = await ExportXuatHoaDon(Helper.convertObjectToQueryString(_paramsPaginator));
+      const url = window.URL.createObjectURL(new Blob([respo.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'hoa_don_kh.xlsx'); // or any other extension
+      document.body.appendChild(link);
+      link.click();
+      link?.parentNode?.removeChild(link);  
+    }
+  const items = [
+        {
+            label: 'Xuất chi tiết hóa đơn',
+            icon: "pi pi-file-export",
+            command: () => ExportHoaDonKH()
+        }
+    ];
   return (
     <GridForm
       paramsPaginator={_paramsPaginator}
@@ -131,7 +139,9 @@ export default function ListContractFile() {
           feature: { value: null, matchMode: FilterMatchMode.CONTAINS },
           type: { value: null, matchMode: FilterMatchMode.CONTAINS },
           declaration_type: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          declaration: { value: null, matchMode: FilterMatchMode.CONTAINS },
           occurrence: { value: null, matchMode: FilterMatchMode.CONTAINS },
+          quantity: { value: null, matchMode: FilterMatchMode.CONTAINS },
           business: { value: null, matchMode: FilterMatchMode.CONTAINS },
           listEmployee: { value: null, matchMode: FilterMatchMode.CONTAINS },
           file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },

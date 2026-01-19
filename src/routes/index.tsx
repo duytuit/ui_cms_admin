@@ -1,7 +1,6 @@
 import { AccessDeniedPage, ErrorPage } from "modules/auth/screen/DefaultPage";
 import Loading from "modules/auth/screen/Loading";
 import Login from "modules/auth/screen/login";
-import Bill from "modules/bill/screen";
 import UpdateBill from "modules/bill/screen/update";
 import Categories from "modules/categories/screen";
 import UpdateCategories from "modules/categories/screen/update";
@@ -80,6 +79,7 @@ import ListTongHopNCC from "modules/Debit/screen/index_tonghop_ncc";
 import ListCuocKeToan from "modules/Debit/screen/index_cuoc_ketoan";
 import ListTamThuKeToan from "modules/Debit/screen/index_tamthu_ketoan";
 import ListBaoCaoLuuChuyenTienTe from "modules/receipt/screen/index_baocao_luuchuyen_tiente";
+import ListKyCongNoKH from "modules/Debit/screen/index_kycongno_kh";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -108,7 +108,6 @@ const publicRoutes = [
   { path: "/customer/detail/:id", component: UpdateCustomer, layout: 'DetailCustomer' },
 
   // bill 
-  { path: "/bill/list", component: Bill, layout: 'ListBill' },
   { path: "/bill/add", component: UpdateBill, layout: 'UpdateBill' },
   { path: "/bill/detail/:id", component: UpdateBill, layout: 'DetailBill' },
 
@@ -209,6 +208,7 @@ const publicRoutes = [
   { path: "/debit/ListChiTietNCC", component: ListChiTietNCC, layout: 'ListChiTietNCC' },
   { path: "/debit/ListDebitChiTietGiaoNhan", component: ListDebitChiTietGiaoNhan, layout: 'ListDebitChiTietGiaoNhan' },
   { path: "/debit/ListDebitChiTietLaiXe", component: ListDebitChiTietLaiXe, layout: 'ListDebitChiTietLaiXe' },
+  { path: "/debit/ListKyCongNoKH", component: ListKyCongNoKH, layout: 'ListKyCongNoKH' },
 
   { path: "/debit/ListDebitNCC", component: ListDebitNCC, layout: 'ListDebitNCC' },
 

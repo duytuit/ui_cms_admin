@@ -122,16 +122,18 @@ export default function ListBaoCaoLuuChuyenTienTe() {
 
     const tk = buildData(extra.bao_cao_tk_results, 'tk');
     const dk = buildData(extra.bao_cao_dk_results, 'dk');
-
+    
     // ===== Tổng phải thu =====
+    const tk_tong_thukhac =  roundMoney(tk.tk_thu_khac) + roundMoney(tk.tk_doanh_thu_khac);
+    const dk_tong_thukhac =  roundMoney(dk.tk_thu_khac) + roundMoney(dk.dk_doanh_thu_khac);
     const tk_tong_cac_khoan_phai_thu =
       tk.tk_thu_cong_no_khach_hang +
-      tk.tk_thu_khac +
+      tk_tong_thukhac +
       tk.tk_thu_hoan_ung_giao_nhan;
 
     const dk_tong_cac_khoan_phai_thu =
       dk.dk_thu_cong_no_khach_hang +
-      dk.dk_thu_khac +
+      dk_tong_thukhac +
       dk.dk_thu_hoan_ung_giao_nhan;
 
     // ===== Chi phí KD =====
@@ -160,46 +162,45 @@ export default function ListBaoCaoLuuChuyenTienTe() {
       chi_phi_kinh_doanh_khac: dk.dk_chi_phi_kinh_doanh_khac,
       chi_tien_gui_xe: dk.dk_chi_tien_gui_xe,
     });
-
-    // ===== Tổng chi =====
-    const sumTongChi = (x: any) =>
-      roundMoney(x.chi_phi_kinh_doanh) +
-      roundMoney(x.chi_tra_cong_no_nha_cundoanh) +
-      roundMoney(x.chi_tam_ung_tien_cho_nha_cundoanh) +
-      roundMoney(x.chi_tam_ung_giaodoanh) +
-      roundMoney(x.chi_tam_ung_ldoanh) +
-      roundMoney(x.chidoanh) +
-      roundMoney(x.chi_ho_khachdoanh) +
-      roundMoney(x.tra_luong_nhandoanh) +
-      roundMoney(x.tra_bao_hiem_xdoanh);
-
-    const tk_tong_cac_khoan_chi = sumTongChi({
-      ...tk,
-      chi_phi_kinh_doanh: tk_chi_phi_kinh_doanh,
-    });
-
-    const dk_tong_cac_khoan_chi = sumTongChi({
-      ...dk,
-      chi_phi_kinh_doanh: dk_chi_phi_kinh_doanh,
-    });
+    
+    
+    const tk_tong_cac_khoan_chi = roundMoney(tk_chi_phi_kinh_doanh)+
+    roundMoney(tk.tk_chi_phi_kinh_doanh) +
+    roundMoney(tk.tk_chi_tra_cong_no_nha_cung_cap) +
+    roundMoney(tk.tk_chi_tam_ung_tien_cho_nha_cung_cap) +
+    roundMoney(tk.tk_chi_tam_ung_giao_nhan) +
+    roundMoney(tk.tk_chi_tam_ung_lai_xe) +
+    roundMoney(tk.tk_chi_khac) +
+    roundMoney(tk.tk_chi_ho_khach_hang) +
+    roundMoney(tk.tk_tra_luong_nhan_vien) +
+    roundMoney(tk.tk_tra_bao_hiem_xa_hoi);
+    
+    const dk_tong_cac_khoan_chi = roundMoney(dk_chi_phi_kinh_doanh)+
+    roundMoney(dk.dk_chi_phi_kinh_doanh) +
+    roundMoney(dk.dk_chi_tra_cong_no_nha_cung_cap) +
+    roundMoney(dk.dk_chi_tam_ung_tien_cho_nha_cung_cap) +
+    roundMoney(dk.dk_chi_hoan_ung_giao_nhan) +
+    roundMoney(dk.dk_chi_tam_ung_lai_xe) +
+    roundMoney(dk.dk_chi_khac) +
+    roundMoney(dk.dk_chi_ho_khach_hang) +
+    roundMoney(dk.dk_tra_luong_nhan_vien) +
+    roundMoney(dk.dk_tra_bao_hiem_xa_hoi);
+    
 
     // ===== Lưu chuyển tiền =====
-    const tk_luu_chuyen_tien_thuan_trong_ky =
-      tk_tong_cac_khoan_phai_thu - tk_tong_cac_khoan_chi;
+    const tk_luu_chuyen_tien_thuan_trong_ky = tk_tong_cac_khoan_phai_thu - tk_tong_cac_khoan_chi;
 
-    const dk_luu_chuyen_tien_thuan_trong_ky =
-      dk_tong_cac_khoan_phai_thu - dk_tong_cac_khoan_chi;
+    const dk_luu_chuyen_tien_thuan_trong_ky = dk_tong_cac_khoan_phai_thu - dk_tong_cac_khoan_chi;
 
-    const tien_va_tuong_duong_tien_dau_ky =
-      dk_luu_chuyen_tien_thuan_trong_ky;
+    const tien_va_tuong_duong_tien_dau_ky = dk_luu_chuyen_tien_thuan_trong_ky;
 
-    const tien_va_tuong_duong_tien_cuoi_ky =
-      tk_luu_chuyen_tien_thuan_trong_ky +
-      tien_va_tuong_duong_tien_dau_ky;
+    const tien_va_tuong_duong_tien_cuoi_ky = tk_luu_chuyen_tien_thuan_trong_ky + tien_va_tuong_duong_tien_dau_ky;
 
     setDisplayData({
       ...tk,
       ...dk,
+      tk_tong_thukhac,
+      dk_tong_thukhac,
       tk_tong_cac_khoan_phai_thu,
       dk_tong_cac_khoan_phai_thu,
       tk_chi_phi_kinh_doanh,
@@ -211,8 +212,6 @@ export default function ListBaoCaoLuuChuyenTienTe() {
       tien_va_tuong_duong_tien_dau_ky,
       tien_va_tuong_duong_tien_cuoi_ky,
     });
-    console.log(displayData);
-    
     // ===== Báo cáo doanh thu =====
     const ex = baocaodoanhthu.extra;
 
@@ -269,8 +268,8 @@ export default function ListBaoCaoLuuChuyenTienTe() {
                              <tr>
                                 <td className="border-1 surface-border">3. Thu khác</td>
                                 <td className="border-1 surface-border text-center">03</td>
-                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.tk_thu_khac.toString())}</td>
-                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.dk_thu_khac.toString())}</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.tk_tong_thukhac.toString())}</td>
+                                <td className="border-1 surface-border" style={{ textAlign: 'right' }}>{Helper.formatCurrency(displayData?.dk_tong_thukhac.toString())}</td>
                             </tr>
                              <tr>
                                 <td className="border-1 surface-border"><b>4. Tổng các khoản phải thu</b></td>

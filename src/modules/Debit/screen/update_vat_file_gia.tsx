@@ -195,9 +195,17 @@ export default function UpdateVATFileGia({ id, onClose }: { id: any; onClose: ()
           <Panel header="Chi tiết các chi phí">
             <div className="child-table">
              <DataTable rowHover value={debitDetail}>
-                <Column
+                 <Column
                     field="name"
                     header="Chi phí"
+                    body={(row: any) => {
+                         return (
+                            <>
+                                <div>{row.name}</div>
+                                {row.note && <div><i>Ghi chú: {row.note}</i></div>}
+                            </>
+                          )
+                    }}
                 />
                 <Column
                   field="type"

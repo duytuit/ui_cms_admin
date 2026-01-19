@@ -83,15 +83,24 @@ export class Helper {
       })
       .join('&');
   }
-  static convertObjectToQueryString(params: Record<string, any>): string {
+   static convertObjectToQueryString(params: Record<string, any>): string {
     const cleanParams: Record<string, string> = {};
-
     Object.entries(params).forEach(([key, value]) => {
       if (value === null || value === undefined) return;
-
       cleanParams[key] = String(value); // ép thành string
     });
-
+    // 🔹 StorageId
+    try {
+      const projectRaw = localStorage.getItem('project');
+      if (projectRaw) {
+        const project = JSON.parse(projectRaw);
+        if (project?.projectId) {
+          cleanParams["StorageId"] = String(project.projectId);
+        }
+      }
+    } catch {
+      // ignore parse error
+    }
     return new URLSearchParams(cleanParams).toString();
   }
   // static makeSignature(data:any, hash_key:any) {
@@ -156,16 +165,30 @@ export class Helper {
     };
     return object;
   };
-  static formatDMY (d: Date) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
+  static formatDMY = (d?: Date | string | null) => {
+    if (!d) return "";
+
+    const date = d instanceof Date ? d : new Date(d);
+
+    if (isNaN(date.getTime())) return "";
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const y = date.getFullYear();
+
     return `${day}-${m}-${y}`;
   };
-  static formatYMDLocal (d: Date) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
+  static formatYMDLocal = (d?: Date | string | null) => {
+    if (!d) return "";
+
+    const date = d instanceof Date ? d : new Date(d);
+
+    if (isNaN(date.getTime())) return "";
+
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
     return `${y}-${m}-${day}`;
   };
   static parseMoney = (value: string | number): number => {
@@ -194,9 +217,19 @@ export class Helper {
     const day = String(d.getDate()).padStart(2, "0");
     return `${y}-${m}-${day}`;
   }
-  static formatDMYLocal(date: string) {
-     return date.split("T")[0]
-  };
+  static formatDMYLocal(date?: string | Date | null) {
+    if (!date) return "";
+
+    if (date instanceof Date) {
+      return date.toISOString().split("T")[0];
+    }
+
+    if (typeof date === "string") {
+      return date.split("T")[0];
+    }
+
+    return "";
+  }
     // format tiền VN
   static formatCurrency(value: string) {
       if (!value) return "";
@@ -236,5 +269,34 @@ export class Helper {
 
     const diffTime = today.getTime() - from.getTime();
     return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  };
+  static getMonthlyCycles = () => {
+      const currentYear = new Date().getFullYear();
+      const years = [currentYear - 1, currentYear, currentYear + 1];
+
+      const cycles: string[] = [];
+
+      years.forEach(year => {
+        for (let month = 1; month <= 12; month++) {
+          const mm = month.toString().padStart(2, "0");
+          cycles.push(`${mm}${year}`);
+        }
+      });
+      return cycles;
+  };
+  static getNextMonthCycle = (cycle: string) => {
+    const month = parseInt(cycle.slice(0, 2), 10);
+    const year = parseInt(cycle.slice(2), 10);
+
+    if (month === 12) {
+      return `01${year + 1}`;
+    }
+    return `${String(month + 1).padStart(2, "0")}${year}`;
+  };
+  static getCurrentMonthCycle = () => {
+    const now = new Date();
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const yyyy = now.getFullYear();
+    return `${mm}${yyyy}`;
   };
 }

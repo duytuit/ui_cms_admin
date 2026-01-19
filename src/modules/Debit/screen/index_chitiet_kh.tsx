@@ -15,6 +15,7 @@ import { Row } from "primereact/row";
 import UpdatePhieuThuKH from "modules/receipt/screen/update_phieuthu_kh";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { Splitter, SplitterPanel } from "primereact/splitter";
+import { ExportXuatHoaDon } from "modules/ContractFile/api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setSelectedRows}: any) => {
@@ -54,6 +55,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
       customerDetailId: filter.customerDetailId,
       fromDate: filter.fromDate,
       toDate: filter.toDate,
+      Invoice:1
     }));
     console.log(dunoDKKH);
     setdunoDK(0)
@@ -81,6 +83,24 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
     link.click();
     link?.parentNode?.removeChild(link);  
   }
+   async function ExportHoaDonKH() {
+      const respo = await ExportXuatHoaDon(
+        Helper.convertObjectToQueryString(_paramsPaginator)
+      );
+  
+      const blob = new Blob([respo.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+  
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "hoa_don_kh.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url); // ✅ tránh leak memory
+    }
  const items = [
         {
             label: 'Công nợ chi tiết',
@@ -91,6 +111,11 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
             icon: "pi pi-file-export",
             label: 'Công nợ chi tiết 1',
             command: () => ExportExcelCongNoKHVer1()
+        },
+        {
+            label: 'Xuất chi tiết hóa đơn',
+            icon: "pi pi-file-export",
+            command: () => ExportHoaDonKH()
         }
     ];
   return (

@@ -8,7 +8,7 @@ import { AccordionTab } from "primereact/accordion";
 import { Button, FormInput, InputSwitch, InputTextarea, Panel } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { listToast, scrollToTop, refreshObject } from "utils";
-import { updateBill, addBill, listBill } from "../api";
+import { updateBill, addBill } from "../api";
 import { useDispatch } from "react-redux";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 const UpdateBill = () => {
@@ -48,17 +48,7 @@ const UpdateBill = () => {
   };
     useEffect(()=>{
        if(id){
-          listBill({id:id}).then(res=>{
-              const detail = res.data.data?.rows[0]
-              if(detail){
-                let info = {
-                  ...detail, status: detail.status === 0 ? true : false,
-                };
-                setInfos(info)
-              }
-          }).catch(err => {
-            //setHasError(true)
-        });
+         
        }
     },[])
     return (

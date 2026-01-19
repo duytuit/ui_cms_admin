@@ -1,6 +1,7 @@
 import { getData, postData } from "lib/request";
 
 export const listPartner = async (params: any) => await getData("Partner", params);
+export const GetPartnerWithDebitNoBill = async (params: any) => await getData("Partner/GetPartnerWithDebitNoBill", params);
 export const listPartnerDetail = async (params: any) => await getData("Partner/PartnerDetail", params);
 export const GetPartnerKHAndNCCDetail = async (params: any) => await getData("Partner/GetPartnerKHAndNCCDetail", params);
 export const showPartner = async (params: any) => await getData("Partner/show", params);

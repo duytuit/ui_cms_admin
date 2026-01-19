@@ -14,7 +14,7 @@ import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useListContractFile, useListContractFileNotDispatch, useListContractFileWithState } from "modules/ContractFile/service";
 import UpdateDebitDispatchFile from "./update_dispatch";
 import { useListDebitDispatch } from "../service";
-import { deleteDebit } from "../api";
+import { deleteDebit, exportDieuXe } from "../api";
 import { listContractFileNotDispatch } from "modules/ContractFile/api";
 import UpdateDebitDispatchFileCustom from "./update_dispatch_custom";
 import { FilterMatchMode } from "primereact/api";
@@ -54,7 +54,23 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,refreshDebitDispatch }: 
       toDate: filter.toDate,
     }));
   }, [filter]);
-
+    async function ExportExcelDieuXe(){
+      const respo = await exportDieuXe(Helper.convertObjectToQueryString(_paramsPaginator));
+      const url = window.URL.createObjectURL(new Blob([respo.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'dieu_xe_chi_tiet_kh.xlsx'); // or any other extension
+      document.body.appendChild(link);
+      link.click();
+      link?.parentNode?.removeChild(link);  
+    }
+  const items = [
+        {
+            label: 'Điều xe chi tiết',
+            icon: "pi pi-file-export",
+            command: () => ExportExcelDieuXe()
+        }
+    ];
   return (
     <>
     <GridForm
@@ -65,6 +81,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,refreshDebitDispatch }: 
       className="lg:col-9"
       openDialogAdd={()=>openDialogAdd(1)}
       openDialogAddName="Tạo điều xe"
+      MenuItems={items}
     >
       <div className="col-2">
         <MyCalendar

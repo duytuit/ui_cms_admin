@@ -99,7 +99,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
           customerAbb: cus?.label || "",
         };
       });
-
+      const dispatch = _debits.find((x:any)=>x.type == 1);
       // Xử lý loaiToKhai và status
       const _loaiToKhai = loaiToKhai.find((x: any) => x.DeclarationType === detail.declarationType);
 
@@ -118,7 +118,8 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
         ...detail,
         status: detail.status === 0,
         loaiToKhai: _loaiToKhai?.name,
-        list_giaonhan:_list_giaonhan
+        list_giaonhan:_list_giaonhan,
+        accountingDate: dispatch?.accountingDate || detail.accountingDate
       };
       
       // ✅ Cập nhật state luôn trong function
