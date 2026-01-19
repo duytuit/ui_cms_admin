@@ -248,7 +248,7 @@ export default function ListFileGia() {
             const _sumMua = row.debits.reduce((sum: number, x: any) => sum + (x.debit_purchase_price || 0), 0);
             const _sumBan = row.debits.reduce((sum: number, x: any) => sum + (x.debit_price || 0), 0);
             const _sumVat = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_vat || 0), 0);
-            const cf_status_confirm = row.debits.find((x: any) => x.cf_status_confirm === 0);
+            const cf_status_confirm = row.debits.find((x: any) => x.cf_status_confirm === 1 && x.cf_status == 2);
             const _userUpdate = listEmployee.find((x: any) => x.user_id === row.cf_updated_by);
             return {
               ...row,
@@ -259,7 +259,7 @@ export default function ListFileGia() {
               sumBan:_sumBan,
               sumVat:_sumVat,
               loiNhuan:_sumBan-_sumMua,
-              cf_status_confirm:cf_status_confirm ? 0 : 1,
+              cf_status_confirm:cf_status_confirm ? 1 : 0,
               userUpdate: `${_userUpdate?.last_name ?? ""} ${_userUpdate?.first_name ?? ""}`.trim(),
               debit_cus_bill :  (row.debits && row.debits.length > 0) ?  row.debits[0]?.debit_cus_bill || "chưa hd":"chưa hd"
             };

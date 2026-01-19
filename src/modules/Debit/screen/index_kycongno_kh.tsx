@@ -12,6 +12,10 @@ import { useGetObjectDebitChiTietNoBillKHAsync } from "../service";
 import { FilterMatchMode } from "primereact/api";
 import { useGetObjectTaskAsync } from "modules/bill/service";
 import UpdateKyCongNoKH from "./update_kycongno_kh";
+import { confirmDialog } from "primereact/confirmdialog";
+import { useDispatch } from "react-redux";
+import { showToast } from "redux/features/toast";
+import { listToast } from "utils";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator, selectedRows, refreshBill, setSelectedRows,refresh,cycleName }: any) => {
@@ -22,7 +26,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selectedRows, refreshBi
     toDate: Helper.toDayString(),
   });
   const [visible, setVisible] = useState(false);
-  const [customerCreditLimitMonth, setCustomerCreditLimitMonth] = useState<number>(0);
+  const [customerSelect, setCustomerSelect] = useState<any>({});
   const [customer, setCustomer] = useState<any[]>([]);
   const { data: customerHasDebit, refresh: refreshPartner} = useGetPartnerWithDebitNoBill({params:{a:"abc"}});
   const customerOptions = useMemo(() => {
@@ -97,8 +101,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selectedRows, refreshBi
               (x: any) => x.customer_detail_id === customerId
             );
             console.log(selectedCustomer);
-            
-            setCustomerCreditLimitMonth(selectedCustomer.customer_credit_limit_month)
+            setCustomerSelect(selectedCustomer)
             setFilter((prev: any) => ({
               ...prev,
               customerDetailId: customerId,
@@ -120,7 +123,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selectedRows, refreshBi
             style={{ width: "30vw", top:"30px"}}
         >
           <p className="m-0">
-            {selectedRows && <UpdateKyCongNoKH customerDetailId={filter.customerDetailId} customerCreditLimitMonth={customerCreditLimitMonth} ids={selectedRows} cycleName={cycleName} onClose={handleModalClose} ></UpdateKyCongNoKH>}
+            {selectedRows && <UpdateKyCongNoKH customerSelect={customerSelect} ids={selectedRows} cycleName={cycleName} onClose={handleModalClose} ></UpdateKyCongNoKH>}
           </p>
       </Dialog>
     </>
@@ -129,7 +132,9 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selectedRows, refreshBi
 
 export default function ListKyCongNoKH() {
   const { handleParamUrl } = useHandleParamUrl();
+  const dispatch = useDispatch();
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
+  const [actionId, setActionId] = useState<number>(0);
   const [selectedDebitDispatchRows, setSelectedDebitDispatchRows] = useState<any[]>([]);
   const [displayBill, setDisplayBill] = useState<any[]>([]);
   const [displayDataNoBill, setDisplayDataNoBill] = useState<any[]>([]);
@@ -217,6 +222,35 @@ export default function ListKyCongNoKH() {
         }, 0);
 
         return Helper.formatCurrency(sum.toString());
+    };
+      async function accept() {
+          // const res = await actions.action({ id: ids });
+          // if (res.status === 200) {
+          //     if(res.data.status){
+          //         dispatch(showToast({ ...listToast[0], detail: res.data.message  }));
+          //         if (paramsPaginator && setParamsPaginator) {
+          //             setParamsPaginator({ ...paramsPaginator, render: !paramsPaginator.render });
+          //         };
+          //     }else{
+          //         dispatch(showToast({ ...listToast[2], detail: res.data.message  }));
+          //     }
+          // } else {
+          //     dispatch(showToast({ ...listToast[1], detail: res.data.message  }));
+          // }
+      };
+     const confirm = (id:number) => {
+          console.log(id);
+        
+          if(id > 0)
+          {
+            setActionId(id)
+            confirmDialog({
+                message: 'Bạn có muốn tiếp tục xóa?',
+                header: 'Quản trị dự án',
+                icon: 'pi pi-info-circle',
+                accept
+            });
+          }
     };
   return (
     <>
@@ -323,7 +357,6 @@ export default function ListKyCongNoKH() {
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                      <b>Kỳ công nợ đã tạo</b>
                       <DataTableClient
-                        rowHover
                         value={displayBill}
                         loading={loading}
                         dataKey="id"
@@ -372,8 +405,8 @@ export default function ListKyCongNoKH() {
                                       <tr>
                                         <td>Thao tác: </td>
                                         <td>
-                                            <Button icon='pi pi-trash' label="Xóa" severity="danger" size="small" raised />
-                                            <Button icon='pi pi-plus' label="Bổ sung"  className="ml-1" severity="info" size="small" raised />
+                                            <Button icon='pi pi-trash' label="Xóa" onClick={()=>confirm(row.id)} className={classNames("btn-custom-sm")} outlined  severity="danger" size="small" raised />
+                                            <Button icon='pi pi-plus' label="Bổ sung" outlined  className={classNames("ml-1","btn-custom-sm")} severity="info" size="small" raised />
                                         </td>
                                      </tr>
                                   </tbody>
@@ -381,6 +414,7 @@ export default function ListKyCongNoKH() {
                               </>
                             )
                           }} 
+                         filter showFilterMenu={false} filterMatchMode="contains"
                          headerClassName="my-title-center" />
                     </DataTableClient>
                   </div>

@@ -151,7 +151,7 @@ export default function ListConfirmFileGia() {
             const _employee = listEmployee.find((x: any) => x.id === row.employee_id);
             const _sumMua = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_purchase_price || 0), 0);
             const _sumBan = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_price || 0), 0);
-            const cf_status_confirm = row.debits.find((x: any) => x.cf_status_confirm === 0);
+            const cf_status_confirm = row.debits.find((x: any) => x.cf_status_confirm === 1 && x.cf_status == 2);
             console.log("cf_status_confirm",cf_status_confirm);
             return {
               ...row,
@@ -161,7 +161,7 @@ export default function ListConfirmFileGia() {
               sumMua:_sumMua,
               sumBan:_sumBan,
               loiNhuan:_sumBan-_sumMua,
-              cf_status_confirm:cf_status_confirm ? 0 : 1
+              cf_status_confirm:cf_status_confirm ? 1 : 0
             };
           });
          console.log(mappedDebitFileGia);

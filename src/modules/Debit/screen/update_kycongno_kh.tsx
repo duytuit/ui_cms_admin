@@ -4,23 +4,26 @@ import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, refreshObject} from "utils";
 import { useDispatch } from "react-redux";
-import { updateBillCustomerFileGia } from "../api";
 import { Dropdown, Input } from "components/common/ListForm";
 import { Panel } from "components/uiCore";
 import { Helper } from "utils/helper";
 import { MyCalendar } from "components/common/MyCalendar";
 import { classNames } from "primereact/utils";
 import { addBill } from "modules/bill/api";
-export default function UpdateKyCongNoKH({ ids,cycleName,customerCreditLimitMonth,customerDetailId, onClose }: { ids: any, cycleName: any,customerCreditLimitMonth :any,customerDetailId:any, onClose: () => void }) {
+export default function UpdateKyCongNoKH({ ids,cycleName,customerSelect, onClose }: { ids: any, cycleName: any,customerSelect :any, onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [dataCycleName, setDataCycleName] = useState<any[]>([]);
   const [infos, setInfos] = useState<any>({accountingDate:Helper.toDayString() });
   const dispatch = useDispatch();
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    if (ids.length === 0) {
+      dispatch(showToast({ ...listToast[2], detail: "Chưa có chi tiết công nợ" }));
+      return;
+    }
     infos.ids = ids;
     infos.expiryDate = Helper.formatYMDLocal(infos.expiryDate);
-    infos.customerDetailId =customerDetailId;
+    infos.customerDetailId =customerSelect.customerDetailId;
     console.log('info', infos);
     setLoading(true);
     fetchDataSubmit(infos);
@@ -67,7 +70,7 @@ useEffect(() => {
     if (!monthlyCycles.includes(selectedCycle)) break;
   }
   const expiryDate = new Date(infos.accountingDate);
-          expiryDate.setDate(expiryDate.getDate() + customerCreditLimitMonth);
+          expiryDate.setDate(expiryDate.getDate() + customerSelect.customer_credit_limit_month);
           setInfos({
             ...infos,
             expiryDate,
@@ -121,6 +124,18 @@ useEffect(() => {
                                 htmlFor="code"
                                 className="col-12 mb-2 md:col-3 md:mb-0"
                               >
+                                Khách hàng
+                              </label>
+                              <div className="col-12 md:col-9">
+                                  <div><b>{customerSelect.abbreviation}</b></div>
+                                  <div><i>Nợ tối đa: {customerSelect.customer_credit_limit_month} ngày</i></div>
+                              </div>
+                            </div>
+                            <div className="field grid">
+                              <label
+                                htmlFor="code"
+                                className="col-12 mb-2 md:col-3 md:mb-0"
+                              >
                                 Ngày hạch toán
                               </label>
                               <div className="col-12 md:col-9">
@@ -129,7 +144,7 @@ useEffect(() => {
                                     onChange={(e: any) => {
                                       const accountingDate = e;
                                       const expiryDate = new Date(accountingDate);
-                                      expiryDate.setDate(expiryDate.getDate() + customerCreditLimitMonth);
+                                      expiryDate.setDate(expiryDate.getDate() + customerSelect.customer_credit_limit_month);
                                       setInfos({
                                         ...infos,
                                         accountingDate,

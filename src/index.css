@@ -47,6 +47,9 @@ code {
   font-size: 0.875rem;
   padding: 0.35rem 0.45rem;
 }
+.btn-custom-sm {
+  padding: 0.2rem 0.45rem !important;
+}
 .p-datatable .p-datatable-thead > tr > th {
   padding: 0.5rem 1rem;
 }
@@ -208,4 +211,5 @@ display: none !important;
 .p-dropdown-item.p-disabled {
   opacity: 0.6;
 }
+
 
