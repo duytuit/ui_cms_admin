@@ -10,20 +10,26 @@ import { Helper } from "utils/helper";
 import { MyCalendar } from "components/common/MyCalendar";
 import { classNames } from "primereact/utils";
 import { addBill } from "modules/bill/api";
-export default function UpdateKyCongNoKH({ ids,cycleName,customerSelect, onClose }: { ids: any, cycleName: any,customerSelect :any, onClose: () => void }) {
+export default function UpdateKyCongNoKH({ debit_ids,cycleName,customerSelect,bill,type, onClose }: { debit_ids: any, cycleName: any,customerSelect :any,bill:any,type:any, onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [dataCycleName, setDataCycleName] = useState<any[]>([]);
-  const [infos, setInfos] = useState<any>({accountingDate:Helper.toDayString() });
+ const [infos, setInfos] = useState<any>({
+  accountingDate: Helper.toDayString(),
+  expiryDate: null,
+  note: "",
+  cycleName: null,
+});
   const dispatch = useDispatch();
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    if (ids.length === 0) {
+    if (debit_ids.length === 0 && type == 1) {
       dispatch(showToast({ ...listToast[2], detail: "Chưa có chi tiết công nợ" }));
       return;
     }
-    infos.ids = ids;
+    infos.id = type == 1 ? 0 : bill.id;
+    infos.DebitIds = debit_ids;
     infos.expiryDate = Helper.formatYMDLocal(infos.expiryDate);
-    infos.customerDetailId =customerSelect.customerDetailId;
+    infos.customerDetailId = customerSelect?.customer_detail_id;
     console.log('info', infos);
     setLoading(true);
     fetchDataSubmit(infos);
@@ -48,6 +54,8 @@ export default function UpdateKyCongNoKH({ ids,cycleName,customerSelect, onClose
   }));
 }, [dataCycleName]);
 useEffect(() => {
+  if (type !== 1) return;
+
   const excludedCycles = cycleName ?? [];
   const monthlyCycles = Helper.getMonthlyCycles();
 
@@ -58,31 +66,36 @@ useEffect(() => {
 
   setDataCycleName(cycles);
 
-  if (infos.cycleName) return;
-
   let selectedCycle = Helper.getCurrentMonthCycle();
-
-  // 🔥 nếu tháng hiện tại bị exclude → tìm tháng kế tiếp hợp lệ
   while (excludedCycles.includes(selectedCycle)) {
     selectedCycle = Helper.getNextMonthCycle(selectedCycle);
-
-    // tránh loop vô hạn
     if (!monthlyCycles.includes(selectedCycle)) break;
   }
-  const expiryDate = new Date(infos.accountingDate);
-          expiryDate.setDate(expiryDate.getDate() + customerSelect.customer_credit_limit_month);
-          setInfos({
-            ...infos,
-            expiryDate,
-          });
-  if (cycles.includes(selectedCycle)) {
-    setInfos((prev: any) => ({
-      ...prev,
-      cycleName: selectedCycle,
-    }));
+
+  const accountingDate = infos.accountingDate ?? Helper.toDayString();
+  const expiryDate = new Date(accountingDate);
+  expiryDate.setDate(
+    expiryDate.getDate() + (customerSelect?.customer_credit_limit_month ?? 0)
+  );
+
+  setInfos((prev:any) => ({
+    ...prev,
+    cycleName: selectedCycle,
+    expiryDate,
+  }));
+}, [cycleName, type]);
+useEffect(() => {
+  if (type !== 1 && bill) {
+    setInfos({
+      accountingDate: bill.accounting_date ?? Helper.toDayString(),
+      expiryDate: bill.expiry_date ?? null,
+      name: bill.name ?? "",
+      cycleName: bill.cycle_name,
+    });
+    // 🔥 QUAN TRỌNG: PHẢI CÓ OPTION CHO DROPDOWN
+    setDataCycleName([bill.cycle_name]);
   }
- 
-}, [cycleName]);
+}, [bill, type]);
   return (
     <>
        <UpdateForm
@@ -113,7 +126,10 @@ useEffect(() => {
                                     label="Kỳ công nợ"
                                     className="p-inputtext-sm"
                                     onChange={(e: any) =>
-                                      setInfos({ ...infos, cycleName: e.target.value })
+                                     {
+                                        console.log( e.target.value);
+                                        setInfos({ ...infos, cycleName: e.target.value })
+                                     }
                                     }
                                     required
                                   />
@@ -127,8 +143,8 @@ useEffect(() => {
                                 Khách hàng
                               </label>
                               <div className="col-12 md:col-9">
-                                  <div><b>{customerSelect.abbreviation}</b></div>
-                                  <div><i>Nợ tối đa: {customerSelect.customer_credit_limit_month} ngày</i></div>
+                                  <div><b>{customerSelect?.abbreviation}</b></div>
+                                  <div><i>Nợ tối đa: {customerSelect?.customer_credit_limit_month} ngày</i></div>
                               </div>
                             </div>
                             <div className="field grid">
@@ -144,7 +160,7 @@ useEffect(() => {
                                     onChange={(e: any) => {
                                       const accountingDate = e;
                                       const expiryDate = new Date(accountingDate);
-                                      expiryDate.setDate(expiryDate.getDate() + customerSelect.customer_credit_limit_month);
+                                      expiryDate.setDate(expiryDate.getDate() + (customerSelect?.customer_credit_limit_month ?? 0));
                                       setInfos({
                                         ...infos,
                                         accountingDate,
@@ -176,10 +192,10 @@ useEffect(() => {
                                 </label>
                                 <div className="col-12 md:col-9">
                                   <InputForm className="w-full"
-                                    id="note"
-                                    value={infos.note}
+                                    id="name"
+                                    value={infos.name}
                                     onChange={(e: any) =>
-                                      setInfos({ ...infos, note: e.target.value })
+                                      setInfos({ ...infos, name: e.target.value })
                                     }
                                     label="Ghi chú"
                                   />

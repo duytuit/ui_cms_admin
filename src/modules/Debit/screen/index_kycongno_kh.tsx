@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Column, DataTableClient, DateBody, } from "components/common/DataTable";
+import { ActionBody, Column, DataTableClient, DateBody, } from "components/common/DataTable";
 import { Dropdown, GridForm } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
@@ -8,7 +8,7 @@ import { useGetPartnerWithDebitNoBill } from "modules/partner/service";
 import { Button, Checkbox, Dialog, Tag } from "components/uiCore";
 import { Helper } from "utils/helper";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { useGetObjectDebitChiTietNoBillKHAsync } from "../service";
+import { useGetObjectDebitChiTietHasBillKHAsync, useGetObjectDebitChiTietNoBillKHAsync } from "../service";
 import { FilterMatchMode } from "primereact/api";
 import { useGetObjectTaskAsync } from "modules/bill/service";
 import UpdateKyCongNoKH from "./update_kycongno_kh";
@@ -16,18 +16,21 @@ import { confirmDialog } from "primereact/confirmdialog";
 import { useDispatch } from "react-redux";
 import { showToast } from "redux/features/toast";
 import { listToast } from "utils";
+import { GetObjectDebitChiTietHasBillKHAsync, UpdateBill } from "../api";
+import { deleteBill } from "modules/bill/api";
 
 // ✅ Component Header lọc dữ liệu
-const Header = ({ _setParamsPaginator, _paramsPaginator, selectedRows, refreshBill, setSelectedRows,refresh,cycleName }: any) => {
+const Header = ({ _setParamsPaginator, _paramsPaginator, selectedRows, refreshBill, setSelectedRows,refresh,cycleName,setStatusVisible,statusVisible,bill }: any) => {
   const [filter, setFilter] = useState({
     name: "",
     customerDetailId: "",
     fromDate: Helper.lastWeekString(),
     toDate: Helper.toDayString(),
   });
-  const [visible, setVisible] = useState(false);
-  const [customerSelect, setCustomerSelect] = useState<any>({});
-  const [customer, setCustomer] = useState<any[]>([]);
+  const [ customerSelect, setCustomerSelect] = useState<any>({});
+  const [ customer, setCustomer] = useState<any[]>([]);
+  const [ type, setType] = useState<number>(0);
+  const dispatch = useDispatch();
   const { data: customerHasDebit, refresh: refreshPartner} = useGetPartnerWithDebitNoBill({params:{a:"abc"}});
   const customerOptions = useMemo(() => {
   const list = customerHasDebit?.data;
@@ -41,10 +44,16 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selectedRows, refreshBi
   }));
 }, [customerHasDebit]);
   const openDialogAdd = (e:any) => {
-      setVisible(true)
+    if (!filter.customerDetailId) {
+      dispatch(showToast({ ...listToast[2], detail: "Chưa chọn khách hàng" }));
+      return;
+    }
+    setType(1)
+    setStatusVisible(true)
   };
   const handleModalClose = () => {
-      setVisible(false);
+      setType(0)
+      setStatusVisible(false);
       refreshBill?.();
       refresh?.();
       refreshPartner?.();
@@ -100,7 +109,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selectedRows, refreshBi
             const selectedCustomer = customer.find(
               (x: any) => x.customer_detail_id === customerId
             );
-            console.log(selectedCustomer);
+            // console.log(selectedCustomer);
             setCustomerSelect(selectedCustomer)
             setFilter((prev: any) => ({
               ...prev,
@@ -118,12 +127,12 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, selectedRows, refreshBi
      <Dialog
             position="top"
             dismissableMask
-            visible={visible}
-            onHide={() => setVisible(false)}
+            visible={statusVisible}
+            onHide={handleModalClose}
             style={{ width: "30vw", top:"30px"}}
         >
           <p className="m-0">
-            {selectedRows && <UpdateKyCongNoKH customerSelect={customerSelect} ids={selectedRows} cycleName={cycleName} onClose={handleModalClose} ></UpdateKyCongNoKH>}
+            {selectedRows && <UpdateKyCongNoKH type={type} bill={bill} customerSelect={customerSelect} debit_ids={selectedRows} cycleName={cycleName} onClose={handleModalClose} ></UpdateKyCongNoKH>}
           </p>
       </Dialog>
     </>
@@ -134,14 +143,13 @@ export default function ListKyCongNoKH() {
   const { handleParamUrl } = useHandleParamUrl();
   const dispatch = useDispatch();
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
-  const [actionId, setActionId] = useState<number>(0);
-  const [selectedDebitDispatchRows, setSelectedDebitDispatchRows] = useState<any[]>([]);
   const [displayBill, setDisplayBill] = useState<any[]>([]);
+  const [statusVisible, setStatusVisible] = useState(false);
   const [displayDataNoBill, setDisplayDataNoBill] = useState<any[]>([]);
   const [displayDataHasBill, setDisplayDataHasBill] = useState<any[]>([]);
   const [cycleName, setCycleName] = useState<any[]>([]);
   const [visible, setVisible] = useState(false);
-  const [selectedId, setSelectedId] = useState<any>();
+  const [bill, setBill] = useState<any>();
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
     pageSize: 20,
@@ -156,7 +164,7 @@ export default function ListKyCongNoKH() {
   const { data, loading, error, refresh } = useGetObjectDebitChiTietNoBillKHAsync({params: paramsPaginator,debounce: 500,});
   const { data: dataBill, refresh: refreshBill  } = useGetObjectTaskAsync({params: {...paramsPaginator}, debounce: 500,});
   //const { data: dataDebitHasBill, refresh: refreshDebitHasBill } = useGetObjectDebitChiTietHasBillKHAsync({params: {...paramsPaginator}, debounce: 500,});
-
+   
   // ✅ Client-side pagination
   useEffect(() => {
     if (!data?.data || !dataBill?.data) return;
@@ -205,6 +213,7 @@ export default function ListKyCongNoKH() {
       };
     });
     setDisplayBill(dataBill_mapped);
+
   }, [data,dataBill, paramsPaginator]);
    const getSumColumn = (field: string) => {
         const filtered = (displayDataNoBill??[]).filter((item: any) => {
@@ -223,35 +232,101 @@ export default function ListKyCongNoKH() {
 
         return Helper.formatCurrency(sum.toString());
     };
-      async function accept() {
-          // const res = await actions.action({ id: ids });
-          // if (res.status === 200) {
-          //     if(res.data.status){
-          //         dispatch(showToast({ ...listToast[0], detail: res.data.message  }));
-          //         if (paramsPaginator && setParamsPaginator) {
-          //             setParamsPaginator({ ...paramsPaginator, render: !paramsPaginator.render });
-          //         };
-          //     }else{
-          //         dispatch(showToast({ ...listToast[2], detail: res.data.message  }));
-          //     }
-          // } else {
-          //     dispatch(showToast({ ...listToast[1], detail: res.data.message  }));
-          // }
-      };
-     const confirm = (id:number) => {
-          console.log(id);
-        
-          if(id > 0)
-          {
-            setActionId(id)
-            confirmDialog({
-                message: 'Bạn có muốn tiếp tục xóa?',
-                header: 'Quản trị dự án',
-                icon: 'pi pi-info-circle',
-                accept
+    const getSumColumnHasBill = (field: string) => {
+        const filtered = (displayDataHasBill??[]).filter((item: any) => {
+            return Object.entries(filters).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
             });
-          }
+        });
+
+        const sum = filtered.reduce((acc: any, item: any) => {
+            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
     };
+      async function acceptBill(id : number) {
+          const res = await deleteBill({ Id: id });
+          if (res.status === 200) {
+              if(res.data.status){
+                  dispatch(showToast({ ...listToast[0], detail: res.data.message  }));
+                  await viewListDetail(id); // refresh lại list debit theo bill
+                  refreshBill?.();
+                  refresh?.();
+              }else{
+                  dispatch(showToast({ ...listToast[2], detail: res.data.message  }));
+              }
+          } else {
+              dispatch(showToast({ ...listToast[1], detail: res.data.message  }));
+          }
+      };
+     async function acceptDebit(id:number,billId: number) {
+        const res = await UpdateBill({ Id: id });
+        if (res.status === 200) {
+          if (res.data.status) {
+            dispatch(showToast({ ...listToast[0], detail: res.data.message }));
+            await viewListDetail(billId); // refresh lại list debit theo bill
+            refreshBill?.();
+            refresh?.();
+          } else {
+            dispatch(showToast({ ...listToast[2], detail: res.data.message }));
+          }
+        } else {
+          dispatch(showToast({ ...listToast[1], detail: res.data.message }));
+        }
+      }
+      async function BoSungBill(bill:any) {
+           setBill(bill)
+           setStatusVisible(true)
+      }
+      async function viewListDetail(billId:number) {
+          const res = await GetObjectDebitChiTietHasBillKHAsync({ BillId: billId });
+          if (res.status === 200) {
+              if(res.data.status){
+                  const mapped = (res.data.data?.data || []).map((row: any) => {
+                    const _data = JSON.parse(row.data);
+                    const total_price = row.price + row.price_com;
+                    const thanh_tien_dv = Math.round(total_price * (1 + row.vat / 100));
+                    const thanh_tien_ch = Math.round(row.price * (1 + row.vat / 100));
+                    return {
+                      ...row,
+                        fileNumber: _data?.fileNumber || "không file",
+                        thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 || row.type === 8) ? thanh_tien_dv : 0,
+                        thanhtien_ch: (row.type === 2 || row.type === 3 || row.type === 6) ? thanh_tien_ch : 0,
+                    };
+                  });
+                  setDisplayDataHasBill(mapped)
+              }else{
+                  dispatch(showToast({ ...listToast[2], detail: res.data.message  }));
+              }
+          } else {
+              dispatch(showToast({ ...listToast[1], detail: res.data.message  }));
+          }
+      };
+    const confirm = (id:number) => {
+        if(id > 0){
+          confirmDialog({
+              message: 'Bạn có muốn tiếp tục xóa?',
+              header: 'Quản trị dự án',
+              icon: 'pi pi-info-circle',
+              accept:()=>acceptBill(id)
+          });
+        }
+    };
+   const confirmDebit = (id: number, billId: number) => {
+    if (id > 0) {
+      confirmDialog({
+        message: 'Bạn có muốn tiếp tục xóa?',
+        header: 'Quản trị dự án',
+        icon: 'pi pi-info-circle',
+        accept: () => acceptDebit(id,billId),
+      });
+    }
+  };
   return (
     <>
       <div className="card">
@@ -263,6 +338,9 @@ export default function ListKyCongNoKH() {
           refreshBill={refreshBill}
           refresh={refresh}
           cycleName={cycleName}
+          setStatusVisible={setStatusVisible}
+          statusVisible={statusVisible}
+          bill={bill}
         />
         <div style={{ height: 'calc(100vh - 8rem)' }}>
           <Splitter style={{ height: '100%', width: '100%' }}>
@@ -368,7 +446,7 @@ export default function ListKyCongNoKH() {
                         tableStyle={{ minWidth: "600px" }}
                       >
                         <Column header="Kỳ công nợ"
-                         body={(row: any) =>{
+                         body={(row: any, options:any) =>{
                             return (
                               <>
                                  <table>
@@ -405,8 +483,9 @@ export default function ListKyCongNoKH() {
                                       <tr>
                                         <td>Thao tác: </td>
                                         <td>
-                                            <Button icon='pi pi-trash' label="Xóa" onClick={()=>confirm(row.id)} className={classNames("btn-custom-sm")} outlined  severity="danger" size="small" raised />
-                                            <Button icon='pi pi-plus' label="Bổ sung" outlined  className={classNames("ml-1","btn-custom-sm")} severity="info" size="small" raised />
+                                            {options.rowIndex == displayBill.length - 1  && <Button icon='pi pi-trash' label="Xóa" onClick={()=>confirm(row.id)} className={classNames("btn-custom-sm")} outlined  severity="danger" size="small" raised />}
+                                            <Button icon='pi pi-eye' label="Chi tiết"  onClick={()=>viewListDetail(row.id)}  outlined  className={classNames("ml-1","btn-custom-sm")} severity="success" size="small" raised />
+                                            <Button icon='pi pi-plus' label="Bổ sung" onClick={()=>BoSungBill(row)} outlined  className={classNames("ml-1","btn-custom-sm")} severity="info" size="small" raised />
                                         </td>
                                      </tr>
                                   </tbody>
@@ -443,6 +522,11 @@ export default function ListKyCongNoKH() {
                         style={{ flex: 1 }}
                         tableStyle={{ minWidth: "600px" }}
                       >
+                        <Column header="Thao tác" body={(e: any) => {
+                          return <Button className="mr-2" 
+                          type='button' icon="pi pi-trash"
+                           onClick={() => confirmDebit(e.id, e.bill_id)} rounded outlined severity="danger" />
+                        }} />
                         <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} style={{ width: "6em" }} />
                         <Column field="fileNumber" header="Số file" filter showFilterMenu={false} filterMatchMode="contains"  style={{ width: "6em" }} />
                         <Column field="name" header="Nội dung" filter showFilterMenu={false} filterMatchMode="contains"  />
@@ -450,14 +534,14 @@ export default function ListKyCongNoKH() {
                           body={(row: any) =>{
                             return Helper.formatCurrency(row.thanhtien_dv.toString());
                           }} 
-                          footer={getSumColumn("thanhtien_dv")}
+                          footer={getSumColumnHasBill("thanhtien_dv")}
                           footerStyle={{ fontWeight: "bold" }}
                         />
                         <Column // chi hộ
                           body={(row: any) =>{
                             return Helper.formatCurrency(row.thanhtien_ch.toString());
                           }} 
-                          footer={getSumColumn("thanhtien_ch")}
+                          footer={getSumColumnHasBill("thanhtien_ch")}
                           footerStyle={{ fontWeight: "bold" }}
                         />
                     </DataTableClient>

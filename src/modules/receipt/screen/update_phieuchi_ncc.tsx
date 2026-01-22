@@ -171,7 +171,7 @@ export default function UpdatePhieuChiNCC({debits, onClose}: {debits: any, onClo
                             <Column field="name" header="Nội dung"/>
                             <Column  header="Dịch vụ" 
                             body={(row: any) =>{
-                              if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5){ // dịch vụ
+                              if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10 ||row.type === 7){ // dịch vụ
                                   const purchase_price = typeof row.purchase_price === "string"
                                     ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
                                     : Number(row.purchase_price) || 0;
@@ -186,7 +186,7 @@ export default function UpdatePhieuChiNCC({debits, onClose}: {debits: any, onClo
                             }}/>
                             <Column  header="Chi hộ" 
                              body={(row: any) =>{
-                              if(row.type === 2 || row.type === 3 || row.type === 6){
+                              if(row.type === 2 || row.type === 3 || row.type === 6 || row.type === 11){
                                   const purchase_price = typeof row.purchase_price === "string"
                                     ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
                                     : Number(row.purchase_price) || 0;

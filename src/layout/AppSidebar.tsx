@@ -422,7 +422,7 @@ const model = [{
           {
             id: 1,
             name: 'Nhắc nợ KH',
-            route: '/page-two',
+            route: '/debit/ListNhacNoKH',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,

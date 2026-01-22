@@ -380,13 +380,13 @@ useEffect(() => {
             supplierAbb: sup?.partners?.abbreviation || "",
             userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
             typeKH: _typeKH?.name || "",
-            thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien_dv : 0,
+            thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10 ||row.type === 7) ? thanh_tien_dv : 0,
             thanhtien_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien_ch : 0,
-            dathu_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? row.receipt_total : 0,
+            dathu_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10 ||row.type === 7) ? row.receipt_total : 0,
             dathu_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? row.receipt_total : 0,
-            conlai_dv_view: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien_dv - row.receipt_total : 0,
+            conlai_dv_view: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10 ||row.type === 7) ? thanh_tien_dv - row.receipt_total : 0,
             conlai_ch_view: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien_ch - row.receipt_total : 0,
-            conlai_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10) ? thanh_tien_dv - row.receipt_total : 0,
+            conlai_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10  ||row.type === 7) ? thanh_tien_dv - row.receipt_total : 0,
             conlai_ch: (row.type === 2 || row.type === 3 || row.type === 6 ||row.type === 11) ? thanh_tien_ch - row.receipt_total : 0,
             conlai_tong: thanh_tien - row.receipt_total
         };
@@ -592,7 +592,7 @@ useEffect(() => {
                         />
                         <Column 
                         body={(row:any, options:any) => {
-                          if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10){
+                          if(row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 ||row.type === 10 ||row.type === 7){
                             const purchase_price = typeof row.purchase_price === "string"
                               ? parseFloat(row.purchase_price.replace(/[^0-9.]/g, "")) || 0
                               : Number(row.purchase_price) || 0;

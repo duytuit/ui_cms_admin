@@ -5,6 +5,7 @@ export const GetObjectDebitChiTietNoBillKHAsync = async (params: any) => await g
 export const GetObjectDebitChiTietHasBillKHAsync = async (params: any) => await getData("Debit/GetObjectDebitChiTietHasBillKHAsync", params);
 export const listMuahangNCC = async (params: any) => await getData("Debit/muahangNCC", params);
 export const listBanhangKH = async (params: any) => await getData("Debit/banhangKH", params);
+export const GetObjectTheoDoiNhacNoKHAsync= async (params: any) => await getData("Debit/GetObjectTheoDoiNhacNoKHAsync", params);
 export const listNoDebitNoFileNCC= async (params: any) => await getData("Debit/noDebitNoFileNCC", params);
 export const listHasDebitNoFileNCC= async (params: any) => await getData("Debit/hasDebitNoFileNCC", params);
 export const listNoDebitNoFileDispatchKH = async (params: any) => await getData("Debit/noDebitNoFileDispatchKH", params);
@@ -45,6 +46,7 @@ export const updateBillCustomerFileGia = async (params: any) => await postData("
 export const updateBillCustomerFileNoFile = async (params: any) => await postData("Debit/updateBillDebitNoFile", params);
 export const updateDebitBanHangKH = async (params: any) => await postData("Debit/update/banhang", params);
 export const updateDebitDauKyKH = async (params: any) => await postData("Debit/update/daukykh", params);
+export const UpdateBill = async (params: any) => await postData("Debit/UpdateBill", params);
 //===== end ===========
 // cập nhật debit nhà cung cấp
 export const updateDebitDauKyNCC = async (params: any) => await postData("Debit/update/daukyncc", params);

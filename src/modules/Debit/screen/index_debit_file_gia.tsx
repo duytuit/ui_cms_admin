@@ -87,11 +87,50 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFil
     link.remove();
     window.URL.revokeObjectURL(url); // ✅ tránh leak memory
   }
+   async function ExportHoaDonHasBillKH() {
+    if (!Array.isArray(selected) || selected.length === 0) {
+      dispatch(
+        showToast({
+          ...listToast[2],
+          detail: "Chưa chọn file giá",
+        })
+      );
+      return;
+    }
+
+    const params = {
+      ..._paramsPaginator,
+      FileInfoIds: selected.map(Number), // ✅ đảm bảo number[]
+      ExportHasBill: 1
+    };
+
+    const respo = await ExportXuatHoaDon(
+      Helper.convertObjectToQueryString(params)
+    );
+
+    const blob = new Blob([respo.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "hoa_don_kh.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url); // ✅ tránh leak memory
+  }
     const items = [
           {
               label: 'Xuất chi tiết hóa đơn',
               icon: "pi pi-file-export",
               command: () => ExportHoaDonKH()
+          },
+          {
+              label: 'Xuất chi tiết hóa đơn + bill',
+              icon: "pi pi-file-export",
+              command: () => ExportHoaDonHasBillKH()
           }
       ];
     return (
@@ -248,7 +287,7 @@ export default function ListFileGia() {
             const _sumMua = row.debits.reduce((sum: number, x: any) => sum + (x.debit_purchase_price || 0), 0);
             const _sumBan = row.debits.reduce((sum: number, x: any) => sum + (x.debit_price || 0), 0);
             const _sumVat = row.debits.reduce((sum: number, x: any) => sum + (x.debit_total_vat || 0), 0);
-            const cf_status_confirm = row.debits.find((x: any) => x.cf_status_confirm === 1 && x.cf_status == 2);
+            const cf_status_confirm = row.debits.find( (x: any) => x.cf_status_confirm === 0 || (x.cf_status_confirm === 1 && x.cf_status === 1) );
             const _userUpdate = listEmployee.find((x: any) => x.user_id === row.cf_updated_by);
             return {
               ...row,
@@ -259,7 +298,7 @@ export default function ListFileGia() {
               sumBan:_sumBan,
               sumVat:_sumVat,
               loiNhuan:_sumBan-_sumMua,
-              cf_status_confirm:cf_status_confirm ? 1 : 0,
+              cf_status_confirm:cf_status_confirm ? 0 : 1,
               userUpdate: `${_userUpdate?.last_name ?? ""} ${_userUpdate?.first_name ?? ""}`.trim(),
               debit_cus_bill :  (row.debits && row.debits.length > 0) ?  row.debits[0]?.debit_cus_bill || "chưa hd":"chưa hd"
             };

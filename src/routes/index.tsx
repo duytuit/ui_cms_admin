@@ -80,6 +80,7 @@ import ListCuocKeToan from "modules/Debit/screen/index_cuoc_ketoan";
 import ListTamThuKeToan from "modules/Debit/screen/index_tamthu_ketoan";
 import ListBaoCaoLuuChuyenTienTe from "modules/receipt/screen/index_baocao_luuchuyen_tiente";
 import ListKyCongNoKH from "modules/Debit/screen/index_kycongno_kh";
+import ListNhacNoKH from "modules/Debit/screen/index_nhac_no_kh";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -178,6 +179,7 @@ const publicRoutes = [
   { path: "/receipt/ListBaoCaoLuuChuyenTienTe", component: ListBaoCaoLuuChuyenTienTe, layout: 'ListBaoCaoLuuChuyenTienTe' },
   // Debit 
   { path: "/debit/listCuoc", component: ListCuoc, layout: 'ListCuoc' },
+  { path: "/debit/ListNhacNoKH", component: ListNhacNoKH, layout: 'ListNhacNoKH' },
   { path: "/debit/listTamThu", component: ListTamThu, layout: 'ListTamThu' },
   { path: "/debit/ListCuocKeToan", component: ListCuocKeToan, layout: 'ListCuocKeToan' },
   { path: "/debit/ListTamThuKeToan", component: ListTamThuKeToan, layout: 'ListTamThuKeToan' },
