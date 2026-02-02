@@ -205,6 +205,40 @@ export default function UpdateDoiTruCongNo() {
 
         return Helper.formatCurrency(sum.toString());
     };
+     const getTotalColumnKH = (field: string) => {
+        const filtered = (displayDataKH??[]).filter((item: any) => {
+            return Object.entries(filterKH).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
+
+        const sum = filtered.reduce((acc: any, item: any) => {
+            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
+    const getTotalColumnNCC = (field: string) => {
+        const filtered = (displayDataNCC??[]).filter((item: any) => {
+            return Object.entries(filterNCC).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
+
+        const sum = filtered.reduce((acc: any, item: any) => {
+            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
   useEffect(() => {
            const mapped = (debitDoiTruKH?.data || []).map((row: any) => {
                   let _fileNumber='';
@@ -412,16 +446,28 @@ const canBangBuTru = (
                                 <Column field="name" header="Nội dung" filter showFilterMenu={false} filterMatchMode="contains"/>
                                 <Column field="thanhtien_dv" body={(row: any) =>{
                                   return Helper.formatCurrency(row.thanhtien_dv.toString());
-                                }}  header="Dịch vụ phát sinh" style={{ textAlign: 'right' }}/>
+                                }}  header="Dịch vụ phát sinh" style={{ textAlign: 'right' }}
+                                  footer={getTotalColumnKH("thanhtien_dv")}
+                                  footerStyle={{ fontWeight: "bold" }}
+                                />
                                 <Column field="thanhtien_ch" body={(row: any) =>{
                                   return Helper.formatCurrency(row.thanhtien_ch.toString());
-                                }} header="Chi hộ phát sinh" style={{ textAlign: 'right' }}/>
+                                }} header="Chi hộ phát sinh" style={{ textAlign: 'right' }}
+                                  footer={getTotalColumnKH("thanhtien_ch")}
+                                  footerStyle={{ fontWeight: "bold" }}
+                                />
                                 <Column field="conlai_dv_view" body={(row: any) =>{
                                   return Helper.formatCurrency(row.conlai_dv_view.toString());
-                                }} header="Dịch vụ chưa thu" style={{ textAlign: 'right' }}/>
+                                }} header="Dịch vụ chưa thu" style={{ textAlign: 'right' }}
+                                  footer={getTotalColumnKH("conlai_dv_view")}
+                                  footerStyle={{ fontWeight: "bold" }}
+                                />
                                 <Column field="conlai_ch_view" body={(row: any) =>{
                                   return Helper.formatCurrency(row.conlai_ch_view.toString());
-                                }} header="Chi hộ chưa thu" style={{ textAlign: 'right' }}/>
+                                }} header="Chi hộ chưa thu" style={{ textAlign: 'right' }}
+                                  footer={getTotalColumnKH("conlai_ch_view")}
+                                  footerStyle={{ fontWeight: "bold" }}
+                                />
                                 <Column
                                 body={(rowData: any) => {
                                   const total_price = rowData.price + rowData.price_com;
@@ -493,16 +539,28 @@ const canBangBuTru = (
                                 <Column field="name" header="Nội dung" filter showFilterMenu={false} filterMatchMode="contains"/>
                                 <Column field="thanhtien_dv" body={(row: any) =>{
                                   return Helper.formatCurrency(row.thanhtien_dv.toString());
-                                }}  header="Dịch vụ phát sinh" style={{ textAlign: 'right' }}/>
+                                }}  header="Dịch vụ phát sinh" style={{ textAlign: 'right' }}
+                                  footer={getTotalColumnNCC("thanhtien_dv")}
+                                  footerStyle={{ fontWeight: "bold" }}
+                                />
                                 <Column field="thanhtien_ch" body={(row: any) =>{
                                   return Helper.formatCurrency(row.thanhtien_ch.toString());
-                                }} header="Chi hộ phát sinh" style={{ textAlign: 'right' }}/>
+                                }} header="Chi hộ phát sinh" style={{ textAlign: 'right' }}
+                                  footer={getTotalColumnNCC("thanhtien_ch")}
+                                  footerStyle={{ fontWeight: "bold" }}
+                                />
                                 <Column field="conlai_dv_view" body={(row: any) =>{
                                   return Helper.formatCurrency(row.conlai_dv_view.toString());
-                                }} header="Dịch vụ chưa thu" style={{ textAlign: 'right' }}/>
+                                }} header="Dịch vụ chưa thu" style={{ textAlign: 'right' }}
+                                  footer={getTotalColumnNCC("conlai_dv_view")}
+                                  footerStyle={{ fontWeight: "bold" }}
+                                />
                                 <Column field="conlai_ch_view" body={(row: any) =>{
                                   return Helper.formatCurrency(row.conlai_ch_view.toString());
-                                }} header="Chi hộ chưa thu" style={{ textAlign: 'right' }}/>
+                                }} header="Chi hộ chưa thu" style={{ textAlign: 'right' }}
+                                  footer={getTotalColumnNCC("conlai_ch_view")}
+                                  footerStyle={{ fontWeight: "bold" }}
+                                />
                                 <Column
                                 body={(rowData: any) => {
                                   const total_purchase = rowData.purchase_price + rowData.purchase_com;

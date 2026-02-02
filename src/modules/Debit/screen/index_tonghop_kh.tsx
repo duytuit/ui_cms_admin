@@ -96,7 +96,14 @@ export default function ListTongHopKH() {
     debounce: 500,
   });
     const [filters, setFilters] = useState({
-      abbreviation:""
+      abbreviation:"",
+      dvtk:"",
+      chtk:"",
+      ttdvtk:"",
+      ttchtk:"",
+      dvck:"",
+      chck:"",
+      ck:""
   });
       // --- Header template with filter ---
     const customerAbbHeader = (
@@ -109,12 +116,250 @@ export default function ListTongHopKH() {
             />
        </div>
     );
+  const dvtkHeader = (
+     <div className="py-1">
+         <Input
+            type="text"
+            value={filters.dvtk}
+            onChange={(e:any) => setFilters({ ...filters, dvtk: e.target.value })}
+            label="><=giá trị"
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );   
+  const chtkHeader = (
+     <div className="py-1">
+         <Input
+            type="text"
+            value={filters.chtk}
+            onChange={(e:any) => setFilters({ ...filters, chtk: e.target.value })}
+            label="><=giá trị"
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );  
+  const ttdvtkHeader = (
+     <div className="py-1">
+         <Input
+            type="text"
+            value={filters.ttdvtk}
+            onChange={(e:any) => setFilters({ ...filters, ttdvtk: e.target.value })}
+            label="><=giá trị"
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  );  
+  const ttchtkHeader = (
+     <div className="py-1">
+         <Input
+            type="text"
+            value={filters.ttchtk}
+            onChange={(e:any) => setFilters({ ...filters, ttchtk: e.target.value })}
+            label="><=giá trị"
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  ); 
+    const dvckHeader = (
+     <div className="py-1">
+         <Input
+            type="text"
+            value={filters.dvck}
+            onChange={(e:any) => setFilters({ ...filters, dvck: e.target.value })}
+            label="><=giá trị"
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  ); 
+    const chckHeader = (
+     <div className="py-1">
+         <Input
+            type="text"
+            value={filters.chck}
+            onChange={(e:any) => setFilters({ ...filters, chck: e.target.value })}
+            label="><=giá trị"
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  ); 
+    const ckHeader = (
+     <div className="py-1">
+         <Input
+            type="text"
+            value={filters.ck}
+            onChange={(e:any) => setFilters({ ...filters, ck: e.target.value })}
+            label="><=giá trị"
+            size="small"
+            className={classNames("input-sm")}
+          />
+     </div>
+  ); 
     // --- Filter dữ liệu dựa vào input ---
 const applyFilters = (rows: any[]) => {
     return rows.filter((row) => {
         const f = filters;
           return (
-            (f.abbreviation ? row.abbreviation?.toLowerCase().includes(f.abbreviation.toLowerCase()) : true)
+            (f.abbreviation ? row.abbreviation?.toLowerCase().includes(f.abbreviation.toLowerCase()) : true)&&
+             (f.dvtk.trim() ? (() => {
+              const input = f.dvtk.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = '>';
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              } else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case '>': return row.dvtk > num;
+                case '>=': return row.dvtk >= num;
+                case '=': case '==': return row.dvtk === num;
+                case '<=': return row.dvtk <= num;
+                case '<': return row.dvtk < num;
+                default: return row.dvtk > num;
+              }
+            })() : true)
+            &&
+            (f.chtk.trim() ? (() => {
+              const input = f.chtk.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = '>';
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              }
+              else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case '>': return row.chtk > num;
+                case '>=': return row.chtk >= num;
+                case '=': case '==': return row.chtk === num;
+                case '<=': return row.chtk <= num;
+                case '<': return row.chtk < num;
+                default: return row.chtk > num;
+              }
+            })() : true)&&
+             (f.ttdvtk.trim() ? (() => {
+              const input = f.ttdvtk.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = '>';
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              } else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case '>': return row.ttdvtk > num;
+                case '>=': return row.ttdvtk >= num;
+                case '=': case '==': return row.ttdvtk === num;
+                case '<=': return row.ttdvtk <= num;
+                case '<': return row.ttdvtk < num;
+                default: return row.ttdvtk > num;
+              }
+            })() : true)
+            &&
+            (f.ttchtk.trim() ? (() => {
+              const input = f.ttchtk.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = '>';
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              }
+              else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case '>': return row.ttchtk > num;
+                case '>=': return row.ttchtk >= num;
+                case '=': case '==': return row.ttchtk === num;
+                case '<=': return row.ttchtk <= num;
+                case '<': return row.ttchtk < num;
+                default: return row.ttchtk > num;
+              }
+            })() : true)&&
+               (f.dvck.trim() ? (() => {
+              const input = f.dvck.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = '>';
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              }
+              else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case '>': return row.dvck > num;
+                case '>=': return row.dvck >= num;
+                case '=': case '==': return row.dvck === num;
+                case '<=': return row.dvck <= num;
+                case '<': return row.dvck < num;
+                default: return row.dvck > num;
+              }
+            })() : true)&&
+              (f.chck.trim() ? (() => {
+              const input = f.chck.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = '>';
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              }
+              else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case '>': return row.chck > num;
+                case '>=': return row.chck >= num;
+                case '=': case '==': return row.chck === num;
+                case '<=': return row.chck <= num;
+                case '<': return row.chck < num;
+                default: return row.chck > num;
+              }
+            })() : true)&&
+             (f.ck.trim() ? (() => {
+              const input = f.ck.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = '>';
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              }
+              else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case '>': return row.ck > num;
+                case '>=': return row.ck >= num;
+                case '=': case '==': return row.ck === num;
+                case '<=': return row.ck <= num;
+                case '<': return row.ck < num;
+                default: return row.ck > num;
+              }
+            })() : true)
         );
     });
 };
@@ -175,13 +420,13 @@ const applyFilters = (rows: any[]) => {
                 <Column header={customerAbbHeader} headerClassName="my-title-center"/>
                 <Column />
                 <Column />
-                <Column />
-                <Column />
-                <Column />
-                <Column />
-                <Column />
-                <Column />
-                <Column />
+                <Column header={dvtkHeader}/>
+                <Column header={chtkHeader}/>
+                <Column header={ttdvtkHeader}/>
+                <Column header={ttchtkHeader}/>
+                <Column header={dvckHeader}/>
+                <Column header={chckHeader}/>
+                <Column header={ckHeader}/>
             </Row>
         </ColumnGroup>
     );

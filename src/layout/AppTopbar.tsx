@@ -6,6 +6,7 @@ import { Image } from 'primereact/image';
 import { showToast } from 'redux/features/toast';
 import { listToast } from 'utils';
 import { useDispatch } from 'react-redux';
+import AppBreadcrumb from './AppBreadcrumb';
 
 const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
     const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
@@ -34,6 +35,7 @@ const AppTopbar = forwardRef<AppTopbarRef>((props, ref) => {
             <button ref={menubuttonRef} type="button" className="p-link layout-menu-button layout-topbar-button" onClick={onMenuToggle}>
                 <i className="pi pi-bars" />
             </button>
+            <AppBreadcrumb />
             <div className="layout-topbar-menu">
                     <span>{`${employeeInfo?.last_name ?? ""} ${employeeInfo?.first_name ?? ""}`.trim()}</span>
                     <div className="p-link layout-topbar-button">

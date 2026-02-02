@@ -12,6 +12,11 @@ body {
 .p-button:enabled:focus {
   box-shadow: none;
 }
+.p-breadcrumb {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

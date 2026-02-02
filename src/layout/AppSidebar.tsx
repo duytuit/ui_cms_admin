@@ -4,7 +4,7 @@ import { MenuProvider } from './context/menuContext';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { listByUserIdStorage, listStorage } from 'modules/storage/api';
-const model = [{
+export const sidebarModel = [{
     items: [
       {
         id: 5,
@@ -804,7 +804,6 @@ const model = [{
             status: 1,
             category_id: 1,
             sort: 1,
-            actions: '[{"action":"import"},{"action":"export"},{"action":"delete"},{"action":"update"},{"action":"add"},{"action":"detail"},{"action":"view"}]'
           },
           {
             id: 1,
@@ -827,7 +826,6 @@ const model = [{
             status: 1,
             category_id: 1,
             sort: 2,
-            actions: '[{"action":"delete"},{"action":"update"},{"action":"add"},{"action":"detail"},{"action":"view"}]'
           }
         ]
       }
@@ -904,7 +902,7 @@ export default function AppSidebar(){
         <label htmlFor="dropdown">Dữ liệu</label>
       </span>
        <ul className="layout-menu">
-        {model.map((item: any, i) => {
+        {sidebarModel.map((item: any, i) => {
           return <MenuSidebar item={item} root={true} index={i} key={i} />;
         })}
       </ul>

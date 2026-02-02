@@ -218,20 +218,19 @@ export default function ListNhacNoKH() {
                     <Column field="b_accounting_date" header="Ngày kỳ công nợ" body={(e: any) => DateBody(e.b_accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                     <Column field="customer_credit_limit_month" header="Nợ tối đa theo tháng" filter showFilterMenu={false} filterMatchMode="contains" />
                     <Column field="overdue_days_of_month" header="Số ngày quá hạn" filter showFilterMenu={false} filterMatchMode="contains" />
-                    <Column field="remain_debit" body={(row: any) => Helper.formatCurrency(row.remain_debit.toString())} header="Số tiền"
-                      footer={getSumColumn("remain_debit")}
+                    <Column field="receipt_total" body={(row: any) => Helper.formatCurrency(row.receipt_total.toString())} header="Thanh toán"
+                      footer={getSumColumn("receipt_total")}
                       footerStyle={{ fontWeight: "bold" }}
                       filter showFilterMenu={false} filterMatchMode="contains" 
                     />
-                    <Column field="receipt_total" body={(row: any) => Helper.formatCurrency(row.receipt_total.toString())} header="Thanh toán"
-                      footer={getSumColumn("receipt_total")}
+                     <Column field="remain_debit" body={(row: any) => Helper.formatCurrency(row.remain_debit.toString())} header="Còn thiếu"
+                      footer={getSumColumn("remain_debit")}
                       footerStyle={{ fontWeight: "bold" }}
                       filter showFilterMenu={false} filterMatchMode="contains" 
                     />
                     <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
                     <Column field="userName" header="Người thực hiện" filter showFilterMenu={false} filterMatchMode="contains" />
                     <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
-
                   </DataTableClient>
             </div>
           </Splitter>

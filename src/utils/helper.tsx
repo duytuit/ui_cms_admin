@@ -299,4 +299,33 @@ export class Helper {
     const yyyy = now.getFullYear();
     return `${mm}${yyyy}`;
   };
+  static findBreadcrumb(
+    items: any[],
+    pathname: string,
+    parents: any[] = []
+  ): any[] | null {
+    for (const item of items) {
+    const current = [...parents, item];
+
+    // match chính xác
+    if (item.route === pathname) {
+      return current;
+    }
+
+    // match route con (trừ '/')
+    if (
+      item.route &&
+      item.route !== '/' &&
+      pathname.startsWith(item.route + '/')
+    ) {
+      return current;
+    }
+
+    if (item.items && item.items.length > 0) {
+      const found = this.findBreadcrumb(item.items, pathname, current);
+      if (found?.length) return found;
+    }
+  }
+  return [];
+  }
 }
