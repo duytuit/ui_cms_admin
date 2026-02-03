@@ -10,6 +10,7 @@ import { Panel } from "primereact/panel";
 import { addEmployee, showEmployee, updateEmployee } from "../api";
 import { Dropdown } from "components/common/ListForm";
 import { useListDepartment } from "modules/department/service";
+import { Helper } from "utils/helper";
 const UpdateEmployee = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,7 @@ const UpdateEmployee = () => {
   const navigate = useNavigate();
   const handleSubmit = (e: any) => {
     e.preventDefault();
+    infos.baseSalary = Helper.toInt(infos.baseSalary);
     let info = {
       ...infos, status: infos.status ? 0 : 1,
     };
@@ -173,6 +175,25 @@ const UpdateEmployee = () => {
                       />
                   </div>
                  
+                </div>
+                  <div className="field grid">
+                  <label
+                    htmlFor="baseSalary"
+                    className="col-12 mb-2 md:col-3 md:mb-0"
+                  >
+                    Lương cơ bản
+                  </label>
+                  <div className="col-12 md:col-9">
+                    <InputForm className="w-full"
+                      id="baseSalary"
+                      value={Helper.formatCurrency(infos.baseSalary?infos.baseSalary.toString():'')}
+                      onChange={(e: any) =>
+                        setInfos({ ...infos, baseSalary: e.target.value })
+                      }
+                      label="Lương cơ bản"
+                      required
+                    />
+                  </div>
                 </div>
                 <div className="field grid">
                   <label

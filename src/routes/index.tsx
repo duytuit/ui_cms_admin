@@ -81,6 +81,8 @@ import ListTamThuKeToan from "modules/Debit/screen/index_tamthu_ketoan";
 import ListBaoCaoLuuChuyenTienTe from "modules/receipt/screen/index_baocao_luuchuyen_tiente";
 import ListKyCongNoKH from "modules/Debit/screen/index_kycongno_kh";
 import ListNhacNoKH from "modules/Debit/screen/index_nhac_no_kh";
+import ListSalary from "modules/salary/screen";
+import UpdateSalary from "modules/salary/screen/update";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -151,6 +153,10 @@ const publicRoutes = [
   { path: "/department/list", component: ListDepartment, layout: 'ListDepartment' },
   { path: "/department/add", component: UpdateDepartment, layout: 'UpdateDepartment' },
   { path: "/department/detail/:id", component: UpdateDepartment, layout: 'UpdateDepartment' },
+  // ListSalary 
+  { path: "/salary/list", component: ListSalary, layout: 'ListSalary' },
+  { path: "/salary/add", component: UpdateSalary, layout: 'UpdateSalary' },
+  { path: "/salary/detail/:id", component: UpdateSalary, layout: 'UpdateSalary' },
   // Receipt 
   { path: "/receipt/list", component: ListReceipt, layout: 'ListReceipt' },
   { path: "/receipt/ListReceiptThu", component: ListReceiptThu, layout: 'ListReceiptThu' },

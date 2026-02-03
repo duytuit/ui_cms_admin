@@ -258,7 +258,7 @@ export class Helper {
     return obj;
   }
   static toInt (v: any){
-     return v == null ? "" : typeof v === "number" ? v : parseInt(String(v).replace(/\D/g, ""), 10) || "";
+   return  v == null ? 0 : typeof v === "number" ? v : parseInt(String(v).replace(/\D/g, ""), 10) || 0;
   }
   static diffDays = (fromDate: string | Date): number => {
     const from = new Date(fromDate);
