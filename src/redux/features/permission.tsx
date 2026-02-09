@@ -3,17 +3,14 @@ import { createSlice } from '@reduxjs/toolkit'
 export const permissionSlice = createSlice({
   name: 'permission',
   initialState: {
-    permissionCate: [],
-    permissionTool: [],
+    permission: null,
   },
   reducers: {
     setPermission: (state, action) => {
-      state.permissionCate = action.payload.permissionCate;
-      state.permissionTool = action.payload.permissionTool;
+      state.permission = action.payload;
     },
     clearPermission: (state) => {
-      state.permissionCate = [];
-      state.permissionTool = [];
+      state.permission = null;
     },
   },
 })

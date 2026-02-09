@@ -4,6 +4,8 @@ import { MenuProvider } from './context/menuContext';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { listByUserIdStorage, listStorage } from 'modules/storage/api';
+import { listPermission } from 'modules/permission/api';
+import { setPermission } from 'redux/features/permission';
 export const sidebarModel = [{
     items: [
       {
@@ -852,64 +854,115 @@ export const sidebarModel = [{
       }
     ]
 }];
-export default function AppSidebar(){
+export default function AppSidebar() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [selectedCity, setSelectedCity] = useState<any>();
-  const [data, setData] = useState<any>([]);
-  const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
-  const fetchProject = async (userId:number) => {
+  const [selectedCity, setSelectedCity] = useState<any>(null);
+  const [data, setData] = useState<any[]>([]);
+  const [permission, setPermission] = useState<any[]>([]);
+
+  const employeeInfo = localStorage.getItem("employeeInfo")
+    ? JSON.parse(localStorage.getItem("employeeInfo") || "{}")
+    : null;
+
+  // =========================
+  // 1) Fetch project list
+  // =========================
+  const fetchProject = async (userId: number) => {
     try {
-      if([280].includes(employeeInfo.user_id)){
-        const res = await listStorage({});
-        if (res?.data?.data?.data) {
-          const _data = res.data.data.data.map((item: any) => ({
-            name: item.name,
-            projectId: item.id,
-          }));
-          setData(_data);
-        }
-      }else{
-        const res = await listByUserIdStorage({UserId: userId});
-        if (res?.data?.data?.data) {
-          const _data = res.data.data.data.map((item: any) => ({
-            name: item.name,
-            projectId: item.id,
-          }));
-          setData(_data);
-        }
+      let res: any;
+
+      if ([280].includes(employeeInfo?.user_id)) {
+        res = await listStorage({});
+      } else {
+        res = await listByUserIdStorage({ UserId: userId });
       }
-    } catch (err) {} 
+
+      if (res?.data?.data?.data) {
+        const _data = res.data.data.data.map((item: any) => ({
+          name: item.name,
+          projectId: item.id,
+        }));
+
+        setData(_data);
+        return _data;
+      }
+
+      setData([]);
+      return [];
+    } catch (err) {
+      setData([]);
+      return [];
+    }
   };
 
-  useEffect(() => {
-    if (employeeInfo){
-      fetchProject(employeeInfo.user_id);
-    }
-  }, employeeInfo);
+  // =========================
+  // 2) Set selected project
+  // =========================
+  const applyDefaultProject = (projects: any[]) => {
+    if (!projects || projects.length === 0) return null;
 
-  // khi data đã load xong → set selected
-  useEffect(() => {
-    if (data.length > 0) {
-      const _project = JSON.parse(localStorage.getItem('project') || '{}');
-       // lấy projectId từ data
-      const dataProjectIds = data.map((x: any) => x.projectId);
-      if (_project && dataProjectIds.includes(_project.projectId)) {
-        setSelectedCity(_project);
-        setSearchParams({ "projectId": _project.projectId})
-      } else {
-        setSelectedCity(data[0]);
-        localStorage.setItem('project', JSON.stringify(data[0]))
-        setSearchParams({ "projectId": data[0].projectId})
-      }
+    const _project = JSON.parse(localStorage.getItem("project") || "{}");
+    const dataProjectIds = projects.map((x: any) => x.projectId);
+
+    let selected: any = null;
+
+    if (_project && dataProjectIds.includes(_project.projectId)) {
+      selected = _project;
+    } else {
+      selected = projects[0];
+      localStorage.setItem("project", JSON.stringify(selected));
     }
-  }, [data]);
+
+    setSelectedCity(selected);
+    setSearchParams({ projectId: selected.projectId });
+
+    return selected;
+  };
+
+  // =========================
+  // 3) Get permission
+  // =========================
+  const getPermission = async (userId: number) => {
+    try {
+      const res = await listPermission({ UserId: userId });
+      if (res?.data?.data) {
+        setPermission(res.data.data);
+      }
+    } catch (err) {}
+  };
+
+  // =========================
+  // Run đúng thứ tự
+  // =========================
+  useEffect(() => {
+    const run = async () => {
+      if (!employeeInfo?.user_id) return;
+
+      // 1) fetchProject
+      const projects = await fetchProject(employeeInfo.user_id);
+
+      // 2) set selected + setSearchParams trước
+      applyDefaultProject(projects);
+
+      // 3) rồi mới getPermission
+      await getPermission(employeeInfo.user_id);
+    };
+
+    run();
+  }, []);
+
+  // =========================
+  // OnChange project
+  // =========================
   const onChange = (event: any) => {
     setSelectedCity(event.value);
-    localStorage.setItem('project', JSON.stringify(event.value))
-    setSearchParams({ "projectId": event.value.projectId })
-    window.location.reload()
-  }
- return (
+    localStorage.setItem("project", JSON.stringify(event.value));
+    setSearchParams({ projectId: event.value.projectId });
+
+    window.location.reload();
+  };
+
+  return (
     <MenuProvider>
       <span className="p-float-label">
         <Dropdown
@@ -922,11 +975,12 @@ export default function AppSidebar(){
         />
         <label htmlFor="dropdown">Dữ liệu</label>
       </span>
-       <ul className="layout-menu">
+
+      <ul className="layout-menu">
         {sidebarModel.map((item: any, i) => {
           return <MenuSidebar item={item} root={true} index={i} key={i} />;
         })}
       </ul>
     </MenuProvider>
   );
-};
+}

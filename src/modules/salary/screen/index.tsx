@@ -34,7 +34,6 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
 
 export default function ListSalary() {
     const { handleParamUrl } = useHandleParamUrl();
-    const [selectedRows, setSelectedRows] = useState<any>([]);
     const [displayData, setDisplayData] = useState<any>();
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
@@ -86,6 +85,7 @@ export default function ListSalary() {
                 <Column field="name" header="Nhân viên" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="name" header="Bộ phận" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="note" header="Ghi chú" />
+                <Column field="name" header="Xem lương"/>
                 <Column field="updated_by" header="Người cập nhật" />
                 <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
                 <Column

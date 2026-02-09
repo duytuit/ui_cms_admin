@@ -1,19 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { useListDepartment } from "../service";
-import { addDepartment, updateDepartment } from "../api";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { AddForm, InputForm, UpdateForm } from "components/common/AddForm";
+import { InputForm, UpdateForm } from "components/common/AddForm";
 import Panel from "components/uiCore/panel/Panel";
-import { useDispatch } from "react-redux";
-import { showToast } from "redux/features/toast";
-import { listToast, refreshObject } from "utils";
-import { Checkbox, Column, DataTable, TreeTable } from "components/uiCore";
-import { useNavigate } from "react-router";
+import { Checkbox, Column, TreeTable } from "components/uiCore";
 import { sidebarModel } from '../../../layout/AppSidebar';
-import { ActionBody, DataTableClient, TimeBody } from "components/common/DataTable";
+import { ActionBody, DataTableClient } from "components/common/DataTable";
 import { classNames } from "primereact/utils";
 import { TreeNode } from "primereact/treenode";
+import { addOrUpdate, delRole, showRole } from "../api";
+import { useListRole } from "../service";
+import { listToast, refreshObject } from "utils";
+import { useDispatch } from "react-redux";
+import { showToast } from "redux/features/toast";
 export interface PermissionRow {
   name: string;
   permission: string;
@@ -53,6 +52,53 @@ export const mergePermissionTreeToArray = (
   walk(nodes);
 
   return result;
+};
+const applyPermissionsToTree = (
+  tree: TreeNode[],
+  rolePermissions: any[]
+): TreeNode[] => {
+  // Tạo map nhanh: permissionName -> permission object
+  const map = new Map<string, any>();
+  (rolePermissions || []).forEach((rp: any) => {
+    map.set(rp.permissionName, rp);
+  });
+
+  const walk = (nodes: TreeNode[]): TreeNode[] => {
+    return nodes.map((node) => {
+      const data = node.data as PermissionRow;
+
+      // permission key trong tree (ví dụ: data.permission = "ke_toan")
+      const key = data?.permission;
+
+      const rp = key ? map.get(key) : null;
+
+      let newNode: TreeNode = { ...node };
+
+      // Nếu permissionName match thì set checkbox
+      if (rp) {
+        newNode = {
+          ...newNode,
+          data: {
+            ...data,
+            all: rp.all,
+            view: rp.view,
+            add: rp.add,
+            edit: rp.edit,
+            delete: rp.delete,
+          },
+        };
+      }
+
+      // Đệ quy children
+      if (node.children?.length) {
+        newNode.children = walk(node.children);
+      }
+
+      return newNode;
+    });
+  };
+
+  return walk(tree);
 };
 export const buildPermissionTree = (sidebarModel: any[]): TreeNode[] => {
   const walk = (items: any[], parentKey = "0"): TreeNode[] => {
@@ -96,47 +142,19 @@ export const buildPermissionTree = (sidebarModel: any[]): TreeNode[] => {
 };
 
 export default function ListPermission() {
-     const [loading, setLoading] = useState(false);
-        const [infos, setInfos] = useState<any>({});
-        const dispatch = useDispatch();
-        const navigate = useNavigate();
-        const handleSubmit = (e:any) => {
-            e.preventDefault();
-            let info = {
-              ...infos, status: infos.status ? 0 : 1,
-          };
-          console.log('info',info);
-          
-        //   setLoading(true);
-        //   fetchDataSubmit(info);
-        };
-         async function fetchDataSubmit(info:any) {
-          if (info.id) {
-              const response = await updateDepartment(info);
-              if (response) setLoading(false);
-              if (response.status === 200) {
-                  if(response.data.status){
-                    dispatch(showToast({ ...listToast[0], detail: response.data.message }));
-                    navigate('/department/list');
-                  }else{
-                    dispatch(showToast({ ...listToast[2], detail: response.data.message }))
-                  }
-              } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
-          } else {
-              const response = await addDepartment(info);
-              if (response) setLoading(false);
-              if (response.status === 200) {
-                  if(response.data.status){
-                    setInfos({ ...refreshObject(infos), status: true })
-                    dispatch(showToast({ ...listToast[0], detail: response.data.message }));
-                    navigate('/department/list');
-                  }else{
-                    dispatch(showToast({ ...listToast[2], detail: response.data.message }))
-                  }
-              } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
-          }
-      };
-    const initialTree  = useMemo(
+  const { handleParamUrl } = useHandleParamUrl();
+  const [displayData, setDisplayData] = useState<any>();
+  const [loading, setLoading] = useState(false);
+  const [infos, setInfos] = useState<any>({});
+  const dispatch = useDispatch();
+  const [paramsPaginator, setParamsPaginator] = useState({
+        pageNum: 1,
+        pageSize: 20,
+        first: 0,
+        render: false,
+        keyword: "",
+  });
+  const initialTree  = useMemo(
     () => buildPermissionTree(sidebarModel),
     [sidebarModel]
   );
@@ -217,7 +235,6 @@ export default function ListPermission() {
   const checkboxBody =
     (field: keyof PermissionRow) => (node: any) => {
       const data = node.data as PermissionRow;
-
       return (
         <Checkbox
           checked={data[field] as boolean}
@@ -234,11 +251,61 @@ export default function ListPermission() {
       );
     };
     async function Capnhat() {
-        const payload = mergePermissionTreeToArray(nodes);
-
-       console.log(payload); // đúng format mảng để lưu db
-        
+      setLoading(true);
+      const payload = mergePermissionTreeToArray(nodes);
+      infos.PermissionDetail = payload;
+      const response = await addOrUpdate(infos);
+      if (response) setLoading(false);
+      if (response.status === 200) {
+          if(response.data.status){
+            setInfos({ ...refreshObject(infos), status: true })
+            refresh?.();
+            dispatch(showToast({ ...listToast[0], detail: response.data.message }));
+          }else{
+            dispatch(showToast({ ...listToast[2], detail: response.data.message }))
+          }
+      } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
     };
+    async function ClearForm() {
+      setInfos({ id:'', name:'',note:'' });
+      const newTree = buildPermissionTree(sidebarModel);
+      setNodes(newTree); // ✅ reset nodes về mặc định
+    }
+    function getDetail(id:any){
+        showRole({ id: id}).then(res => {
+            const detail = res.data.data
+            if (detail) {
+               console.log("detail",detail);
+                let info = {
+                  ...detail
+                };
+                setInfos(info)
+                // ✅ Map permissions vào nodes theo permissionName
+                if (detail.rolePermissions) {
+                  setNodes((prev) =>
+                    applyPermissionsToTree(prev, detail.rolePermissions)
+                  );
+                }
+            }
+        }).catch(err => {
+        //setHasError(true)
+        }).finally();
+    }
+    const { data,loading:loadingRole, error, refresh } = useListRole({
+        params: paramsPaginator,
+        debounce: 500,
+    });
+         // ✅ Client-side pagination
+    useEffect(() => {
+        if (!data) return;
+        handleParamUrl(paramsPaginator);
+         const mapped = (data?.data || []).map((row: any) => {
+                    return {
+                        ...row,
+                    };
+                });
+        setDisplayData(mapped);
+    }, [ data, paramsPaginator]);
     return (
         <div className="card">
             <UpdateForm
@@ -247,8 +314,8 @@ export default function ListPermission() {
                 checkId={infos.id}
                 title="quyền"
                 loading={loading}
-                onSubmit={handleSubmit}
                 Accept={{Name:"Cập nhật", Action: () => Capnhat()}}
+                Cancel={{Name:"Xóa làm lại", Action: () => ClearForm()}}
             >
                 <div className="field">
                     <Panel header="Thông tin">
@@ -257,10 +324,10 @@ export default function ListPermission() {
                                 <div className="formgrid grid">
                                     <div className="field col-6">
                                         <InputForm className="w-full"
-                                            id="note"
-                                            value={infos.note}
+                                            id="name"
+                                            value={infos.name}
                                             onChange={(e: any) =>
-                                                setInfos({ ...infos, note: e.target.value })
+                                                setInfos({ ...infos, name: e.target.value })
                                             }
                                             label="Nhóm quyền"
                                             required
@@ -326,24 +393,31 @@ export default function ListPermission() {
                             <b>Danh sách nhóm quyền</b>
                             <DataTableClient
                                 rowHover
-                                value={[]}
+                                value={displayData}
                                 loading={loading}
                                 filterDisplay="row"
                                 className={classNames("Custom-DataTableClient")}
+                                onRowClick={(e: any) => {
+                                    getDetail(e.data.id);
+                                }}
                             >
                                 <Column field="name" header="Tên nhóm quyền"/>
                                 <Column field="note" header="Ghi chú" />
-                                <Column field="updated_by" header="Người cập nhật" />
+                                <Column field="updatedAt" header="Người cập nhật" />
                                 {/* <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} /> */}
                                 <Column
                                     header="Thao tác"
-                                    body={(row: any) => {
-                                        return ActionBody(
-                                            row,
-                                            "/department/detail",
-                                            null
-                                        );
-                                    }}
+                                    body={(e: any) =>
+                                        {
+                                            return ActionBody(
+                                                e,
+                                                null,
+                                                { route: "Permission/delete", action: delRole },
+                                                paramsPaginator,
+                                                setParamsPaginator
+                                            )
+                                        }
+                                    }
                                 />
                             </DataTableClient>
                         </div>

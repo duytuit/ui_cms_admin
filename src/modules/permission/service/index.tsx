@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { listDepartment } from '../api';
+import { getRole } from '../api';
 
-export const useListDepartment = ({ params, debounce = 500 }: any) => {
+export const useListRole = ({ params, debounce = 500 }: any) => {
     const [data, setData] = useState<any>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<any>(null);
@@ -10,8 +10,8 @@ export const useListDepartment = ({ params, debounce = 500 }: any) => {
         try {
             setLoading(true);
             setError(null);
-            const res = await listDepartment({ ...params });
-            setData(res?.data?.data || []);
+            const res = await getRole({ ...params });
+            setData(res?.data || []);
         } catch (err) {
             setError(err);
         } finally {
