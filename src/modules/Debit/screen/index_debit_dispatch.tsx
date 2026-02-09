@@ -519,7 +519,11 @@ export default function ListCreateDispatch() {
                           <Column field="penalty_fee" body={(row: any) => Helper.formatCurrency(row.penalty_fee.toString())}
                                footer={getSumColumn("penalty_fee")}
                                footerStyle={{ fontWeight: "bold" }}
-                               header="Tiền luật" filter showFilterMenu={false} filterMatchMode="contains" />
+                               header="Tiền luật / phí phác" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="delivery_point"   body={(row: any) => Helper.formatCurrency((row.delivery_point ?? 0).toString())}
+                               footer={getSumColumn("delivery_point")}
+                               footerStyle={{ fontWeight: "bold" }}
+                               header="Điểm trả hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />

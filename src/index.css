@@ -216,5 +216,15 @@ display: none !important;
 .p-dropdown-item.p-disabled {
   opacity: 0.6;
 }
+.p-treetable-scrollable-body {
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow-y: unset !important;
+}
+.p-treetable-scrollable-wrapper {
+  height: 100% !important;
+}
 
-
+.p-treetable-scrollable-body {
+  flex: 1 !important;
+}

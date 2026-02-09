@@ -95,6 +95,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
     infos.ticketFee      = toInt(infos.ticketFee);
     infos.overnightFee   = toInt(infos.overnightFee);
     infos.penaltyFee     = toInt(infos.penaltyFee);
+    infos.deliveryPoint  = toInt(infos.deliveryPoint);
     infos.goodsFee       = toInt(infos.goodsFee);
     infos.data = JSON.stringify(infos);
     infos.fileInfoId= infos.id || 0;
@@ -443,7 +444,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="Tiền luật"
                 />
               </div>
-              <div className="field col-4">
+              <div className="field col-2">
                 <InputForm className="w-full"
                   id="goodsFee"
                   value={infos.goodsFee}
@@ -451,6 +452,16 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                     setInfos({ ...infos, goodsFee: Helper.formatCurrency(e.target.value) })
                   }
                   label="Lượng hàng về"
+                />
+              </div>
+              <div className="field col-2">
+                <InputForm className="w-full"
+                  id="deliveryPoint"
+                  value={Helper.formatCurrency(infos.deliveryPoint?infos.deliveryPoint.toString():'')}
+                  onChange={(e: any) =>
+                    setInfos({ ...infos, deliveryPoint: e.target.value })
+                  }
+                  label="Điểm trả hàng"
                 />
               </div>
               <div className="field col-8">

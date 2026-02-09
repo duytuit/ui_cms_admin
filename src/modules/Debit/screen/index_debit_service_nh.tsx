@@ -196,67 +196,6 @@ export default function ListContractFileNangHa() {
                         >
                           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                             <b>File chưa tạo bảng kê nâng hạ</b>
-                                <DataTableClient
-                                rowHover
-                                value={displayData}
-                                onPage={(e: any) => {
-                                    setFirst(e.first);
-                                    setRows(e.rows);
-                                }}
-                                loading={loading}
-                                dataKey="id"
-                                title="Tài khoản"
-                                filterDisplay="row"
-                                className={classNames("Custom-DataTableClient")}
-                                scrollable
-                                scrollHeight="flex"
-                                style={{ flex: 1 }}
-                                tableStyle={{ minWidth: "1600px" }}// ép bảng rộng hơn để có scroll ngang
-                                >
-                                {/* Custom checkbox column */}
-                                <Column
-                                    header={
-                                    <Checkbox
-                                        checked={selectedRows.length === displayData.length && displayData.length > 0}
-                                        onChange={(e:any) => {
-                                            if (e.checked) setSelectedRows(displayData.map(d => d.id));
-                                            else setSelectedRows([]);
-                                        }}
-                                    />
-                                    }
-                                    body={(rowData:any) => (
-                                    <Checkbox
-                                        className="p-checkbox-sm"
-                                        checked={selectedRows.includes(rowData.id)}
-                                        onChange={(e:any) => {
-                                            if (e.checked) setSelectedRows(prev => [...prev, rowData.id]);
-                                            else setSelectedRows(prev => prev.filter(id => id !== rowData.id));
-                                        }}
-                                        onClick={(e:any) => e.stopPropagation()} // ⚡ chặn row click
-                                    />
-                                    )}
-                                    style={{ width: "3em" }}
-                                />
-                               <Column
-                                  header="Thao tác"
-                                  body={(e: any) =>
-                                    ActionBody(e, null, null, null, null, () =>
-                                      openDialogAdd(e.id,e.total)
-                                    )
-                                  }
-                                  style={{ width: "6em" }}
-                                />
-                                <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="employee" header="Giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="declaration" header="Số bill" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="quantity" header="Số lượng" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="userName" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
-                            </DataTableClient>
                           </div>
                         </SplitterPanel>
             
@@ -279,94 +218,7 @@ export default function ListContractFileNangHa() {
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                                  <b>Bảng kê nâng hạ đã tạo</b>
-                                  <DataTableClient
-                                      rowHover
-                                      value={displayDebitServiceData}
-                                      onPage={(e: any) => {
-                                        setFirst(e.first);
-                                        setRows(e.rows);
-                                      }}
-                                      loading={loading}
-                                      dataKey="id"
-                                      title="Tài khoản"
-                                      filterDisplay="row"
-                                      className={classNames("Custom-DataTableClient")}
-                                      scrollable
-                                      scrollHeight="flex"
-                                      style={{ flex: 1 }}
-                                      tableStyle={{ minWidth: "2000px" }}
-                                      onRowClick={(e: any) => {
-                                         setSelectedDetail(e.data.debits)
-                                         console.log(e.data.debits);
-                                         
-                                      }}
-                                    >
-                                      {/* Custom checkbox column */}
-                                      <Column
-                                        header={
-                                          <Checkbox
-                                            checked={
-                                              selectedDebitServiceRows.length === displayDebitServiceData.length &&
-                                              displayDebitServiceData.length > 0
-                                            }
-                                            onChange={(e: any) => {
-                                              if (e.checked)
-                                                setSelectedDebitServiceRows(displayDebitServiceData.map((d) => d.id));
-                                              else setSelectedDebitServiceRows([]);
-                                            }}
-                                          />
-                                        }
-                                        body={(rowData: any) => (
-                                          <Checkbox
-                                            className="p-checkbox-sm"
-                                            checked={selectedDebitServiceRows.includes(rowData.id)}
-                                            onChange={(e: any) => {
-                                              if (e.checked)
-                                                setSelectedDebitServiceRows((prev) => [...prev, rowData.id]);
-                                              else
-                                                setSelectedDebitServiceRows((prev) =>
-                                                  prev.filter((id) => id !== rowData.id)
-                                                );
-                                            }}
-                                            onClick={(e: any) => e.stopPropagation()} // ⚡ chặn row click
-                                          />
-                                        )}
-                                        style={{ width: "3em" }}
-                                      />
-                                        <Column
-                                            header="Thao tác"
-                                            body={(row: any) => {
-                                              if(row.cf_status_confirm == 1){
-                                                                                              
-                                              }else{
-                                                return ActionBodyWithIds(
-                                                    row.debit_ids,
-                                                    null,
-                                                    { route: "Debit/delete/multiDebit", action: delMultiDebit },
-                                                    paramsPaginator,
-                                                    setParamsPaginator
-                                                );
-                                              }
-                                            }}
-                                        />
-                                        <Column header="Trạng thái" body={(row: any) => {
-                                          if(row.cf_status_confirm == 1){
-                                            return <Button label="đã duyệt" rounded severity="success" size="small" text  />
-                                          }else{
-                                            return <Button label="chưa duyệt" rounded severity="warning" size="small" text  />
-                                          }
-                                        }} filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="file_number" header="Số file" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="container_code" header="Số cont" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumCuoc" body={(row: any) => Helper.formatCurrency(row.sumCuoc.toString())} header="Tiền cược" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumNH" body={(row: any) => Helper.formatCurrency(row.sumNH.toString())} header="Tổng phí nâng hạ" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="employee" header="Tên giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
-                                  </DataTableClient>
+                          
                               </div>
                             </SplitterPanel>
             
@@ -378,15 +230,7 @@ export default function ListContractFileNangHa() {
                             >
                               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                                 <b>Chi tiết bảng kê nâng hạ</b>
-                                  <DataTable rowHover value={selectedDetail}>
-                                      <Column body={(row: any) =>{
-                                          const cus = listCustomer.find((x: any) => x.id === row.supplier_detail_id);
-                                          return cus?.partners?.abbreviation || ""
-                                      }} header="Nhà cung cấp" />
-                                      <Column field="debit_name" header="Chi phí" />
-                                      <Column field="debit_type"  body={(row: any) => typeDebit.find((x:any) => x.type === row.debit_type)?.name || ""} header="Loại chi phí" />
-                                      <Column field="debit_purchase_price" body={(row: any) => Helper.formatCurrency(row.debit_purchase_price.toString())} header="Số tiền" />
-                                  </DataTable>
+                             
                               </div>
                             </SplitterPanel>
                           </Splitter>

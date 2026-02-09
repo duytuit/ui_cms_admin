@@ -85,6 +85,7 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
     infos.overnightFee   = toInt(infos.overnightFee);
     infos.penaltyFee     = toInt(infos.penaltyFee);
     infos.goodsFee       = toInt(infos.goodsFee);
+    infos.deliveryPoint       = toInt(infos.deliveryPoint);
     infos.fileInfoId= type == 0? infos.id :infos.fileInfo?.id;
     infos.data = JSON.stringify(infos);
     infos.vehicleNumber = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleLabel ?? infos?.vehicleNumber : infos.vehicleNumber
@@ -447,10 +448,10 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                   onChange={(e: any) =>
                     setInfos({ ...infos, penaltyFee: e.target.value })
                   }
-                  label="Tiền luật"
+                  label="Tiền luật / phí phác"
                 />
               </div>
-              <div className="field col-4">
+              <div className="field col-2">
                 <InputForm className="w-full"
                   id="goodsFee"
                   value={Helper.formatCurrency(infos.goodsFee?infos.goodsFee.toString():'')}
@@ -458,6 +459,16 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                     setInfos({ ...infos, goodsFee: e.target.value })
                   }
                   label="Lượng hàng về"
+                />
+              </div>
+              <div className="field col-2">
+                <InputForm className="w-full"
+                  id="deliveryPoint"
+                  value={Helper.formatCurrency(infos.deliveryPoint?infos.deliveryPoint.toString():'')}
+                  onChange={(e: any) =>
+                    setInfos({ ...infos, deliveryPoint: e.target.value })
+                  }
+                  label="Điểm trả hàng"
                 />
               </div>
               <div className="field col-8">

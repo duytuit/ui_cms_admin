@@ -26,7 +26,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             filter={filter}
             setFilter={setFilter}
             className="lg:col-9"
-            add="/department/add"
+            add="/salary/add"
         >
         </GridForm>
     );
@@ -68,7 +68,7 @@ export default function ListSalary() {
 
             <DataTableClient
                 rowHover
-                value={displayData}
+                value={[]}
                 paginator
                 rows={rows}
                 first={first}
@@ -82,8 +82,9 @@ export default function ListSalary() {
                 filterDisplay="row"
                 className={classNames("Custom-DataTableClient")}
             >
-                <Column field="code" header="Mã bộ phận" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="name" header="Tên bộ phận" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                <Column field="code" header="Kỳ lương" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                <Column field="name" header="Nhân viên" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                <Column field="name" header="Bộ phận" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="note" header="Ghi chú" />
                 <Column field="updated_by" header="Người cập nhật" />
                 <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />

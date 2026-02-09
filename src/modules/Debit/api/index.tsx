@@ -16,6 +16,7 @@ export const listDebitCongNoChiTietKH = async (params: any) => await getData("De
 export const listDebitCongNoChiTietNCC = async (params: any) => await getData("Debit/congnochitietncc", params);
 export const listCongNoGiaoNhan = async (params: any) => await getData("Debit/congNoGiaoNhan", params);
 export const listCongNoLaiXe = async (params: any) => await getData("Debit/congNoLaiXe", params);
+export const GetObjectDebitLaiXeTinhLuongAsync = async (params: any) => await getData("Debit/GetObjectDebitLaiXeTinhLuongAsync", params);
 export const listDebitMuaBan = async (params: any) => await getData("Debit/muaban", params);
 export const listDebitDauKyKH = async (params: any) => await getData("Debit/daukykh", params);
 export const listDebitDauKyNCC = async (params: any) => await getData("Debit/daukyncc", params);

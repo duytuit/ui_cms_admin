@@ -83,6 +83,8 @@ import ListKyCongNoKH from "modules/Debit/screen/index_kycongno_kh";
 import ListNhacNoKH from "modules/Debit/screen/index_nhac_no_kh";
 import ListSalary from "modules/salary/screen";
 import UpdateSalary from "modules/salary/screen/update";
+import PrintPayrollTable from "modules/salary/screen/exports/print_salary";
+import ListPermission from "modules/permission/screen";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -157,6 +159,8 @@ const publicRoutes = [
   { path: "/salary/list", component: ListSalary, layout: 'ListSalary' },
   { path: "/salary/add", component: UpdateSalary, layout: 'UpdateSalary' },
   { path: "/salary/detail/:id", component: UpdateSalary, layout: 'UpdateSalary' },
+  { path: "/salary/SalaryByCycleName", component: PrintPayrollTable,  layout: null, public: true  },
+  { path: "/salary/SalaryByDate", component: PrintPayrollTable,  layout: null, public: true  },
   // Receipt 
   { path: "/receipt/list", component: ListReceipt, layout: 'ListReceipt' },
   { path: "/receipt/ListReceiptThu", component: ListReceiptThu, layout: 'ListReceiptThu' },
@@ -221,6 +225,7 @@ const publicRoutes = [
   { path: "/debit/ListDebitNCC", component: ListDebitNCC, layout: 'ListDebitNCC' },
 
   { path: "/user/inportExcelPartner", component: UpdateImportExcel, layout: 'UpdateImportExcel' },
+  { path: "/permission", component: ListPermission, layout: 'ListPermission' },
 
   //{ path: "/debit/detail/:id", component: UpdateDebit, layout: 'UpdateDebit' },
   // { path: "/auth/forgotpassword", component: ForgotPassword, layout: null, public: true },

@@ -28,7 +28,6 @@ export const sidebarModel = [{
         updated_at: null,
         icon: 'pi pi-home',
         admin:false,
-        route: '/page-two',
         items: [
           {
             id: 1,
@@ -110,7 +109,7 @@ export const sidebarModel = [{
           {
             id: 1,
             name: 'Tính lương',
-            route: '/page-two',
+            route: '/salary/list',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -121,7 +120,6 @@ export const sidebarModel = [{
           {
             id: 1,
             name: 'Số dư đầu kỳ',
-            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -158,7 +156,6 @@ export const sidebarModel = [{
       {
         id: 1,
         name: 'Giao nhận',
-        route: '/page-two',
         created_at: '2023-05-29 14:14:02',
         updated_at: null,
         deleted_at: null,
@@ -217,7 +214,6 @@ export const sidebarModel = [{
       {
         id: 1,
         name: 'Bảng điều xe',
-        route: '/page-two',
         created_at: '2023-05-29 14:14:02',
         updated_at: null,
         deleted_at: null,
@@ -254,7 +250,6 @@ export const sidebarModel = [{
         {
         id: 1,
         name: 'Mua-Bán hàng',
-        route: '/page-two',
         created_at: '2023-05-29 14:14:02',
         updated_at: null,
         deleted_at: null,
@@ -291,7 +286,6 @@ export const sidebarModel = [{
       {
         id: 1,
         name: 'Công nợ',
-        route: '/page-two',
         created_at: '2023-05-29 14:14:02',
         updated_at: null,
         deleted_at: null,
@@ -339,7 +333,6 @@ export const sidebarModel = [{
           {
             id: 1,
             name: 'Nhà cung cấp',
-            route: '/page-two',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -409,7 +402,6 @@ export const sidebarModel = [{
       {
         id: 1,
         name: 'Theo dõi nhắc nợ',
-        route: '/page-two',
         created_at: '2023-05-29 14:14:02',
         updated_at: null,
         deleted_at: null,
@@ -468,7 +460,6 @@ export const sidebarModel = [{
       {
         id: 1,
         name: 'Thủ quỹ',
-        route: '/page-two',
         created_at: '2023-05-29 14:14:02',
         updated_at: null,
         deleted_at: null,
@@ -494,7 +485,6 @@ export const sidebarModel = [{
         {
         id: 1,
         name: 'Báo cáo',
-        route: '/page-two',
         created_at: '2023-05-29 14:14:02',
         updated_at: null,
         deleted_at: null,
@@ -560,7 +550,6 @@ export const sidebarModel = [{
         updated_at: null,
         icon: 'pi pi-home',
         admin:false,
-        route: '/page-two',
         items: [
           {
               id: 5,
@@ -617,7 +606,6 @@ export const sidebarModel = [{
         updated_at: null,
         icon: 'pi pi-home',
         admin:false,
-        route: '/page-two',
         items: [
           {
             id: 1,
@@ -735,6 +723,30 @@ export const sidebarModel = [{
       },
       {
         id: 5,
+        name: 'Phân quyền',
+        sort: 1,
+        status: 1,
+        created_at: '2023-06-01 10:04:39',
+        deleted_at: null,
+        updated_at: null,
+        icon: 'pi pi-home',
+        admin:false,
+          items: [
+            {
+              id: 1,
+              name: 'Danh sách quyền',
+              route: '/permission',
+              created_at: '2023-05-29 14:14:02',
+              updated_at: null,
+              deleted_at: null,
+              status: 1,
+              category_id: 1,
+              sort: 1,
+            }
+          ]
+      },
+      {
+        id: 5,
         name: 'Quản lý',
         sort: 1,
         status: 1,
@@ -743,7 +755,6 @@ export const sidebarModel = [{
         updated_at: null,
         icon: 'pi pi-home',
         admin:false,
-        route: '/page-two',
         items: [
           {
             id: 1,
@@ -777,7 +788,6 @@ export const sidebarModel = [{
         created_at: '2023-05-29 14:13:14',
         deleted_at: null,
         updated_at: null,
-        route: '/storage/list',
         icon: 'pi pi-home',
         admin:true,
         items: [
