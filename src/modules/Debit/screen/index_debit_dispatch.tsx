@@ -490,11 +490,11 @@ export default function ListCreateDispatch() {
                             footer={getSumColumn("price")}
                             footerStyle={{ fontWeight: "bold" }}
                             header="Cước bán" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="driver_fee" body={(row: any) => Helper.formatCurrency(row.driver_fee.toString())} 
+                          <Column field="driver_fee" body={(row: any) => Helper.formatCurrency((row.driver_fee ?? 0).toString())} 
                             footer={getSumColumn("driver_fee")}
                             footerStyle={{ fontWeight: "bold" }}
                             header="Lái xe thu cước" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="goods_fee" body={(row: any) => Helper.formatCurrency(row.goods_fee.toString())}
+                          <Column field="goods_fee" body={(row: any) => Helper.formatCurrency((row.goods_fee ?? 0).toString())}
                              footer={getSumColumn("goods_fee")}
                              footerStyle={{ fontWeight: "bold" }}
                              header="Lương hàng về" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -504,19 +504,19 @@ export default function ListCreateDispatch() {
                           <Column field="driver" header="Lái xe" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="TTHQ" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Điểm trả hàng" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="meal_fee" body={(row: any) => Helper.formatCurrency(row.meal_fee.toString())} 
+                          <Column field="meal_fee" body={(row: any) => Helper.formatCurrency((row.meal_fee ?? 0).toString())} 
                              footer={getSumColumn("meal_fee")}
                              footerStyle={{ fontWeight: "bold" }}
                              header="Tiền ăn" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="ticket_fee" body={(row: any) => Helper.formatCurrency(row.ticket_fee.toString())}
+                          <Column field="ticket_fee" body={(row: any) => Helper.formatCurrency((row.ticket_fee ?? 0).toString())}
                               footer={getSumColumn("ticket_fee")}
                               footerStyle={{ fontWeight: "bold" }}
                               header="Tiền Vé" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="overnight_fee" body={(row: any) => Helper.formatCurrency(row.overnight_fee.toString())}
+                          <Column field="overnight_fee" body={(row: any) => Helper.formatCurrency((row.overnight_fee ?? 0).toString())}
                               footer={getSumColumn("overnight_fee")}
                               footerStyle={{ fontWeight: "bold" }}
                               header="Tiền qua đêm" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="penalty_fee" body={(row: any) => Helper.formatCurrency(row.penalty_fee.toString())}
+                          <Column field="penalty_fee" body={(row: any) => Helper.formatCurrency((row.penalty_fee ?? 0).toString())}
                                footer={getSumColumn("penalty_fee")}
                                footerStyle={{ fontWeight: "bold" }}
                                header="Tiền luật / phí phác" filter showFilterMenu={false} filterMatchMode="contains" />

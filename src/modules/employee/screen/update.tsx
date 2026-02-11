@@ -8,10 +8,10 @@ import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { Panel } from "primereact/panel";
 import { addEmployee, showEmployee, updateEmployee } from "../api";
-import { Dropdown, MultiSelect } from "components/common/ListForm";
+import { MultiSelect } from "components/common/ListForm";
 import { useListDepartment } from "modules/department/service";
 import { Helper } from "utils/helper";
-import { useListEmployeeWithState } from "../service";
+import { useListRole } from "modules/permission/service";
 const UpdateEmployee = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
@@ -54,6 +54,14 @@ const UpdateEmployee = () => {
       } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
     }
   };
+  const { data: role } = useListRole({ params: { keyword: "abc" }, debounce: 500 });
+    const roleOptions = useMemo(() => {
+      if (!Array.isArray(role?.data)) return [];
+      return role.data.map((x: any,index:number) => ({
+        label: x.name,
+        value: x.id,
+      }));
+  }, [role]);
   const { data: departments } = useListDepartment({ params: { keyword: "abc" }, debounce: 500 });
     const departmentOptions = useMemo(() => {
       if (!Array.isArray(departments?.data)) return [];
@@ -68,10 +76,10 @@ const UpdateEmployee = () => {
         const detail = res.data.data
         if (detail) {
           const departmentIds = detail.employeeDepartments?.map((dept: any) => dept.departmentId) || [];
-          console.log(departmentIds);
+          const roleIds = detail.userRoles?.map((r: any) => r.roleId) || [];
           
           let info = {
-            ...detail, status: detail.status === 0 ? true : false, departmentIds
+            ...detail, status: detail.status === 0 ? true : false, departmentIds,roleIds
           };
           setInfos(info)
         }
@@ -154,7 +162,7 @@ const UpdateEmployee = () => {
                     />
                   </div>
                 </div>
-                  <div className="field grid">
+                <div className="field grid">
                    <label
                     className="col-12 mb-2 md:col-3 md:mb-0"
                   >
@@ -168,6 +176,24 @@ const UpdateEmployee = () => {
                         optionLabel="label"
                         optionValue="value"
                         label="Bộ phận"
+                        className="w-full"
+                      />
+                  </div>
+                </div>
+                <div className="field grid">
+                   <label
+                    className="col-12 mb-2 md:col-3 md:mb-0"
+                  >
+                    Nhóm quyền
+                  </label>
+                  <div className="col-12 md:col-9">
+                      <MultiSelect  
+                        value={infos.roleIds}
+                        onChange={(e: any) => setInfos({ ...infos, roleIds: e.value })}
+                        options={roleOptions}
+                        optionLabel="label"
+                        optionValue="value"
+                        label="Nhóm quyền"
                         className="w-full"
                       />
                   </div>

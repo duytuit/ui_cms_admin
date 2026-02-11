@@ -1,7 +1,7 @@
 import { Dropdown } from 'primereact/dropdown';
 import MenuSidebar from './MenuSidebar';
 import { MenuProvider } from './context/menuContext';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { listByUserIdStorage, listStorage } from 'modules/storage/api';
 import { listPermission } from 'modules/permission/api';
@@ -878,13 +878,13 @@ export default function AppSidebar() {
       }
 
       if (res?.data?.data?.data) {
-        const _data = res.data.data.data.map((item: any) => ({
+        const projects = res.data.data.data.map((item: any) => ({
           name: item.name,
           projectId: item.id,
         }));
 
-        setData(_data);
-        return _data;
+        setData(projects);
+        return projects;
       }
 
       setData([]);
@@ -896,27 +896,21 @@ export default function AppSidebar() {
   };
 
   // =========================
-  // 2) Set selected project
+  // 2) Set default project
   // =========================
   const applyDefaultProject = (projects: any[]) => {
-    if (!projects || projects.length === 0) return null;
+    if (!projects?.length) return;
 
-    const _project = JSON.parse(localStorage.getItem("project") || "{}");
-    const dataProjectIds = projects.map((x: any) => x.projectId);
+    const localProject = JSON.parse(localStorage.getItem("project") || "{}");
+    const projectIds = projects.map(p => p.projectId);
 
-    let selected: any = null;
+    let selected = localProject && projectIds.includes(localProject.projectId)
+      ? localProject
+      : projects[0];
 
-    if (_project && dataProjectIds.includes(_project.projectId)) {
-      selected = _project;
-    } else {
-      selected = projects[0];
-      localStorage.setItem("project", JSON.stringify(selected));
-    }
-
+    localStorage.setItem("project", JSON.stringify(selected));
     setSelectedCity(selected);
     setSearchParams({ projectId: selected.projectId });
-
-    return selected;
   };
 
   // =========================
@@ -928,7 +922,9 @@ export default function AppSidebar() {
       if (res?.data?.data) {
         setPermission(res.data.data);
       }
-    } catch (err) {}
+    } catch (err) {
+      setPermission([]);
+    }
   };
 
   // =========================
@@ -938,13 +934,8 @@ export default function AppSidebar() {
     const run = async () => {
       if (!employeeInfo?.user_id) return;
 
-      // 1) fetchProject
       const projects = await fetchProject(employeeInfo.user_id);
-
-      // 2) set selected + setSearchParams trước
       applyDefaultProject(projects);
-
-      // 3) rồi mới getPermission
       await getPermission(employeeInfo.user_id);
     };
 
@@ -952,16 +943,81 @@ export default function AppSidebar() {
   }, []);
 
   // =========================
-  // OnChange project
+  // On change project
   // =========================
   const onChange = (event: any) => {
     setSelectedCity(event.value);
     localStorage.setItem("project", JSON.stringify(event.value));
     setSearchParams({ projectId: event.value.projectId });
-
     window.location.reload();
   };
 
+  // =========================
+  // Permission helpers
+  // =========================
+  const permissionMap = useMemo(() => {
+    return new Map(permission.map(p => [p.permission?.trim(), p]));
+  }, [permission]);
+
+  const canViewMenu = (menuName: string) => {
+    const p = permissionMap.get(menuName?.trim());
+    return p?.view === true || p?.all === true;
+  };
+
+  const filterSidebarByPermission = (sidebar: any[]) => {
+    return sidebar
+      .map(group => {
+        const items = (group.items || [])
+          .map((item:any) => {
+            let children: any[] = [];
+
+            if (item.items?.length) {
+              children = filterSidebarByPermission([
+                { items: item.items }
+              ])[0]?.items || [];
+            }
+            const permissionKey = item.name
+            ? item.name
+                .trim()
+                .toLowerCase()
+                .normalize("NFD") // tách dấu
+                .replace(/[\u0300-\u036f]/g, "") // xoá dấu
+                .replace(/đ/g, "d")
+                .replace(/[^a-z0-9]+/g, "_") // ký tự đặc biệt => _
+                .replace(/^_+|_+$/g, "") // xoá _ đầu/cuối
+            : "";
+            const allow = canViewMenu(permissionKey);
+
+            if (children.length > 0) {
+              return allow || children.length
+                ? { ...item, items: children }
+                : null;
+            }
+
+            return allow ? item : null;
+          })
+          .filter(Boolean);
+
+        return items.length ? { ...group, items } : null;
+      })
+      .filter(Boolean);
+  };
+
+  // =========================
+  // Sidebar đã filter
+  // =========================
+  const sidebarFiltered = useMemo(() => {
+     if ([280].includes(employeeInfo?.user_id)) {
+         return sidebarModel
+      } else {
+         if (!permission.length) return [];
+         return filterSidebarByPermission(sidebarModel);
+      }
+  }, [permission]);
+
+  // =========================
+  // Render
+  // =========================
   return (
     <MenuProvider>
       <span className="p-float-label">
@@ -973,14 +1029,20 @@ export default function AppSidebar() {
           placeholder="Chọn dữ liệu"
           className="w-full md:w-14rem p-inputtext-sm"
         />
-        <label htmlFor="dropdown">Dữ liệu</label>
+        <label>Dữ liệu</label>
       </span>
 
       <ul className="layout-menu">
-        {sidebarModel.map((item: any, i) => {
-          return <MenuSidebar item={item} root={true} index={i} key={i} />;
-        })}
+        {sidebarFiltered.map((item: any, i: number) => (
+          <MenuSidebar
+            key={i}
+            item={item}
+            root={true}
+            index={i}
+          />
+        ))}
       </ul>
     </MenuProvider>
   );
 }
+

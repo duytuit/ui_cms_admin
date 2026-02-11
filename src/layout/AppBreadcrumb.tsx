@@ -7,8 +7,6 @@ export default function AppBreadcrumb() {
 
   const breadcrumbItems =
     Helper.findBreadcrumb(sidebarModel[0].items, location.pathname) || [];
-   console.log('breadcrumbItems', breadcrumbItems);
-   
   const model = breadcrumbItems.map((item) => ({
     label: item.name,
     template: () =>

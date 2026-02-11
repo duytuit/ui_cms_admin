@@ -10,9 +10,7 @@ export default function MenuSidebar(props: any) {
 
   const location = useLocation();
   const [activeMenu, setActiveMenu] = useState<string>('');
-
   const item = props.item;
-
   const key = props.parentKey
     ? `${props.parentKey}-${props.index}`
     : `${props.index}`;
