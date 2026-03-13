@@ -115,6 +115,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
       }, {});
     }
     updatedInfos.fileInfoId= infos.id || 0;
+    updatedInfos.serviceDate= infos.accountingDate;
     updatedInfos.vehicleNumber = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleLabel : infos.vehicleNumber
     updatedInfos.vehicleId = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleId : null
      updatedInfos.data = JSON.stringify(updatedInfos);
