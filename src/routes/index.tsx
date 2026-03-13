@@ -85,6 +85,12 @@ import ListSalary from "modules/salary/screen";
 import UpdateSalary from "modules/salary/screen/update";
 import PrintPayrollTable from "modules/salary/screen/exports/print_salary";
 import ListPermission from "modules/permission/screen";
+import ListBank from "modules/categories/screen/indexBank";
+import UpdateBank from "modules/categories/screen/updateBank";
+import ListDanhMucChi from "modules/categories/screen/indexChi";
+import ListDanhMucThu from "modules/categories/screen/indexThu";
+import ListVoLuuBai from "modules/ContractFile/screen/index_voluubai";
+import ListXNChiPhiLaiXe from "modules/receipt/screen/index_xn_chiphi_laixe";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -93,6 +99,8 @@ const publicRoutes = [
   { path: "/campaign/add", component: UpdateCampaign, layout: 'UpdateCampaign' },
 
   // categories 
+  { path: "/categories/ListDanhMucChi", component: ListDanhMucChi, layout: 'ListDanhMucChi' },
+  { path: "/categories/ListDanhMucThu", component: ListDanhMucThu, layout: 'ListDanhMucThu' },
   { path: "/categories/list", component: Categories, layout: 'ListCategories' },
   { path: "/categories/add", component: UpdateCategories, layout: 'AddCategories' },
   { path: "/categories/detail/:id", component: UpdateCategories, layout: 'UpdateCategories' },
@@ -139,6 +147,7 @@ const publicRoutes = [
   { path: "/partner/detail/:id", component: UpdatePartner, layout: 'UpdatePartner' },
   // ContractFile 
   { path: "/ContractFile/list", component: ListContractFile, layout: 'ListContractFile' },
+  { path: "/ContractFile/ListVoLuuBai", component: ListVoLuuBai, layout: 'ListVoLuuBai' },
   { path: "/ContractFile/list-create-bangke", component: ListContractFileBangKe, layout: 'ListContractFileBangKe' },
   { path: "/ContractFile/list-confirm-bangke", component: ListConfirmContractFileBangKe, layout: 'ListConfirmContractFileBangKe' },
   { path: "/ContractFile/list-create-nangha", component: ListContractFileNangHa, layout: 'ListContractFileNangHa' },
@@ -151,10 +160,14 @@ const publicRoutes = [
   { path: "/vehicle/list", component: ListVehicle, layout: 'ListVehicle' },
   { path: "/vehicle/add", component: UpdateVehicle, layout: 'UpdateVehicle' },
   { path: "/vehicle/detail/:id", component: UpdateVehicle, layout: 'UpdateVehicle' },
-   // Vehicle 
+   // Department 
   { path: "/department/list", component: ListDepartment, layout: 'ListDepartment' },
   { path: "/department/add", component: UpdateDepartment, layout: 'UpdateDepartment' },
   { path: "/department/detail/:id", component: UpdateDepartment, layout: 'UpdateDepartment' },
+  // Bank 
+  { path: "/bank/list", component: ListBank, layout: 'ListBank' },
+  { path: "/bank/add", component: UpdateBank, layout: 'UpdateBank' },
+  { path: "/bank/detail/:id", component: UpdateBank, layout: 'UpdateBank' },
   // ListSalary 
   { path: "/salary/list", component: ListSalary, layout: 'ListSalary' },
   { path: "/salary/add", component: UpdateSalary, layout: 'UpdateSalary' },
@@ -166,6 +179,7 @@ const publicRoutes = [
   { path: "/receipt/ListReceiptThu", component: ListReceiptThu, layout: 'ListReceiptThu' },
   { path: "/receipt/ListReceiptChi", component: ListReceiptChi, layout: 'ListReceiptChi' },
   { path: "/receipt/listChiPhiGiaoNhan", component: ListChiPhiGiaoNhan, layout: 'ListChiPhiGiaoNhan' },
+  { path: "/receipt/ListXNChiPhiLaiXe", component: ListXNChiPhiLaiXe, layout: 'ListXNChiPhiLaiXe' },
   { path: "/receipt/listViewChiPhiGiaoNhan", component: ListViewChiPhiGiaoNhan, layout: 'ListViewChiPhiGiaoNhan' },
   { path: "/receipt/UpdateReceiptThu", component: UpdateReceiptThu, layout: 'UpdateReceiptThu' },
   { path: "/receipt/detail/thu/:id", component: UpdateReceiptThu, layout: 'UpdateReceiptThu' },

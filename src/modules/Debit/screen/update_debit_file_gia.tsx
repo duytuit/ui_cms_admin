@@ -119,7 +119,7 @@ export default function UpdateFileGia({ id, onClose }: { id: any; onClose: () =>
         status: detail.status === 0,
         loaiToKhai: _loaiToKhai?.name,
         list_giaonhan:_list_giaonhan,
-        accountingDate: dispatch?.accountingDate || detail.accountingDate
+        accountingDate: dispatch?.serviceDate || detail.accountingDate
       };
       
       // ✅ Cập nhật state luôn trong function

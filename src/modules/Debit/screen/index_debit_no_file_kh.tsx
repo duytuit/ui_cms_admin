@@ -392,10 +392,10 @@ export default function ListDebitNoFileKH() {
                            body={(row: any) => Helper.formatCurrency(row.price.toString())}
                            filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="driver_fee" header="Lái xe thu cước"
-                            body={(row: any) => Helper.formatCurrency(row.driver_fee.toString())}
+                            body={(row: any) => Helper.formatCurrency((row.driver_fee ??0).toString())}
                            filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="goods_fee" header="Lương hàng về"
-                            body={(row: any) => Helper.formatCurrency(row.goods_fee.toString())}
+                            body={(row: any) => Helper.formatCurrency((row.driver_fee ??0).toString())}
                            filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplierName" header="Nhà cung cấp" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplierAbb" header="Tên viết tắt NCC" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -404,16 +404,16 @@ export default function ListDebitNoFileKH() {
                           <Column field="declaration_quantity" header="TTHQ" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Điểm trả hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="meal_fee" header="Tiền ăn"
-                            body={(row: any) => Helper.formatCurrency(row.meal_fee.toString())}
+                            body={(row: any) => Helper.formatCurrency((row.meal_fee ?? 0).toString())}
                            filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="ticket_fee" header="Tiền Vé"
-                            body={(row: any) => Helper.formatCurrency(row.ticket_fee.toString())}
+                            body={(row: any) => Helper.formatCurrency((row.ticket_fee??0).toString())}
                            filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="overnight_fee" header="Tiền qua đêm"
-                            body={(row: any) => Helper.formatCurrency(row.overnight_fee.toString())}
+                            body={(row: any) => Helper.formatCurrency((row.overnight_fee??0).toString())}
                            filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="penalty_fee" header="Tiền luật"
-                            body={(row: any) => Helper.formatCurrency(row.penalty_fee.toString())}
+                            body={(row: any) => Helper.formatCurrency((row.penalty_fee ?? 0).toString())}
                            filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />

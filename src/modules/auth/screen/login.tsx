@@ -34,7 +34,8 @@ const Login = () => {
                     detail: 'Đăng nhập thành công!',
                 })
             );
-            navigate('/'); // Chuyển hướng đến trang chính sau khi đăng nhập thành công
+            // 👉 Dùng window.location
+            window.location.replace("/");
         } else {
             console.log(response.data);
             dispatch(

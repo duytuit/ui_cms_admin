@@ -10,12 +10,16 @@ import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { useListContractFileHasFileGia } from "modules/ContractFile/service";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { statusOptions, typeDebit } from "utils";
+import { listToast, statusOptions, typeDebit } from "utils";
 import UpdateConfirmFileGia from "./update_confirm_debit_file_gia";
 import { FilterMatchMode } from "primereact/api";
+import { showToast } from "redux/features/toast";
+import { useDispatch } from "react-redux";
+import { confirmFileGiaByIdFileGia } from "../api";
 
 // ✅ Component Header lọc dữ liệu
-const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
+const Header = ({ _setParamsPaginator, _paramsPaginator,_selectedRows,_setSelectedRows,refreshHasFileGia }: any) => {
+    const dispatch = useDispatch();
     const [filter, setFilter] = useState({ name: "", customerDetailId: "" ,fromDate:Helper.lastWeekString(),toDate:Helper.toDayString()});
     const { data: customerDetails } = useListCustomerDetailWithState({status:1});
     // --- chuyển sang options bằng useMemo ---
@@ -36,7 +40,56 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             toDate:filter.toDate,
         }));
     }, [filter]);
-
+    async function DuyetFileGia(){
+        const res = await confirmFileGiaByIdFileGia({ ids: _selectedRows, StatusConfirm: 1 });
+        if (res.status === 200) {
+          if (res.data.status) {
+            dispatch(
+              showToast({ ...listToast[0], detail: res.data.message })
+            );
+            refreshHasFileGia?.();
+            _setSelectedRows([]);
+          } else {
+            dispatch(
+              showToast({ ...listToast[2], detail: res.data.message })
+            );
+          }
+        } else
+          dispatch(
+            showToast({ ...listToast[1], detail: res.data.message })
+          );
+    }
+    async function HuyDuyetFileGia(){
+        const res = await confirmFileGiaByIdFileGia({ ids: _selectedRows, StatusConfirm: 0 });
+        if (res.status === 200) {
+          if (res.data.status) {
+            dispatch(
+              showToast({ ...listToast[0], detail: res.data.message })
+            );
+            refreshHasFileGia?.();
+            _setSelectedRows([]);
+          } else {
+            dispatch(
+              showToast({ ...listToast[2], detail: res.data.message })
+            );
+          }
+        } else
+          dispatch(
+            showToast({ ...listToast[1], detail: res.data.message })
+          );
+    }
+    const items = [
+      {
+          label: 'Duyệt File Giá',
+          icon: "pi pi-check-square",
+          command: () => DuyetFileGia()
+      },
+      {
+          label: 'Hủy Duyệt',
+          icon: "pi pi-times-circle",
+          command: () => HuyDuyetFileGia()
+      }
+    ];
     return (
         <GridForm
             paramsPaginator={_paramsPaginator}
@@ -44,6 +97,9 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             filter={filter}
             setFilter={setFilter}
             className="lg:col-9"
+            MenuItems={items}
+            MenuIcon="pi pi-check-square"
+            MenuName="Xác nhận"
         >
             <div className="col-2">
                 <Input
@@ -171,7 +227,10 @@ export default function ListConfirmFileGia() {
     return (
       <>
         <div className="card">
-            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
+            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator}
+            _selectedRows={selectedFileGiaRows}
+            _setSelectedRows={setSelectedFileGiaRows}
+            refreshHasFileGia={refreshHasFileGia} />
             <div style={{ height: 'calc(100vh - 8rem)' }}>
                  <Splitter layout="vertical" style={{ height: '100%', width: '100%' }}>
                     <SplitterPanel

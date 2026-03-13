@@ -10,12 +10,14 @@ export const GetChuyenTienNoiBoAsync = (params:any) => getData("receipt/GetChuye
 export const listReceiptSoQuy = (params:any) => getData("receipt/soquy", params);
 export const listReceiptSoQuyDauKy = (params:any) => getData("receipt/soquydauky", params);
 export const listXacNhanChiPhiGiaoNhan = (params:any) => getData("receipt/XacNhanChiPhiGiaoNhan", params);
+export const GetPhiDiDuongCuaLaiXe = (params:any) => getData("receipt/GetPhiDiDuongCuaLaiXe", params);
 export const updateHoanUngGiaoNhan = (params:any) => postData("receipt/update/HoanUngGiaoNhan", params);
 export const deleteReceipt = (params:any) => postData("receipt/delete", params);
 export const addReceipt = (params:any) => postData("receipt/create", params);
 export const addPhieuThuKH = (params:any) => postData("receipt/create/phieuthukh", params);
 export const addPhieuChiNCC = (params:any) => postData("receipt/create/phieuchincc", params);
 export const giayHoanUng = (params:any) => postData("receipt/create/giayHoanUng", params);
+export const yeuCauChiLaiXe = (params:any) => postData("receipt/create/yeucauchilaixe", params);
 export const addReceiptChiGiaoNhan = (params:any) => postData("receipt/create/chigiaonhan", params);
 export const updateReceiptChiGiaoNhan = (params:any) => postData("receipt/update/chigiaonhan", params);
 export const addReceiptChiNoiBo = (params:any) => postData("receipt/create/chinoibo", params);

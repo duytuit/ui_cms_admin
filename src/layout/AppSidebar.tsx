@@ -21,6 +21,42 @@ export const sidebarModel = [{
         route: '/'
       },
       {
+        id: 1,
+        name: 'Số dư đầu kỳ',
+        created_at: '2023-05-29 14:14:02',
+        updated_at: null,
+        deleted_at: null,
+        status: 1,
+        category_id: 1,
+        sort: 1,
+        icon: 'pi pi-home',
+        admin:false,
+        items: [
+          {
+            id: 1,
+            name: 'Số dư đầu kỳ KH',
+            route: '/debit/ListDauKyKh',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
+            id: 1,
+            name: 'Số dư đầu kỳ NCC',
+            route: '/debit/ListDauKyNcc',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+        ]
+      },
+      {
         id: 5,
         name: 'Kế toán',
         sort: 1,
@@ -64,7 +100,18 @@ export const sidebarModel = [{
             category_id: 1,
             sort: 1,
           },
-           {
+          {
+            id: 11,
+            name: 'Theo dõi vỏ lưu bãi',
+            route: '/ContractFile/ListVoLuuBai',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
             id: 1,
             name: 'Debit KH các lô hàng không lập file',
             route: '/debit/ListDebitNoFileKH',
@@ -118,40 +165,6 @@ export const sidebarModel = [{
             status: 1,
             category_id: 1,
             sort: 1,
-          },
-          {
-            id: 1,
-            name: 'Số dư đầu kỳ',
-            created_at: '2023-05-29 14:14:02',
-            updated_at: null,
-            deleted_at: null,
-            status: 1,
-            category_id: 1,
-            sort: 1,
-            items: [
-              {
-                id: 1,
-                name: 'Số dư đầu kỳ KH',
-                route: '/debit/ListDauKyKh',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              },
-              {
-                id: 1,
-                name: 'Số dư đầu kỳ NCC',
-                route: '/debit/ListDauKyNcc',
-                created_at: '2023-05-29 14:14:02',
-                updated_at: null,
-                deleted_at: null,
-                status: 1,
-                category_id: 1,
-                sort: 1,
-              },
-            ]
           },
         ]
       },
@@ -645,7 +658,7 @@ export const sidebarModel = [{
               {
                 id: 1,
                 name: 'Thu',
-                route: '/page-two',
+                route: '/categories/ListDanhMucThu',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -656,7 +669,7 @@ export const sidebarModel = [{
               {
                 id: 1,
                 name: 'Chi',
-                route: '/page-two',
+                route: '/categories/ListDanhMucChi',
                 created_at: '2023-05-29 14:14:02',
                 updated_at: null,
                 deleted_at: null,
@@ -669,7 +682,7 @@ export const sidebarModel = [{
           {
             id: 1,
             name: 'Danh sách tài khoản NH',
-            route: '/page-two',
+            route: '/bank/list',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -725,30 +738,6 @@ export const sidebarModel = [{
       },
       {
         id: 5,
-        name: 'Phân quyền',
-        sort: 1,
-        status: 1,
-        created_at: '2023-06-01 10:04:39',
-        deleted_at: null,
-        updated_at: null,
-        icon: 'pi pi-home',
-        admin:false,
-          items: [
-            {
-              id: 1,
-              name: 'Danh sách quyền',
-              route: '/permission',
-              created_at: '2023-05-29 14:14:02',
-              updated_at: null,
-              deleted_at: null,
-              status: 1,
-              category_id: 1,
-              sort: 1,
-            }
-          ]
-      },
-      {
-        id: 5,
         name: 'Quản lý',
         sort: 1,
         status: 1,
@@ -779,8 +768,43 @@ export const sidebarModel = [{
             status: 1,
             category_id: 1,
             sort: 1,
+          },
+          {
+            id: 1,
+            name: 'Xác nhận chi phí lái xe',
+            route: '/receipt/ListXNChiPhiLaiXe',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
           }
         ]
+      },
+      {
+        id: 5,
+        name: 'Phân quyền',
+        sort: 1,
+        status: 1,
+        created_at: '2023-06-01 10:04:39',
+        deleted_at: null,
+        updated_at: null,
+        icon: 'pi pi-home',
+        admin:false,
+          items: [
+            {
+              id: 1,
+              name: 'Danh sách quyền',
+              route: '/permission',
+              created_at: '2023-05-29 14:14:02',
+              updated_at: null,
+              deleted_at: null,
+              status: 1,
+              category_id: 1,
+              sort: 1,
+            }
+          ]
       },
       {
         id: 1,

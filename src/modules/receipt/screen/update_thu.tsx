@@ -304,7 +304,9 @@ export default function UpdateReceiptThu() {
                       onChange={(e: any) =>
                          {
                            setInfos({ ...infos, amount: Helper.formatCurrency(e.target.value )})
-                           const thanhtien  = parseInt(e.target.value.replace(/\D/g, ""),10) + ( infos.vat ? ( parseInt(e.target.value.replace(/\D/g, ""),10) * infos.vat ) / 100 : 0  );
+                            const amount = parseInt(e.target.value.replace(/\D/g, "") || "0", 10);
+                            const vat = parseInt(infos.vat || 0, 10);
+                            const thanhtien = parseInt((amount + (amount * vat) / 100).toString());
                            setInfos({ ...infos, amount: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                          }
                       }
@@ -323,7 +325,9 @@ export default function UpdateReceiptThu() {
                       onChange={(e: any) =>
                           {
                              setInfos({ ...infos, vat: e.value })
-                             const thanhtien  = parseInt( infos.amount.replace(/\D/g, ""),10) + ( e.value ? ( parseInt( infos.amount.replace(/\D/g, ""),10) * e.value ) / 100 : 0  );
+                              const amount = parseInt(infos.amount.replace(/\D/g, "") || "0", 10);
+                              const vat = parseInt(infos.vat || 0, 10);
+                              const thanhtien = parseInt((amount + (amount * vat) / 100).toString());
                              setInfos({ ...infos, vat: e.value, thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                           }
                       }

@@ -4,7 +4,7 @@ import { Dropdown, GridForm, Input } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
-import { loaiHang, loaiToKhai, nghiepVu, phatSinh, tinhChat } from "utils";
+import { loaiHang, loaiToKhai, nghiepVu, phatSinh, tinhChat, transportation_cost } from "utils";
 import { useListCustomerDetailWithState, useListPartnerDetailWithState } from "modules/partner/service";
 import { useListUserWithState } from "modules/user/service";
 import { Button, Checkbox, Dialog } from "components/uiCore";
@@ -18,6 +18,7 @@ import { deleteDebit, exportDieuXe } from "../api";
 import { listContractFileNotDispatch } from "modules/ContractFile/api";
 import UpdateDebitDispatchFileCustom from "./update_dispatch_custom";
 import { FilterMatchMode } from "primereact/api";
+import UpdateGiayChiLaiXe from "modules/receipt/screen/update_giay_chilaixe";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator,refreshDebitDispatch }: any) => {
@@ -135,10 +136,12 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,refreshDebitDispatch }: 
 
 export default function ListCreateDispatch() {
   const { handleParamUrl } = useHandleParamUrl();
+  const [selectedDetail, setSelectedDetail] = useState<any[]>([]);
   const [selectedRows, setSelectedRows] = useState<any[]>([]);
   const [selectedDebitDispatchRows, setSelectedDebitDispatchRows] = useState<any[]>([]);
   const [displayData, setDisplayData] = useState<any[]>([]);
   const [displayDebitDispatchData, setDisplayDebitDispatchData] = useState<any[]>([]);
+  const [visibleLaiXe, setVisibleLaiXe] = useState(false);
   const [visible, setVisible] = useState(false);
   const [selectedId, setSelectedId] = useState<any>();
   const [type, setType] = useState<any>();
@@ -174,6 +177,23 @@ export default function ListCreateDispatch() {
   const { data: contractFile } = useListContractFileWithState({});
   const { data: userInfosOptions } = useListUserWithState({});
   const { data: employeeOptions } = useListEmployeeWithState({});
+  const mapTransportationCost = (detail: any) => {
+    try {
+      const parsed =
+        typeof detail?.transportation_cost === "string"
+          ? JSON.parse(detail.transportation_cost)
+          : detail?.transportation_cost ?? {};
+      return transportation_cost.reduce((acc: any, item) => {
+        acc[item.key] = parsed?.[item.key] ?? 0;
+        return acc;
+      }, {});
+    } catch {
+      return transportation_cost.reduce((acc: any, item) => {
+        acc[item.key] = 0;
+        return acc;
+      }, {});
+    }
+  };
   // ✅ Client-side pagination
   useEffect(() => {
     if (!data) return;
@@ -208,33 +228,58 @@ export default function ListCreateDispatch() {
       const _customer = partners.find((x: any) => x.id === row.customer_detail_id);
       const _supplier = partners.find((x: any) => x.id === row.supplier_detail_id);
       const _driver = employeeOptions.find((x: any) => x.id === row.employee_driver_id);
-      console.log("partners",_customer?.partners?.abbreviation);
-      let _cf_status_file_confirm=0
-      if(row.cf_status_confirm == 1 && row.file_info_id !=null){
-        _cf_status_file_confirm = 1
-      }else if(row.cf_status_confirm == 0 && row.file_info_id !=null){
-        _cf_status_file_confirm = 0
-      }else{
-        _cf_status_file_confirm = 2
+
+      let _cf_status_file_confirm = 0;
+      if (row.cf_status_confirm == 1 && row.file_info_id != null) {
+        _cf_status_file_confirm = 1;
+      } else if (row.cf_status_confirm == 0 && row.file_info_id != null) {
+        _cf_status_file_confirm = 0;
+      } else {
+        _cf_status_file_confirm = 2;
       }
+      // 🔥 dùng lại function
+      const mappedTransportationCost = mapTransportationCost(row);
+      const Tongchiphivanchuyen = [
+        row.meal_fee,
+        row.ticket_fee,
+        row.overnight_fee,
+        row.penalty_fee,
+        row.goods_fee,
+        row.delivery_point,
+        ...Object.values(mappedTransportationCost)
+      ].reduce((acc: number, val: any) => acc + (Number(val) || 0), 0);
+      const Con_lai =Tongchiphivanchuyen - row.receipt_total;
       return {
         ...row,
-        file_number : _fileContract?.file_number|| "không file",
-        so_cont : _fileContract?.container_code,
-        bill : _fileContract?.bill,
-        sales : _fileContract?.sales,
-        declaration : _fileContract?.declaration,
-        customerName:_customer?.partners?.name || "",
-        customerAbb:_customer?.partners?.abbreviation || "",
-        supplierName:_supplier?.partners?.name || "",
-        supplierAbb:_supplier?.partners?.abbreviation || "",
-        driver : `${_driver?.last_name ?? ""} ${_driver?.first_name ?? ""}`.trim(),
-        cf_status_file_confirm : _cf_status_file_confirm,
+        file_number: _fileContract?.file_number || "không file",
+        so_cont: _fileContract?.container_code,
+        bill: _fileContract?.bill,
+        sales: _fileContract?.sales,
+        declaration: _fileContract?.declaration,
+        customerName: _customer?.partners?.name || "",
+        customerAbb: _customer?.partners?.abbreviation || "",
+        supplierName: _supplier?.partners?.name || "",
+        supplierAbb: _supplier?.partners?.abbreviation || "",
+        driver: `${_driver?.last_name ?? ""} ${_driver?.first_name ?? ""}`.trim(),
+        cf_status_file_confirm: _cf_status_file_confirm,
+        ...mappedTransportationCost,
+        Tongchiphivanchuyen,
+        Con_lai
       };
     });
+    
     setDisplayData(mapped);
     setDisplayDebitDispatchData(mappedDebitDispatch);
   }, [contractFile, first, rows, data, debitDispatch, paramsPaginator, partners]);
+  const openDialogAddPhieuChiLaiXe = (row: any) => {
+     setSelectedDetail(row)
+     setVisibleLaiXe(true)
+  };
+  const handleModalClosePhieuChiLaiXe = () => {
+    setVisibleLaiXe(false);
+    refresh?.(); 
+    refreshDebitDispatch?.(); // reload debitDispatch
+  };
   // Hàm mở dialog thêm mới
   const openDialogAdd = (id: number) => {
     setSelectedId(id);
@@ -257,7 +302,7 @@ export default function ListCreateDispatch() {
     refresh?.(); 
     refreshDebitDispatch?.(); // reload debitDispatch
   };
-   const getSumColumn = (field: string) => {
+  const getSumColumn = (field: string) => {
         const filtered = (displayDebitDispatchData??[]).filter((item: any) => {
             return Object.entries(filters).every(([key, f]: [string, any]) => {
                 const value = f?.value?.toString().toLowerCase() ?? "";
@@ -266,19 +311,17 @@ export default function ListCreateDispatch() {
                 return cell.includes(value);
             });
         });
-
         const sum = filtered.reduce((acc: any, item: any) => {
             const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
             return acc + val;
         }, 0);
-
         return Helper.formatCurrency(sum.toString());
-    };
-      const statusOptions = [
-      { label: 'Không file', value: 2 },
-      { label: 'Đã duyệt', value: 1 },
-      { label: 'Chưa duyệt', value: 0 }
-    ];
+  };
+  const statusOptions = [
+    { label: 'Không file', value: 2 },
+    { label: 'Đã duyệt', value: 1 },
+    { label: 'Chưa duyệt', value: 0 }
+  ];
   return (
     <>
       <div className="card">
@@ -394,7 +437,7 @@ export default function ListCreateDispatch() {
                         scrollable
                         scrollHeight="flex"
                         style={{ flex: 1 }}
-                        tableStyle={{ minWidth: "2900px" }}
+                        tableStyle={{ minWidth: "3600px" }}
                       >
                         {/* Custom checkbox column */}
                         <Column
@@ -432,7 +475,7 @@ export default function ListCreateDispatch() {
                               header="Thao tác"
                               body={(row: any) => {
                                 if(row.cf_status_confirm == 1 || (row.cf_status == 2 && row.file_info_id ==null) ){
-                                                                                
+                                  return <Button icon="pi pi-plus" rounded outlined severity="success" onClick={() => openDialogAddPhieuChiLaiXe(row)} />                                     
                                 }else{
                                   return ActionBody(
                                       row,
@@ -440,12 +483,13 @@ export default function ListCreateDispatch() {
                                       { route: "/Debit/delete", action: deleteDebit },
                                       paramsPaginator,
                                       setParamsPaginator,
-                                      null,null,null,
+                                      () => openDialogAddPhieuChiLaiXe(row)
+                                      ,null,null,
                                       () => openDialogEdit(row.id)
                                   );
                                 }
                               }}
-                              style={{width:"6em"}}
+                              style={{width:"8em"}}
                           />
                           <Column
                             field="cf_status_file_confirm"
@@ -524,6 +568,30 @@ export default function ListCreateDispatch() {
                                footer={getSumColumn("delivery_point")}
                                footerStyle={{ fontWeight: "bold" }}
                                header="Điểm trả hàng" filter showFilterMenu={false} filterMatchMode="contains" />
+                          {transportation_cost.map((item) => (
+                            <Column
+                              header={item.label}
+                              body={(row: any) =>
+                               {
+                                 return Helper.formatCurrency((row[item.key] ?? 0).toString())
+                               }
+                              }
+                              footer={getSumColumn(item.key)}
+                              footerStyle={{ fontWeight: "bold" }}
+                            />
+                          ))}
+                          <Column field="Tongchiphivanchuyen"   body={(row: any) => Helper.formatCurrency((row.Tongchiphivanchuyen ?? 0).toString())}
+                               footer={getSumColumn("Tongchiphivanchuyen")}
+                               footerStyle={{ fontWeight: "bold" }}
+                               header="Tổng cộng" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="receipt_total"   body={(row: any) => Helper.formatCurrency((row.receipt_total ?? 0).toString())}
+                               footer={getSumColumn("receipt_total")}
+                               footerStyle={{ fontWeight: "bold" }}
+                               header="Đã chi" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column field="Con_lai" body={(row: any) => Helper.formatCurrency((row.Con_lai ?? 0).toString())}
+                               footer={getSumColumn("Con_lai")}
+                               footerStyle={{ fontWeight: "bold" }}
+                               header="Còn lại" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="note" header="Ghi chú" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="declaration_quantity" header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
@@ -548,6 +616,23 @@ export default function ListCreateDispatch() {
               onClose={handleModalClose}
               type={type}
             ></UpdateDebitDispatchFile>
+          )}
+        </p>
+      </Dialog>
+      <Dialog
+        position="top"
+        dismissableMask
+        header="Tạo yêu cầu chi lái xe"
+        visible={visibleLaiXe}
+        onHide={() => setVisibleLaiXe(false)}
+        style={{ width: "60vw" }}
+      >
+        <p className="m-0">
+          {selectedDetail && (
+            <UpdateGiayChiLaiXe
+              detail={selectedDetail}
+              onClose={handleModalClosePhieuChiLaiXe}
+            ></UpdateGiayChiLaiXe>
           )}
         </p>
       </Dialog>

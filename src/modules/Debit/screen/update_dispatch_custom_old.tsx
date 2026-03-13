@@ -3,116 +3,110 @@ import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
-import { listToast, loaiToKhai, refreshObject, transportation_cost, typeDebit, typeVehicle } from "utils";
+import { listToast, loaiToKhai, refreshObject, typeDebit, typeVehicle } from "utils";
 import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
-import { addDebit, ShowWithFileInfoAsync, updateDebit } from "../api";
+import { addDebit } from "../api";
 import { showContractFile } from "modules/ContractFile/api";
-import { Panel } from "components/uiCore";
+import { InputSwitch, Panel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Helper } from "utils/helper";
 import { classNames } from "primereact/utils";
 import { Dropdown } from "components/common/ListForm";
-import { useListEmployeeWithState } from "modules/employee/service";
+import { useListEmployee, useListEmployeeWithState } from "modules/employee/service";
 import { useListPartnerDetail } from "modules/partner/service";
-import { useListVehicleWithState } from "modules/VehicleDispatch/service";
-export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: any; onClose: () => void ,type?:number}) {
+import { useListVehicle, useListVehicleWithState } from "modules/VehicleDispatch/service";
+import { json } from "stream/consumers";
+import { useListContractFileWithState } from "modules/ContractFile/service";
+export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: () => void }) {
   const [loading, setLoading] = useState(false);
-  const [infos, setInfos] = useState<any>({
-    isExternalDriver: 1,
-  });
+  const [infos, setInfos] = useState<any>({accountingDate: Helper.toDayString(),isExternalDriver:1});
   const dispatch = useDispatch();
   const navigate = useNavigate();
-     // ===== LIST PARTNER & EMPLOYEE =====
-    const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
-    const { data: partnerVenderDetails } = useListPartnerDetail({ params: { status: 2 }, debounce: 500 });
-    const { data: vehicles } = useListVehicleWithState({});
-    const { data: employees } = useListEmployeeWithState({});
-    // lấy ra nhân viên lái xe với departmentid = 1
-    const driverOptions = useMemo(() => {
-      if (!Array.isArray(employees)) return [];
+  // ===== LIST PARTNER & EMPLOYEE =====
+  const { data: partnerDetails } = useListPartnerDetail({ params: { status: 1 }, debounce: 500 });
+  const { data: partnerVenderDetails } = useListPartnerDetail({ params: { status: 2 }, debounce: 500 });
+  const { data: vehicles } = useListVehicleWithState({});
+  const { data: employees } = useListEmployeeWithState({});
+  const { data: fileContract } = useListContractFileWithState({});
+  const fileContractOptions = useMemo(() => {
+    if (!Array.isArray(fileContract)) return [];
+    return fileContract.map((x: any) => ({
+      label: x.file_number ?? "(không file)",
+      value: x.id,
+    }));
+  }, [fileContract]);
+// lấy ra nhân viên lái xe với departmentid = 1
+  const driverOptions = useMemo(() => {
+    if (!Array.isArray(employees)) return [];
 
-      return employees.filter((x: any) =>
-          Array.isArray(x.employee_departments) &&
-          x.employee_departments[0]?.department_id === 1
-        )
-        .map((x: any, index: number) => ({
-          label: `${index + 1}. ${x.last_name ?? ""} ${x.first_name ?? ""}`.trim(),
-          value: x.id,
-        }));
-    }, [employees]);
-    const vehiclesOptions = useMemo(() => {
-      if (!Array.isArray(vehicles)) return [];
-      return vehicles.map((x: any) => ({
-        label: `${x?.number_code ?? "(không tên)"}`,
+    return employees.filter((x: any) =>
+        Array.isArray(x.employee_departments) &&
+        x.employee_departments[0]?.department_id === 1
+      )
+      .map((x: any, index: number) => ({
+        label: `${index + 1}. ${x.last_name ?? ""} ${x.first_name ?? ""}`.trim(),
         value: x.id,
       }));
-    }, [vehicles]);
-    const partnerOptions = useMemo(() => {
-      if (!Array.isArray(partnerDetails?.data)) return [];
-      return partnerDetails.data.map((x: any) => ({
-        label: x?.partners?.abbreviation ?? "(không tên)",
-        value: x.id,
-      }));
-    }, [partnerDetails]);
+  }, [employees]);
+  const vehiclesOptions = useMemo(() => {
+    if (!Array.isArray(vehicles)) return [];
+    return vehicles.map((x: any) => ({
+      label: `${x?.number_code ?? "(không tên)"}`,
+      value: x.id,
+    }));
+  }, [vehicles]);
+  const partnerOptions = useMemo(() => {
+    if (!Array.isArray(partnerDetails?.data)) return [];
+    return partnerDetails.data.map((x: any) => ({
+      label: x?.partners?.abbreviation ?? "(không tên)",
+      value: x.id,
+    }));
+  }, [partnerDetails]);
 
-    const partnerVenderOptions = useMemo(() => {
-      if (!Array.isArray(partnerVenderDetails?.data)) return [];
-      return partnerVenderDetails.data.map((x: any) => ({
-        label: x?.partners?.abbreviation ?? "(không tên)",
-        value: x.id,
-      }));
-    }, [partnerVenderDetails]);
+  const partnerVenderOptions = useMemo(() => {
+    if (!Array.isArray(partnerVenderDetails?.data)) return [];
+    return partnerVenderDetails.data.map((x: any) => ({
+      label: x?.partners?.abbreviation ?? "(không tên)",
+      value: x.id,
+    }));
+  }, [partnerVenderDetails]);
   
-    const employeeOptions = useMemo(() => {
-      if (!Array.isArray(employees?.data)) return [];
-      return employees.data.map((x: any,index:number) => ({
-        label: `${index+1}.${x.last_name ?? ""} ${x.first_name ?? ""}`.trim(),
-        value: x.id,
-      }));
-    }, [employees]);
+  const employeeOptions = useMemo(() => {
+    if (!Array.isArray(employees?.data)) return [];
+    return employees.data.map((x: any,index:number) => ({
+      label: `${index+1}.${x.last_name ?? ""} ${x.first_name ?? ""}`.trim(),
+      value: x.id,
+    }));
+  }, [employees]);
   function getTypeVehicleLabel(type: number){
     const item = typeVehicle.find((x: any) => x.isExternalDriver === type);
     return item?.name ?? "";
   };
   const handleSubmit = (e: any) => {
     e.preventDefault();
-
-    // clone tránh mutate trực tiếp state
-    const updatedInfos = { ...infos };
-
-    // convert các field thường
-    updatedInfos.driverFee     = toInt(updatedInfos.driverFee);
-    updatedInfos.customsStatus = toInt(updatedInfos.customsStatus);
-    updatedInfos.purchasePrice = toInt(updatedInfos.purchasePrice);
-    updatedInfos.price         = toInt(updatedInfos.price);
-    updatedInfos.mealFee       = toInt(updatedInfos.mealFee);
-    updatedInfos.ticketFee     = toInt(updatedInfos.ticketFee);
-    updatedInfos.overnightFee  = toInt(updatedInfos.overnightFee);
-    updatedInfos.penaltyFee    = toInt(updatedInfos.penaltyFee);
-    updatedInfos.goodsFee      = toInt(updatedInfos.goodsFee);
-    updatedInfos.deliveryPoint = toInt(updatedInfos.deliveryPoint);
-
-    // 🔥 convert toàn bộ transportation_cost
-    if (updatedInfos.transportationCost) {
-      updatedInfos.transportationCost = Object.keys(
-        updatedInfos.transportationCost
-      ).reduce((acc: any, key) => {
-        acc[key] = toInt(updatedInfos.transportationCost[key]);
-        return acc;
-      }, {});
-    }
-    updatedInfos.fileInfoId = type == 0 ? updatedInfos.id : updatedInfos.fileInfo?.id;
-    updatedInfos.vehicleNumber = updatedInfos.isExternalDriver === 0? updatedInfos?.vehicle_info?.vehicleLabel ?? updatedInfos?.vehicleNumber : updatedInfos.vehicleNumber;
-    updatedInfos.vehicleId = updatedInfos.isExternalDriver === 0 ? updatedInfos?.vehicle_info?.vehicleId ?? updatedInfos?.vehicleId : null;
-    updatedInfos.data = JSON.stringify(updatedInfos);
-    const info = {
-      ...updatedInfos,
-      status: updatedInfos.status ? 0 : 1,
+    // lưu lại thông thông label của tất cả các dropdown
+    infos.driverFee      = toInt(infos.driverFee);
+    infos.customsStatus  = toInt(infos.customsStatus);
+    infos.purchasePrice  = toInt(infos.purchasePrice);
+    infos.sellingPrice   = toInt(infos.sellingPrice);
+    infos.price          = toInt(infos.sellingPrice);
+    infos.mealFee        = toInt(infos.mealFee);
+    infos.ticketFee      = toInt(infos.ticketFee);
+    infos.overnightFee   = toInt(infos.overnightFee);
+    infos.penaltyFee     = toInt(infos.penaltyFee);
+    infos.deliveryPoint  = toInt(infos.deliveryPoint);
+    infos.goodsFee       = toInt(infos.goodsFee);
+    infos.data = JSON.stringify(infos);
+    infos.fileInfoId= infos.id || 0;
+    infos.vehicleNumber = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleLabel : infos.vehicleNumber
+    infos.vehicleId = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleId : null
+    let info = {
+      ...infos, status: infos.status ? 0 : 1,
     };
     console.log(info);
-    setLoading(true);
-    fetchDataSubmit(info);
+    //setLoading(true);
+    fetchDataSubmit(info); 
   };
   const toInt = (v: any) =>
   v == null
@@ -120,8 +114,8 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
     : typeof v === "number"
     ? v
     : parseInt(String(v).replace(/\D/g, ""), 10) || 0;
+
   async function fetchDataSubmit(info: any) {
-    if (info.id && type == 0) {
       const response = await addDebit(info);
       if (response) setLoading(false);
       if (response.status === 200) {
@@ -133,104 +127,44 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
           dispatch(showToast({ ...listToast[2], detail: response.data.message }))
         }
       } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
-    }
-     if (info.id && type == 1) {
-      const response = await updateDebit(info);
-      if (response) setLoading(false);
-      if (response.status === 200) {
-        if (response.data.status) {
-          setInfos({ ...refreshObject(infos), status: true })
-          dispatch(showToast({ ...listToast[0], detail: response.data.message }));
-          onClose();
-        } else {
-          dispatch(showToast({ ...listToast[2], detail: response.data.message }))
-        }
-      } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
-    }
   };
-  const mapTransportationCost = (detail: any) => {
-    let parsed: any = {};
-
-    if (detail.transportationCost) {
-      try {
-        parsed =
-          typeof detail.transportationCost === "string"
-            ? JSON.parse(detail.transportationCost)
-            : detail.transportationCost;
-      } catch {
-        parsed = {};
+  const getDetailFileContract = (id: number) => {
+    if (fileContract && fileContract.length > 0) {
+      const detail = fileContract.find((x:any) => x.id === id)
+      if(detail){
+        const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declaration_type);
+        const partner = partnerOptions.find((x:any)=>x.value === detail.customer_detail_id)
+        setInfos({...infos,...detail,
+          loaiToKhai:_loaiToKhai?.name,
+          partnerName:partner?.label,
+          customerDetailId:detail.customer_detail_id,
+          accountingDate:detail.accounting_date,
+          containerCode:detail.container_code,
+          isExternalDriver:1
+        })
       }
     }
-
-    return transportation_cost.reduce((acc: any, item) => {
-      acc[item.key] = parsed[item.key] ?? 0;
-      return acc;
-    }, {});
-  };
+  }
+  function getDetailPartner(event:any,id: number) {
+    event.preventDefault()
+      let info = {
+        isExternalDriver:1,
+        accountingDate: Helper.toDayString(),
+        customerDetailId:id
+      };
+      setInfos(info)
+  }
   useEffect(() => {
-    if (!id) return;
-    if (partnerOptions.length === 0) return;  // ✅ quan trọng
-    if (id && type == 0) {
-      setLoading(true);
-      showContractFile({ id: id, type: CategoryEnum.country }).then(res => {
-        const detail = res.data.data
-        if (detail) {
-          const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
-          const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
-          detail.partnerName = partner?.label
-          console.log(detail);
-          detail.serviceDate = detail.accountingDate;
-          const mappedTransportationCost = mapTransportationCost(detail);
-          let info = {
-            ...detail, status: detail.status === 0 ? true : false,
-            transportationCost: mappedTransportationCost,
-            loaiToKhai:_loaiToKhai?.name,
-            isExternalDriver:1
-          };
-          setInfos(info)
-        }
-      }).catch(err => {
-        //setHasError(true)
-      }).finally(() => setLoading(false));
-    }
-     if (id && type == 1) {
-      setLoading(true);
-      ShowWithFileInfoAsync({ id: id, type: CategoryEnum.country }).then(res => {
-        const detail = res.data.data
-        if (detail) {
-          const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
-          const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.fileInfo?.declarationType);
-          detail.partnerName = partner?.label;
-          detail.route = detail.name;
-          detail.fileNumber = detail.fileInfo?.fileNumber;
-          detail.declaration = detail.fileInfo?.declaration;
-          detail.bill = detail.fileInfo?.bill;
-          detail.quantity = detail.fileInfo?.quantity;
-          detail.containerCode = detail.fileInfo?.containerCode;
-          detail.isExternalDriver = detail.vehicleId > 0 ? 0 : 1;
-          const mappedTransportationCost = mapTransportationCost(detail);
-          let info = {
-            ...detail, status: detail.status === 0 ? true : false, loaiToKhai:_loaiToKhai?.name,
-            transportationCost: mappedTransportationCost
-          };
-          console.log(info);
-          setInfos(info)
-        }
-      }).catch(err => {
-        //setHasError(true)
-      }).finally(() => setLoading(false));
-    }
-  }, [id, partnerOptions, driverOptions, vehiclesOptions, partnerVenderOptions]);
+  }, [fileContract,partnerOptions, driverOptions, vehiclesOptions, partnerVenderOptions]);
   return (
     <>
       <AddForm
         className="w-full"
         style={{ margin: "0 auto" }}
-        checkId={infos.id}
+        checkId={1}
         title="xe"
         loading={loading}
         onSubmit={handleSubmit}
-        route={Number(id) ? "/debit/update" : "/debit/create"}
       >
         <div className="field">
           <Panel header="Thông tin số file">
@@ -240,8 +174,19 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                 <tr>
                   <td className="pr-4 align-top">
                     <div className="mb-2">
-                      <label className="font-medium mr-2">Khách hàng:</label>
-                      <span>{infos.partnerName}</span>
+                      <Dropdown
+                        filter
+                        showClear
+                        value={infos.customerDetailId}
+                        options={partnerOptions}
+                        onChange={(e: any) =>
+                          {
+                             setInfos({...infos,declaration:'',bill:'',container_code:'',quantity:'',loaiToKhai:'',isExternalDriver:1,accountingDate: Helper.toDayString(),customerDetailId:e.value})
+                          }
+                        }
+                        label="khách hàng"
+                        className="w-full"
+                      />
                     </div>
                   </td>
                   <td className="pr-4 align-top">
@@ -261,14 +206,24 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                 <tr>
                   <td className="pr-4 align-top">
                     <div className="mb-2">
-                      <label className="font-medium mr-2">Số file:</label>
-                      <span>{infos.fileNumber}</span>
+                      <Dropdown
+                        filter
+                        showClear
+                        value={infos.id}
+                        options={fileContractOptions}
+                        onChange={(e:any) => {
+                            setInfos((prev: any) => ({ ...prev, id: e.value }));
+                            getDetailFileContract(e.value);
+                        }}
+                        label="Số file"
+                        className="w-full"
+                      />
                     </div>
                   </td>
                   <td className="pr-4 align-top">
                     <div className="mb-2">
                       <label className="font-medium mr-2">Số Cont:</label>
-                      <span>{infos.containerCode}</span>
+                      <span>{infos.container_code}</span>
                     </div>
                   </td>
                   <td className="pr-4 align-top">
@@ -296,9 +251,9 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
             <div className="formgrid grid">
               <div className="field col-4">
                 <MyCalendar dateFormat="dd/mm/yy"
-                  value={Helper.formatDMYLocal(infos.serviceDate ? infos.serviceDate : infos.accountingDate)} // truyền nguyên ISO string
+                  value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
                   onChange={(e: any) =>
-                    setInfos({ ...infos, serviceDate: e })}
+                    setInfos({ ...infos, accountingDate: e })}
                   className={classNames("w-full", "p-inputtext", "input-form-sm")} />
               </div>
                <div className="field col-8">
@@ -334,10 +289,10 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
               </div>
                <div className="field col-4">
                 <InputForm className="w-full"
-                  id="price"
-                  value={Helper.formatCurrency(infos.price ? infos.price.toString():'')}
+                  id="sellingPrice"
+                  value={infos.sellingPrice}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, price: e.target.value })
+                    setInfos({ ...infos, sellingPrice: Helper.formatCurrency(e.target.value) })
                   }
                   label="Cước bán"
                 />
@@ -345,9 +300,9 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                <div className="field col-4">
                 <InputForm className="w-full"
                   id="driverFee"
-                  value={Helper.formatCurrency(infos.driverFee?infos.driverFee.toString():'')}
+                  value={infos.driverFee}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, driverFee: e.target.value })
+                    setInfos({ ...infos, driverFee: Helper.formatCurrency(e.target.value) })
                   }
                   label="Lái xe thu cước"
                 /> 
@@ -355,9 +310,9 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                <div className="field col-4">
                 <InputForm className="w-full"
                   id="customsStatus"
-                  value={Helper.formatCurrency(infos.customsStatus?infos.customsStatus.toString():"")}
+                  value={infos.customsStatus}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, customsStatus: e.target.value })
+                    setInfos({ ...infos, customsStatus: Helper.formatCurrency(e.target.value) })
                   }
                   label="TTHQ"
                 />
@@ -365,9 +320,9 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                <div className="field col-4">
                 <InputForm className="w-full"
                   id="purchasePrice"
-                  value={Helper.formatCurrency(infos.purchasePrice?infos.purchasePrice.toString():'')}
+                  value={infos.purchasePrice}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, purchasePrice: e.target.value })
+                    setInfos({ ...infos, purchasePrice: Helper.formatCurrency(e.target.value) })
                   }
                   label="Cước mua"
                 />
@@ -390,7 +345,7 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                   className="w-full"
                 />
               </div>
-               <div className="field col-2">
+              <div className="field col-2">
                 <Dropdown
                   value={infos.isExternalDriver}
                   optionValue="isExternalDriver"
@@ -426,14 +381,12 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                {infos.isExternalDriver == 1 && <div className="field col-2">
                   <InputForm className="w-full"
                       id="vehicleNumber"
-                      value={infos.vehicleNumber}
                       onChange={(e: any) =>
                         setInfos({ ...infos, vehicleNumber: e.target.value })
                       }
                       label="Biển số xe"
                     />
               </div>}
-              
               <div className="field col-8">
                 <Dropdown
                   value={infos.employeeDriverId}
@@ -451,22 +404,22 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                   }
                 />
               </div>
-              <div className="field col-2">
+              <div className="field col-4">
                 <InputForm className="w-full"
                   id="mealFee"
-                  value={Helper.formatCurrency(infos.mealFee?infos.mealFee.toString():'')}
+                  value={infos.mealFee}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, mealFee: e.target.value })
+                    setInfos({ ...infos, mealFee: Helper.formatCurrency(e.target.value) })
                   }
                   label="Tiền ăn"
                 />
               </div>
-              <div className="field col-2">
+              <div className="field col-3">
                 <InputForm className="w-full"
                   id="ticketFee"
-                  value={Helper.formatCurrency(infos.ticketFee?infos.ticketFee.toString():'')}
+                  value={infos.ticketFee}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, ticketFee: e.target.value })
+                    setInfos({ ...infos, ticketFee: Helper.formatCurrency(e.target.value) })
                   }
                   label="Tiền vé"
                 />
@@ -474,29 +427,29 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
               <div className="field col-2">
                 <InputForm className="w-full"
                   id="overnightFee"
-                  value={Helper.formatCurrency(infos.overnightFee?infos.overnightFee.toString():"")}
+                  value={infos.overnightFee}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, overnightFee: e.target.value })
+                    setInfos({ ...infos, overnightFee: Helper.formatCurrency(e.target.value) })
                   }
                   label="Tiền qua đêm"
                 />
               </div>
-              <div className="field col-2">
+              <div className="field col-3">
                 <InputForm className="w-full"
                   id="penaltyFee"
-                  value={Helper.formatCurrency(infos.penaltyFee?infos.penaltyFee.toString():'')}
+                  value={infos.penaltyFee}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, penaltyFee: e.target.value })
+                    setInfos({ ...infos, penaltyFee: Helper.formatCurrency(e.target.value) })
                   }
-                  label="Tiền luật / phí phác"
+                  label="Tiền luật"
                 />
               </div>
               <div className="field col-2">
                 <InputForm className="w-full"
                   id="goodsFee"
-                  value={Helper.formatCurrency(infos.goodsFee?infos.goodsFee.toString():'')}
+                  value={infos.goodsFee}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, goodsFee: e.target.value })
+                    setInfos({ ...infos, goodsFee: Helper.formatCurrency(e.target.value) })
                   }
                   label="Lượng hàng về"
                 />
@@ -511,33 +464,9 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                   label="Điểm trả hàng"
                 />
               </div>
-              {transportation_cost.map(({ key, label }) => {
-                const value = infos.transportationCost?.[key] ?? "";
-
-                return (
-                  <div className="field col-2" key={key}>
-                    <InputForm
-                      className="w-full"
-                      id={key}
-                      value={Helper.formatCurrency(value.toString())}
-                      onChange={(e: any) =>
-                        setInfos((prev: any) => ({
-                          ...prev,
-                          transportationCost: {
-                            ...prev.transportationCost,
-                            [key]: e.target.value,
-                          },
-                        }))
-                      }
-                      label={label}
-                    />
-                  </div>
-                );
-              })}
-              <div className="field col-12">
+              <div className="field col-8">
                 <InputForm className="w-full"
                   id="note"
-                  value={infos.note}
                   onChange={(e: any) =>
                     setInfos({ ...infos, note: e.target.value })
                   }

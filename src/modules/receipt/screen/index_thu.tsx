@@ -275,11 +275,11 @@ export default function ListReceiptThu() {
                                     showFilterMenu={false}
                                     filterMatchMode="contains"
                                 />
-                                <Column field="amount" body={(row: any) => Helper.formatCurrency(row.amount.toString())}  header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                                <Column field="amount" body={(row: any) => Helper.formatCurrency((row.amount ??0).toString())}  header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
                                     footer={getSumColumn("amount")}
                                     footerStyle={{ fontWeight: "bold" }}
                                 />
-                                <Column field="total"  body={(row: any) => Helper.formatCurrency(row.total.toString())} header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
+                                <Column field="total"  body={(row: any) => Helper.formatCurrency((row.total ?? 0).toString())} header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
                                     footer={getSumColumn("total")}
                                     footerStyle={{ fontWeight: "bold" }}
                                 />
@@ -342,7 +342,7 @@ export default function ListReceiptThu() {
                             <Column 
                               field="amount" 
                               body={(row: any) =>{
-                                  return Helper.formatCurrency(row.amount.toString());
+                                  return Helper.formatCurrency((row.amount ?? 0).toString());
                               }} 
                               header="Số tiền" 
                               footer={selectedDetail ? Helper.formatCurrency((selectedDetail?.reduce((acc: any, item: any) => {
@@ -354,13 +354,13 @@ export default function ListReceiptThu() {
                             <Column field="vat" header="VAT" style={{ textAlign: 'center' }} className="table-title-center" />
                             <Column 
                                 body={(row: any) =>{
-                                    const thanh_tien = Math.round(row.amount * (1 + row.vat / 100));
+                                    const thanh_tien = Math.round((row.amount ??0) * (1 + row.vat / 100));
                                     return Helper.formatCurrency(thanh_tien.toString());
 
                                 }} 
                                 header="Thành tiền" 
                                 footer={selectedDetail ? Helper.formatCurrency((selectedDetail?.reduce((acc: any, item: any) => {
-                                    const thanh_tien = Math.round(item.amount * (1 + item.vat / 100));
+                                    const thanh_tien = Math.round((item.amount ??0) * (1 + item.vat / 100));
                                     return acc + thanh_tien;
                                 }, 0)).toString()) : undefined}
                                 style={{ textAlign: 'right' }}

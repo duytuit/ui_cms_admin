@@ -85,8 +85,8 @@ export default function ListPartner() {
                 <Column field="name" header="Tên công ty" filter showFilterMenu={false} filterMatchMode="contains"/>
                 <Column field="abbreviation" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains"/>
                 <Column field="tax_code" header="Mã số thuế" filter showFilterMenu={false} filterMatchMode="contains"/>
-                <Column field="phone" header="Số điện thoại" filter showFilterMenu={false} filterMatchMode="contains"/>
-                <Column field="email" header="Email" filter showFilterMenu={false} filterMatchMode="contains"/>
+                {/* <Column field="phone" header="Số điện thoại" filter showFilterMenu={false} filterMatchMode="contains"/> */}
+                {/* <Column field="email" header="Email" filter showFilterMenu={false} filterMatchMode="contains"/> */}
                 <Column field="address" header="Địa chỉ" filter showFilterMenu={false} filterMatchMode="contains"/>
                 <Column header="Là khách hàng" body={(e: any) =>  StatusPartnerBody(e.partner_details[0], {  action: updateStatusPartnerDetail },1)} />
                 <Column header="Là nhà cung cấp" body={(e: any) =>  StatusPartnerBody(e.partner_details[1], { action: updateStatusPartnerDetail },2)} />

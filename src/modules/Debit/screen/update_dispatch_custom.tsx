@@ -3,7 +3,7 @@ import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
-import { listToast, loaiToKhai, refreshObject, typeDebit, typeVehicle } from "utils";
+import { listToast, loaiToKhai, refreshObject, transportation_cost, typeDebit, typeVehicle } from "utils";
 import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { addDebit } from "../api";
@@ -20,7 +20,11 @@ import { json } from "stream/consumers";
 import { useListContractFileWithState } from "modules/ContractFile/service";
 export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: () => void }) {
   const [loading, setLoading] = useState(false);
-  const [infos, setInfos] = useState<any>({accountingDate: Helper.toDayString(),isExternalDriver:1});
+  const [infos, setInfos] = useState<any>({accountingDate: Helper.toDayString(),isExternalDriver:1,
+    transportationCost: transportation_cost.map(({ key, label }) => ({
+      key: 0
+    }))
+  });
   const dispatch = useDispatch();
   const navigate = useNavigate();
   // ===== LIST PARTNER & EMPLOYEE =====
@@ -83,30 +87,44 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
     const item = typeVehicle.find((x: any) => x.isExternalDriver === type);
     return item?.name ?? "";
   };
-  const handleSubmit = (e: any) => {
+ const handleSubmit = (e: any) => {
     e.preventDefault();
-    // lưu lại thông thông label của tất cả các dropdown
-    infos.driverFee      = toInt(infos.driverFee);
-    infos.customsStatus  = toInt(infos.customsStatus);
-    infos.purchasePrice  = toInt(infos.purchasePrice);
-    infos.sellingPrice   = toInt(infos.sellingPrice);
-    infos.price          = toInt(infos.sellingPrice);
-    infos.mealFee        = toInt(infos.mealFee);
-    infos.ticketFee      = toInt(infos.ticketFee);
-    infos.overnightFee   = toInt(infos.overnightFee);
-    infos.penaltyFee     = toInt(infos.penaltyFee);
-    infos.deliveryPoint  = toInt(infos.deliveryPoint);
-    infos.goodsFee       = toInt(infos.goodsFee);
-    infos.data = JSON.stringify(infos);
-    infos.fileInfoId= infos.id || 0;
-    infos.vehicleNumber = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleLabel : infos.vehicleNumber
-    infos.vehicleId = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleId : null
-    let info = {
-      ...infos, status: infos.status ? 0 : 1,
+
+    // clone tránh mutate trực tiếp state
+    const updatedInfos = { ...infos };
+
+    // convert các field thường
+    updatedInfos.driverFee     = toInt(updatedInfos.driverFee);
+    updatedInfos.customsStatus = toInt(updatedInfos.customsStatus);
+    updatedInfos.purchasePrice = toInt(updatedInfos.purchasePrice);
+    updatedInfos.price         = toInt(updatedInfos.price);
+    updatedInfos.mealFee       = toInt(updatedInfos.mealFee);
+    updatedInfos.ticketFee     = toInt(updatedInfos.ticketFee);
+    updatedInfos.overnightFee  = toInt(updatedInfos.overnightFee);
+    updatedInfos.penaltyFee    = toInt(updatedInfos.penaltyFee);
+    updatedInfos.goodsFee      = toInt(updatedInfos.goodsFee);
+    updatedInfos.deliveryPoint = toInt(updatedInfos.deliveryPoint);
+
+    // 🔥 convert toàn bộ transportation_cost
+     if (updatedInfos.transportationCost) {
+      updatedInfos.transportationCost = Object.keys(
+        updatedInfos.transportationCost
+      ).reduce((acc: any, key) => {
+        acc[key] = toInt(updatedInfos.transportationCost[key]);
+        return acc;
+      }, {});
+    }
+    updatedInfos.fileInfoId= infos.id || 0;
+    updatedInfos.vehicleNumber = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleLabel : infos.vehicleNumber
+    updatedInfos.vehicleId = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleId : null
+     updatedInfos.data = JSON.stringify(updatedInfos);
+    const info = {
+      ...updatedInfos,
+      status: updatedInfos.status ? 0 : 1,
     };
-    console.log(info);
-    //setLoading(true);
-    fetchDataSubmit(info); 
+    console.log(infos);
+    setLoading(true);
+    fetchDataSubmit(info);
   };
   const toInt = (v: any) =>
   v == null
@@ -289,10 +307,10 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
               </div>
                <div className="field col-4">
                 <InputForm className="w-full"
-                  id="sellingPrice"
-                  value={infos.sellingPrice}
+                  id="price"
+                  value={infos.price}
                   onChange={(e: any) =>
-                    setInfos({ ...infos, sellingPrice: Helper.formatCurrency(e.target.value) })
+                    setInfos({ ...infos, price: Helper.formatCurrency(e.target.value) })
                   }
                   label="Cước bán"
                 />
@@ -404,7 +422,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   }
                 />
               </div>
-              <div className="field col-4">
+              <div className="field col-2">
                 <InputForm className="w-full"
                   id="mealFee"
                   value={infos.mealFee}
@@ -414,7 +432,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="Tiền ăn"
                 />
               </div>
-              <div className="field col-3">
+              <div className="field col-2">
                 <InputForm className="w-full"
                   id="ticketFee"
                   value={infos.ticketFee}
@@ -434,7 +452,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="Tiền qua đêm"
                 />
               </div>
-              <div className="field col-3">
+              <div className="field col-2">
                 <InputForm className="w-full"
                   id="penaltyFee"
                   value={infos.penaltyFee}
@@ -464,7 +482,30 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   label="Điểm trả hàng"
                 />
               </div>
-              <div className="field col-8">
+               {transportation_cost.map(({ key, label }) => {
+                const value = infos.transportationCost?.[key] ?? 0;
+
+                return (
+                  <div className="field col-2" key={key}>
+                    <InputForm
+                      className="w-full"
+                      id={key}
+                      value={Helper.formatCurrency((value ?? 0).toString())}
+                      onChange={(e: any) =>
+                        setInfos((prev: any) => ({
+                          ...prev,
+                          transportationCost: {
+                            ...prev.transportationCost,
+                            [key]: e.target.value,
+                          },
+                        }))
+                      }
+                      label={label}
+                    />
+                  </div>
+                );
+              })}
+              <div className="field col-12">
                 <InputForm className="w-full"
                   id="note"
                   onChange={(e: any) =>

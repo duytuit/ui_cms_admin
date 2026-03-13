@@ -219,7 +219,7 @@ export default function UpdatePartner() {
                       />
                   </div>
                 </div>
-                <div className="field grid">
+                {/* <div className="field grid">
                   <label
                     htmlFor="email"
                     className="col-12 mb-2 md:col-3 md:mb-0"
@@ -236,8 +236,8 @@ export default function UpdatePartner() {
                       label="Email"
                     />
                   </div>
-                </div>
-                <div className="field grid">
+                </div> */}
+                {/* <div className="field grid">
                   <label
                     htmlFor="phone"
                     className="col-12 mb-2 md:col-3 md:mb-0"
@@ -273,7 +273,7 @@ export default function UpdatePartner() {
                       label="Mật khẩu"
                     />
                   </div>
-                </div>
+                </div> */}
                 <div className="field grid">
                   <label
                     htmlFor="address"

@@ -185,8 +185,12 @@ export default function UpdateVATFileGia({ id, onClose }: { id: any; onClose: ()
                     <span>{infos.loaiToKhai}</span>
                   </td>
                   <td className="pr-4">
-                    <label className="font-medium mr-2">Ngày hạch toán:</label>
-                     <span>{infos.accountingDate ? Helper.formatDMYLocal(infos.accountingDate) : ""}</span>
+                    <MyCalendar
+                      value={infos.accountingDate ? Helper.formatDMYLocal(infos.accountingDate) : ""}
+                      dateFormat="dd/mm/yy"
+                      onChange={(e: any) => setInfos({ ...infos, accountingDate: e })}
+                      className={classNames("w-full", "p-inputtext", "input-form-sm")}
+                    />
                   </td>
                 </tr>
               </tbody>

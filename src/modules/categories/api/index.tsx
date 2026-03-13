@@ -14,7 +14,8 @@ export const updateStatusIncomeExpense = (params:any) => postData("IncomeExpense
 
 export const listBank = (params:any) => getData("Bank", params);
 export const deleteBank = (params:any) => postData("Bank/delete", params);
-export const addBank = (params:any) => postData("Bank/create", params);
+export const addBank = (params:any) => postData("Bank/createOrUpdate", params);
+export const showBank = (params: any) => getData("Bank/show", params);
 export const updateBank = (params:any) => postData("Bank/update", params);
 export const updateStatusBank = (params:any) => postData("Bank/update/status", params);
 

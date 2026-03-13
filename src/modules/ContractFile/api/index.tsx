@@ -16,6 +16,8 @@ export const showWithDebitContractFile = async (params: any) => await getData("C
 export const ShowWithDebitConfirmAsync = async (params: any) => await getData("ContractFile/ShowWithDebitConfirmAsync", params);
 export const deleteContractFile = async (params: any) => await postData("ContractFile/delete", params);
 export const addContractFile = async (params: any) => await postData("ContractFile/create", params);
+export const updateVoLuuCont = async (params: any) => await postData("ContractFile/updateVoLuuCont", params);
+export const updateNullVoLuuCont = async (params: any) => await postData("ContractFile/updateNullVoLuuCont", params);
 export const updateContractFile = async (params: any) => await postData("ContractFile/update", params);
 export const updateStatusContractFile = async (params: any) => await postData("ContractFile/update/status", params);
 export const listNoDebitHasFileNCC= async (params: any) => await getData("ContractFile/noDebitHasFileNCC", params);

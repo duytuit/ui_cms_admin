@@ -57,6 +57,7 @@ export const updateDebitMuaHangNCC = async (params: any) => await postData("Debi
 //===== end ===========
 // confirm debit
 export const confirmFileGia = async (params: any) => await postData("Debit/confirmFileGia", params);
+export const confirmFileGiaByIdFileGia = async (params: any) => await postData("Debit/confirmFileGiaByIdFileGia", params);
 export const confirmDebitNoFileDispatchKH = async (params: any) => await postData("Debit/confirmDebitNoFileDispatchKH", params);
 export const confirmChiPhiHaiQuan = async (params: any) => await postData("Debit/confirmChiPhiHaiQuan", params);
 //===== end ===========

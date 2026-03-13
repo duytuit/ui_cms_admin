@@ -148,8 +148,8 @@ export default function ListReceiptChi() {
                             hinhthuc: _hinhthuc?.name,
                             nguoitao: `${_nguoitao?.last_name ?? ""} ${_nguoitao?.first_name ?? ""}`.trim(),
                             sofile:_sofile?.file_number,
-                            amount: Helper.formatCurrency(row.amount.toString()),
-                            total: Helper.formatCurrency(row.total.toString()),
+                            amount: Helper.formatCurrency((row.amount ?? 0).toString()),
+                            total: Helper.formatCurrency((row.total ?? 0).toString()),
                             typeReceipt: _typeReceipt?.name || "",
                             typeDoiTuong: _typeDoiTuong,
                         };

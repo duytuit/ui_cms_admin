@@ -122,6 +122,25 @@ export const phatSinh = [
      name:"Nhiều tờ khai"
    }
 ];
+export const transportation_cost = [
+  { key: "DauDinhMuc", label: "Dầu định mức" },
+  { key: "DauThucTe", label: "Dầu thực tế" },
+  { key: "SoPhieu", label: "Số phiếu" },
+  { key: "CayDau", label: "Cây dầu" },
+  { key: "PhatSinh", label: "Phát sinh" },
+  { key: "CaoToc", label: "Cao tốc" },
+  { key: "LuongChuyen", label: "Lương chuyến" }
+];
+export const ChiPhiLaiXe = [
+  { key: "meal_fee", label: "Tiền ăn" },
+  { key: "ticket_fee", label: "Tiền vé" },
+  { key: "overnight_fee", label: "Tiền ăn đêm" },
+  { key: "penalty_fee", label: "Tiền luật" },
+  { key: "goods_fee", label: "Lương hàng về" },
+  { key: "delivery_point", label: "Điểm trả hàng" },
+  { key: "PhatSinh", label: "Phát sinh" },
+  { key: "CaoToc", label: "Cao tốc" },
+];
 export const nghiepVu = [
    {
      business:0,

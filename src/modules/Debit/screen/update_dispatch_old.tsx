@@ -3,7 +3,7 @@ import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
-import { listToast, loaiToKhai, refreshObject, transportation_cost, typeDebit, typeVehicle } from "utils";
+import { listToast, loaiToKhai, refreshObject, typeDebit, typeVehicle } from "utils";
 import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { addDebit, ShowWithFileInfoAsync, updateDebit } from "../api";
@@ -18,9 +18,7 @@ import { useListPartnerDetail } from "modules/partner/service";
 import { useListVehicleWithState } from "modules/VehicleDispatch/service";
 export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: any; onClose: () => void ,type?:number}) {
   const [loading, setLoading] = useState(false);
-  const [infos, setInfos] = useState<any>({
-    isExternalDriver: 1,
-  });
+  const [infos, setInfos] = useState<any>({isExternalDriver:1});
   const dispatch = useDispatch();
   const navigate = useNavigate();
      // ===== LIST PARTNER & EMPLOYEE =====
@@ -71,46 +69,31 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
         value: x.id,
       }));
     }, [employees]);
-  function getTypeVehicleLabel(type: number){
-    const item = typeVehicle.find((x: any) => x.isExternalDriver === type);
-    return item?.name ?? "";
-  };
+ function getTypeVehicleLabel(type: number){
+  const item = typeVehicle.find((x: any) => x.isExternalDriver === type);
+  return item?.name ?? "";
+};
   const handleSubmit = (e: any) => {
     e.preventDefault();
-
-    // clone tránh mutate trực tiếp state
-    const updatedInfos = { ...infos };
-
-    // convert các field thường
-    updatedInfos.driverFee     = toInt(updatedInfos.driverFee);
-    updatedInfos.customsStatus = toInt(updatedInfos.customsStatus);
-    updatedInfos.purchasePrice = toInt(updatedInfos.purchasePrice);
-    updatedInfos.price         = toInt(updatedInfos.price);
-    updatedInfos.mealFee       = toInt(updatedInfos.mealFee);
-    updatedInfos.ticketFee     = toInt(updatedInfos.ticketFee);
-    updatedInfos.overnightFee  = toInt(updatedInfos.overnightFee);
-    updatedInfos.penaltyFee    = toInt(updatedInfos.penaltyFee);
-    updatedInfos.goodsFee      = toInt(updatedInfos.goodsFee);
-    updatedInfos.deliveryPoint = toInt(updatedInfos.deliveryPoint);
-
-    // 🔥 convert toàn bộ transportation_cost
-    if (updatedInfos.transportationCost) {
-      updatedInfos.transportationCost = Object.keys(
-        updatedInfos.transportationCost
-      ).reduce((acc: any, key) => {
-        acc[key] = toInt(updatedInfos.transportationCost[key]);
-        return acc;
-      }, {});
-    }
-    updatedInfos.fileInfoId = type == 0 ? updatedInfos.id : updatedInfos.fileInfo?.id;
-    updatedInfos.vehicleNumber = updatedInfos.isExternalDriver === 0? updatedInfos?.vehicle_info?.vehicleLabel ?? updatedInfos?.vehicleNumber : updatedInfos.vehicleNumber;
-    updatedInfos.vehicleId = updatedInfos.isExternalDriver === 0 ? updatedInfos?.vehicle_info?.vehicleId ?? updatedInfos?.vehicleId : null;
-    updatedInfos.data = JSON.stringify(updatedInfos);
-    const info = {
-      ...updatedInfos,
-      status: updatedInfos.status ? 0 : 1,
+    // lưu lại thông thông label của tất cả các dropdown
+    infos.driverFee      = toInt(infos.driverFee);
+    infos.customsStatus  = toInt(infos.customsStatus);
+    infos.purchasePrice  = toInt(infos.purchasePrice);
+    infos.price          = toInt(infos.price);
+    infos.mealFee        = toInt(infos.mealFee);
+    infos.ticketFee      = toInt(infos.ticketFee);
+    infos.overnightFee   = toInt(infos.overnightFee);
+    infos.penaltyFee     = toInt(infos.penaltyFee);
+    infos.goodsFee       = toInt(infos.goodsFee);
+    infos.deliveryPoint       = toInt(infos.deliveryPoint);
+    infos.fileInfoId= type == 0? infos.id :infos.fileInfo?.id;
+    infos.data = JSON.stringify(infos);
+    infos.vehicleNumber = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleLabel ?? infos?.vehicleNumber : infos.vehicleNumber
+    infos.vehicleId = infos.isExternalDriver === 0 ? infos?.vehicle_info?.vehicleId ?? infos?.vehicleId : null
+    let info = {
+      ...infos, status: infos.status ? 0 : 1,
     };
-    console.log(info);
+   
     setLoading(true);
     fetchDataSubmit(info);
   };
@@ -148,25 +131,6 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
       } else dispatch(showToast({ ...listToast[1], detail: response.data.message }));
     }
   };
-  const mapTransportationCost = (detail: any) => {
-    let parsed: any = {};
-
-    if (detail.transportationCost) {
-      try {
-        parsed =
-          typeof detail.transportationCost === "string"
-            ? JSON.parse(detail.transportationCost)
-            : detail.transportationCost;
-      } catch {
-        parsed = {};
-      }
-    }
-
-    return transportation_cost.reduce((acc: any, item) => {
-      acc[item.key] = parsed[item.key] ?? 0;
-      return acc;
-    }, {});
-  };
   useEffect(() => {
     if (!id) return;
     if (partnerOptions.length === 0) return;  // ✅ quan trọng
@@ -175,15 +139,13 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
       showContractFile({ id: id, type: CategoryEnum.country }).then(res => {
         const detail = res.data.data
         if (detail) {
-          const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
-          const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
-          detail.partnerName = partner?.label
-          console.log(detail);
-          detail.serviceDate = detail.accountingDate;
-          const mappedTransportationCost = mapTransportationCost(detail);
+           const _loaiToKhai = loaiToKhai.find( (x: any) => x.DeclarationType === detail.declarationType);
+             const partner = partnerOptions.find((x:any)=>x.value == detail.customerDetailId)
+             detail.partnerName = partner?.label
+             console.log(detail);
+             detail.serviceDate = detail.accountingDate;
           let info = {
             ...detail, status: detail.status === 0 ? true : false,
-            transportationCost: mappedTransportationCost,
             loaiToKhai:_loaiToKhai?.name,
             isExternalDriver:1
           };
@@ -208,10 +170,8 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
           detail.quantity = detail.fileInfo?.quantity;
           detail.containerCode = detail.fileInfo?.containerCode;
           detail.isExternalDriver = detail.vehicleId > 0 ? 0 : 1;
-          const mappedTransportationCost = mapTransportationCost(detail);
           let info = {
-            ...detail, status: detail.status === 0 ? true : false, loaiToKhai:_loaiToKhai?.name,
-            transportationCost: mappedTransportationCost
+            ...detail, status: detail.status === 0 ? true : false, loaiToKhai:_loaiToKhai?.name
           };
           console.log(info);
           setInfos(info)
@@ -296,7 +256,7 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
             <div className="formgrid grid">
               <div className="field col-4">
                 <MyCalendar dateFormat="dd/mm/yy"
-                  value={Helper.formatDMYLocal(infos.serviceDate ? infos.serviceDate : infos.accountingDate)} // truyền nguyên ISO string
+                  value={Helper.formatDMYLocal(infos.serviceDate ? infos.serviceDate : '')} // truyền nguyên ISO string
                   onChange={(e: any) =>
                     setInfos({ ...infos, serviceDate: e })}
                   className={classNames("w-full", "p-inputtext", "input-form-sm")} />
@@ -451,7 +411,7 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                   }
                 />
               </div>
-              <div className="field col-2">
+              <div className="field col-4">
                 <InputForm className="w-full"
                   id="mealFee"
                   value={Helper.formatCurrency(infos.mealFee?infos.mealFee.toString():'')}
@@ -461,7 +421,7 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                   label="Tiền ăn"
                 />
               </div>
-              <div className="field col-2">
+              <div className="field col-3">
                 <InputForm className="w-full"
                   id="ticketFee"
                   value={Helper.formatCurrency(infos.ticketFee?infos.ticketFee.toString():'')}
@@ -481,7 +441,7 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                   label="Tiền qua đêm"
                 />
               </div>
-              <div className="field col-2">
+              <div className="field col-3">
                 <InputForm className="w-full"
                   id="penaltyFee"
                   value={Helper.formatCurrency(infos.penaltyFee?infos.penaltyFee.toString():'')}
@@ -511,30 +471,7 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                   label="Điểm trả hàng"
                 />
               </div>
-              {transportation_cost.map(({ key, label }) => {
-                const value = infos.transportationCost?.[key] ?? "";
-
-                return (
-                  <div className="field col-2" key={key}>
-                    <InputForm
-                      className="w-full"
-                      id={key}
-                      value={Helper.formatCurrency(value.toString())}
-                      onChange={(e: any) =>
-                        setInfos((prev: any) => ({
-                          ...prev,
-                          transportationCost: {
-                            ...prev.transportationCost,
-                            [key]: e.target.value,
-                          },
-                        }))
-                      }
-                      label={label}
-                    />
-                  </div>
-                );
-              })}
-              <div className="field col-12">
+              <div className="field col-8">
                 <InputForm className="w-full"
                   id="note"
                   value={infos.note}
