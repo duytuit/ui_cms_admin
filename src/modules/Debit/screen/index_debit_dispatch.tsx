@@ -15,11 +15,39 @@ import { useListContractFile, useListContractFileNotDispatch, useListContractFil
 import UpdateDebitDispatchFile from "./update_dispatch";
 import { useListDebitDispatch } from "../service";
 import { deleteDebit, exportDieuXe } from "../api";
-import { listContractFileNotDispatch } from "modules/ContractFile/api";
 import UpdateDebitDispatchFileCustom from "./update_dispatch_custom";
-import { FilterMatchMode } from "primereact/api";
+import { FilterMatchMode, FilterService } from "primereact/api";
 import UpdateGiayChiLaiXe from "modules/receipt/screen/update_giay_chilaixe";
+FilterService.register('custom_numeric', (value, filter) => {
+    if (!filter) return true;
 
+    const input = filter.toString().trim();
+    const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+
+    let operator = '=';
+    let num = 0;
+
+    if (match) {
+        operator = match[1];
+        num = parseFloat(match[2]);
+    } else {
+        num = parseFloat(input);
+        if (isNaN(num)) return true;
+    }
+
+    const val = parseFloat(value) || 0;
+
+    switch (operator) {
+        case '>': return val > num;
+        case '>=': return val >= num;
+        case '=':
+        case '==': return val === num;
+        case '<=': return val <= num;
+        case '<': return val < num;
+        case '!=': return val !== num;
+        default: return true;
+    }
+});
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator,refreshDebitDispatch }: any) => {
   const [filter, setFilter] = useState({
@@ -171,6 +199,8 @@ export default function ListCreateDispatch() {
       name: { value: null, matchMode: FilterMatchMode.CONTAINS },
       vehicle_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
       driver: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      price: { value: null, matchMode: 'custom_numeric' },
+      purchase_price: { value: null, matchMode: 'custom_numeric' },
      });
   const { data, loading, error, refresh } = useListContractFileNotDispatch({params: paramsPaginator,debounce: 500,});
   const { data: debitDispatch, refresh:refreshDebitDispatch  } = useListDebitDispatch({params: {...paramsPaginator}, debounce: 500,});
@@ -297,26 +327,29 @@ export default function ListCreateDispatch() {
     setVisible(true);
     setType(1)
   };
-  const handleModalEditClose = () => {
-    setVisible(false);
-    refresh?.(); 
-    refreshDebitDispatch?.(); // reload debitDispatch
-  };
-  const getSumColumn = (field: string) => {
-        const filtered = (displayDebitDispatchData??[]).filter((item: any) => {
-            return Object.entries(filters).every(([key, f]: [string, any]) => {
-                const value = f?.value?.toString().toLowerCase() ?? "";
-                if (!value) return true;
-                const cell = item[key]?.toString().toLowerCase() ?? "";
-                return cell.includes(value);
-            });
+ const getSumColumn = (field: string) => {
+    const filtered = (displayDebitDispatchData ?? []).filter((row: any) => {
+        return Object.entries(filters).every(([key, meta]: any) => {
+            const { value, matchMode } = meta;
+
+            if (value === null || value === undefined || value === '') return true;
+
+            const fieldValue = row[key];
+
+            const fn = FilterService.filters[
+                (matchMode || FilterMatchMode.CONTAINS) as keyof typeof FilterService.filters
+            ];
+
+            return fn ? fn(fieldValue, value) : true;
         });
-        const sum = filtered.reduce((acc: any, item: any) => {
-            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
-            return acc + val;
-        }, 0);
-        return Helper.formatCurrency(sum.toString());
-  };
+    });
+
+    const sum = filtered.reduce((acc: number, item: any) => {
+        return acc + (parseFloat(item[field]) || 0);
+    }, 0);
+
+    return Helper.formatCurrency(sum.toString());
+};
   const statusOptions = [
     { label: 'Không file', value: 2 },
     { label: 'Đã duyệt', value: 1 },
@@ -526,14 +559,25 @@ export default function ListCreateDispatch() {
                           <Column field="customer_vehicle_type" header="Loại xe KH" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="supplier_vehicle_type" header="Loại xe NCC" filter showFilterMenu={false} filterMatchMode="contains" />
                           <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="purchase_price" body={(row: any) => Helper.formatCurrency(row.purchase_price.toString())}
-                            footer={getSumColumn("purchase_price")}
-                            footerStyle={{ fontWeight: "bold" }}
-                            header="Cước mua" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column field="price" body={(row: any) => Helper.formatCurrency(row.price.toString())}
-                            footer={getSumColumn("price")}
-                            footerStyle={{ fontWeight: "bold" }}
-                            header="Cước bán" filter showFilterMenu={false} filterMatchMode="contains" />
+                          <Column
+                              field="price"
+                              header="Cước bán"
+                              body={(row: any) => Helper.formatCurrency(row.price?.toString())}
+                              footer={getSumColumn("price")}
+                              filter
+                              showFilterMenu={false}
+                              filterMatchMode="custom_numeric"
+                          />
+
+                          <Column
+                              field="purchase_price"
+                              header="Cước mua"
+                              body={(row: any) => Helper.formatCurrency(row.purchase_price?.toString())}
+                              footer={getSumColumn("purchase_price")}
+                              filter
+                              showFilterMenu={false}
+                              filterMatchMode="custom_numeric"
+                          />
                           <Column field="driver_fee" body={(row: any) => Helper.formatCurrency((row.driver_fee ?? 0).toString())} 
                             footer={getSumColumn("driver_fee")}
                             footerStyle={{ fontWeight: "bold" }}

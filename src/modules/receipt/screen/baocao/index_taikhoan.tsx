@@ -78,7 +78,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,dunoDK}: any) => {
               />
             </div>
             <div className="col-4">
-                 <div><b>Dư nợ đầu kỳ: {dunoDK ? Helper.formatCurrency(dunoDK.toString()):0}</b></div>
+                 <div><b>Dư nợ đầu kỳ: {dunoDK ? Helper.formatCurrency(parseInt(dunoDK).toString()):0}</b></div>
             </div>
     </GridForm>
   );

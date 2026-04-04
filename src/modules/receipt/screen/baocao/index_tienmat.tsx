@@ -223,7 +223,7 @@ export default function ListBaoCaoTienMat() {
              body={(row: any) =>
              {
               if(row.iecat_type === 0){
-                  return Helper.formatCurrency(row.total.toString())
+                  return Helper.formatCurrency((row.total || 0).toString())
               }
              }}
             filter showFilterMenu={false}  filterMatchMode="contains"/>
@@ -231,14 +231,14 @@ export default function ListBaoCaoTienMat() {
               body={(row: any) =>
              {
               if(row.iecat_type === 1){
-                  return Helper.formatCurrency(row.total.toString())
+                  return Helper.formatCurrency((row.total|| 0).toString())
               }
              }}
              filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="ton" header="Tồn" 
               body={(row: any) =>
              {
-                return Helper.formatCurrency(row.ton.toString())
+                return Helper.formatCurrency((row.ton||0).toString())
              }}
             filter showFilterMenu={false}  filterMatchMode="contains"/>
         </DataTableClient>
