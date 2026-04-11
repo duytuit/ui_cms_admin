@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { addDepartment, showDepartment, updateDepartment } from "../api";
 import { Dropdown, GridForm } from "components/common/ListForm";
-import { Column, DataTable, Panel } from "components/uiCore";
+import { Column, DataTable, Panel, ScrollPanel } from "components/uiCore";
 import { MyCalendar } from "components/common/MyCalendar";
 import { classNames } from "primereact/utils";
 import { Helper } from "utils/helper";
@@ -217,58 +217,285 @@ export default function UpdateSalary() {
                   minSize={10}
                   style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                 >
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                    <b>Danh sách chuyến đi của lái xe</b>
-                        <DataTableClient  
-                          rowHover
-                          scrollable
-                          scrollHeight="flex"
-                          style={{ flex: 1 }}
-                          className={classNames("Custom-DataTableClient")}
-                          value={displayData}
-                        >
-                          <Column header="STT" body={(rowData: any, options: any) => options.rowIndex + 1} />
-                          <Column field="service_date" header="Ngày điều xe" body={(e: any) => DateBody(e.service_date)} />
-                          <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column header="Điểm trả hàng"
-                            footer={getSumColumn("delivery_point")}
-                            footerStyle={{ fontWeight: "bold" }}
-                            body={(row: any) => Helper.formatCurrency((row.delivery_point ?? 0).toString())} filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column header="Lái xe thu cước"
-                            footer={getSumColumn("driver_fee")}
-                            footerStyle={{ fontWeight: "bold" }}
-                            body={(row: any) => Helper.formatCurrency(row.driver_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column header="Tiền ăn"
-                            footer={getSumColumn("meal_fee")}
-                            footerStyle={{ fontWeight: "bold" }}
-                            body={(row: any) => Helper.formatCurrency(row.meal_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column header="Tiền vé"
-                            footer={getSumColumn("ticket_fee")}
-                            footerStyle={{ fontWeight: "bold" }}
-                            body={(row: any) => Helper.formatCurrency(row.ticket_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column header="Tiền qua đêm"
-                            footer={getSumColumn("overnight_fee")}
-                            footerStyle={{ fontWeight: "bold" }}
-                            body={(row: any) => Helper.formatCurrency(row.overnight_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column header="Tiền luật"
-                            footer={getSumColumn("penalty_fee")}
-                            footerStyle={{ fontWeight: "bold" }}
-                            body={(row: any) => Helper.formatCurrency(row.penalty_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
-                          <Column header="Lương hàng về"
-                            footer={getSumColumn("goods_fee")}
-                            footerStyle={{ fontWeight: "bold" }}
-                            body={(row: any) => Helper.formatCurrency(row.goods_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
-                        </DataTableClient>
-                  </div>
+                  <Splitter style={{ height: '100%', width: '100%' }}>
+                    {/* Panel 1 */}
+                    <SplitterPanel
+                      size={50}
+                      minSize={10}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                        <b>Danh sách chuyến đi của lái xe</b>
+                          <DataTableClient  
+                            rowHover
+                            scrollable
+                            scrollHeight="flex"
+                            style={{ flex: 1 }}
+                            className={classNames("Custom-DataTableClient")}
+                            value={displayData}
+                          >
+                            <Column field="service_date" header="Ngày điều xe" body={(e: any) => DateBody(e.service_date)} />
+                            <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
+                            <Column header="Điểm trả hàng"
+                              footer={getSumColumn("delivery_point")}
+                              footerStyle={{ fontWeight: "bold" }}
+                              body={(row: any) => Helper.formatCurrency((row.delivery_point ?? 0).toString())} filter showFilterMenu={false} filterMatchMode="contains" />
+                            <Column header="Lái xe thu cước"
+                              footer={getSumColumn("driver_fee")}
+                              footerStyle={{ fontWeight: "bold" }}
+                              body={(row: any) => Helper.formatCurrency(row.driver_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
+                            <Column header="Tiền ăn"
+                              footer={getSumColumn("meal_fee")}
+                              footerStyle={{ fontWeight: "bold" }}
+                              body={(row: any) => Helper.formatCurrency(row.meal_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
+                            <Column header="Tiền vé"
+                              footer={getSumColumn("ticket_fee")}
+                              footerStyle={{ fontWeight: "bold" }}
+                              body={(row: any) => Helper.formatCurrency(row.ticket_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
+                            <Column header="Tiền qua đêm"
+                              footer={getSumColumn("overnight_fee")}
+                              footerStyle={{ fontWeight: "bold" }}
+                              body={(row: any) => Helper.formatCurrency(row.overnight_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
+                            <Column header="Tiền luật"
+                              footer={getSumColumn("penalty_fee")}
+                              footerStyle={{ fontWeight: "bold" }}
+                              body={(row: any) => Helper.formatCurrency(row.penalty_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
+                            <Column header="Lương hàng về"
+                              footer={getSumColumn("goods_fee")}
+                              footerStyle={{ fontWeight: "bold" }}
+                              body={(row: any) => Helper.formatCurrency(row.goods_fee.toString())} filter showFilterMenu={false} filterMatchMode="contains" />
+                          </DataTableClient>
+                      </div>
+                    </SplitterPanel>
+                    {/* Panel 2 */}
+                    <SplitterPanel
+                      size={30}
+                      minSize={20}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden'
+                      }}
+                    >
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                        <b>Danh sách lần ứng tiền của lái xe</b>
+                    </div>
+                    </SplitterPanel>
+                    {/* Panel 3 */}
+                    <SplitterPanel
+                      size={20}
+                      minSize={20}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        overflow: 'hidden'
+                      }}
+                    >
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                        <b>Danh sách nghỉ phép nhân viên</b>
+                    </div>
+                    </SplitterPanel>
+                  </Splitter>
                 </SplitterPanel>
                 <SplitterPanel
                   size={50}
                   minSize={10}
-                  style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
+                  style={{ display: 'flex', flexDirection: 'column'}}
                 >
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                  {/* Header cố định */}
+                  <div style={{ padding: '8px' }}>
                     <b>Thông tin khoản lương</b>
-                    <div className="card">
+                  </div>
+                  <div className="p-3">
+                    <div className="formgrid grid">
+                       <div className="field col-2">
+                        <InputForm className="w-full"
+                          id="route"
+                          value={infos.route}
+                          onChange={(e: any) =>
+                            setInfos({ ...infos, route: e.target.value })
+                          }
+                          label="Phiếu lương"
+                        />
+                      </div>
+                      <div className="field col-2">
+                        <InputForm className="w-full"
+                          id="route"
+                          value={infos.route}
+                          onChange={(e: any) =>
+                            setInfos({ ...infos, route: e.target.value })
+                          }
+                          label="Lương cứng"
+                        />
+                      </div>
+                      <div className="field col-2">
+                        <InputForm className="w-full"
+                          id="customerVehicleType"
+                          value={infos.customerVehicleType}
+                          onChange={(e: any) =>
+                            setInfos({ ...infos, customerVehicleType: e.target.value })
+                          }
+                          label="Số ngày nghỉ có phép"
+                        />
+                      </div>
+
+                      <div className="field col-2">
+                        <InputForm className="w-full"
+                          id="customerVehicleType"
+                          value={infos.customerVehicleType}
+                          onChange={(e: any) =>
+                            setInfos({ ...infos, customerVehicleType: e.target.value })
+                          }
+                          label="Số ngày nghỉ không phép"
+                        />
+                      </div>
+                      <div className="field col-4">
+                        <InputForm className="w-full"
+                          id="route"
+                          value={infos.route}
+                          onChange={(e: any) =>
+                            setInfos({ ...infos, route: e.target.value })
+                          }
+                          label="Lương thực tế"
+                        />
+                      </div>
+                      <div className="field col-6">
+                        <div className="card col-12">
+                          <div className="mb-2">
+                            <b>Các khoản trợ cấp</b>
+                          </div>
+                          <div className="field grid">
+                            <div className="field col-4">
+                              <InputForm className="w-full"
+                                id="route"
+                                value={infos.route}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, route: e.target.value })
+                                }
+                                label="Điểm trả hàng"
+                              />
+                            </div>
+                            <div className="field col-4">
+                              <InputForm className="w-full"
+                                id="route"
+                                value={infos.route}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, route: e.target.value })
+                                }
+                                label="Tiền ăn"
+                              />
+                            </div>
+                            <div className="field col-4">
+                              <InputForm className="w-full"
+                                id="route"
+                                value={infos.route}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, route: e.target.value })
+                                }
+                                label="Tiền vé"
+                              />
+                            </div>
+                            <div className="field col-4">
+                              <InputForm className="w-full"
+                                id="route"
+                                value={infos.route}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, route: e.target.value })
+                                }
+                                label="Điện thoại"
+                              />
+                            </div>
+                             <div className="field col-4">
+                              <InputForm className="w-full"
+                                id="route"
+                                value={infos.route}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, route: e.target.value })
+                                }
+                                label="Qua đêm"
+                              />
+                            </div>
+                             <div className="field col-4">
+                              <InputForm className="w-full"
+                                id="route"
+                                value={infos.route}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, route: e.target.value })
+                                }
+                                label="Luật"
+                              />
+                            </div>
+                             <div className="field col-4">
+                              <InputForm className="w-full"
+                                id="route"
+                                value={infos.route}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, route: e.target.value })
+                                }
+                                label="Lương hàng về"
+                              />
+                            </div>
+                             <div className="field col-4">
+                              <InputForm className="w-full"
+                                id="route"
+                                value={infos.route}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, route: e.target.value })
+                                }
+                                label="Trợ cấp khác"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="field col-6">
+                        <div className="card col-12">
+                          <div className="mb-2">
+                            <b>Các khoản chi</b>
+                          </div>
+                          <div className="field grid">
+                            <div className="field col-4">
+                              <InputForm className="w-full"
+                                id="route"
+                                value={infos.route}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, route: e.target.value })
+                                }
+                                label="Tổng tạm ứng"
+                              />
+                            </div>
+                            <div className="field col-4">
+                              <InputForm className="w-full"
+                                id="route"
+                                value={infos.route}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, route: e.target.value })
+                                }
+                                label="Bảo hiểm xã hội"
+                              />
+                            </div>
+                            <div className="field col-4">
+                              <InputForm className="w-full"
+                                id="route"
+                                value={infos.route}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, route: e.target.value })
+                                }
+                                label="Chi khác"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="card col-12">
+                      <div className="mb-2">
+                        <b>Lương thực nhận</b>
+                      </div>
                       <div className="formgrid grid">
                         <div className="field col-4">
                           <InputForm className="w-full"
@@ -280,124 +507,14 @@ export default function UpdateSalary() {
                             label="Lương cứng"
                           />
                         </div>
-                        <div className="field col-4">
-                          <InputForm className="w-full"
-                            id="customerVehicleType"
-                            value={infos.customerVehicleType}
-                            onChange={(e: any) =>
-                              setInfos({ ...infos, customerVehicleType: e.target.value })
-                            }
-                            label="Số ngày nghỉ có phép"
-                          />
-                        </div>
                         <div className="field col-8">
                           <InputForm className="w-full"
-                            id="supplierVehicleType"
-                            value={infos.supplierVehicleType}
+                            id="route"
+                            value={infos.route}
                             onChange={(e: any) =>
-                              setInfos({ ...infos, supplierVehicleType: e.target.value })
+                              setInfos({ ...infos, route: e.target.value })
                             }
-                            label="Loại xe NCC"
-                          />
-                        </div>
-                        <div className="field col-4">
-                          <InputForm className="w-full"
-                            id="price"
-                            value={Helper.formatCurrency(infos.price ? infos.price.toString() : '')}
-                            onChange={(e: any) =>
-                              setInfos({ ...infos, price: e.target.value })
-                            }
-                            label="Cước bán"
-                          />
-                        </div>
-                        <div className="field col-4">
-                          <InputForm className="w-full"
-                            id="driverFee"
-                            value={Helper.formatCurrency(infos.driverFee ? infos.driverFee.toString() : '')}
-                            onChange={(e: any) =>
-                              setInfos({ ...infos, driverFee: e.target.value })
-                            }
-                            label="Lái xe thu cước"
-                          />
-                        </div>
-                        <div className="field col-4">
-                          <InputForm className="w-full"
-                            id="customsStatus"
-                            value={Helper.formatCurrency(infos.customsStatus ? infos.customsStatus.toString() : "")}
-                            onChange={(e: any) =>
-                              setInfos({ ...infos, customsStatus: e.target.value })
-                            }
-                            label="TTHQ"
-                          />
-                        </div>
-                        <div className="field col-4">
-                          <InputForm className="w-full"
-                            id="purchasePrice"
-                            value={Helper.formatCurrency(infos.purchasePrice ? infos.purchasePrice.toString() : '')}
-                            onChange={(e: any) =>
-                              setInfos({ ...infos, purchasePrice: e.target.value })
-                            }
-                            label="Cước mua"
-                          />
-                        </div>
-                        <div className="field col-4">
-                          <InputForm className="w-full"
-                            id="mealFee"
-                            value={Helper.formatCurrency(infos.mealFee ? infos.mealFee.toString() : '')}
-                            onChange={(e: any) =>
-                              setInfos({ ...infos, mealFee: e.target.value })
-                            }
-                            label="Tiền ăn"
-                          />
-                        </div>
-                        <div className="field col-3">
-                          <InputForm className="w-full"
-                            id="ticketFee"
-                            value={Helper.formatCurrency(infos.ticketFee ? infos.ticketFee.toString() : '')}
-                            onChange={(e: any) =>
-                              setInfos({ ...infos, ticketFee: e.target.value })
-                            }
-                            label="Tiền vé"
-                          />
-                        </div>
-                        <div className="field col-2">
-                          <InputForm className="w-full"
-                            id="overnightFee"
-                            value={Helper.formatCurrency(infos.overnightFee ? infos.overnightFee.toString() : "")}
-                            onChange={(e: any) =>
-                              setInfos({ ...infos, overnightFee: e.target.value })
-                            }
-                            label="Tiền qua đêm"
-                          />
-                        </div>
-                        <div className="field col-3">
-                          <InputForm className="w-full"
-                            id="penaltyFee"
-                            value={Helper.formatCurrency(infos.penaltyFee ? infos.penaltyFee.toString() : '')}
-                            onChange={(e: any) =>
-                              setInfos({ ...infos, penaltyFee: e.target.value })
-                            }
-                            label="Tiền luật"
-                          />
-                        </div>
-                        <div className="field col-4">
-                          <InputForm className="w-full"
-                            id="goodsFee"
-                            value={Helper.formatCurrency(infos.goodsFee ? infos.goodsFee.toString() : '')}
-                            onChange={(e: any) =>
-                              setInfos({ ...infos, goodsFee: e.target.value })
-                            }
-                            label="Lượng hàng về"
-                          />
-                        </div>
-                        <div className="field col-8">
-                          <InputForm className="w-full"
-                            id="note"
-                            value={infos.note}
-                            onChange={(e: any) =>
-                              setInfos({ ...infos, note: e.target.value })
-                            }
-                            label="Ghi chú"
+                            label="Ghi chú thông tin lương"
                           />
                         </div>
                       </div>
