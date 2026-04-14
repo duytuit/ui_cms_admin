@@ -25,7 +25,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             filter={filter}
             setFilter={setFilter}
             className="lg:col-9"
-            add="/department/add"
+            add="/bank/add"
         >
         </GridForm>
     );

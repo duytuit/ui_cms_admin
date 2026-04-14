@@ -178,7 +178,7 @@ export default function ListCreateDispatch() {
   const {data: partners } = useListPartnerDetailWithState({});
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
-    pageSize: 20,
+    pageSize: 500,
     first: 0,
     render: false,
     keyword: "",
