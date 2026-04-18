@@ -89,6 +89,9 @@ export default function ListBaoCaoTaiKhoan() {
   const [filters, setFilters] = useState({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       code_receipt: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      note: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      tendoituong: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      lydo: { value: null, matchMode: FilterMatchMode.CONTAINS },
       });
   const [displayData, setDisplayData] = useState<any[]>([]);
    const [dunoDK, setdunoDK] = useState<number>(0);

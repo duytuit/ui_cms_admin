@@ -12,7 +12,7 @@ import { Helper } from "utils/helper";
 import { Dropdown, Input } from "components/common/ListForm";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { useListBankWithState, useListFundCategoryWithState } from "modules/categories/service";
-export default function UpdatePhieuThuKH({debits, onClose}: {debits: any, onClose: () => void }) {
+export default function UpdatePhieuThuKH({debits, customerDetailId, onClose}: {debits: any, customerDetailId: string, onClose: () => void }) {
   const amount = debits.reduce((sum: number, item: any) => {
                   const conlai = (item.conlai_dv || 0) + (item.conlai_ch || 0);
                   return sum + conlai;
@@ -26,6 +26,8 @@ export default function UpdatePhieuThuKH({debits, onClose}: {debits: any, onClos
     e.preventDefault();
     infos.Debits = JSON.stringify(debits);
     infos.amount = amount;
+    infos.ObjectId = customerDetailId;
+    infos.Object = 0;
     let info = {
       ...infos,
       data: JSON.stringify(infos),

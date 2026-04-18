@@ -9,12 +9,14 @@ import { Checkbox, Dialog } from "components/uiCore";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { useListDebitCongNoChiTietNCC, useListDebitDuNoDKNCC } from "../service";
-import { TypeDebitDKKH } from "utils";
+import { listToast, TypeDebitDKKH } from "utils";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import UpdatePhieuChiNCC from "modules/receipt/screen/update_phieuchi_ncc";
 import { Splitter } from "primereact/splitter";
 import { exportDebitNCC } from "../api";
+import { showToast } from "redux/features/toast";
+import { useDispatch } from "react-redux";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setSelectedRows}: any) => {
@@ -24,6 +26,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
     fromDate: Helper.lastWeekString(),
     toDate: Helper.toDayString(),
   });
+  const dispatch = useDispatch();
   const [visible, setVisible] = useState(false);
    const [dunoDK, setdunoDK] = useState<number>(0);
   const { data: supplierDetails } = useListSupplierDetailWithState({ status: 2});
@@ -38,6 +41,10 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
   }, [supplierDetails]);
   const openDialogAdd = () => {
     console.log(selected);
+    if (filter.supplierDetailId === "" || filter.supplierDetailId === undefined) {
+      dispatch(showToast({ ...listToast[2], detail: "Hãy chọn nhà cung cấp" }));
+      return;
+    }
     setVisible(true);
   };
   const handleModalClose = () => {
@@ -131,7 +138,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
             style={{ width: "70vw", top:"30px" }}
         >
           <p className="m-0">
-            {selected && <UpdatePhieuChiNCC debits={selected} onClose={handleModalClose} ></UpdatePhieuChiNCC>}
+            {selected && <UpdatePhieuChiNCC debits={selected} supplierDetailId={filter.supplierDetailId} onClose={handleModalClose} ></UpdatePhieuChiNCC>}
           </p>
       </Dialog>
     </>
@@ -394,7 +401,7 @@ useEffect(() => {
 
     const filtered = applyFilters(mapped);
     setDisplayData(filtered);
-
+    setSelectedRows([]);
 }, [first, rows, data, paramsPaginator, filters, suppliers, employees]);
   const headerGroup = (
         <ColumnGroup>
@@ -407,6 +414,7 @@ useEffect(() => {
                 <Column header="Đã thu" headerClassName="my-title-center" colSpan={2} />
                 <Column frozen alignFrozen="right" className="font-bold"  header="Còn lại" headerClassName="my-title-center" colSpan={3} />
                 <Column frozen alignFrozen="right" className="font-bold"  header="Số thu" headerClassName="my-title-center" colSpan={3} />
+                <Column frozen alignFrozen="right" className="font-bold" header="Phiếu chi" headerClassName="my-title-center" rowSpan={3} />
             </Row>
             <Row>
                 <Column header="Số file"/>
@@ -477,7 +485,7 @@ useEffect(() => {
                         scrollable
                         scrollHeight="flex"
                         style={{ flex: 1 }}
-                        tableStyle={{ minWidth: "2200px" }} // ép bảng rộng hơn để có scroll ngang
+                        tableStyle={{ minWidth: "2300px" }} // ép bảng rộng hơn để có scroll ngang
                       >
                         <Column field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="supplierAbb" filter showFilterMenu={false} filterMatchMode="contains" />
@@ -673,6 +681,7 @@ useEffect(() => {
                             );
                           }
                         }} frozen alignFrozen="right" className="font-bold"/>
+                          <Column field="receipt_codes" frozen alignFrozen="right" filter showFilterMenu={false} filterMatchMode="contains" />
                 </DataTableClient>
                 </div>
             </Splitter>
