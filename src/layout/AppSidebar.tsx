@@ -611,6 +611,52 @@ export const sidebarModel = [{
           }
         ]
       },
+       {
+        id: 5,
+        name: 'Khấu Hao',
+        sort: 1,
+        status: 1,
+        created_at: '2023-06-01 10:04:39',
+        deleted_at: null,
+        updated_at: null,
+        icon: 'pi pi-home',
+        admin:false,
+        items: [
+          {
+            id: 1,
+            name: 'Tài Sản',
+            route: '/partner/list',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+          {
+            id: 1,
+            name: 'Chi Phí Chung',
+            route: '/page-two',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          },
+           {
+            id: 1,
+            name: 'Chi Phí Trả Trước',
+            route: '/page-two',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          }
+        ]
+      },
       {
         id: 5,
         name: 'Danh mục',

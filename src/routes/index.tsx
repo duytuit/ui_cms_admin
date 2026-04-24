@@ -91,6 +91,8 @@ import ListDanhMucChi from "modules/categories/screen/indexChi";
 import ListDanhMucThu from "modules/categories/screen/indexThu";
 import ListVoLuuBai from "modules/ContractFile/screen/index_voluubai";
 import ListXNChiPhiLaiXe from "modules/receipt/screen/index_xn_chiphi_laixe";
+import ListDepreciation from "modules/Depreciation/screen";
+import UpdateDepreciation from "modules/Depreciation/screen/update";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -164,6 +166,10 @@ const publicRoutes = [
   { path: "/department/list", component: ListDepartment, layout: 'ListDepartment' },
   { path: "/department/add", component: UpdateDepartment, layout: 'UpdateDepartment' },
   { path: "/department/detail/:id", component: UpdateDepartment, layout: 'UpdateDepartment' },
+  // Depreciation 
+  { path: "/depreciation/list", component: ListDepreciation, layout: 'ListDepreciation' },
+  { path: "/depreciation/add", component: UpdateDepreciation, layout: 'UpdateDepreciation' },
+  { path: "/depreciation/detail/:id", component: UpdateDepreciation, layout: 'UpdateDepreciation' },
   // Bank 
   { path: "/bank/list", component: ListBank, layout: 'ListBank' },
   { path: "/bank/add", component: UpdateBank, layout: 'UpdateBank' },
