@@ -625,7 +625,7 @@ export const sidebarModel = [{
           {
             id: 1,
             name: 'Tài Sản',
-            route: '/partner/list',
+            route: '/depreciation/list',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
