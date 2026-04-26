@@ -29,7 +29,10 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             filter={filter}
             setFilter={setFilter}
             className="lg:col-9"
-            add="/department/add"
+            add="/depreciation/add"
+            addName="Thêm tài sản"
+            addOne="/depreciation/add"
+            addOneName="Phân bổ khấu hao tài sản"
         >
         </GridForm>
     );
@@ -193,6 +196,7 @@ export default function ListDepreciation() {
                                     }}
                                 />
                                 <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
+                                <Column field="cycle_name" header="Kỳ khấu hao" body={(e: any) => e.cycle_name} filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="file_number" header="Số chứng từ" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="container_code" header="Diễn giải" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerName" header="Tổng tiền" filter showFilterMenu={false} filterMatchMode="contains" />
