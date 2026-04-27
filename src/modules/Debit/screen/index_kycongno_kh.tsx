@@ -356,6 +356,69 @@ export default function ListKyCongNoKH() {
             >
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
                 <b>Chi tiết công nợ chưa tạo kỳ</b>
+                <DataTableClient
+                  rowHover
+                  value={displayDataNoBill}
+                  loading={loading}
+                  dataKey="id"
+                  title="Tài khoản"
+                  filterDisplay="row"
+                  className={classNames("Custom-DataTableClient")}
+                  scrollable
+                  scrollHeight="flex"
+                  style={{ flex: 1 }}
+                  tableStyle={{ minWidth: "600px" }}
+                >
+                  {/* Custom checkbox column */}
+                  <Column
+                    header={
+                      <Checkbox
+                        checked={
+                          selectedRows.length === displayDataNoBill.length &&
+                          displayDataNoBill.length > 0
+                        }
+                        onChange={(e: any) => {
+                          if (e.checked)
+                            setSelectedRows(displayDataNoBill.map((d) => d.id));
+                          else setSelectedRows([]);
+                        }}
+                      />
+                    }
+                    body={(rowData: any) => (
+                      <Checkbox
+                        className="p-checkbox-sm"
+                        checked={selectedRows.includes(rowData.id)}
+                        onChange={(e: any) => {
+                          if (e.checked)
+                            setSelectedRows((prev) => [...prev, rowData.id]);
+                          else
+                            setSelectedRows((prev) =>
+                              prev.filter((id) => id !== rowData.id)
+                            );
+                        }}
+                        onClick={(e: any) => e.stopPropagation()} // ⚡ chặn row click
+                      />
+                    )}
+                    style={{ width: "3em" }}
+                  />
+                  <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} style={{ width: "6em" }} />
+                  <Column field="fileNumber" header="Số file" filter showFilterMenu={false} filterMatchMode="contains"  style={{ width: "6em" }} />
+                  <Column field="name" header="Nội dung" filter showFilterMenu={false} filterMatchMode="contains"  />
+                  <Column // dịch vụ
+                    body={(row: any) =>{
+                      return Helper.formatCurrency(row.thanhtien_dv.toString());
+                    }} 
+                    footer={getSumColumn("thanhtien_dv")}
+                    footerStyle={{ fontWeight: "bold" }}
+                  />
+                  <Column // chi hộ
+                    body={(row: any) =>{
+                      return Helper.formatCurrency(row.thanhtien_ch.toString());
+                    }} 
+                    footer={getSumColumn("thanhtien_ch")}
+                    footerStyle={{ fontWeight: "bold" }}
+                  />
+                </DataTableClient>
               </div>
             </SplitterPanel>
 
@@ -369,9 +432,71 @@ export default function ListKyCongNoKH() {
                 overflow: 'hidden'
               }}
             >
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                <b>Kỳ công nợ đã tạo</b>
-            </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                     <b>Kỳ công nợ đã tạo</b>
+                      <DataTableClient
+                        value={displayBill}
+                        loading={loading}
+                        dataKey="id"
+                        filterDisplay="row"
+                        className={classNames("Custom-DataTableClient")}
+                        scrollable
+                        scrollHeight="flex"
+                        style={{ flex: 1 }}
+                        tableStyle={{ minWidth: "600px" }}
+                      >
+                        <Column header="Kỳ công nợ"
+                         body={(row: any, options:any) =>{
+                            return (
+                              <>
+                                 <table>
+                                  <tbody>
+                                     <tr>
+                                        <td>Kỳ tháng: </td>
+                                        <td><b>{row.cycle_name}</b></td>
+                                     </tr>
+                                     <tr>
+                                        <td>Ngày hạch toán: </td>
+                                        <td><b>{Helper.formatDMY(row.accounting_date)}</b></td>
+                                     </tr>
+                                     <tr>
+                                        <td>Hạn thanh toán: </td>
+                                        <td><b>{Helper.formatDMY(row.expiry_date)}</b></td>
+                                     </tr>
+                                     <tr>
+                                        <td>Số tiền: </td>
+                                        <td><b>{Helper.formatCurrency(row.total_debit.toString())}</b></td>
+                                     </tr>
+                                     <tr>
+                                        <td>Thanh toán: </td>
+                                        <td><b>{Helper.formatCurrency(row.total_receipt.toString())}</b></td>
+                                     </tr>
+                                     <tr>
+                                        <td>Trạng thái:</td>
+                                        <td>
+                                          <Tag
+                                              value={row.tagStatus?.value ?? "Chưa xác định"}
+                                              severity={row.tagStatus?.severity ?? "info"}
+                                            />
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td>Thao tác: </td>
+                                        <td>
+                                            {options.rowIndex == displayBill.length - 1  && <Button icon='pi pi-trash' label="Xóa" onClick={()=>confirm(row.id)} className={classNames("btn-custom-sm")} outlined  severity="danger" size="small" raised />}
+                                            <Button icon='pi pi-eye' label="Chi tiết"  onClick={()=>viewListDetail(row.id)}  outlined  className={classNames("ml-1","btn-custom-sm")} severity="success" size="small" raised />
+                                            <Button icon='pi pi-plus' label="Bổ sung" onClick={()=>BoSungBill(row)} outlined  className={classNames("ml-1","btn-custom-sm")} severity="info" size="small" raised />
+                                        </td>
+                                     </tr>
+                                  </tbody>
+                                 </table>
+                              </>
+                            )
+                          }} 
+                         filter showFilterMenu={false} filterMatchMode="contains"
+                         headerClassName="my-title-center" />
+                    </DataTableClient>
+                  </div>
             </SplitterPanel>
              {/* Panel 2 */}
             <SplitterPanel
@@ -383,9 +508,44 @@ export default function ListKyCongNoKH() {
                 overflow: 'hidden'
               }}
             >
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                <b>Chi tiết theo kỳ công nợ</b>
-            </div>
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                     <b>Chi tiết theo kỳ công nợ</b>
+                      <DataTableClient
+                        rowHover
+                        value={displayDataHasBill}
+                        loading={loading}
+                        dataKey="id"
+                        filterDisplay="row"
+                        className={classNames("Custom-DataTableClient")}
+                        scrollable
+                        scrollHeight="flex"
+                        style={{ flex: 1 }}
+                        tableStyle={{ minWidth: "600px" }}
+                      >
+                        <Column header="Thao tác" body={(e: any) => {
+                          return <Button className="mr-2" 
+                          type='button' icon="pi pi-trash"
+                           onClick={() => confirmDebit(e.id, e.bill_id)} rounded outlined severity="danger" />
+                        }} />
+                        <Column field="accounting_date" header="Ngày lập" body={(e: any) => DateBody(e.accounting_date)} style={{ width: "6em" }} />
+                        <Column field="fileNumber" header="Số file" filter showFilterMenu={false} filterMatchMode="contains"  style={{ width: "6em" }} />
+                        <Column field="name" header="Nội dung" filter showFilterMenu={false} filterMatchMode="contains"  />
+                        <Column // dịch vụ
+                          body={(row: any) =>{
+                            return Helper.formatCurrency(row.thanhtien_dv.toString());
+                          }} 
+                          footer={getSumColumnHasBill("thanhtien_dv")}
+                          footerStyle={{ fontWeight: "bold" }}
+                        />
+                        <Column // chi hộ
+                          body={(row: any) =>{
+                            return Helper.formatCurrency(row.thanhtien_ch.toString());
+                          }} 
+                          footer={getSumColumnHasBill("thanhtien_ch")}
+                          footerStyle={{ fontWeight: "bold" }}
+                        />
+                    </DataTableClient>
+                  </div>
             </SplitterPanel>
           </Splitter>
         </div>

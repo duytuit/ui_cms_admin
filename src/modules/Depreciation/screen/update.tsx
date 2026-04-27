@@ -13,8 +13,8 @@ import { Input } from "components/common/ListForm";
 export default function UpdateDepreciation() {
     const { id } = useParams();
     const [loading, setLoading] = useState(false);
-    const [productMuaHang, setProductMuaHang] = useState<any[]>([]);
-  const [newMuaHang, setNewMuaHang] = useState<any>({vehicleId:0, amount: "", note: "",allocation:0,bill:"" });
+    const [productTaiSan, setProductTaiSan] = useState<any[]>([]);
+    const [newTaiSan, setNewTaiSan] = useState<any>({CodeNumber:"", Name: "", OriginalCost: 0,UsefulLife:0,MonthlyDepreciation:0,Note:"" });
     const [infos, setInfos] = useState<any>({type:CategoryEnum.country,isExternalDriver:0});
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -82,56 +82,76 @@ export default function UpdateDepreciation() {
           route={Number(id) ? "/depreciation/update" : "/depreciation/create"}
         >
            <div className="field">
-               <Panel header="Chi tiết mua hàng">
+               <Panel header="Chi tiết tài sản">
             <div className="formgrid grid">
-              <div className="field col-3">
+              <div className="field col-1">
                 <InputForm
                   className="w-full"
-                  id="note"
-                  value={newMuaHang.note}
+                  id="CodeNumber"
+                  value={newTaiSan.CodeNumber}
                   onChange={(e: any) =>
-                    setNewMuaHang({ ...newMuaHang, note: e.target.value })
+                    setNewTaiSan({ ...newTaiSan, CodeNumber: e.target.value })
                   }
-                  label="Diễn giải"
+                  label="Mã tài sản"
                 />
               </div>
-               <div className="field col-3">
+               <div className="field col-2">
                 <InputForm
                   className="w-full"
-                  id="amount"
-                  value={newMuaHang.amount}
+                  id="Name"
+                  value={newTaiSan.Name}
                   onChange={(e: any) =>
-                    setNewMuaHang({
-                      ...newMuaHang,
-                      amount: Helper.formatCurrency(e.target.value),
-                    })
+                    setNewTaiSan({ ...newTaiSan, Name: e.target.value })
                   }
-                  label="Số tiền"
+                  label="Tên tài sản"
                 />
               </div>
-              <div className="field col-3">
-                 {/* <Dropdown
-                    filter
-                    showClear
-                    value={newMuaHang.vehicleId}
-                    optionValue="value"
-                    optionLabel="label"
-                    options={vehiclesOptions}
-                    label="Tên xe công trình"
-                    className="w-full p-inputtext-sm"
-                    onChange={(e: any) =>
-                       {
-                          const selected = e.value; // Đây là value (ví dụ: 123)
-                          const option = vehiclesOptions.find((x: any) => x.value === selected);
-                            setNewMuaHang({ ...newMuaHang, vehicleId: selected, vehicle_info: {
-                            id: selected,
-                            name: option ? option.label : ''
-                          } })  
-                        }
-                    }
-                  /> */}
+              <div className="field col-2">
+                <InputForm
+                  className="w-full"
+                  id="OriginalCost"
+                  value={Helper.formatCurrency(newTaiSan.OriginalCost)}
+                  onChange={(e: any) =>
+                    setNewTaiSan({ ...newTaiSan, OriginalCost: e.target.value })
+                  }
+                  label="Giá trị gốc"
+                />
               </div>
-              <div className="field col-3">
+              <div className="field col-2">
+                <InputForm
+                  className="w-full"
+                  type="number"
+                  id="UsefulLife"
+                  value={newTaiSan.UsefulLife}
+                  onChange={(e: any) =>
+                    setNewTaiSan({ ...newTaiSan, UsefulLife: e.target.value })
+                  }
+                  label="Thời gian sử dụng"
+                />
+              </div>
+              <div className="field col-2">
+                <InputForm
+                  className="w-full"
+                  id="MonthlyDepreciation"
+                  value={Helper.formatCurrency(newTaiSan.MonthlyDepreciation)}
+                  onChange={(e: any) =>
+                    setNewTaiSan({ ...newTaiSan, MonthlyDepreciation: e.target.value })
+                  }
+                  label="Khấu hao hàng tháng"
+                />
+              </div>
+               <div className="field col-2">
+                <InputForm
+                  className="w-full"
+                  id="Note"
+                  value={newTaiSan.Note}
+                  onChange={(e: any) =>
+                    setNewTaiSan({ ...newTaiSan, Note: e.target.value })
+                  }
+                  label="Ghi chú"
+                />
+              </div>
+              <div className="field col-1">
                 <Button
                   type="button"
                   className="w-full p-button-normal"
@@ -139,142 +159,23 @@ export default function UpdateDepreciation() {
                   severity="success"
                   raised
                   onClick={() => {
-                    if (!newMuaHang.note || !newMuaHang.amount)
+                    if (!newTaiSan.CodeNumber || !newTaiSan.Name || !newTaiSan.OriginalCost || !newTaiSan.UsefulLife || !newTaiSan.MonthlyDepreciation)
                       return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin mua hàng" }));
-
-                    // convert price về số khi push
-                    const numericPrice = parseInt(newMuaHang.amount.replace(/\D/g, ""), 10);
-
-                    setProductMuaHang([
-                      ...productMuaHang,
-                      { ...newMuaHang, amount: numericPrice,note:newMuaHang.note,vehicleId:newMuaHang.vehicleId,vehicleName:newMuaHang.vehicle_info?.name || "" },
-                    ]);
-
-                    // reset input
-                    setNewMuaHang({vehicleId:0, note: "", amount: "",allocation:0,bill:""});
+                    setProductTaiSan([...productTaiSan, newTaiSan]);
+                    setNewTaiSan({CodeNumber:"", Name: "", OriginalCost: 0,UsefulLife:0,MonthlyDepreciation:0,Note:"" }); 
                   }}
                 />
               </div>
             </div>
 
             <div className="child-table">
-              <DataTable rowHover value={productMuaHang}>
-                <Column field="note" header="Diễn giải" />
-                <Column
-                  field="amount"
-                  header="Số tiền"
-                  body={(row: any) => Helper.formatCurrency(row.amount.toString())}
-                  footer={Helper.formatCurrency(
-                    productMuaHang
-                      .reduce((sum, item) => sum + (item.amount || 0), 0)
-                      .toString()
-                  )}
-                  footerStyle={{ fontWeight: "bold" }}
-                />
-                 <Column
-                  header="VAT"
-                  body={(_: any, opt: any) => (
-                    <Dropdown
-                      value={productMuaHang[opt.rowIndex].vat || 0}
-                      options={[]}
-                      optionValue="vat"
-                      optionLabel="name"
-                      className="p-inputtext-sm p-dropdown-sm"
-                      onChange={(e: any) => {
-                        const vatValue = Number(e.value) || 0;
-                        const updated = [...productMuaHang];
-                        const row = { ...updated[opt.rowIndex] };
-                        // ✅ Chuyển price về số nguyên, loại bỏ ký tự không phải số
-                        const rawPrice =
-                          typeof row.amount === "string"
-                            ? parseInt(row.amount.replace(/\D/g, ""), 10) || 0
-                            : Number(row.amount) || 0;
-                        // ✅ Nếu có quantity thì nhân thêm, mặc định là 1
-                        const qty = Number(row.quantity) || 1;
-                        // ✅ Tính thành tiền (price * qty * (1 + vat/100))
-                        const thanhTien = Math.round(rawPrice * qty * (1 + vatValue / 100));
-                        updated[opt.rowIndex] = {
-                          ...row,
-                          vat: vatValue,
-                          thanhTien: thanhTien
-                        };
-                        setProductMuaHang(updated);
-                      }}
-                      required
-                    />
-                  )}
-                />
-
-               <Column
-                  field="thanhTien"
-                  header="Thành tiền"
-                  body={(_: any, opt: any) => {
-                    const row = productMuaHang[opt.rowIndex];
-                    // Chuyển amount về số thực, giữ decimal
-                    const amount = typeof row.amount === "string"
-                      ? parseFloat(row.amount.replace(/[^0-9.]/g, "")) || 0
-                      : Number(row.amount) || 0;
-                    const vat = Number(row.vat) || 0;
-                    // Tính thành tiền
-                    const thanhTien = Math.round(amount * (1 + vat / 100));
-                    // ✅ Cập nhật luôn vào state
-                    if (row.thanhTien !== thanhTien) {
-                      const updated = [...productMuaHang];
-                      updated[opt.rowIndex] = { ...row, thanhTien };
-                      setProductMuaHang(updated);
-                    }
-                    return Helper.formatCurrency(thanhTien.toString());
-                  }}
-                  footer={Helper.formatCurrency(
-                    productMuaHang
-                      .reduce((sum, item) => {
-                        const amount = typeof item.amount === "string"
-                          ? parseFloat(item.amount.replace(/[^0-9.]/g, "")) || 0
-                          : Number(item.amount) || 0;
-
-                        const vat = Number(item.vat) || 0;
-                        return Math.round(sum + amount * (1 + vat / 100));
-                      }, 0)
-                      .toString()
-                  )}
-                  footerStyle={{ fontWeight: "bold" }}
-                />
-                <Column field="bill" header="Số hóa đơn" 
-                 body={(_: any, opt: any) => (
-                    <Input
-                      className="w-full input-sm"
-                      value={productMuaHang[opt.rowIndex].bill || ""}
-                      onChange={(e: any) => {
-                        const updated = [...productMuaHang];
-                        updated[opt.rowIndex] = {
-                          ...updated[opt.rowIndex],
-                          bill: e.target.value,
-                        };
-                        setProductMuaHang(updated);
-                      }}
-                    />
-                  )}
-                />
-                <Column field="vehicleName" header="Tên xe công trình" />
-                <Column field="allocation" header="Là chi phí phân bổ" 
-                  body={(row: any) => {
-                    return(
-                      <Checkbox
-                        className="p-checkbox-sm"
-                        checked={row.allocation === 1}
-                        onChange={(e: any) => {
-                          const updated = [...productMuaHang];
-                          const rowData = { ...updated.find((item) => item === row) };
-                          rowData.allocation = e.checked ? 1 : 0;
-                          const index = updated.findIndex((item) => item === row);
-                          updated[index] = rowData;
-                          setProductMuaHang(updated);
-                        }}
-                        onClick={(e: any) => e.stopPropagation()}
-                      />
-                    );
-                  }}  
-                />
+              <DataTable rowHover value={productTaiSan}>
+                <Column field="CodeNumber" header="Mã tài sản" />
+                <Column field="Name" header="Tên tài sản" />
+                <Column field="OriginalCost" header="Giá trị gốc" />
+                <Column field="UsefulLife" header="Thời gian sử dụng" />
+                <Column field="MonthlyDepreciation" header="Khấu hao hàng tháng" />
+                <Column field="Note" header="Ghi chú" />
                 <Column
                   header="Thao tác"
                   body={(_: any, opt: any) => (
@@ -284,7 +185,7 @@ export default function UpdateDepreciation() {
                       severity="danger"
                       text
                       onClick={() =>
-                        setProductMuaHang(productMuaHang.filter((_, i) => i !== opt.rowIndex))
+                        setProductTaiSan(productTaiSan.filter((_, i) => i !== opt.rowIndex))
                       }
                     />
                   )}

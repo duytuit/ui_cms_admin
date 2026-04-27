@@ -6,14 +6,16 @@ import { CategoryEnum } from "utils/type.enum";
 import { classNames } from "primereact/utils";
 import { useListDepreciation } from "../service";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { Button, Checkbox, DataTable } from "components/uiCore";
+import { Button, Checkbox, DataTable, Dialog } from "components/uiCore";
 import { delMultiDebit } from "modules/Debit/api";
 import { Helper } from "utils/helper";
+import UpdateKyCongNoKH from "modules/Debit/screen/update_kycongno_kh";
+import UpdatePhanBoKhauHao from "modules/Debit/screen/update_phanbo_khauhao";
 
 // ✅ Component Header lọc dữ liệu
-const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
+const Header = ({ _setParamsPaginator, _paramsPaginator ,_displayData,refresh}: any) => {
     const [filter, setFilter] = useState({ name: "" });
-
+    const [visible, setVisible] = useState(false);
     useEffect(() => {
         // Mỗi khi filter thay đổi => cập nhật params
         _setParamsPaginator((prev: any) => ({
@@ -21,20 +23,40 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             keyword: filter.name,
         }));
     }, [filter.name]);
-
+    const openDialogAdd = (e:any) => {
+       setVisible(true)
+    };
+    const handleModalClose = () => {
+       setVisible(false);
+       refresh?.();
+    };
     return (
-        <GridForm
-            paramsPaginator={_paramsPaginator}
-            setParamsPaginator={_setParamsPaginator}
-            filter={filter}
-            setFilter={setFilter}
-            className="lg:col-9"
-            add="/depreciation/add"
-            addName="Thêm tài sản"
-            addOne="/depreciation/add"
-            addOneName="Phân bổ khấu hao tài sản"
-        >
-        </GridForm>
+        <>
+            <GridForm
+                paramsPaginator={_paramsPaginator}
+                setParamsPaginator={_setParamsPaginator}
+                filter={filter}
+                setFilter={setFilter}
+                className="lg:col-9"
+                add="/depreciation/add"
+                addName="Thêm tài sản"
+                openDialogAdd={openDialogAdd}
+                openDialogAddName="Phân bổ khấu hao tài sản"
+            >
+            </GridForm>
+            <Dialog
+                position="top"
+                dismissableMask
+                visible={visible}
+                onHide={handleModalClose}
+                style={{ width: "30vw", top: "30px" }}
+            >
+                <p className="m-0">
+                    {_displayData && <UpdatePhanBoKhauHao displayData={_displayData} onClose={handleModalClose} ></UpdatePhanBoKhauHao>}
+                </p>
+            </Dialog>
+        </>
+    
     );
 };
 
@@ -70,7 +92,10 @@ export default function ListDepreciation() {
 
     return (
         <div className="card">
-            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
+            <Header 
+            _paramsPaginator={paramsPaginator} 
+            _setParamsPaginator={setParamsPaginator}
+            _displayData={displayData} />
              <div style={{ height: 'calc(100vh - 8rem)' }}>
                 <Splitter style={{ height: '100%', width: '100%' }}>
                 {/* Panel 1 */}
@@ -200,7 +225,6 @@ export default function ListDepreciation() {
                                 <Column field="file_number" header="Số chứng từ" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="container_code" header="Diễn giải" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="customerName" header="Tổng tiền" filter showFilterMenu={false} filterMatchMode="contains" />
-                                <Column field="sumNH" body={(row: any) => Helper.formatCurrency(row.sumNH.toString())} header="Tổng phí nâng hạ" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column header="Người cập nhật" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
                             </DataTableClient>
