@@ -4,8 +4,7 @@ import { createPortal } from "react-dom";
 interface CalendarProps {
   value?: string | null;
   onChange?: (date: string | null) => void;
-  dateFormat?: string; // ✅ bắt buộc có
-  showButtonBar?: boolean;
+  dateFormat?: string;
   className?: string;
 }
 
@@ -13,7 +12,6 @@ export const MyCalendar = ({
   value,
   onChange,
   dateFormat = "dd/mm/yyyy",
-  showButtonBar = true,
   className = "",
 }: CalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(
@@ -28,10 +26,21 @@ export const MyCalendar = ({
 
   const formatDate = (date: Date | null) => {
     if (!date) return "";
-    const d = date.getDate().toString().padStart(2, "0");
-    const m = (date.getMonth() + 1).toString().padStart(2, "0");
+
+    const d = String(date.getDate()).padStart(2, "0");
+    const m = String(date.getMonth() + 1).padStart(2, "0");
     const y = date.getFullYear();
-    return `${d}/${m}/${y}`;
+
+    switch (dateFormat.toLowerCase()) {
+      case "dd/mm/yyyy":
+        return `${d}/${m}/${y}`;
+      case "mm/dd/yyyy":
+        return `${m}/${d}/${y}`;
+      case "yyyy-mm-dd":
+        return `${y}-${m}-${d}`;
+      default:
+        return `${d}/${m}/${y}`;
+    }
   };
 
   const handleSelect = (date: Date | null) => {
@@ -51,22 +60,19 @@ export const MyCalendar = ({
 
   return (
     <>
-      <div style={{ position: "relative", width: "100%" }}>
-        <input
-          ref={inputRef}
-          value={formatDate(selectedDate)}
-          readOnly
-          onClick={() => setOpen(true)}
-          className={className}
-        />
-          <span
+      <input
+        ref={inputRef}
+        value={formatDate(selectedDate)}
+        readOnly
+        onClick={() => setOpen(true)}
+        className={className}
+      />
+        <span
           style={{ marginLeft: -25, cursor: "pointer" }}
           onClick={() => setOpen(true)}
         >
           📅
         </span>
-      </div>
-
       {open &&
         createPortal(
           <CalendarPopup
@@ -80,6 +86,7 @@ export const MyCalendar = ({
     </>
   );
 };
+
 interface PopupProps {
   anchorRef: React.RefObject<HTMLInputElement>;
   selectedDate: Date | null;
@@ -103,19 +110,49 @@ const CalendarPopup = ({
   );
 
   const [pos, setPos] = useState({ top: 0, left: 0 });
+  const [placement, setPlacement] = useState<"top" | "bottom">("bottom");
+  const [arrowLeft, setArrowLeft] = useState(20);
+
   const ref = useRef<HTMLDivElement>(null);
 
-  // 🔥 Position chuẩn + follow scroll
+  // 🔥 POSITION LOGIC
   useEffect(() => {
     const update = () => {
-      if (!anchorRef.current) return;
+      if (!anchorRef.current || !ref.current) return;
 
       const rect = anchorRef.current.getBoundingClientRect();
+      const popup = ref.current;
 
-      setPos({
-        top: rect.bottom + 6,
-        left: rect.left,
-      });
+      const popupW = popup.offsetWidth;
+      const popupH = popup.offsetHeight;
+
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      let top = 0;
+      let left = rect.left;
+
+      // flip top/bottom
+      const spaceBelow = vh - rect.bottom;
+      const spaceAbove = rect.top;
+
+      if (spaceBelow < popupH && spaceAbove > popupH) {
+        top = rect.top - popupH - 8;
+        setPlacement("top");
+      } else {
+        top = rect.bottom + 8;
+        setPlacement("bottom");
+      }
+
+      // tránh tràn ngang
+      if (left + popupW > vw - 8) left = vw - popupW - 8;
+      if (left < 8) left = 8;
+
+      // arrow
+      const arrow = rect.left + rect.width / 2 - left;
+      setArrowLeft(arrow);
+
+      setPos({ top, left });
     };
 
     update();
@@ -129,7 +166,7 @@ const CalendarPopup = ({
     };
   }, [anchorRef]);
 
-  // 🔥 click outside
+  // click ngoài
   useEffect(() => {
     const handle = (e: MouseEvent) => {
       if (
@@ -147,7 +184,7 @@ const CalendarPopup = ({
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const isSame = (d: number) =>
+  const isSelected = (d: number) =>
     selectedDate &&
     d === selectedDate.getDate() &&
     month === selectedDate.getMonth() &&
@@ -165,15 +202,32 @@ const CalendarPopup = ({
         position: "fixed",
         top: pos.top,
         left: pos.left,
+        zIndex: 9999,
         background: "#fff",
         border: "1px solid #ddd",
-        padding: 10,
-        zIndex: 9999,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
         borderRadius: 6,
+        padding: 10,
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        visibility: pos.top === 0 ? "hidden" : "visible",
       }}
     >
-      {/* Header */}
+      {/* arrow */}
+      <div
+        style={{
+          position: "absolute",
+          left: arrowLeft,
+          transform: "translateX(-50%)",
+          width: 0,
+          height: 0,
+          borderLeft: "6px solid transparent",
+          borderRight: "6px solid transparent",
+          ...(placement === "bottom"
+            ? { top: -6, borderBottom: "6px solid #fff" }
+            : { bottom: -6, borderTop: "6px solid #fff" }),
+        }}
+      />
+
+      {/* header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5, gap: 5 }}>
         <button onClick={() => setMonth((m) => (m === 0 ? 11 : m - 1))}>
           {"<"}
@@ -198,7 +252,7 @@ const CalendarPopup = ({
         </button>
       </div>
 
-      {/* Days */}
+      {/* days */}
       <div
         style={{
           display: "grid",
@@ -216,12 +270,12 @@ const CalendarPopup = ({
               padding: 6,
               cursor: "pointer",
               borderRadius: 4,
-              background: isSame(d)
+              background: isSelected(d)
                 ? "#3f51b5"
                 : isToday(d)
                 ? "#eee"
                 : "transparent",
-              color: isSame(d) ? "#fff" : "#000",
+              color: isSelected(d) ? "#fff" : "#000",
             }}
           >
             {d}
@@ -229,8 +283,14 @@ const CalendarPopup = ({
         ))}
       </div>
 
-      {/* Footer */}
-      <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between" }}>
+      {/* footer */}
+      <div
+        style={{
+          marginTop: 8,
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <button onClick={() => onSelect(today)}>Today</button>
         <button onClick={onClose}>Close</button>
       </div>
