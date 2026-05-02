@@ -194,7 +194,23 @@ export default function ListBaoCaoTaiKhoan() {
             />
         </div>
     );
+ const getSumColumn = (field: string) => {
+        const filtered = (displayData??[]).filter((item: any) => {
+            return Object.entries(filters).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
 
+        const sum = filtered.reduce((acc: any, item: any) => {
+            const val = parseInt(item[field]?.toString().replace(/\D/g, ""), 10) || 0;
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
     // Mỗi khi filter thay đổi => cập nhật params
   const applyFilters = (rows: any[]) => {
     return rows.filter((row) => {
@@ -440,12 +456,16 @@ export default function ListBaoCaoTaiKhoan() {
              {
                 return Helper.formatCurrency(row.thu.toString())
              }}
+             footer={getSumColumn("thu")}
+             footerStyle={{ fontWeight: "bold" }}
              filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column header="Chi"  
             body={(row: any) =>
              {
                 return Helper.formatCurrency(row.chi.toString())
              }}
+              footer={getSumColumn("chi")}  
+              footerStyle={{ fontWeight: "bold" }}
              filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="ton" header="Tồn" 
               body={(row: any) =>
