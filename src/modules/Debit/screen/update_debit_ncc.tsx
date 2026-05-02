@@ -69,14 +69,14 @@ export default function UpdateDebitNCC({ debits, onClose}: { debits: any, onClos
             <div className="grid">
               <div className="col-12">
                 <div className="formgrid grid">
-                  <div className="field col-3">
+                  {/* <div className="field col-3">
                       <div>Ngày hạch toán</div>
                       <MyCalendar dateFormat="dd/mm/yy"
                       value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
                       onChange={(e: any) =>
                         setInfos({ ...infos, accountingDate: e })}
                       className={classNames("w-full", "p-inputtext", "input-form-sm")} />
-                  </div>
+                  </div> */}
                   <div className="field col-2">
                     <div>VAT</div>
                     <Dropdown

@@ -114,7 +114,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,selected,refresh,refresh
         header="Tạo công nợ khách hàng không lập file"
         visible={visible}
         onHide={() => setVisible(false)}
-        style={{ width: "70vw" }}
+        style={{ width: "85vw" }}
       >
         <p className="m-0">
           {

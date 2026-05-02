@@ -2,6 +2,28 @@ import { customAlphabet } from 'nanoid';
 // import * as crypto from 'crypto';
 
 export class Helper {
+  static debugParents(el: HTMLElement | null) {
+  let current = el;
+  const result = [];
+
+  while (current) {
+    const style = window.getComputedStyle(current);
+
+    result.push({
+      tag: current.tagName,
+      class: current.className,
+      id: current.id,
+      position: style.position,
+      zIndex: style.zIndex,
+      overflow: style.overflow,
+      transform: style.transform,
+    });
+
+    current = current.parentElement;
+  }
+
+  console.table(result);
+}
   static convertToSlug(Text: any) {
     return Text.toLowerCase()
       .replace(/ /g, '-')

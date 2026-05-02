@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
+
 interface CalendarProps {
-  value?: string | null; // trả về string
+  value?: string | null;
   onChange?: (date: string | null) => void;
-  dateFormat?: string;
+  dateFormat?: string; // ✅ bắt buộc có
   showButtonBar?: boolean;
   className?: string;
 }
@@ -14,18 +16,15 @@ export const MyCalendar = ({
   showButtonBar = true,
   className = "",
 }: CalendarProps) => {
-
   const [selectedDate, setSelectedDate] = useState<Date | null>(
     value ? new Date(value) : null
   );
+  const [open, setOpen] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Sync lại khi parent đổi value
     setSelectedDate(value ? new Date(value) : null);
   }, [value]);
-
-  const [showPopup, setShowPopup] = useState(false);
-  const inputRef = useRef<HTMLInputElement | null>(null);
 
   const formatDate = (date: Date | null) => {
     if (!date) return "";
@@ -35,210 +34,206 @@ export const MyCalendar = ({
     return `${d}/${m}/${y}`;
   };
 
-  const handleDateSelect = (date: Date | null) => {
+  const handleSelect = (date: Date | null) => {
     setSelectedDate(date);
+
     if (date) {
       const y = date.getFullYear();
       const m = String(date.getMonth() + 1).padStart(2, "0");
       const d = String(date.getDate()).padStart(2, "0");
-      onChange?.(`${y}-${m}-${d}`);   // trả string yyyy-MM-dd
+      onChange?.(`${y}-${m}-${d}`);
     } else {
       onChange?.(null);
     }
-    setShowPopup(false);
+
+    setOpen(false);
   };
 
   return (
-    <div className="custom-calendar" style={{ position: "relative", display: "inline-block", width: "100%" }}>
-      <div style={{ display: "block", position: "relative" }}>
+    <>
+      <div style={{ position: "relative", width: "100%" }}>
         <input
           ref={inputRef}
-          type="text"
           value={formatDate(selectedDate)}
           readOnly
-          onClick={() => setShowPopup(!showPopup)}
-          className={`calendar-input ${className}`}
-          style={{ cursor: "pointer", border: "1px" }}
+          onClick={() => setOpen(true)}
+          className={className}
         />
-        <span
+          <span
           style={{ marginLeft: -25, cursor: "pointer" }}
-          onClick={() => setShowPopup(!showPopup)}
+          onClick={() => setOpen(true)}
         >
           📅
         </span>
       </div>
 
-      {showPopup && (
-        <CalendarPopup
-          selectedDate={selectedDate}
-          onSelectDate={handleDateSelect}
-          onClose={() => setShowPopup(false)}
-          showButtonBar={showButtonBar}
-          className={`${className}-popup`}
-          targetRef={inputRef}
-        />
-      )}
-    </div>
+      {open &&
+        createPortal(
+          <CalendarPopup
+            anchorRef={inputRef}
+            selectedDate={selectedDate}
+            onSelect={handleSelect}
+            onClose={() => setOpen(false)}
+          />,
+          document.body
+        )}
+    </>
   );
 };
-interface CalendarPopupProps {
+interface PopupProps {
+  anchorRef: React.RefObject<HTMLInputElement>;
   selectedDate: Date | null;
-  onSelectDate: (date: Date | null) => void;
-  onClose: () => void; // 🟢 thêm prop
-  showButtonBar?: boolean;
-  className?: string;
-  targetRef?: React.RefObject<HTMLInputElement>;
+  onSelect: (date: Date | null) => void;
+  onClose: () => void;
 }
 
-export const CalendarPopup = ({
+const CalendarPopup = ({
+  anchorRef,
   selectedDate,
-  onSelectDate,
+  onSelect,
   onClose,
-  showButtonBar = true,
-  className = "",
-  targetRef,
-}: CalendarPopupProps) => {
+}: PopupProps) => {
   const today = new Date();
-  const [currentMonth, setCurrentMonth] = useState(today.getMonth());
-  const [currentYear, setCurrentYear] = useState(today.getFullYear());
-  const [position, setPosition] = useState({ top: 0, left: 0 });
-  const popupRef = useRef<HTMLDivElement | null>(null);
-  // 🟢 Đóng khi click ra ngoài
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      const popupEl = popupRef.current;
-      const targetEl = targetRef?.current;
-      const clickedEl = event.target as Node | null;
 
+  const [month, setMonth] = useState(
+    selectedDate?.getMonth() ?? today.getMonth()
+  );
+  const [year, setYear] = useState(
+    selectedDate?.getFullYear() ?? today.getFullYear()
+  );
+
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const ref = useRef<HTMLDivElement>(null);
+
+  // 🔥 Position chuẩn + follow scroll
+  useEffect(() => {
+    const update = () => {
+      if (!anchorRef.current) return;
+
+      const rect = anchorRef.current.getBoundingClientRect();
+
+      setPos({
+        top: rect.bottom + 6,
+        left: rect.left,
+      });
+    };
+
+    update();
+
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [anchorRef]);
+
+  // 🔥 click outside
+  useEffect(() => {
+    const handle = (e: MouseEvent) => {
       if (
-        popupEl &&
-        !popupEl.contains(clickedEl) &&
-        targetEl &&
-        !targetEl.contains(clickedEl)
+        ref.current &&
+        !ref.current.contains(e.target as Node) &&
+        !anchorRef.current?.contains(e.target as Node)
       ) {
-        onClose(); // 🟢 Gọi callback để đóng popup
+        onClose();
       }
     };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [onClose, targetRef]);
-  // 📍 Đặt vị trí popup
-useEffect(() => {
-  if (targetRef?.current && popupRef.current?.offsetParent) {
-    const inputEl = targetRef.current;
-    const parentEl = popupRef.current.offsetParent as HTMLElement;
-    const inputRect = inputEl.getBoundingClientRect();
-    const parentRect = parentEl.getBoundingClientRect();
+    document.addEventListener("mousedown", handle);
+    return () => document.removeEventListener("mousedown", handle);
+  }, []);
 
-    // 🧭 Tính vị trí tương đối với container (MyCalendar)
-    const top = inputRect.bottom - parentRect.top + 4;
-    const left = inputRect.left - parentRect.left;
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-    setPosition({ top, left });
-  }
-}, [targetRef]);
+  const isSame = (d: number) =>
+    selectedDate &&
+    d === selectedDate.getDate() &&
+    month === selectedDate.getMonth() &&
+    year === selectedDate.getFullYear();
 
-  // 🗓 Sinh ngày
-  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-  const years = Array.from({ length: 201 }, (_, i) => 1900 + i);
-
-  const prevMonth = (e:any) => {
-    e.preventDefault();
-    if (currentMonth === 0) {
-      setCurrentMonth(11);
-      setCurrentYear(currentYear - 1);
-    } else setCurrentMonth(currentMonth - 1);
-  };
-
-  const nextMonth = (e:any) => {
-      e.preventDefault();
-    if (currentMonth === 11) {
-      setCurrentMonth(0);
-      setCurrentYear(currentYear + 1);
-    } else setCurrentMonth(currentMonth + 1);
-  };
-
-  const handleToday = () => onSelectDate(today);
-  const handleClose = () => onClose(); // 🟢 thay vì onSelectDate(selectedDate)
+  const isToday = (d: number) =>
+    d === today.getDate() &&
+    month === today.getMonth() &&
+    year === today.getFullYear();
 
   return (
     <div
-      ref={popupRef}
-      className={`calendar-popup ${className}`}
+      ref={ref}
       style={{
-        position: "absolute",
-        top: position.top,
-        left: position.left,
+        position: "fixed",
+        top: pos.top,
+        left: pos.left,
         background: "#fff",
-        border: "1px solid #ccc",
-        borderRadius: 4,
+        border: "1px solid #ddd",
         padding: 10,
         zIndex: 9999,
-        minWidth: 220,
-        boxShadow: "0 4px 10px rgba(0,0,0,0.15)",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+        borderRadius: 6,
       }}
     >
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5, gap: 5 }}>
-        <button onClick={prevMonth}>{"<"}</button>
-        <select value={currentMonth} onChange={(e) => setCurrentMonth(Number(e.target.value))}>
-          {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-            <option key={m} value={m - 1}>
-              {m}
+        <button onClick={() => setMonth((m) => (m === 0 ? 11 : m - 1))}>
+          {"<"}
+        </button>
+
+        <select value={month} onChange={(e) => setMonth(+e.target.value)}>
+          {Array.from({ length: 12 }).map((_, i) => (
+            <option key={i} value={i}>
+              {i + 1}
             </option>
           ))}
         </select>
-        <select value={currentYear} onChange={(e) => setCurrentYear(Number(e.target.value))}>
-          {years.map((y) => (
-            <option key={y} value={y}>
-              {y}
-            </option>
+
+        <select value={year} onChange={(e) => setYear(+e.target.value)}>
+          {Array.from({ length: 201 }, (_, i) => 1900 + i).map((y) => (
+            <option key={y}>{y}</option>
           ))}
         </select>
-        <button onClick={nextMonth}>{">"}</button>
+
+        <button onClick={() => setMonth((m) => (m === 11 ? 0 : m + 1))}>
+          {">"}
+        </button>
       </div>
 
       {/* Days */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 30px)", gap: 2, justifyContent: "center" }}>
-        {days.map((day) => {
-          const isSelected =
-            selectedDate &&
-            selectedDate.getDate() === day &&
-            selectedDate.getMonth() === currentMonth &&
-            selectedDate.getFullYear() === currentYear;
-
-          const isToday =
-            today.getDate() === day &&
-            today.getMonth() === currentMonth &&
-            today.getFullYear() === currentYear;
-
-          return (
-            <div
-              key={day}
-              onClick={() => onSelectDate(new Date(currentYear, currentMonth, day))}
-              style={{
-                textAlign: "center",
-                padding: 4,
-                cursor: "pointer",
-                borderRadius: "3px",
-                backgroundColor: isSelected ? "#3f51b5" : isToday ? "#eee" : "transparent",
-                color: isSelected ? "#fff" : "#000",
-              }}
-            >
-              {day}
-            </div>
-          );
-        })}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 32px)",
+          gap: 4,
+          marginTop: 8,
+        }}
+      >
+        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
+          <div
+            key={d}
+            onClick={() => onSelect(new Date(year, month, d))}
+            style={{
+              textAlign: "center",
+              padding: 6,
+              cursor: "pointer",
+              borderRadius: 4,
+              background: isSame(d)
+                ? "#3f51b5"
+                : isToday(d)
+                ? "#eee"
+                : "transparent",
+              color: isSame(d) ? "#fff" : "#000",
+            }}
+          >
+            {d}
+          </div>
+        ))}
       </div>
 
-      {showButtonBar && (
-        <div style={{ marginTop: 6, display: "flex", justifyContent: "space-between" }}>
-          <button onClick={handleToday}>Today</button>
-          <button onClick={handleClose}>Close</button>
-        </div>
-      )}
+      {/* Footer */}
+      <div style={{ marginTop: 8, display: "flex", justifyContent: "space-between" }}>
+        <button onClick={() => onSelect(today)}>Today</button>
+        <button onClick={onClose}>Close</button>
+      </div>
     </div>
   );
 };
