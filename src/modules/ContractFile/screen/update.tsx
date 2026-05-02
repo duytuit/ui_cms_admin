@@ -210,7 +210,6 @@ export default function UpdateContractFile() {
                   onChange={(e: any) =>
                     setInfos({ ...infos, declarationType: e.target.value })
                   }
-                  required
                 />
               </div>
               <div className="field col-3">
