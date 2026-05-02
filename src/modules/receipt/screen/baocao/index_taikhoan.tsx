@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Column, DataTableClient, DateBody, } from "components/common/DataTable";
-import { Dropdown, GridForm } from "components/common/ListForm";
+import { Dropdown, GridForm, Input } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { classNames } from "primereact/utils";
 import { MyCalendar } from "components/common/MyCalendar";
@@ -10,6 +10,8 @@ import { Helper } from "utils/helper";
 import { FilterMatchMode } from "primereact/api";
 import { useListBankWithState, useListExpenseWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { useListReceiptSoQuy, useListReceiptSoQuyDauKy } from "modules/receipt/service";
+import { ColumnGroup } from "primereact/columngroup";
+import { Row } from "primereact/row";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,dunoDK}: any) => {
@@ -87,11 +89,13 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,dunoDK}: any) => {
 export default function ListBaoCaoTaiKhoan() {
   const { handleParamUrl } = useHandleParamUrl();
   const [filters, setFilters] = useState({
-      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      code_receipt: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      note: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      tendoituong: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      lydo: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      code_receipt:"",
+      note:"",
+      tendoituong:"",
+      lydo:"",
+      thu:"",
+      chi:"",
+      ton:""
       });
   const [displayData, setDisplayData] = useState<any[]>([]);
   const [dunoDK, setdunoDK] = useState<number>(0);
@@ -116,6 +120,195 @@ export default function ListBaoCaoTaiKhoan() {
     params: paramsPaginator,
     debounce: 500,
   });
+  // --- Header template with filter ---
+    const codeReceiptHeader = (
+        <div className="py-1">
+            <Input
+              value={filters.code_receipt}
+              onChange={(e:any) => setFilters({ ...filters, code_receipt: e.target.value })}
+              size="small"
+              className={classNames("input-sm")}
+            />
+        </div>
+    );
+    const noteHeader = (
+        <div className="py-1">
+            <Input
+              value={filters.note}
+              onChange={(e:any) => setFilters({ ...filters, note: e.target.value })}
+              size="small"
+              className={classNames("input-sm")}
+            />
+        </div>
+    );
+    const tendoituongHeader = (
+        <div className="py-1">
+            <Input
+              value={filters.tendoituong}
+              onChange={(e:any) => setFilters({ ...filters, tendoituong: e.target.value })}
+              size="small"
+              className={classNames("input-sm")}
+            />
+        </div>
+    );
+    const lydoHeader = (
+        <div className="py-1">
+            <Input
+              value={filters.lydo}
+              onChange={(e:any) => setFilters({ ...filters, lydo: e.target.value })}
+              size="small"
+              className={classNames("input-sm")}
+            />
+        </div>
+    );
+    const thuHeader = (
+        <div className="py-1">
+            <Input
+              value={filters.thu}
+              onChange={(e:any) => setFilters({ ...filters, thu: e.target.value })}
+              label="><=giá trị"
+              size="small"
+              className={classNames("input-sm")}
+            />
+        </div>
+    );
+    const chiHeader = (
+        <div className="py-1">
+            <Input
+              value={filters.chi}
+              onChange={(e:any) => setFilters({ ...filters, chi: e.target.value })}
+              label="><=giá trị"
+              size="small"
+              className={classNames("input-sm")}
+            />
+        </div>
+    );
+    const tonHeader = (
+        <div className="py-1">
+            <Input
+              value={filters.ton}
+              onChange={(e:any) => setFilters({ ...filters, ton: e.target.value })}
+              label="><=giá trị"
+              size="small"
+              className={classNames("input-sm")}
+            />
+        </div>
+    );
+
+    // Mỗi khi filter thay đổi => cập nhật params
+  const applyFilters = (rows: any[]) => {
+    return rows.filter((row) => {
+      const f = filters;
+      return (
+        (f.code_receipt
+          ? row.code_receipt
+              ?.toLowerCase()
+              .includes(f.code_receipt.toLowerCase())
+          : true) &&
+        (f.thu.trim()
+          ? (() => {
+              const input = f.thu.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = ">";
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              } else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case ">":
+                  return row.thu > num;
+                case ">=":
+                  return row.thu >= num;
+                case "=":
+                case "==":
+                  return row.thu === num;
+                case "<=":
+                  return row.thu <= num;
+                case "<":
+                  return row.thu < num;
+                default:
+                  return row.thu > num;
+              }
+            })()
+          : true)&&
+        (f.chi.trim()
+          ? (() => {
+              const input = f.chi.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = ">";
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              } else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case ">":
+                  return row.chi > num;
+                case ">=":
+                  return row.chi >= num;
+                case "=":
+                case "==":
+                  return row.chi === num;
+                case "<=":
+                  return row.chi <= num;
+                case "<":
+                  return row.chi < num;
+                default:
+                  return row.chi > num;
+              }
+            })()
+          : true)&&
+        (f.ton.trim()
+          ? (() => {
+              const input = f.ton.trim();
+              const match = input.match(/^([><=!]+)\s*(\d+(?:\.\d+)?)$/);
+              let operator = ">";
+              let num = 0;
+              if (match) {
+                operator = match[1];
+                num = parseFloat(match[2]);
+              } else {
+                num = parseFloat(input);
+                if (isNaN(num)) return true;
+              }
+              switch (operator) {
+                case ">":
+                  return row.ton > num;
+                case ">=":
+                  return row.ton >= num;
+                case "=":
+                case "==":
+                  return row.ton === num;
+                case "<=":
+                  return row.ton <= num;
+                case "<":
+                  return row.ton < num;
+                default:
+                  return row.ton > num;
+              }
+            })()
+          : true)&&
+        (f.note
+          ? row.note?.toLowerCase().includes(f.note.toLowerCase())
+          : true) &&
+        (f.tendoituong
+          ? row.tendoituong
+              ?.toLowerCase()
+              .includes(f.tendoituong.toLowerCase())
+          : true) &&
+        (f.lydo
+          ? row.lydo?.toLowerCase().includes(f.lydo.toLowerCase())
+          : true)
+      );
+    });
+  };
   // ✅ Client-side pagination
   useEffect(() => {
     if (!data) return;
@@ -128,6 +321,7 @@ export default function ListBaoCaoTaiKhoan() {
       let ton = soDuDauKy;
 
       const dataRows = [...(data?.data || [])];
+     
 
       // 1️⃣ sort ASC để tính tồn
       dataRows.sort((a: any, b: any) => {
@@ -165,6 +359,8 @@ export default function ListBaoCaoTaiKhoan() {
 
           return {
               ...row,
+              thu: row.iecat_type === 0 ? total : 0,
+              chi: row.iecat_type === 1 ? total : 0,
               ton,
               tendoituong,
               lydo: _lydochi?.name,
@@ -172,19 +368,8 @@ export default function ListBaoCaoTaiKhoan() {
               stk: _bank?.account_number,
           };
       });
-
-      // 2️⃣ sort DESC để hiển thị
-      // withTon.sort((a: any, b: any) => {
-      //     const dateDiff =
-      //         new Date(b.accounting_date).getTime() -
-      //         new Date(a.accounting_date).getTime();
-
-      //     if (dateDiff !== 0) return dateDiff;
-
-      //     return b.id - a.id; // 👈 tie-break bằng id
-      // });
-      // console.log(withTon);
-      setDisplayData(withTon);
+      const filteredData = applyFilters(withTon);
+      setDisplayData(filteredData);
   }
    
   }, [ data,
@@ -194,8 +379,37 @@ export default function ListBaoCaoTaiKhoan() {
    DMQuy,
    DMBank,
    employees,
-   listPartner]);
-
+   listPartner,filters]);
+ const headerGroup = (
+        <ColumnGroup>
+            <Row>
+                <Column />
+                <Column header="Ngày hạch toán" />
+                <Column header="Số tài khoản" />
+                <Column header="Số phiếu" />
+                <Column header="Diễn giải" />
+                <Column header="Đối tượng" />
+                <Column header="Tên quỹ" />
+                <Column header="Lý do" />
+                <Column header="Thu" />
+                <Column header="Chi" />
+                <Column header="Tồn" />
+            </Row>
+             <Row>
+                <Column />
+                <Column />
+                <Column />
+                <Column header={codeReceiptHeader}/>
+                <Column header={noteHeader}/>
+                <Column header={tendoituongHeader}/>
+                <Column />
+                <Column header={lydoHeader}/>
+                <Column header={thuHeader}/>
+                <Column header={chiHeader}/>
+                <Column header={tonHeader}/>
+            </Row>
+        </ColumnGroup>
+    );
   return (
     <>
       <div className="card">
@@ -208,8 +422,7 @@ export default function ListBaoCaoTaiKhoan() {
          <DataTableClient
             rowHover
             value={displayData}
-            filters={filters}
-            onFilter={(e:any) => setFilters(e.filters)}
+            headerColumnGroup={headerGroup}
             loading={loading}
             filterDisplay="row"
             className={classNames("Custom-DataTableClient")}
@@ -223,19 +436,15 @@ export default function ListBaoCaoTaiKhoan() {
             <Column field="tenquy" header="Tên quỹ" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="lydo" header="Lý do" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column header="Thu" 
-             body={(row: any) =>
+            body={(row: any) =>
              {
-              if(row.iecat_type === 0){
-                  return Helper.formatCurrency(row.total.toString())
-              }
+                return Helper.formatCurrency(row.thu.toString())
              }}
-            filter showFilterMenu={false}  filterMatchMode="contains"/>
-            <Column header="Chi"
-              body={(row: any) =>
+             filter showFilterMenu={false}  filterMatchMode="contains"/>
+            <Column header="Chi"  
+            body={(row: any) =>
              {
-              if(row.iecat_type === 1){
-                  return Helper.formatCurrency(row.total.toString())
-              }
+                return Helper.formatCurrency(row.chi.toString())
              }}
              filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="ton" header="Tồn" 
