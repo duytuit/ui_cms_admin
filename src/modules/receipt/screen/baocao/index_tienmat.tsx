@@ -8,7 +8,7 @@ import { useListPartnerDetailWithState } from "modules/partner/service";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { FilterMatchMode } from "primereact/api";
-import { useListBankWithState, useListExpenseWithState, useListFundCategoryWithState } from "modules/categories/service";
+import { useListBankWithState, useListExpenseWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { useListReceiptSoQuy, useListReceiptSoQuyDauKy } from "modules/receipt/service";
 
 // ✅ Component Header lọc dữ liệu
@@ -106,7 +106,7 @@ export default function ListBaoCaoTienMat() {
     FormOfPayment:1
   });
   const { data: employees } = useListEmployeeWithState({});
-  const { data: DMExpense } = useListExpenseWithState({type:1,enable:1}); // danh mục chi phí
+  const { data: DMExpense } = useListIncomeExpenseWithState({}); // danh mục chi phí
   const { data: DMBank } = useListBankWithState({type:1});
   const { data: DMQuy } = useListFundCategoryWithState({type:1});
   const { data: listPartner } = useListPartnerDetailWithState({});
@@ -175,15 +175,15 @@ export default function ListBaoCaoTienMat() {
       });
 
       // 2️⃣ sort DESC để hiển thị
-       withTon.sort((a: any, b: any) => {
-          const dateDiff =
-              new Date(b.accounting_date).getTime() -
-              new Date(a.accounting_date).getTime();
+      //  withTon.sort((a: any, b: any) => {
+      //     const dateDiff =
+      //         new Date(b.accounting_date).getTime() -
+      //         new Date(a.accounting_date).getTime();
 
-          if (dateDiff !== 0) return dateDiff;
+      //     if (dateDiff !== 0) return dateDiff;
 
-          return b.id - a.id; // 👈 tie-break bằng id
-      });
+      //     return b.id - a.id; // 👈 tie-break bằng id
+      // });
       console.log(withTon);
       setDisplayData(withTon);
   }

@@ -636,7 +636,7 @@ export const sidebarModel = [{
           {
             id: 1,
             name: 'Chi Phí Chung',
-            route: '/page-two',
+            route: '/depreciation/ListChiPhiChung',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,
@@ -647,7 +647,7 @@ export const sidebarModel = [{
            {
             id: 1,
             name: 'Chi Phí Trả Trước',
-            route: '/page-two',
+            route: '/depreciation/ListChiPhiTraTruoc',
             created_at: '2023-05-29 14:14:02',
             updated_at: null,
             deleted_at: null,

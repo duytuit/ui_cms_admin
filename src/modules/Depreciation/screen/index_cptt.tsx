@@ -50,10 +50,10 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,_refresh,_refreshAllocat
                 filter={filter}
                 setFilter={setFilter}
                 className="lg:col-9"
-                add="/depreciation/add?type=1"
-                addName="Thêm tài sản"
+                add="/depreciation/add?type=2"
+                addName="Thêm chi phí trả trước"
                 openDialogAdd={openDialogAdd}
-                openDialogAddName="Phân bổ khấu hao tài sản"
+                openDialogAddName="Phân bổ khấu hao"
             >
             <div className="col-6">
              <Dropdown
@@ -78,7 +78,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,_refresh,_refreshAllocat
                 style={{ width: "30vw", top: "30px" }}
             >
                 <p className="m-0">
-                    {visible && <UpdatePhanBoKhauHao type={1} onClose={handleModalClose} ></UpdatePhanBoKhauHao>}
+                    {visible && <UpdatePhanBoKhauHao type={2} onClose={handleModalClose} ></UpdatePhanBoKhauHao>}
                 </p>
             </Dialog>
         </>
@@ -86,7 +86,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,_refresh,_refreshAllocat
     );
 };
 
-export default function ListDepreciation() {
+export default function ListChiPhiTraTruoc() {
     const { handleParamUrl } = useHandleParamUrl();
     const [displayData, setDisplayData] = useState<any[]>([]);
     const [displayDataAllocation, setDisplayDataAllocation] = useState<any[]>([]);
@@ -99,7 +99,7 @@ export default function ListDepreciation() {
         pageSize: 20,
         first: 0,
         render: false,
-        type: 1,
+        type: 2,
         keyword: "",
     });
     const { data, loading, error, refresh } = useListDepreciation({
@@ -171,7 +171,7 @@ export default function ListDepreciation() {
                     }}
                 >
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                    <b>Danh sách tài sản</b>
+                    <b>Danh sách chi phí trả trước</b>
                         <DataTableClient
                         rowHover
                         value={displayData}
@@ -211,8 +211,8 @@ export default function ListDepreciation() {
                                 </>
                             )
                         }}/>
-                        <Column field="code_number" header="Mã tài sản" filter showFilterMenu={false} filterMatchMode="contains" />
-                        <Column field="name" header="Tên tài sản" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="code_number" header="Mã chi phí" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="name" header="Tên chi phí" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="original_cost" header="Nguyên giá" body={(e: any) => Helper.formatCurrency((e.original_cost || 0).toString())} filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="useful_life" header="Thời gian sử dụng" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="monthly_depreciation" header="Giá trị khấu hao tháng" body={(e: any) => Helper.formatCurrency((e.monthly_depreciation || 0).toString())} filter showFilterMenu={false} filterMatchMode="contains" />
@@ -242,7 +242,7 @@ export default function ListDepreciation() {
                         style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
                     >
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-                            <b>Phân bổ khấu hao tài sản</b>
+                            <b>Phân bổ khấu hao chi phí trả trước</b>
                             <DataTableClient
                                 rowHover
                                 value={displayDataAllocation}
@@ -290,8 +290,8 @@ export default function ListDepreciation() {
                         <b>Chi tiết</b>
                             <DataTable rowHover value={detailAllocation}>
                                 <Column field="cycleName" header="Kỳ khấu hao" />
-                                <Column field="codeNumber" header="Mã tài sản" />
-                                <Column field="name" header="Tên tài sản" />
+                                <Column field="codeNumber" header="Mã chi phí" />
+                                <Column field="name" header="Tên chi phí" />
                                 <Column field="monthlyDepreciation" body={(row: any) => Helper.formatCurrency((row.monthlyDepreciation || 0).toString())} header="Giá trị khấu hao tháng" />
                             </DataTable>
                         </div>

@@ -73,22 +73,11 @@ export default function ListMuaHang() {
   const { handleParamUrl } = useHandleParamUrl();
   const [filters, setFilters] = useState({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      code_receipt: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      accounting_date: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      sofile: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      fullname_giaonhan: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      lydochi: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      total_amount: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      vat_rate: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      total_with_vat: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      tenquy: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      hinhthuc: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      stk: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      chutk: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      nganhang: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      dispatch_code: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      supplierName: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      supplierAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
       note: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      nguoitao: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      userName: { value: null, matchMode: FilterMatchMode.CONTAINS },
       });
   const [displayData, setDisplayData] = useState<any[]>([]);
   const [first, setFirst] = useState(0);
@@ -194,7 +183,7 @@ export default function ListMuaHang() {
                   footer={getSumColumn("thanh_tien")}
                   footerStyle={{ fontWeight: "bold" }}
             />
-            <Column field="note" header="Diễn giải" />
+            <Column field="note" header="Diễn giải" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="userName" header="Người cập nhật" filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
             

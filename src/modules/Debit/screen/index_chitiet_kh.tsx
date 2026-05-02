@@ -69,6 +69,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
     if(dunoDKKH && dunoDKKH[0]){
         setdunoDK(dunoDKKH[0].total_debit - dunoDKKH[0].total_receipt)
     }
+    _setSelectedRows([]);
   }, [dunoDKKH,filter]);
   async function ExportExcelCongNoKH(){
     const respo = await exportDebitKH(Helper.convertObjectToQueryString(_paramsPaginator));
@@ -428,7 +429,7 @@ useEffect(() => {
 
     const filtered = applyFilters(mapped);
     setDisplayData(filtered);
-    setSelectedRows([]);
+    
 }, [first, rows, data, paramsPaginator, filters, customers, employees]);
   const headerGroup = (
         <ColumnGroup>

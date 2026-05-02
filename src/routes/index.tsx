@@ -93,6 +93,9 @@ import ListVoLuuBai from "modules/ContractFile/screen/index_voluubai";
 import ListXNChiPhiLaiXe from "modules/receipt/screen/index_xn_chiphi_laixe";
 import ListDepreciation from "modules/Depreciation/screen";
 import UpdateDepreciation from "modules/Depreciation/screen/update";
+import UpdateSingleDepreciation from "modules/Depreciation/screen/update_single";
+import ListChiPhiChung from "modules/Depreciation/screen/index_cpc";
+import ListChiPhiTraTruoc from "modules/Depreciation/screen/index_cptt";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -168,8 +171,11 @@ const publicRoutes = [
   { path: "/department/detail/:id", component: UpdateDepartment, layout: 'UpdateDepartment' },
   // Depreciation 
   { path: "/depreciation/list", component: ListDepreciation, layout: 'ListDepreciation' },
+  { path: "/depreciation/ListChiPhiChung", component: ListChiPhiChung, layout: 'ListChiPhiChung' },
+  { path: "/depreciation/ListChiPhiTraTruoc", component: ListChiPhiTraTruoc, layout: 'ListChiPhiTraTruoc' },
   { path: "/depreciation/add", component: UpdateDepreciation, layout: 'UpdateDepreciation' },
-  { path: "/depreciation/detail/:id", component: UpdateDepreciation, layout: 'UpdateDepreciation' },
+  { path: "/depreciation/update", component: UpdateSingleDepreciation, layout: 'UpdateSingleDepreciation' },
+  { path: "/depreciation/detail/:id", component: UpdateSingleDepreciation, layout: 'UpdateSingleDepreciation' },
   // Bank 
   { path: "/bank/list", component: ListBank, layout: 'ListBank' },
   { path: "/bank/add", component: UpdateBank, layout: 'UpdateBank' },

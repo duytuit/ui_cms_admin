@@ -263,6 +263,20 @@ export const typeService = [
      name:"Chi phí chi hộ"
    }
 ];
+export const typeDepreciation = [
+   {
+     type:1,
+     name:"TSCD"
+   },
+    {
+     type:2,
+     name:"CPTT"
+   },
+   {
+     type:3,
+     name:"CPC"
+   }
+];
 export const typeReceipt = [
    {
      typeReceipt:0,

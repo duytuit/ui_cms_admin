@@ -2,7 +2,7 @@
 import { InputForm, UpdateForm } from "components/common/AddForm";
 import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
-import { listToast, refreshObject} from "utils";
+import { listToast, refreshObject, typeDepreciation} from "utils";
 import { useDispatch } from "react-redux";
 import { Dropdown, Input } from "components/common/ListForm";
 import { Panel } from "components/uiCore";
@@ -10,14 +10,16 @@ import { Helper } from "utils/helper";
 import { MyCalendar } from "components/common/MyCalendar";
 import { classNames } from "primereact/utils";
 import { addBill } from "modules/bill/api";
-export default function UpdatePhanBoKhauHao({ displayData, onClose }: {  displayData: any, onClose: () => void }) {
+import { updateDepreciationAllocation } from "modules/Depreciation/api";
+export default function UpdatePhanBoKhauHao({ type, onClose }: {  type: number, onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [dataCycleName, setDataCycleName] = useState<any[]>([]);
  const [infos, setInfos] = useState<any>({
   accountingDate: Helper.toDayString(),
   expiryDate: null,
-  note: "",
+  note: `Khấu hao ${typeDepreciation.find((t: any) => t.type === type || '')?.name} kỳ ${Helper.getCurrentMonthCycle()}`,
   cycleName: null,
+  type: type
 });
   const dispatch = useDispatch();
   const handleSubmit = (e: any) => {
@@ -35,7 +37,7 @@ export default function UpdatePhanBoKhauHao({ displayData, onClose }: {  display
     fetchDataSubmit(infos);
   };
   async function fetchDataSubmit(info: any) {
-      const response = await addBill(info);
+      const response = await updateDepreciationAllocation(info);
       if (response) setLoading(false);
       if (response.status === 200) {
         if (response.data.status) {
@@ -100,7 +102,8 @@ useEffect(() => {
                                     onChange={(e: any) =>
                                      {
                                         console.log( e.target.value);
-                                        setInfos({ ...infos, cycleName: e.target.value })
+                                        const note = `Khấu hao ${typeDepreciation.find((t: any) => t.type === type || '')?.name} kỳ ${e.target.value}`; 
+                                        setInfos({ ...infos, cycleName: e.target.value, note })
                                      }
                                     }
                                     required
@@ -134,10 +137,10 @@ useEffect(() => {
                              <div className="field grid">
                                 <div className="col-12">
                                   <InputForm className="w-full"
-                                    id="name"
-                                    value={infos.name}
+                                    id="note"
+                                    value={infos.note}
                                     onChange={(e: any) =>
-                                      setInfos({ ...infos, name: e.target.value })
+                                      setInfos({ ...infos, note: e.target.value })
                                     }
                                     label="Diễn giải"
                                   />

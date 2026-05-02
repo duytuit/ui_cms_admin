@@ -66,6 +66,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
     if(dunoDKNCC && dunoDKNCC[0]){
         setdunoDK(dunoDKNCC[0].total_debit - dunoDKNCC[0].total_receipt)
     }
+    _setSelectedRows([]); // mỗi khi filter thay đổi thì reset selected rows về rỗng
   }, [dunoDKNCC,filter]);
   async function ExportExcelCongNoNCC(){
     const respo = await exportDebitNCC(Helper.convertObjectToQueryString(_paramsPaginator));
@@ -401,7 +402,6 @@ useEffect(() => {
 
     const filtered = applyFilters(mapped);
     setDisplayData(filtered);
-    setSelectedRows([]);
 }, [first, rows, data, paramsPaginator, filters, suppliers, employees]);
   const headerGroup = (
         <ColumnGroup>

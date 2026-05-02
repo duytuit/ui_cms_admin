@@ -389,7 +389,7 @@ const applyFilters = (rows: any[]) => {
                         ...row,
                     };
                 });
-          const filtered = applyFilters(mapped);
+    const filtered = applyFilters(mapped);
     setDisplayData(filtered);
     
   }, [data, paramsPaginator,filters]);
