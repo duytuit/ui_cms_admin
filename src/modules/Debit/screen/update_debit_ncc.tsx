@@ -22,8 +22,6 @@ export default function UpdateDebitNCC({ debits, onClose}: { debits: any, onClos
     infos.Data = JSON.stringify(debitRows);
     setLoading(true);
     fetchDataSubmit(infos);
-    console.log(infos);
-    
   };
   async function fetchDataSubmit(info: any) {
     const response = await updateDebitNCC(info);
@@ -115,6 +113,21 @@ export default function UpdateDebitNCC({ debits, onClose}: { debits: any, onClos
                         >
                         <Column header="STT" body={(rowData:any, options:any) => options.rowIndex + 1}/>
                         <Column field="name" header="Tuyến vận chuyển" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column header="Ngày điều xe" 
+                          body={(row: any,options: any) => {
+                            return (
+                               <>
+                                <MyCalendar dateFormat="dd/mm/yy"
+                                  value={Helper.formatDMYLocal(row.service_date ? row.service_date : '')}
+                                  onChange={(e: any) => {
+                                    const updated = [...debitRows];
+                                    updated[options.rowIndex] = { ...row, service_date: e };
+                                    setDebitRows(updated);
+                                  }}
+                                  className={classNames("w-full", "p-inputtext", "input-form-sm")} />
+                               </>
+                            )
+                        } }/>
                         <Column field="dispatch_code" header="Mã điều xe" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="vehicle_number" header="Biển số" />
                         <Column field="purchase_com" header="Mua Com"

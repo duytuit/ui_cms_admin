@@ -15,9 +15,10 @@ import { FilterMatchMode } from "primereact/api";
 import { useListCustomerDetailWithState } from "modules/partner/service";
 import { MyCalendar } from "components/common/MyCalendar";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { DataTable } from "components/uiCore";
+import { DataTable, Dialog } from "components/uiCore";
 import { showWithIds } from "modules/Debit/api";
 import { text } from "stream/consumers";
+import UpdateNgayHachToan from "modules/Debit/screen/update_ngayhachtoan";
 
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   const [filter, setFilter] = useState({
@@ -121,6 +122,9 @@ export default function ListReceiptThu() {
     nguoitao: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
     const [selectedDetail, setSelectedDetail] = useState<any>(null);
+    const [visible, setVisible] = useState(false);
+    const [selectedId, setSelectedId] = useState<any>();
+    const [accountingDate, setAccountingDate] = useState<any>();
     const [paramsPaginator, setParamsPaginator] = useState({
         pageNum: 1,
         pageSize: 20,
@@ -209,6 +213,16 @@ export default function ListReceiptThu() {
             //setHasError(true)
             }).finally();
     }
+      // Hàm mở dialog thêm mới
+    const openDialogAdd = (id: number, accountingDate: string) => {
+        setSelectedId(id);
+        setAccountingDate(accountingDate);
+        setVisible(true);
+    };
+    const handleModalClose = () => {
+        setVisible(false);
+        refresh?.(); 
+    };
     return (
           <div className="card">
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
@@ -265,6 +279,13 @@ export default function ListReceiptThu() {
                                       }
                                     }}
                                   style={{width:"6em"}}
+                                />
+                                <Column
+                                    header="Sửa ngày hach toán"
+                                    body={(row: any) => {
+                                        return ActionBody(row, null, null, null, null, () => openDialogAdd(row.id,row.accounting_date))
+                                    }}
+                                    style={{ width: "0.1em" }}
                                 />
                                 <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column
@@ -371,7 +392,17 @@ export default function ListReceiptThu() {
                     </SplitterPanel>
                  </Splitter>
             </div>
-           
+              <Dialog
+                position="top"
+                dismissableMask
+                visible={visible}
+                onHide={() => setVisible(false)}
+                style={{ width: "30vw", top:"30px" }}
+            >
+              <p className="m-0">
+                {selectedId && <UpdateNgayHachToan id={selectedId} ngayhachtoan={accountingDate} onClose={handleModalClose} ></UpdateNgayHachToan>}
+              </p>
+          </Dialog>
           </div>
     );
 }

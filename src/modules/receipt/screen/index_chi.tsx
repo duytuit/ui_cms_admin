@@ -7,7 +7,7 @@ import { classNames } from "primereact/utils";
 import { useListReceiptChi } from "../service";
 import { deleteReceipt } from "../api";
 import { useListEmployeeWithState } from "modules/employee/service";
-import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState, useListIncomeExpenseWithState } from "modules/categories/service";
+import { useListBankWithState, useListFundCategoryWithState, useListIncomeExpenseWithState } from "modules/categories/service";
 import { Helper } from "utils/helper";
 import { formOfPayment, TypeDoiTuong, typeReceipt } from "utils";
 import { useListContractFileWithState } from "modules/ContractFile/service";
@@ -15,6 +15,8 @@ import { FilterMatchMode } from "primereact/api";
 import { useListPartnerDetailWithState } from "modules/partner/service";
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { MyCalendar } from "components/common/MyCalendar";
+import { Dialog } from "components/uiCore";
+import UpdateNgayHachToan from "modules/Debit/screen/update_ngayhachtoan";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -89,6 +91,9 @@ export default function ListReceiptChi() {
     });
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
+    const [visible, setVisible] = useState(false);
+    const [selectedId, setSelectedId] = useState<any>();
+    const [accountingDate, setAccountingDate] = useState<any>();
     const [paramsPaginator, setParamsPaginator] = useState({
         pageNum: 1,
         pageSize: 20,
@@ -173,6 +178,16 @@ export default function ListReceiptChi() {
 
         return Helper.formatCurrency(sum.toString());
     };
+     // Hàm mở dialog thêm mới
+    const openDialogAdd = (id: number, accountingDate: string) => {
+        setSelectedId(id);
+        setAccountingDate(accountingDate);
+        setVisible(true);
+    };
+    const handleModalClose = () => {
+        setVisible(false);
+        refresh?.(); 
+    };
     return (
         <div className="card">
             <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
@@ -233,8 +248,16 @@ export default function ListReceiptChi() {
                                                         );
                                                     }
                                                 }
+                                               
                                             }}
                                             style={{ width: "6em" }}
+                                        />
+                                         <Column
+                                        header="Sửa ngày hach toán"
+                                        body={(row: any) => {
+                                           return ActionBody(row, null, null, null, null, () => openDialogAdd(row.id,row.accounting_date))
+                                        }}
+                                        style={{ width: "0.1em" }}
                                         />
                                         <Column field="code_receipt" header="Số chứng từ" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                         <Column
@@ -282,7 +305,17 @@ export default function ListReceiptChi() {
                                 </SplitterPanel>
                              </Splitter>
                         </div>
-          
+             <Dialog
+                position="top"
+                dismissableMask
+                visible={visible}
+                onHide={() => setVisible(false)}
+                style={{ width: "30vw", top:"30px" }}
+            >
+              <p className="m-0">
+                {selectedId && <UpdateNgayHachToan id={selectedId} ngayhachtoan={accountingDate} onClose={handleModalClose} ></UpdateNgayHachToan>}
+              </p>
+          </Dialog>
         </div>
     );
 }

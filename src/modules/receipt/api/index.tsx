@@ -3,6 +3,7 @@ import { getData, postData } from "lib/request";
 export const listReceipt = (params:any) => getData("receipt", params);
 export const listReceiptThu = (params:any) => getData("receipt/phieuthu", params);
 export const listReceiptChi = (params:any) => getData("receipt/phieuchi", params);
+export const listReceiptUngTienLaiXe = (params:any) => getData("receipt/GetUngTienCuaLaiXeAsync", params);
 export const GetObjectBaoCaoDoanhThuAsync = (params:any) => getData("Debit/GetObjectBaoCaoDoanhThuAsync", params);
 export const GetBaoCaoLuuChuyenTienTeAsync = (params:any) => getData("receipt/GetBaoCaoLuuChuyenTienTeAsync", params);
 export const GetSoDuDauKyAsync = (params:any) => getData("receipt/GetSoDuDauKyAsync", params);
@@ -12,6 +13,7 @@ export const listReceiptSoQuyDauKy = (params:any) => getData("receipt/soquydauky
 export const listXacNhanChiPhiGiaoNhan = (params:any) => getData("receipt/XacNhanChiPhiGiaoNhan", params);
 export const GetPhiDiDuongCuaLaiXe = (params:any) => getData("receipt/GetPhiDiDuongCuaLaiXe", params);
 export const updateHoanUngGiaoNhan = (params:any) => postData("receipt/update/HoanUngGiaoNhan", params);
+export const updateAccountDate = (params:any) => postData("receipt/updateAccountDate", params);
 export const deleteReceipt = (params:any) => postData("receipt/delete", params);
 export const addReceipt = (params:any) => postData("receipt/create", params);
 export const addPhieuThuKH = (params:any) => postData("receipt/create/phieuthukh", params);

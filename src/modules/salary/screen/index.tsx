@@ -1,11 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import { RenderHeader, StatusBody, ActionBody, DataTable, Column, TimeBody, DataTableClient } from "components/common/DataTable";
-import { Calendar, CalendarY, Dropdown, GridForm, Input } from "components/common/ListForm";
+import { useEffect, useState } from "react";
+import { ActionBody, Column, TimeBody, DataTableClient } from "components/common/DataTable";
+import { GridForm } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { CategoryEnum } from "utils/type.enum";
 import { classNames } from "primereact/utils";
-import { useListDepartment } from "../service";
-import { deleteDepartment } from "../api";
+import { useListPayrollPeriod } from "../service";
+import { useListEmployeeWithState } from "modules/employee/service";
+import { useListDepartmentWithState } from "modules/department/service";
+import { Helper } from "utils/helper";
+import { create } from "domain";
+import { Link } from "react-router-dom";
+import { Button } from "primereact/button";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -45,21 +50,35 @@ export default function ListSalary() {
         type: CategoryEnum.country,
         keyword: "",
     });
-    const { data, loading, error, refresh } = useListDepartment({
+    const { data, loading, error, refresh } = useListPayrollPeriod({
         params: paramsPaginator,
         debounce: 500,
     });
+     const { data: employees } = useListEmployeeWithState({});
+     const { data: departments } = useListDepartmentWithState({});
     // ✅ Client-side pagination
     useEffect(() => {
         if (!data) return;
         handleParamUrl(paramsPaginator);
          const mapped = (data?.data || []).map((row: any) => {
+                const emp = employees.find((e: any) => e.id === row.employee_id);
+                const user = employees.find((e: any) => e.user_id === row.created_by);
+                let dept = null;
+                if(emp) {
+                    const  employee_departments = emp?.employee_departments || [];
+                    const emp_dept = employee_departments[0]; // Giả sử lấy department đầu tiên 
+                    dept = departments.find((d: any) => d.id === emp_dept?.department_id);
+                }
                     return {
                         ...row,
+                         userName: `${emp?.last_name ?? ""} ${emp?.first_name ?? ""}`.trim(),
+                         departmentName: dept?.name || "",
+                         createdBy: user ? `${user.last_name} ${user.first_name}` : "",
                     };
                 });
         setDisplayData(mapped);
-    }, [first, rows, data, paramsPaginator]);
+        
+    }, [first, rows, data,employees, departments,paramsPaginator]);
 
     return (
         <div className="card">
@@ -67,7 +86,7 @@ export default function ListSalary() {
 
             <DataTableClient
                 rowHover
-                value={[]}
+                value={displayData}
                 paginator
                 rows={rows}
                 first={first}
@@ -81,25 +100,25 @@ export default function ListSalary() {
                 filterDisplay="row"
                 className={classNames("Custom-DataTableClient")}
             >
-                <Column field="code" header="Kỳ lương" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="name" header="Nhân viên" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="name" header="Bộ phận" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="note" header="Ghi chú" />
-                <Column field="name" header="Xem lương"/>
-                <Column field="updated_by" header="Người cập nhật" />
+                <Column field="cycle_name" header="Kỳ lương" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                <Column field="userName" header="Nhân viên" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                <Column field="luongthucnhan" header="Lương thực nhận" 
+                body={(e: any) => Helper.formatCurrency((e.luongthucnhan || 0).toString())} 
+                filter showFilterMenu={false}  filterMatchMode="contains"/>
+                <Column field="departmentName" header="Bộ phận" filter showFilterMenu={false}  filterMatchMode="contains"/>
+                <Column field="ghichu" header="Ghi chú" />
+                <Column body={(e: any) =>{
+                    return (
+                        <>
+                            <a href={`/`} target="_blank" rel="noopener noreferrer">
+                                <Button label="chi tiết" rounded icon="pi pi-eye" severity="info" size="small" text />
+                            </a>
+                        </>
+                    )
+                }}
+                 header="Xem lương"/>
+                <Column field="createdBy" header="Người cập nhật" />
                 <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
-                <Column
-                   header="Thao tác"
-                   body={(row: any) => {
-                        return ActionBody(
-                            row,
-                            "/department/detail",
-                            null,
-                            paramsPaginator,
-                            setParamsPaginator
-                        );
-                    }}
-                />
             </DataTableClient>
         </div>
     );
