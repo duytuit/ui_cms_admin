@@ -8,7 +8,6 @@ import { useListEmployeeWithState } from "modules/employee/service";
 import { listContractFileHasFileGia } from "modules/ContractFile/api";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
-import { text } from "stream/consumers";
 export default function PrintDebit() {
   const [displayFileGia, setDisplayFileGia] = useState<any[]>([]);
   const [searchParams] = useSearchParams();
