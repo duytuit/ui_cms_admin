@@ -142,6 +142,10 @@ export default function UpdateSalary() {
     const { data:nghiPhepNV, loading: loadingNghiPhepNV } = useListFormRequest({ params: {...paramsPaginator,employeeId: paramsPaginator.employeeDriverId}});
     const handleSubmit = (e:any) => {
         e.preventDefault();
+        if (!infos.employeeId || infos.employeeId <= 0) {
+          dispatch(showToast({ ...listToast[2], detail: "Vui lòng chọn nhân viên" }));
+          return;
+        }
         infos.DiemTraHang= Number((infos.DiemTraHang || 0).toString().replaceAll(".", "") || 0)
         infos.TienAn= Number((infos.TienAn || 0).toString().replaceAll(".", "") || 0)
         infos.TienVe= Number((infos.TienVe || 0).toString().replaceAll(".", "") || 0)
@@ -155,6 +159,9 @@ export default function UpdateSalary() {
         infos.ChiKhac = Number((infos.ChiKhac || 0).toString().replaceAll(".", "") || 0)
         infos.LuongCung = Number((infos.LuongCung || 0).toString().replaceAll(".", "") || 0)
         infos.BaoHiemXaHoi = Number((infos.BaoHiemXaHoi || 0).toString().replaceAll(".", "") || 0)
+        infos.LuongThucTe = Number((infos.LuongThucTe || 0).toString().replaceAll(".", "") || 0)
+        infos.LaiXeThuCuuoc = Number((infos.LaiXeThuCuuoc || 0).toString().replaceAll(".", "") || 0)
+        infos.TruPhep = Number((infos.TruPhep || 0).toString().replaceAll(".", "") || 0)
         infos.EmployeeId = paramsPaginator.employeeDriverId;
         infos.ChiTietDebit = JSON.stringify(displayData);
         infos.ChiTietNghiPhep = JSON.stringify(displayNghiPhepNV);
@@ -570,7 +577,7 @@ const getSumColumnUngTienLaiXe = (data: any[], field: string) => {
                           label="Số ngày nghỉ không phép"
                         />
                       </div>
-                      <div className="field col-4">
+                      <div className="field col-2">
                         <InputForm
                           className="w-full"
                           id="SoNgayLam"
@@ -579,6 +586,17 @@ const getSumColumnUngTienLaiXe = (data: any[], field: string) => {
                             setInfos({ ...infos, SoNgayLam: e.target.value })
                           }
                           label="Ngày đi làm thực tế"
+                        />
+                      </div>
+                       <div className="field col-2">
+                        <InputForm
+                          className="w-full"
+                          id="LuongThucTe"
+                          value={infos.LuongThucTe}
+                          onChange={(e: any) =>
+                            setInfos({ ...infos, LuongThucTe: e.target.value })
+                          }
+                          label="Lương thực tế"
                         />
                       </div>
                       <div className="field col-6">
@@ -704,6 +722,28 @@ const getSumColumnUngTienLaiXe = (data: any[], field: string) => {
                                   setInfos({ ...infos, BaoHiemXaHoi: e.target.value })
                                 }
                                 label="Bảo hiểm xã hội"
+                              />
+                            </div>
+                            <div className="field col-4">
+                              <InputForm
+                                className="w-full"
+                                id="LaiXeThuCuuoc"
+                                value={Helper.formatCurrency((infos.LaiXeThuCuuoc || "").toString())}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, LaiXeThuCuuoc: e.target.value })
+                                }
+                                label="Lái xe thu cước"
+                              />
+                            </div>
+                             <div className="field col-4">
+                              <InputForm
+                                className="w-full"
+                                id="TruPhep"
+                                value={Helper.formatCurrency((infos.TruPhep || "").toString())}
+                                onChange={(e: any) =>
+                                  setInfos({ ...infos, TruPhep: e.target.value })
+                                }
+                                label="Trừ phép"
                               />
                             </div>
                             <div className="field col-4">

@@ -1,50 +1,112 @@
+import { useListDepartmentWithState } from "modules/department/service";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { showPayrollPeriodByCycleName } from "modules/salary/api";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-
-const formatCurrency = (n: number) =>
-  (n ?? 0).toLocaleString("vi-VN", { maximumFractionDigits: 0 });
-
+import { Helper } from "utils/helper";
 export default function PrintPayrollTable() {
   const [searchParams] = useSearchParams();
-  const cycleName = searchParams.get("CycleName") || "";
-  const employeeId = searchParams.get("EmployeeId") || "";
-  const [payroll, setPayroll] = useState<any>({ 
+  const cycleName = searchParams.get("cycleName") || "";
+  const employeeId = searchParams.get("employeeId") || "";
+
+  const [payroll, setPayroll] = useState<any>({
     company: "CÔNG TY TNHH VUDACO",
     address: "Số 6C/195 Kiều Hạ, P. Đông Hải 2, Q. Hải An, TP. Hải Phòng",
+    khoanChi: [],
   });
-  const { data: listEmployee } = useListEmployeeWithState({});
-  useEffect(() => {
-    if(cycleName && employeeId){
-        showPayrollPeriodByCycleName({ cycleName, employeeId }).then(res => {
-             const detail = res.data.data
-              if(detail){
-              
-                
-                const _employee = listEmployee.find((x: any) => x.id === detail.employee_id);
-                const _khoanChi = detail.chiTietKhoanChi ? JSON.parse(detail.chiTietKhoanChi) : [];
-                const info = {
-                    ...payroll,
-                    ...detail,
-                    employeeName: `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""}`.trim(),
-                    baseSalary: detail.base_salary,
-                    khoanChi : _khoanChi,
-                }
-                console.log(info);
-                setPayroll(info);
-              }
-        });
-    }
-  }, [cycleName, employeeId, listEmployee]);
 
+  const { data: listEmployee } = useListEmployeeWithState({});
+  const { data: departments } = useListDepartmentWithState({});
 
   // =========================
-  // UI TABLE
+  // HELPER
+  // =========================
+  const toNumber = (v: any) => Number(v) || 0;
+
+  const parseKhoanChi = (arr: any[] = []) =>
+    arr.map((x) => ({
+      ...x,
+      dataParsed: typeof x.data === "string" ? JSON.parse(x.data) : x.data,
+    }));
+
+  // =========================
+  // LOAD DATA
+  // =========================
+  useEffect(() => {
+    if (!cycleName || !employeeId || !listEmployee || !departments) return;
+
+    const load = async () => {
+      const res = await showPayrollPeriodByCycleName({ cycleName, employeeId });
+      const detail = res?.data?.data;
+      if (!detail) return;
+
+      const employee = listEmployee.find((x: any) => x.id === detail.employeeId);
+
+      const deptId = employee?.employee_departments?.[0]?.department_id;
+      const dept = departments.find((d: any) => d.id === deptId);
+
+      const khoanChi = parseKhoanChi(
+        detail.chiTietPhieuChi ? JSON.parse(detail.chiTietPhieuChi) : []
+      );
+      setPayroll({
+        company: "CÔNG TY TNHH VUDACO",
+        address: "Số 6C/195 Kiều Hạ, P. Đông Hải 2, Q. Hải An, TP. Hải Phòng",
+        ...detail,
+        employeeCode: employee?.code || "",
+        employeeName: `${employee?.last_name ?? ""} ${employee?.first_name ?? ""}`.trim(),
+        position: dept?.name || "",
+        khoanChi,
+      });
+      console.log(khoanChi);
+    };
+    
+    load();
+  }, [cycleName, employeeId, listEmployee, departments]);
+
+  // =========================
+  // CONFIG TABLE
+  // =========================
+  const thuNhapList = [
+    { label: "Lương thực tế", key: "luongThucTe" },
+    { label: "Điểm trả hàng", key: "diemTraHang" },
+    { label: "Tiền ăn", key: "tienAn" },
+    { label: "Qua đêm", key: "quaDem" },
+    { label: "Điện thoại", key: "dienThoai" },
+    { label: "Tiền vé", key: "tienVe" },
+    { label: "Luật", key: "luat" },
+    { label: "Lương hàng về", key: "luongHangVe" },
+    { label: "Trợ cấp khác", key: "troCapKhac" },
+  ];
+
+  const khauTruList = [
+    { label: "Tổng tạm ứng", key: "tongUng" },
+    { label: "Bảo hiểm xã hội", key: "baoHiemXaHoi" },
+    { label: "Trừ phép", key: "truPhep" },
+    { label: "Lái xe thu cước", key: "laiXeThuCuoc" },
+    { label: "Chi khác", key: "chiKhac" },
+  ];
+
+  // =========================
+  // CALC TOTAL
+  // =========================
+  const totalThuNhap = useMemo(
+    () => thuNhapList.reduce((sum, i) => sum + toNumber(payroll[i.key]), 0),
+    [payroll]
+  );
+
+  const totalKhauTru = useMemo(
+    () => khauTruList.reduce((sum, i) => sum + toNumber(payroll[i.key]), 0),
+    [payroll]
+  );
+
+  const net = totalThuNhap - totalKhauTru;
+
+  // =========================
+  // UI
   // =========================
   return (
     <div style={{ padding: 12, background: "#fff" }}>
-      <div style={{ width: 900, margin: "0 auto" }}>
+      <div style={{ width: "100%", margin: "0 auto" }}>
         <table
           style={{
             width: "100%",
@@ -72,7 +134,7 @@ export default function PrintPayrollTable() {
             {/* Title */}
             <tr>
               <td colSpan={6} style={cell({ textAlign: "center", padding: "14px 0" })}>
-                <div style={{ fontWeight: 800, fontSize: 18 }}>PHIẾU LƯƠNG</div>
+                <div style={{ fontWeight: 800, fontSize: 18 }}>PHIẾU LƯƠNG {payroll.cycleName}</div>
               </td>
             </tr>
 
@@ -89,7 +151,7 @@ export default function PrintPayrollTable() {
                 <b>Mã Nhân Viên</b>: {payroll.employeeCode}
               </td>
               <td colSpan={3} style={cell()}>
-                <b>Lương cơ bản</b>: {formatCurrency(payroll.baseSalary)}
+                <b>Lương cơ bản</b>: {Helper.formatCurrency((payroll.luongCung || "").toString())}
               </td>
             </tr>
 
@@ -99,7 +161,7 @@ export default function PrintPayrollTable() {
                 <b>Họ Và Tên</b>: {payroll.employeeName}
               </td>
               <td colSpan={3} style={cell()}>
-                <b>Ngày công đi làm</b>: {payroll.workDays}
+                <b>Ngày công đi làm</b>: {payroll.soNgayLam}
               </td>
             </tr>
 
@@ -109,7 +171,7 @@ export default function PrintPayrollTable() {
                 <b>Chức Danh</b>: {payroll.position}
               </td>
               <td colSpan={3} style={cell()}>
-                <b>Ngày công chuẩn</b>: {payroll.standardDays}
+                <b>Ngày nghỉ phép</b>: {payroll.nghiPhep}
               </td>
             </tr>
 
@@ -119,25 +181,24 @@ export default function PrintPayrollTable() {
               <td colSpan={2} style={cell({ fontWeight: 700 })}>Các Khoản Thu Nhập</td>
               <td colSpan={2} style={cell({ textAlign: "right", fontWeight: 700 })}>Số tiền</td>
             </tr>
-
             {/* Rows */}
-            {/* {rows.map((r, idx) => (
-              <tr key={idx}>
-                <td colSpan={2} style={cell({ textAlign: "center" })}>{r.left.stt}</td>
-                <td colSpan={2} style={cell()}>{r.left.name}</td>
+            {thuNhapList.map((item, index) => (
+              <tr key={index}>
+                <td colSpan={2} style={cell({ textAlign: "center" })}>{index + 1}</td>
+                <td colSpan={2} style={cell()}>{item.label}</td>
                 <td colSpan={2} style={cell({ textAlign: "right" })}>
-                  {r.left.amount === null ? "" : formatCurrency(r.left.amount)}
+                  {Helper.formatCurrency((payroll[item.key] || "").toString())}
                 </td>
               </tr>
-            ))} */}
-          
-            {/* Totals */}
-            <tr>
+            ))}
+
+             {/* Tổng thu nhập */}
+             <tr>
               <td colSpan={4} style={cell({ fontWeight: 800 })}>
                 Tổng Cộng
               </td>
               <td colSpan={2} style={cell({ textAlign: "right", fontWeight: 800 })}>
-                {/* {formatCurrency(incomeTotal)} */}
+                {Helper.formatCurrency(totalThuNhap.toString())}
               </td>
             </tr>
             <tr>
@@ -146,35 +207,45 @@ export default function PrintPayrollTable() {
               <td colSpan={2} style={cell({ textAlign: "right", fontWeight: 700 })}>Số tiền</td>
             </tr>
               {/* Rows */}
-            {/* {rows.map((r, idx) => (
-              <tr key={idx}>
-                <td colSpan={2} style={cell({ textAlign: "center" })}>{r.right.stt}</td>
-                <td colSpan={2} style={cell()}>{r.right.name}</td>
+              {khauTruList.map((item, index) => (
+              <tr key={index}>
+                <td colSpan={2} style={cell({ textAlign: "center" })}>{index + 1}</td>
+                <td colSpan={2} style={cell()}>
+                  <div>
+                    {item.label}
+                  </div>
+                  {payroll.khoanChi && index === 0 && payroll.khoanChi.length > 0 && (
+                    <div style={{ marginTop: 4, paddingLeft: 12 }}>
+                      {payroll.khoanChi.map((kc: any, idx: number) => (
+                        <div key={idx} style={{ fontSize: 12 }}>
+                          {kc.note || ""}: {Helper.formatCurrency((kc.total || 0).toString())}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </td>
                 <td colSpan={2} style={cell({ textAlign: "right" })}>
-                  {r.right.amount === null ? "" : formatCurrency(r.right.amount)}
+                  {Helper.formatCurrency((payroll[item.key] || "").toString())}
                 </td>
               </tr>
-            ))} */}
+            ))}
+
+             {/* Tổng khấu trừ */}
              <tr>
               <td colSpan={4} style={cell({ fontWeight: 800 })}>
                 Tổng Cộng
               </td>
               <td colSpan={2} style={cell({ textAlign: "right", fontWeight: 800 })}>
-                {/* {formatCurrency(deductionTotal)} */}
+                {Helper.formatCurrency(totalKhauTru.toString())}
               </td>
             </tr>
             {/* Net */}
             <tr>
-              <td colSpan={6} style={cell({ fontWeight: 800 })}>
-                Tổng Số Tiền Lương Thực Nhận:{" "}
-                {/* <span style={{ float: "right" }}>{formatCurrency(net)}</span> */}
+              <td colSpan={4} style={cell({ fontWeight: 800 })}>
+                Tổng Số Tiền Lương Thực Nhận
               </td>
-            </tr>
-
-            {/* Bằng chữ */}
-            <tr>
-              <td colSpan={6} style={cell()}>
-                <b>Bằng chữ</b>: Mười bốn triệu sáu trăm mười nghìn đồng
+              <td colSpan={2} style={cell({ textAlign: "right", fontWeight: 800 })}>
+                {Helper.formatCurrency(net.toString())}
               </td>
             </tr>
 
@@ -190,31 +261,12 @@ export default function PrintPayrollTable() {
 
             <tr>
               <td colSpan={3} style={cell({ textAlign: "center", height: 90 })}>
-                Ký và ghi rõ họ tên
               </td>
               <td colSpan={3} style={cell({ textAlign: "center", height: 90 })}>
-                Ký và ghi rõ họ tên
               </td>
             </tr>
           </tbody>
         </table>
-
-        {/* Nút in */}
-        {/* <div style={{ marginTop: 14, textAlign: "right" }}>
-          <button
-            onClick={() => window.print()}
-            style={{
-              padding: "10px 16px",
-              borderRadius: 8,
-              border: "1px solid #000",
-              cursor: "pointer",
-              background: "#fff",
-              fontWeight: 700,
-            }}
-          >
-            In phiếu lương
-          </button>
-        </div> */}
       </div>
     </div>
   );

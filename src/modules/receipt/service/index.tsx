@@ -281,7 +281,7 @@ export const useListReceiptUngTienLaiXe = ({ params, debounce = 500 }: any) => {
     };
 
     useEffect(() => {
-        if (!params || Object.keys(params).length === 0) {
+        if (!params || Object.keys(params).length === 0 || !params.employeeId || params.employeeId <= 0) {
             setData([]);
             return;
         }

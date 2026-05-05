@@ -143,7 +143,6 @@ export default function UpdatePartner() {
                         setInfos({ ...infos, taxCode: e.target.value })
                       }
                       label="Mã số thuế"
-                      required
                     />
                   </div>
                 </div>

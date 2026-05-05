@@ -102,15 +102,15 @@ export default function ListSalary() {
             >
                 <Column field="cycle_name" header="Kỳ lương" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="userName" header="Nhân viên" filter showFilterMenu={false}  filterMatchMode="contains"/>
-                <Column field="luongthucnhan" header="Lương thực nhận" 
+                {/* <Column field="luongthucnhan" header="Lương thực nhận" 
                 body={(e: any) => Helper.formatCurrency((e.luongthucnhan || 0).toString())} 
-                filter showFilterMenu={false}  filterMatchMode="contains"/>
+                filter showFilterMenu={false}  filterMatchMode="contains"/> */}
                 <Column field="departmentName" header="Bộ phận" filter showFilterMenu={false}  filterMatchMode="contains"/>
                 <Column field="ghichu" header="Ghi chú" />
                 <Column body={(e: any) =>{
                     return (
                         <>
-                            <a href={`/`} target="_blank" rel="noopener noreferrer">
+                            <a href={`/salary/SalaryByCycleName?cycleName=${e.cycle_name}&employeeId=${e.employee_id}`} target="_blank" rel="noopener noreferrer">
                                 <Button label="chi tiết" rounded icon="pi pi-eye" severity="info" size="small" text />
                             </a>
                         </>
