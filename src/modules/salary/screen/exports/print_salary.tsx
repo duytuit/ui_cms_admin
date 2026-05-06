@@ -1,6 +1,5 @@
-import { useListDepartmentWithState } from "modules/department/service";
-import { useListEmployeeWithState } from "modules/employee/service";
-import { showPayrollPeriodByCycleName } from "modules/salary/api";
+import { showDataShareEmployeeByCycleName } from "modules/department/api";
+import { useListDataShareDepartment, useListDataShareEmployee, useListDepartmentWithState } from "modules/department/service";
 import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Helper } from "utils/helper";
@@ -8,6 +7,7 @@ export default function PrintPayrollTable() {
   const [searchParams] = useSearchParams();
   const cycleName = searchParams.get("cycleName") || "";
   const employeeId = searchParams.get("employeeId") || "";
+  const storageId = searchParams.get("storageId") || 1;
 
   const [payroll, setPayroll] = useState<any>({
     company: "CÔNG TY TNHH VUDACO",
@@ -15,8 +15,8 @@ export default function PrintPayrollTable() {
     khoanChi: [],
   });
 
-  const { data: listEmployee } = useListEmployeeWithState({});
-  const { data: departments } = useListDepartmentWithState({});
+  const { data: listEmployee } = useListDataShareEmployee({});
+  const { data: departments } = useListDataShareDepartment({});
 
   // =========================
   // HELPER
@@ -36,7 +36,7 @@ export default function PrintPayrollTable() {
     if (!cycleName || !employeeId || !listEmployee || !departments) return;
 
     const load = async () => {
-      const res = await showPayrollPeriodByCycleName({ cycleName, employeeId });
+      const res = await showDataShareEmployeeByCycleName({ cycleName, employeeId ,storageId});
       const detail = res?.data?.data;
       if (!detail) return;
 
