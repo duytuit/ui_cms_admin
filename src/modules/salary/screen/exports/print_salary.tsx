@@ -15,9 +15,6 @@ export default function PrintPayrollTable() {
     khoanChi: [],
   });
 
-  const { data: listEmployee } = useListDataShareEmployee({});
-  const { data: departments } = useListDataShareDepartment({});
-
   // =========================
   // HELPER
   // =========================
@@ -33,17 +30,12 @@ export default function PrintPayrollTable() {
   // LOAD DATA
   // =========================
   useEffect(() => {
-    if (!cycleName || !employeeId || !listEmployee || !departments) return;
+    if (!cycleName || !employeeId) return;
 
     const load = async () => {
       const res = await showDataShareEmployeeByCycleName({ cycleName, employeeId ,storageId});
       const detail = res?.data?.data;
       if (!detail) return;
-
-      const employee = listEmployee.find((x: any) => x.id === detail.employeeId);
-
-      const deptId = employee?.employee_departments?.[0]?.department_id;
-      const dept = departments.find((d: any) => d.id === deptId);
 
       const khoanChi = parseKhoanChi(
         detail.chiTietPhieuChi ? JSON.parse(detail.chiTietPhieuChi) : []
@@ -52,16 +44,16 @@ export default function PrintPayrollTable() {
         company: "CÔNG TY TNHH VUDACO",
         address: "Số 6C/195 Kiều Hạ, P. Đông Hải 2, Q. Hải An, TP. Hải Phòng",
         ...detail,
-        employeeCode: employee?.code || "",
-        employeeName: `${employee?.last_name ?? ""} ${employee?.first_name ?? ""}`.trim(),
-        position: dept?.name || "",
+        employeeCode: detail.employee?.code || "",
+        employeeName: `${detail.employee?.lastName ?? ""} ${detail.employee?.firstName ?? ""}`.trim(),
+        position: detail.departmentName || "",
         khoanChi,
       });
       console.log(khoanChi);
     };
     
     load();
-  }, [cycleName, employeeId, listEmployee, departments]);
+  }, [cycleName, employeeId]);
 
   // =========================
   // CONFIG TABLE
