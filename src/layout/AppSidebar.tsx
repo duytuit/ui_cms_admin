@@ -749,17 +749,6 @@ export const sidebarModel = [{
           },
           {
             id: 1,
-            name: 'Danh sách xe công trình',
-            route: '/page-two',
-            created_at: '2023-05-29 14:14:02',
-            updated_at: null,
-            deleted_at: null,
-            status: 1,
-            category_id: 1,
-            sort: 1,
-          },
-          {
-            id: 1,
             name: 'Bộ phận',
             route: '/department/list',
             created_at: '2023-05-29 14:14:02',

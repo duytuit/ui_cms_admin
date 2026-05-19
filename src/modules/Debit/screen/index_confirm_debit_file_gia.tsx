@@ -190,13 +190,13 @@ export default function ListConfirmFileGia() {
          const dataArray = Array.isArray(listFileGia?.data) ? listFileGia.data : [];
          const groupedHasFileGia = Object.values(
             dataArray.reduce((acc:any, cur:any) => {
-              const {debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by, ...rest } = cur;
+              const {debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_vehicle_number, ...rest } = cur;
               if (!acc[cur.id]) {
                 acc[cur.id] = { ...rest, debits: [] ,debit_ids: [] };
               }
               // chỉ gom debit nếu debitService có dữ liệu
               if (listFileGia?.data) {
-                acc[cur.id].debits.push({debit_data,debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by});
+                acc[cur.id].debits.push({debit_bill,debit_employee_staff_id,debit_service_id,debit_type,debit_id,debit_name,debit_updated_at,debit_updated_by,debit_status,debit_accounting_date,debit_purchase_price,debit_purchase_vat,debit_total_purchase_price,debit_price,debit_vat,debit_total_price,cf_note,cf_status,cf_status_confirm,cf_updated_at,cf_updated_by,debit_vehicle_number});
                 acc[cur.id].debit_ids.push(debit_id);
               }
               return acc;
@@ -355,19 +355,15 @@ export default function ListConfirmFileGia() {
                               value={selectedDetail}
                               >
                                 <Column body={(row: any) =>{
-                                    let data = JSON.parse(row.debit_data);
-                                    return data?.fileNumber
+                                    return row?.file_number ? row.file_number : (row?.debits ? row.debits[0]?.file_number : "")
                                 }} header="Số file" />
                                 <Column field="debit_name" header="Chi phí" />
                                 <Column field="debit_type"  body={(row: any) => typeDebit.find((x:any) => x.type === row.debit_type)?.name || ""} header="Loại chi phí" />
                                 <Column body={(row: any) =>{
-                                    let data = JSON.parse(row.debit_data);
-                                    return data?.partner_info?.partnerLabel
-                                }} header="Nhà cung cấp" />
-                                <Column body={(row: any) =>{
-                                    let data = JSON.parse(row.debit_data);
-                                    return data?.vehicle_info?.vehicleLabel
-                                }} header="Biển số" />
+                                        const cus = listCustomer.find((x: any) => x.id === row.supplier_detail_id);
+                                        return cus?.partners?.abbreviation || ""
+                                    }} header="Nhà cung cấp" />
+                                <Column field="debit_vehicle_number" header="Biển số" />
                                 <Column field="debit_purchase_price" body={(row: any) => Helper.formatCurrency(row.debit_purchase_price.toString())} header="Giá mua" />
                                 <Column field="debit_price" body={(row: any) => Helper.formatCurrency(row.debit_price.toString())} header="Giá bán" />
                                 <Column field="debit_vat" header="VAT" />

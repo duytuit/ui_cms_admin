@@ -410,7 +410,7 @@ export default function ListContractFileBangKe() {
                                             }}
                                             body={(rowData: any) => {
                                                 const isChecked = selectedDebitServiceRows.findIndex(x => x.id === rowData.id) !== -1;
-                                                if(rowData.re_status == null && rowData.cf_status_confirm == 1){
+                                                // if(rowData.re_status == null && rowData.cf_status_confirm == 1){
                                                     return (
                                                         <Checkbox
                                                             className="p-checkbox-sm"
@@ -429,7 +429,7 @@ export default function ListContractFileBangKe() {
                                                             onClick={(e:any) => e.stopPropagation()}
                                                         />
                                                     );
-                                                }
+                                                // }
                                             }}
                                             style={{ width: "3em" }}
                                         />
