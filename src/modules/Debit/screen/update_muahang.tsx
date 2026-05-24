@@ -409,7 +409,7 @@ export default function UpdateMuaHang() {
                     />
                   )}
                 />
-                <Column field="vehicleName" header="Tên xe công trình" />
+                <Column field="vehicleName" header="Tên xe" />
                 <Column field="allocation" header="Là chi phí phân bổ" 
                   body={(row: any) => {
                     return(

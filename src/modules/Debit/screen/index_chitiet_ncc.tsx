@@ -378,12 +378,12 @@ useEffect(() => {
 
         return {
             ...row,
-            fileNumber: _data?.fileNumber || "không file",
-            declaration: _data?.declaration || "",
+            fileNumber: row?.file_number || "không file",
+            declaration: row?.declaration || "",
             dispatch_code: row.type === 1 ? row.dispatch_code : "",
             bill: row?.sup_bill || "",
-            file_bill: _data?.bill || "",
-            cont: _data?.containerCode || "",
+            file_bill: row?.bill || "",
+            cont: row?.container_code || "",
             supplierName: sup?.partners?.name || "",
             supplierAbb: sup?.partners?.abbreviation || "",
             userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),

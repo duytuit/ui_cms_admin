@@ -406,11 +406,11 @@ useEffect(() => {
 
         return {
             ...row,
-            fileNumber: _data?.fileNumber || "không file",
-            declaration: _data?.declaration || "",
+            fileNumber: row?.file_number || "không file",
+            declaration: row?.declaration || "",
             dispatch_code: row.type === 1 ? row.dispatch_code : "",
-            bill: _data?.bill || "",
-            file_bill: _data?.bill || "",
+            bill: row?.bill || "",
+            file_bill: row?.bill || "",
             customerName: cus?.partners?.name || "",
             customerAbb: cus?.partners?.abbreviation || "",
             userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
