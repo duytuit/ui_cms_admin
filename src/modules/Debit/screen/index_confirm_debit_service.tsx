@@ -209,7 +209,24 @@ export default function ListConfirmContractFileBangKe() {
                  
         setDisplayDebitServiceData(mappedDebitService);
     }, [first, rows,debitService, paramsPaginator,listCustomer]);
- 
+   const getSumColumn = (field: string) => {
+        const filtered = (displayDebitServiceData ?? []).filter((item: any) => {
+            return Object.entries(filters).every(([key, f]: [string, any]) => {
+                const value = f?.value?.toString().toLowerCase() ?? "";
+                if (!value) return true;
+                const cell = item[key]?.toString().toLowerCase() ?? "";
+                return cell.includes(value);
+            });
+        });
+
+        const sum = filtered.reduce((acc: number, item: any) => {
+            const raw = item[field]?.toString() ?? "0";
+            const val = parseFloat(raw.replace(/[^0-9.-]/g, "")) || 0; // giữ lại dấu âm
+            return acc + val;
+        }, 0);
+
+        return Helper.formatCurrency(sum.toString());
+    };
     return (
       <>
         <div className="card">
@@ -283,10 +300,18 @@ export default function ListConfirmContractFileBangKe() {
                                         <Column field="customerName" header="Khách hàng" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="customerAbb" header="Tên viết tắt" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column field="receipt_total" body={(row: any) => Helper.formatCurrency(row.receipt_total.toString())} header="Duyệt ứng" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumHQ" body={(row: any) => Helper.formatCurrency(row.sumHQ.toString())} header="Tổng phí HQ" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumCH" body={(row: any) => Helper.formatCurrency(row.sumCH.toString())} header="Tổng phí CH" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="sumCuoc" body={(row: any) => Helper.formatCurrency(row.sumCuoc.toString())} header="Tiền cược" filter showFilterMenu={false} filterMatchMode="contains" />
-                                        <Column field="phaiTra" body={(row: any) => Helper.formatCurrency(row.phaiTra.toString())} header="Phải thanh toán" filter showFilterMenu={false} filterMatchMode="contains" />
+                                        <Column field="sumHQ" body={(row: any) => Helper.formatCurrency(row.sumHQ.toString())} header="Tổng phí HQ" filter showFilterMenu={false} filterMatchMode="contains" 
+                                         footer={getSumColumn("sumHQ")}
+                                          footerStyle={{ fontWeight: "bold" }}/>
+                                        <Column field="sumCH" body={(row: any) => Helper.formatCurrency(row.sumCH.toString())} header="Tổng phí CH" filter showFilterMenu={false} filterMatchMode="contains" 
+                                         footer={getSumColumn("sumCH")}
+                                          footerStyle={{ fontWeight: "bold" }}/>
+                                        <Column field="sumCuoc" body={(row: any) => Helper.formatCurrency(row.sumCuoc.toString())} header="Tiền cược" filter showFilterMenu={false} filterMatchMode="contains" 
+                                         footer={getSumColumn("sumCuoc")}
+                                          footerStyle={{ fontWeight: "bold" }}/>
+                                        <Column field="phaiTra" body={(row: any) => Helper.formatCurrency(row.phaiTra.toString())} header="Phải thanh toán" filter showFilterMenu={false} filterMatchMode="contains" 
+                                         footer={getSumColumn("phaiTra")}
+                                          footerStyle={{ fontWeight: "bold" }}/>
                                         <Column field="employee" header="Tên giao nhận" filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Người cập nhật" body={(row: any) => row.userUpdate} filter showFilterMenu={false} filterMatchMode="contains" />
                                         <Column header="Cập nhật lúc" body={(e: any) => TimeBody(e.updated_at)} />
