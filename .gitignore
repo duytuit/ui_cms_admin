@@ -24,6 +24,7 @@ yarn-debug.log*
 yarn-error.log*
 # Ignore publish profiles
 *.pubxml
+*.json
 *.pubxml.user
 .vs
 
