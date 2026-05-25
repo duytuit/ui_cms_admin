@@ -142,6 +142,7 @@ export default function ListConfirmContractFileBangKe() {
         declaration: { value: null, matchMode: FilterMatchMode.CONTAINS },
         bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
         debit_cus_bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        employee: { value: null, matchMode: FilterMatchMode.CONTAINS },
         cf_status_confirm: { value: null, matchMode: FilterMatchMode.EQUALS }
     });
     const { data: debitService, loading, refresh:refreshHasDebitDispatch } = useListContractFileHasDebitService({ params: {...paramsPaginator,},debounce: 500,});
