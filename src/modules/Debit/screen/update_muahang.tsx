@@ -271,7 +271,7 @@ export default function UpdateMuaHang() {
                     optionValue="value"
                     optionLabel="label"
                     options={vehiclesOptions}
-                    label="Tên xe công trình"
+                    label="Tên xe"
                     className="w-full p-inputtext-sm"
                     onChange={(e: any) =>
                        {
