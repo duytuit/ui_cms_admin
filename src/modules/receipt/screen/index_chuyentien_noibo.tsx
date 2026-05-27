@@ -173,6 +173,7 @@ export default function ListChuyenTienNoiBo() {
                     <Column field="price" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
                         footer={getSumColumn("price")}
                         footerStyle={{ fontWeight: "bold" }}
+                          style={{ textAlign: 'right' }}
                     />
                     <Column field="note" header="Ghi chú" />
                     <Column field="nguoitao" header="Người cập nhật" filter showFilterMenu={false}  filterMatchMode="contains"/>

@@ -299,10 +299,12 @@ export default function ListReceiptThu() {
                                 <Column field="amount" body={(row: any) => Helper.formatCurrency((row.amount ??0).toString())}  header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
                                     footer={getSumColumn("amount")}
                                     footerStyle={{ fontWeight: "bold" }}
+                                      style={{ textAlign: 'right' }}
                                 />
                                 <Column field="total"  body={(row: any) => Helper.formatCurrency((row.total ?? 0).toString())} header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
                                     footer={getSumColumn("total")}
                                     footerStyle={{ fontWeight: "bold" }}
+                                      style={{ textAlign: 'right' }}
                                 />
                                 <Column field="lydo" header="Lý do" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                 <Column field="tenquy" header="Quỹ" filter showFilterMenu={false}  filterMatchMode="contains"/>

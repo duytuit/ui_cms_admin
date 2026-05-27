@@ -229,6 +229,8 @@ export default function ListBaoCaoTienMat() {
                   return Helper.formatCurrency((row.total || 0).toString())
               }
              }}
+               style={{ textAlign: 'right' }}
+               headerClassName="my-title-center"
             filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column header="Chi"
               body={(row: any) =>
@@ -237,12 +239,16 @@ export default function ListBaoCaoTienMat() {
                   return Helper.formatCurrency((row.total|| 0).toString())
               }
              }}
+               style={{ textAlign: 'right' }}
+               headerClassName="my-title-center"
              filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="ton" header="Tồn" 
               body={(row: any) =>
              {
                 return Helper.formatCurrency((row.ton||0).toString())
              }}
+               style={{ textAlign: 'right' }}
+               headerClassName="my-title-center"
             filter showFilterMenu={false}  filterMatchMode="contains"/>
         </DataTableClient>
       </div>

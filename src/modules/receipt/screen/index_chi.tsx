@@ -276,10 +276,12 @@ export default function ListReceiptChi() {
                                         <Column field="amount" header="Số tiền" filter showFilterMenu={false}  filterMatchMode="contains"
                                             footer={getSumColumn("amount")}
                                             footerStyle={{ fontWeight: "bold" }}
+                                              style={{ textAlign: 'right' }}
                                         />
                                         <Column field="total" header="Thành tiền" filter showFilterMenu={false}  filterMatchMode="contains"
                                             footer={getSumColumn("total")}
                                             footerStyle={{ fontWeight: "bold" }}
+                                              style={{ textAlign: 'right' }}
                                         />
                                         <Column field="tenquy" header="Quỹ" filter showFilterMenu={false}  filterMatchMode="contains"/>
                                         <Column field="typeReceipt" header="Kiểu phiếu" filter showFilterMenu={false}  filterMatchMode="contains"/>

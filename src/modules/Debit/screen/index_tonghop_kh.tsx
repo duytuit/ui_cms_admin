@@ -405,15 +405,15 @@ const applyFilters = (rows: any[]) => {
             </Row>
             <Row>
                 <Column header="Khách hàng" />
-                <Column header="Phí DVDK" />
-                <Column header="Phí CHDK" />
-                <Column header="Phí DVTK" />
-                <Column header="Phí CHTK" />
-                <Column header="Thanh toán DVTK" />
-                <Column header="Thanh toán CHTK" />
-                <Column header="DVCK" />
-                <Column header="CHCK" />
-                <Column header="Còn lại" />
+                <Column header="Phí DVDK" headerClassName="my-title-center"/>
+                <Column header="Phí CHDK" headerClassName="my-title-center"/>
+                <Column header="Phí DVTK" headerClassName="my-title-center"/>
+                <Column header="Phí CHTK" headerClassName="my-title-center"/>
+                <Column header="Thanh toán DVTK" headerClassName="my-title-center"/>
+                <Column header="Thanh toán CHTK" headerClassName="my-title-center"/>
+                <Column header="DVCK" headerClassName="my-title-center"/>
+                <Column header="CHCK" headerClassName="my-title-center"/>
+                <Column header="Còn lại" headerClassName="my-title-center"/>
             </Row>
              <Row>
                 <Column />
@@ -462,6 +462,7 @@ const applyFilters = (rows: any[]) => {
                       }} 
                       footer={getSumColumn("dvdk")}
                       footerStyle={{ fontWeight: "bold" }}
+                      style={{ textAlign: 'right' }}
                     />
                     <Column field="chdk"  
                       body={(row: any) =>{
@@ -469,6 +470,7 @@ const applyFilters = (rows: any[]) => {
                       }} 
                       footer={getSumColumn("chdk")}
                       footerStyle={{ fontWeight: "bold" }}
+                      style={{ textAlign: 'right' }}
                     />
                     <Column field="dvtk"  
                       body={(row: any) =>{
@@ -476,6 +478,7 @@ const applyFilters = (rows: any[]) => {
                       }} 
                       footer={getSumColumn("dvtk")}
                       footerStyle={{ fontWeight: "bold" }}
+                      style={{ textAlign: 'right' }}
                     />
                     <Column field="chtk"  
                       body={(row: any) =>{
@@ -483,6 +486,7 @@ const applyFilters = (rows: any[]) => {
                       }} 
                       footer={getSumColumn("chtk")}
                       footerStyle={{ fontWeight: "bold" }}
+                      style={{ textAlign: 'right' }}
                     />
                     <Column field="ttdvtk"  
                       body={(row: any) =>{
@@ -490,6 +494,7 @@ const applyFilters = (rows: any[]) => {
                       }} 
                       footer={getSumColumn("ttdvtk")}
                       footerStyle={{ fontWeight: "bold" }}
+                      style={{ textAlign: 'right' }}
                     />
                     <Column field="ttchtk"  
                       body={(row: any) =>{
@@ -497,6 +502,7 @@ const applyFilters = (rows: any[]) => {
                       }} 
                       footer={getSumColumn("ttchtk")}
                       footerStyle={{ fontWeight: "bold" }}
+                      style={{ textAlign: 'right' }}
                     />
                     <Column field="dvck"  
                       body={(row: any) =>{
@@ -504,6 +510,7 @@ const applyFilters = (rows: any[]) => {
                       }} 
                       footer={getSumColumn("dvck")}
                       footerStyle={{ fontWeight: "bold" }}
+                      style={{ textAlign: 'right' }}
                     />
                     <Column field="chck"  
                       body={(row: any) =>{
@@ -511,6 +518,7 @@ const applyFilters = (rows: any[]) => {
                       }} 
                       footer={getSumColumn("chck")}
                       footerStyle={{ fontWeight: "bold" }}
+                      style={{ textAlign: 'right' }}
                     />
                     <Column field="ck" 
                       body={(row: any) =>{
@@ -518,6 +526,7 @@ const applyFilters = (rows: any[]) => {
                       }} 
                       footer={getSumColumn("ck")}
                       footerStyle={{ fontWeight: "bold" }}
+                      style={{ textAlign: 'right' }}
                     />
                   </DataTableClient>
               </div>

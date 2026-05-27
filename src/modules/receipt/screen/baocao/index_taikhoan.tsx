@@ -407,9 +407,9 @@ export default function ListBaoCaoTaiKhoan() {
                 <Column header="Đối tượng" />
                 <Column header="Tên quỹ" />
                 <Column header="Lý do" />
-                <Column header="Thu" />
-                <Column header="Chi" />
-                <Column header="Tồn" />
+                <Column header="Thu" headerClassName="my-title-center"/>
+                <Column header="Chi" headerClassName="my-title-center"/>
+                <Column header="Tồn" headerClassName="my-title-center"/>
             </Row>
              <Row>
                 <Column />
@@ -458,6 +458,7 @@ export default function ListBaoCaoTaiKhoan() {
              }}
              footer={getSumColumn("thu")}
              footerStyle={{ fontWeight: "bold" }}
+               style={{ textAlign: 'right' }}
              filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column header="Chi"  
             body={(row: any) =>
@@ -466,12 +467,14 @@ export default function ListBaoCaoTaiKhoan() {
              }}
               footer={getSumColumn("chi")}  
               footerStyle={{ fontWeight: "bold" }}
+               style={{ textAlign: 'right' }}
              filter showFilterMenu={false}  filterMatchMode="contains"/>
             <Column field="ton" header="Tồn" 
               body={(row: any) =>
              {
                 return Helper.formatCurrency(row.ton.toString())
              }}
+               style={{ textAlign: 'right' }}
             filter showFilterMenu={false}  filterMatchMode="contains"/>
         </DataTableClient>
       </div>

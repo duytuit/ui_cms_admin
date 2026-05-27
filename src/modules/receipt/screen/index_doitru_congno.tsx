@@ -173,6 +173,7 @@ export default function ListDoiTruCongNo() {
                     <Column field="price" header="Số tiền"
                         footer={getSumColumn("price")}
                         footerStyle={{ fontWeight: "bold" }}
+                          style={{ textAlign: 'right' }}
                     />
                     <Column field="code_receipt_a" header="Chứng từ chi" />
                     <Column field="code_receipt_b" header="Chứng từ thu" />

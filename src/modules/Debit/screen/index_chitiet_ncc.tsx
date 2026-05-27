@@ -502,6 +502,7 @@ useEffect(() => {
                           }} 
                           footer={getSumColumn("thanhtien_dv")}
                           footerStyle={{ fontWeight: "bold" }}
+                          style={{ textAlign: 'right' }}
                         />
                         <Column // chi hộ
                           body={(row: any) =>{
@@ -509,16 +510,19 @@ useEffect(() => {
                           }} 
                           footer={getSumColumn("thanhtien_ch")}
                           footerStyle={{ fontWeight: "bold" }}
+                          style={{ textAlign: 'right' }}
                         />
                         <Column 
                           body={(row: any) =>{
                             return Helper.formatCurrency(row.dathu_dv.toString());
                           }}
+                          style={{ textAlign: 'right' }}
                         />
                         <Column 
                           body={(row: any) =>{
                             return Helper.formatCurrency(row.dathu_ch.toString());
                           }} 
+                          style={{ textAlign: 'right' }}
                         />
                         <Column  // còn dịch vụ
                           body={(row: any) =>{
@@ -526,6 +530,7 @@ useEffect(() => {
                           }} 
                           footer={getSumColumn("conlai_dv_view")}
                           footerStyle={{ fontWeight: "bold" }}
+                          style={{ textAlign: 'right' }}
                           frozen 
                           alignFrozen="right" 
                           className="font-bold" 
@@ -536,6 +541,7 @@ useEffect(() => {
                           }} 
                           footer={getSumColumn("conlai_ch_view")}
                           footerStyle={{ fontWeight: "bold" }}
+                          style={{ textAlign: 'right' }}
                           frozen 
                           alignFrozen="right" 
                           className="font-bold" 
@@ -546,6 +552,7 @@ useEffect(() => {
                           }} 
                           footer={getSumColumn("conlai_tong")}
                           footerStyle={{ fontWeight: "bold" }}
+                          style={{ textAlign: 'right' }}
                           frozen 
                           alignFrozen="right" 
                           className="font-bold"
