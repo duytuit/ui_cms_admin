@@ -96,6 +96,7 @@ import UpdateDepreciation from "modules/Depreciation/screen/update";
 import UpdateSingleDepreciation from "modules/Depreciation/screen/update_single";
 import ListChiPhiChung from "modules/Depreciation/screen/index_cpc";
 import ListChiPhiTraTruoc from "modules/Depreciation/screen/index_cptt";
+import ListLoiNhuanTheoXe from "modules/receipt/screen/index_baocao_loinhuan_theoxe";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -213,6 +214,7 @@ const publicRoutes = [
   { path: "/receipt/ListDauKyTaiKhoan/detail/:id", component: UpdateDauKyTaiKhoan, layout: 'UpdateDauKyTaiKhoan' },
   { path: "/receipt/ListBaoCaoLoiNhuan", component: ListBaoCaoLoiNhuan, layout: 'ListBaoCaoLoiNhuan' },
   { path: "/receipt/ListBaoCaoLuuChuyenTienTe", component: ListBaoCaoLuuChuyenTienTe, layout: 'ListBaoCaoLuuChuyenTienTe' },
+  { path: "/receipt/ListLoiNhuanTheoXe", component: ListLoiNhuanTheoXe, layout: 'ListLoiNhuanTheoXe' },
   // Debit 
   { path: "/debit/listCuoc", component: ListCuoc, layout: 'ListCuoc' },
   { path: "/debit/ListNhacNoKH", component: ListNhacNoKH, layout: 'ListNhacNoKH' },
