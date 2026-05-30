@@ -10,7 +10,8 @@ import { useListEmployeeWithState } from "modules/employee/service";
 import { Helper } from "utils/helper";
 import { Splitter } from "primereact/splitter";
 import { FilterMatchMode } from "primereact/api";
-import { useListContractFile } from "modules/ContractFile/service";
+import { useListBaoCaoLoiNhuanTheoXe } from "modules/Debit/service";
+import { useListIncomeExpenseWithState } from "modules/categories/service";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -65,21 +66,6 @@ export default function ListLoiNhuanTheoXe() {
   const { data: customers } = useListCustomerDetailWithState({status: 1});
   const [filters, setFilters] = useState({
           global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          customerName: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          customerAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          feature: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          type: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          declaration_type: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          declaration: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          occurrence: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          quantity: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          business: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          listEmployee: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          file_number: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          bill: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          sales: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          container_code: { value: null, matchMode: FilterMatchMode.CONTAINS },
-          note: { value: null, matchMode: FilterMatchMode.CONTAINS },
           });
   const [paramsPaginator, setParamsPaginator] = useState({
     pageNum: 1,
@@ -88,69 +74,81 @@ export default function ListLoiNhuanTheoXe() {
     render: false,
     keyword: "",
   });
-  const { data, loading, error, refresh } = useListContractFile({
+  const { data, loading, error, refresh } = useListBaoCaoLoiNhuanTheoXe({
     params: paramsPaginator,
     debounce: 500,
   });
-  const { data: employeeInfos } = useListEmployeeWithState({});
-  const employeeOptions = useMemo(() => {
-    return employeeInfos;
-  }, [employeeInfos]);
+  const { data: DMExpense } = useListIncomeExpenseWithState({}); 
   // ✅ Client-side pagination
   useEffect(() => {
     if (!data) return;
     handleParamUrl(paramsPaginator);
-    const mapped = (data?.data || []).map((row: any) => {
-      const cus = customers.find((x: any) => x.id === row.customer_detail_id);
-      const _tinhChat = tinhChat.find((x: any) => x.feature === row.feature);
-      const _loaiHang = loaiHang.find((x: any) => x.type === row.type);
-      const _loaiToKhai = loaiToKhai.find(
-        (x: any) => x.DeclarationType === row.declaration_type
-      );
-      const _phatSinh = phatSinh.find(
-        (x: any) => x.occurrence === row.occurrence
-      );
-      const _nghiepVu = nghiepVu.find((x: any) => x.business === row.business);
-      const _user = employeeOptions.find((x: any) => x.user_id === row.updated_by);
-      let _sumTongPrice = 0;
-      let _listEmployee = "";
-      if (row?.file_info_details.length > 0) {
-        row.file_info_details.forEach((element: any, index: number) => {
-          _sumTongPrice += element.price;
-          const _employee = employeeOptions.find(
-            (x: any) => x.id === element.employee_id
-          );
-          const fullName = `${_employee?.last_name ?? ""} ${_employee?.first_name ?? ""
-            }`.trim();
-          // thêm dấu ; giữa các tên, không thêm sau tên cuối cùng
-          _listEmployee +=
-            fullName + (index < row.file_info_details.length - 1 ? ";" : "");
-        });
-      }
-       let _sumAmount = 0;
-       if (row?.receipts.length > 0) {
-        row.receipts.forEach((element: any, index: number) => {
-          _sumAmount += element.receipt_details?.amount || 0;
-        });
-      }
-
+      // 16: phí sửa chữa
+      // 17: phí dầu DO
+      // 18: Cước đường bộ
+      // 19: phí khác
+      // 20: phí lãi vay
+      // 22 : trích lương lái xe
+      // 34: trích BHXH
+      // 35: phí gửi xe
+      // 38: phí đi đường lái xe
+    let baocaoloinhuan = (data[0]?.data?.debit_theoxe || []).map((row: any) => {
+      const totalCost = row.total_price + row.total_driver_fee;
+      const listPhi =(data[0]?.data?.chi_theoxe || []).filter((item: any) => item.vehicle_id === row.id).map((item: any) => {
+        return {
+          ...item,
+          name: DMExpense?.find((d: any) => d.id === item.income_expense_category_id)?.name || "---"
+        }
+      });
       return {
         ...row,
-        feature: _tinhChat?.name || "",
-        type: _loaiHang?.name || "",
-        declaration_type: _loaiToKhai?.name || "",
-        occurrence: _phatSinh?.name || "",
-        business: _nghiepVu?.name || "",
-        customerName: cus?.partners?.name || "",
-        customerAbb: cus?.partners?.abbreviation || "",
-        userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),
-        sumTongPrice: _sumTongPrice,
-        listEmployee: _listEmployee,
-        sumAmount: _sumAmount,
+        totalCost,
+        listPhi
       };
     });
-    setDisplayData(mapped);
-  }, [employeeOptions, data, paramsPaginator, customers]);
+    const loinhuanxengoai = (data[1]?.data || []).map((row: any) => {
+      return {
+        ...row,
+        number_code: "lợi nhuận xe ngoài",
+        totalCost: row.total_price,
+        listPhi: [
+          {
+            income_expense_category_id: 17,
+            amount: row.total_purchase_price
+          }
+        ]
+      };
+    });
+  
+    const loinhuandoanhthukhac = [
+      {
+        number_code: "lợi nhuận doanh thu khác",
+        totalCost: data[3]?.data.loinhuan_banhang.reduce((acc: number, curr: any) => acc + curr.total_price, 0) + data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_price_com, 0) + data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_price, 0), // doanh số
+        listPhi: [  
+          {
+              income_expense_category_id: 17,
+              amount: data[3]?.data.loinhuan_muahang.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0)+ data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) + data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0 // phí mua hàng
+          }
+        ]
+      }
+    ]
+    const loinhuanhaiquan = [
+      {
+        number_code: "lợi nhuận hải quan",
+        totalCost: data[2]?.data.reduce((acc: number, curr: any) => acc + curr.total_price, 0), // doanh số
+        listPhi: [  
+          {
+              income_expense_category_id: 17,
+              amount: data[2]?.data.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0 // phí mua hàng
+          }
+        ]
+      }
+    ]
+    baocaoloinhuan.push(...loinhuanxengoai);
+    baocaoloinhuan.push(...loinhuandoanhthukhac);
+    baocaoloinhuan.push(...loinhuanhaiquan);
+    setDisplayData(baocaoloinhuan);
+  }, [data, paramsPaginator, customers]);
     const getSumColumn = (field: string) => {
         const filtered = (displayData ?? []).filter((item: any) => {
             return Object.entries(filters).every(([key, f]: [string, any]) => {
@@ -193,22 +191,89 @@ export default function ListLoiNhuanTheoXe() {
                 scrollable
                 scrollHeight="flex"
                 style={{ flex: 1 }}
-                tableStyle={{ minWidth: "2900px" }} // ép bảng rộng hơn để có scroll ngang
+                tableStyle={{ minWidth: "2000px" }} // ép bảng rộng hơn để có scroll ngang
               >
-                <Column field="customerName" header="Tên Xe" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="customerAbb" header="Doanh số" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="file_number" header="Phí dầu/cước mua" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="bill" header="Cước đường bộ" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="declaration" header="Phí sửa chữa" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="quantity" header="Phí khác" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="container_code" header="Lãi vay" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="sales" header="Lương lái xe" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="listEmployee" header="Phí gửi xe" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="listEmployee" header="Phí BHXH" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="listEmployee" header="Phí đi đường của lái xe" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="listEmployee" header="Tổng chi phí" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="number_code" header="Tên Xe" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="totalCost" header="Doanh số" body={(rowData: any) => Helper.formatCurrency(rowData?.totalCost?.toString())} style={{ textAlign: 'right' }} filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="file_number" header="Phí dầu/cước mua"
+                  body={(rowData: any) => {
+                    const phiDau = rowData.listPhi?.find((p: any) => p.income_expense_category_id === 17);
+                    return Helper.formatCurrency(phiDau?.amount?.toString() || "0");
+                  }} 
+                  style={{ textAlign: 'right' }}
+                 filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="bill" header="Cước đường bộ"
+                  body={(rowData: any) => {                  
+                    const cuocDuongBo = rowData.listPhi?.find((p: any) => p.income_expense_category_id === 18);
+                    return Helper.formatCurrency(cuocDuongBo?.amount?.toString() || "0");
+                  }} 
+                  style={{ textAlign: 'right' }}
+                 filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="declaration" header="Phí sửa chữa"
+                  body={(rowData: any) => {                  
+                    const phiSuaChua = rowData.listPhi?.find((p: any) => p.income_expense_category_id === 16);
+                    return Helper.formatCurrency(phiSuaChua?.amount?.toString() || "0");
+                  }} 
+                  style={{ textAlign: 'right' }}
+                 filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="quantity" header="Phí khác"
+                  body={(rowData: any) => {                  
+                    const phiKhac = rowData.listPhi?.find((p: any) => p.income_expense_category_id === 19);
+                    return Helper.formatCurrency(phiKhac?.amount?.toString() || "0");
+                  }} 
+                  style={{ textAlign: 'right' }}
+                 filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="container_code" header="Lãi vay"
+                  body={(rowData: any) => {                  
+                    const laiVay = rowData.listPhi?.find((p: any) => p.income_expense_category_id === 20);
+                    return Helper.formatCurrency(laiVay?.amount?.toString() || "0");
+                  }} 
+                  style={{ textAlign: 'right' }}
+                 filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="sales" header="Lương lái xe"
+                  body={(rowData: any) => {                  
+                    const luongLaiXe = rowData.listPhi?.find((p: any) => p.income_expense_category_id === 22);
+                    return Helper.formatCurrency(luongLaiXe?.amount?.toString() || "0");
+                  }} 
+                  style={{ textAlign: 'right' }}
+                 filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column 
+                 body={(rowData: any) => {                  
+                    const luongLaiXe = rowData.listPhi?.find((p: any) => p.income_expense_category_id === 35);
+                    return Helper.formatCurrency(luongLaiXe?.amount?.toString() || "0");
+                 }} 
+                 style={{ textAlign: 'right' }}
+                 header="Phí gửi xe" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="listEmployee" header="Phí BHXH" 
+                  body={(rowData: any) => {
+                    const phiBHXH = rowData.listPhi?.find((p: any) => p.income_expense_category_id === 34);
+                    return Helper.formatCurrency(phiBHXH?.amount?.toString() || "0");
+                  }} 
+                  style={{ textAlign: 'right' }}
+                filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="listEmployee" header="Phí đi đường của lái xe"
+                 body={(rowData: any) => {
+                    const phiDiDuongLaiXe = rowData.listPhi?.find((p: any) => p.income_expense_category_id === 38);
+                    return Helper.formatCurrency(phiDiDuongLaiXe?.amount?.toString() || "0");
+                  }}
+                  style={{ textAlign: 'right' }}  
+                 filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="listEmployee" header="Tổng chi phí"
+                 body={(rowData: any) => {
+                    const tongChiPhi = rowData.listPhi?.reduce((sum: number, p: any) => sum + (p.amount ? parseFloat(p.amount.toString()) : 0), 0);
+                    return Helper.formatCurrency(tongChiPhi?.toString() || "0");
+                  }}
+                  style={{ textAlign: 'right' }}
+                 filter showFilterMenu={false} filterMatchMode="contains" />
                 <Column field="listEmployee" header="Khấu hao/chi phí phân bổ" filter showFilterMenu={false} filterMatchMode="contains" />
-                <Column field="listEmployee" header="Lợi nhuận" filter showFilterMenu={false} filterMatchMode="contains" />
+                <Column field="listEmployee" header="Lợi nhuận"
+                  body={(rowData: any) => { 
+                    const tongChiPhi = rowData.listPhi?.reduce((sum: number, p: any) => sum + (p.amount ? parseFloat(p.amount.toString()) : 0), 0);
+                    const loiNhuan = (rowData.totalCost || 0) - tongChiPhi;
+                    return Helper.formatCurrency(loiNhuan?.toString() || "0");
+                  }} 
+                  style={{ textAlign: 'right' }}
+                 filter showFilterMenu={false} filterMatchMode="contains" />
                 <Column field="listEmployee" header="Tỷ suất lợi nhuận" filter showFilterMenu={false} filterMatchMode="contains" />
                 <Column field="listEmployee" header="Lợi nhuận chưa tính khấu hao" filter showFilterMenu={false} filterMatchMode="contains" />
               </DataTableClient>

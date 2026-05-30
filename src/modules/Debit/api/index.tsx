@@ -3,6 +3,7 @@ import { getData, getDataV3, postData, postDataList } from "lib/request";
 export const listDebit = async (params: any) => await getData("Debit", params);
 export const GetObjectDebitChiTietNoBillKHAsync = async (params: any) => await getData("Debit/GetObjectDebitChiTietNoBillKHAsync", params);
 export const GetObjectDebitChiTietHasBillKHAsync = async (params: any) => await getData("Debit/GetObjectDebitChiTietHasBillKHAsync", params);
+export const GetObjectBaoCaoLoiNhuanTheoXeAsync = async (params: any) => await getData("Debit/GetObjectBaoCaoLoiNhuanAsync", params);
 export const listMuahangNCC = async (params: any) => await getData("Debit/muahangNCC", params);
 export const listBanhangKH = async (params: any) => await getData("Debit/banhangKH", params);
 export const GetObjectTheoDoiNhacNoKHAsync= async (params: any) => await getData("Debit/GetObjectTheoDoiNhacNoKHAsync", params);

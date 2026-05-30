@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {  GetObjectDebitChiTietHasBillKHAsync, GetObjectDebitChiTietNoBillKHAsync, GetObjectDebitLaiXeTinhLuongAsync, GetObjectTheoDoiNhacNoKHAsync, listBanhangKH, listCongNoGiaoNhan, listCongNoLaiXe, listDebit, listDebitCongNoChiTietKH, listDebitCongNoChiTietNCC, listDebitCongNoTongHopKH, listDebitCongNoTongHopNCC, listDebitCuoc, listDebitDauKyKH, listDebitDauKyNCC, listDebitDispatch, listDebitDoiTruKH, listDebitDoiTruNCC, listDebitDuNoDKKH, listDebitDuNoDKNCC, listDebitMuaBan, listDebitService, listDebitTamThu, listHasDebitNCC, listHasDebitNoFileDispatchKH, listHasDebitNoFileNCC, listMuahangNCC, listNoDebitNCC, listNoDebitNoFileDispatchKH, listNoDebitNoFileNCC } from '../api';
+import { GetObjectBaoCaoLoiNhuanTheoXeAsync, GetObjectDebitChiTietHasBillKHAsync, GetObjectDebitChiTietNoBillKHAsync, GetObjectDebitLaiXeTinhLuongAsync, GetObjectTheoDoiNhacNoKHAsync, listBanhangKH, listCongNoGiaoNhan, listCongNoLaiXe, listDebit, listDebitCongNoChiTietKH, listDebitCongNoChiTietNCC, listDebitCongNoTongHopKH, listDebitCongNoTongHopNCC, listDebitCuoc, listDebitDauKyKH, listDebitDauKyNCC, listDebitDispatch, listDebitDoiTruKH, listDebitDoiTruNCC, listDebitDuNoDKKH, listDebitDuNoDKNCC, listDebitMuaBan, listDebitService, listDebitTamThu, listHasDebitNCC, listHasDebitNoFileDispatchKH, listHasDebitNoFileNCC, listMuahangNCC, listNoDebitNCC, listNoDebitNoFileDispatchKH, listNoDebitNoFileNCC } from '../api';
 
 export const useListDebit = ({ params, debounce = 500 }: any) => {
     const [data, setData] = useState<any>([]);
@@ -867,6 +867,35 @@ export const useListDebitDuNoDKNCC = ({ params, debounce = 500 }: any) => {
     useEffect(() => {
         // ❌ Không gọi API khi chưa có supplierDetailId
         if (!params || !params.supplierDetailId || params.supplierDetailId <= 0) {
+            setData([]);
+            return;
+        }
+        const timer = setTimeout(fetchData, debounce);
+        return () => clearTimeout(timer);
+    }, [JSON.stringify(params)]);
+
+    return { data, loading, error, refresh: fetchData };
+};
+export const useListBaoCaoLoiNhuanTheoXe = ({ params, debounce = 500 }: any) => {
+    const [data, setData] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<any>(null);
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const res = await GetObjectBaoCaoLoiNhuanTheoXeAsync({ ...params });
+            setData(res?.data?.data || []);
+        } catch (err) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+       if (!params || Object.keys(params).length === 0) {
             setData([]);
             return;
         }
