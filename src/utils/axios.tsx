@@ -5,7 +5,7 @@ import store from "redux/store";
 
 export const clientApi = axios.create({
     // axios Cấu hình yêu cầu được cấu hình với tùy chọn BaseURL, cho biết rằng phần công khai URL yêu cầu
-    baseURL: process.env.REACT_APP_API_URL+"api/",
+    baseURL: 'https://vudaco.io.vn/api/',
     // hết giờ
     timeout: 120000,
     headers: {
