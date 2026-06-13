@@ -115,6 +115,8 @@ export default function ListLoiNhuanTheoXe() {
         number_code: "lợi nhuận xe ngoài",
         totalCost: row.total_price,
         phiDau : row.total_purchase_price || 0,
+        tongChiPhi: row.total_purchase_price || 0,
+        loiNhuan: row.total_price - (row.total_purchase_price || 0),
       };
     });
   
@@ -122,14 +124,18 @@ export default function ListLoiNhuanTheoXe() {
       {
         number_code: "lợi nhuận doanh thu khác",
         totalCost: data[3]?.data.loinhuan_banhang.reduce((acc: number, curr: any) => acc + curr.total_price, 0) + data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_price_com, 0) + data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_price, 0), // doanh số
-        phiDau: data[3]?.data.loinhuan_muahang.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0)+ data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) + data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0 // phí mua hàng
+        phiDau: data[3]?.data.loinhuan_muahang.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0)+ data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) + data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0 ,// phí mua hàng
+        tongChiPhi: data[3]?.data.loinhuan_muahang.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0)+ data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) + data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0,
+        loiNhuan: (data[3]?.data.loinhuan_banhang.reduce((acc: number, curr: any) => acc + curr.total_price, 0) + data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_price_com, 0) + data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_price, 0)) - (data[3]?.data.loinhuan_muahang.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0)+ data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) + data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_purchase_price , 0) || 0),
       }
     ]
     const loinhuanhaiquan = [
       {
         number_code: "lợi nhuận hải quan",
         totalCost: data[2]?.data.reduce((acc: number, curr: any) => acc + curr.total_price, 0), // doanh số
-        phiDau: data[2]?.data.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0 // phí mua hàng
+        phiDau: data[2]?.data.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0, // phí mua hàng
+        tongChiPhi: data[2]?.data.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0,
+        loiNhuan: data[2]?.data.reduce((acc: number, curr: any) => acc + curr.total_price, 0) - (data[2]?.data.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0),  
       }
     ]
     baocaoloinhuan.push(...loinhuanxengoai);

@@ -161,8 +161,7 @@ export default function UpdatePhieuThuKH({debits, customerDetailId, onClose}: {d
                             <Column field="customerAbb" header="Tên khách hàng"/>
                             <Column header="Số file"
                             body={(row: any) =>{
-                                let data = JSON.parse(row.data);
-                                return data?.fileNumber
+                                return row?.file_number || "không file"
                             }}/>
                             <Column  header="Mã điều xe" 
                             body={(row: any) =>{

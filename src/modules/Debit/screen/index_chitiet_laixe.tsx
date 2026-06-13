@@ -178,15 +178,14 @@ useEffect(() => {
         const _user = employees.find((x: any) => x.user_id === row.updated_by);
         const _laixe = employees.find((x: any) => x.id === row.employee_driver_id);
         const _typeKH = TypeDebitDKKH.find((x: any) => x.value === row.type);
-        const _data = JSON.parse(row.data);
         const thanh_tien = Math.round(row.driver_fee);
         return {
             ...row,
-            fileNumber: _data?.fileNumber || "không file",
-            declaration: _data?.declaration || "",
+            fileNumber: row?.file_number || "không file",
+            declaration: row?.declaration || "",
             dispatch_code: row.type === 1 ? row.dispatch_code : "",
-            bill: _data?.bill || "",
-            file_bill: _data?.bill || "",
+            bill: row?.bill || "",
+            file_bill: row?.bill || "",
             customerName: cus?.partners?.name || "",
             customerAbb: cus?.partners?.abbreviation || "",
             userName: `${_user?.last_name ?? ""} ${_user?.first_name ?? ""}`.trim(),

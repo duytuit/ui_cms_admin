@@ -398,7 +398,6 @@ useEffect(() => {
         const cus = customers.find((x: any) => x.id === row.customer_detail_id);
         const _user = employees.find((x: any) => x.user_id === row.updated_by);
         const _typeKH = TypeDebitDKKH.find((x: any) => x.value === row.type);
-        const _data = JSON.parse(row.data);
         const total_price = row.price + row.price_com;
         const thanh_tien_dv = Math.round(total_price * (1 + row.vat / 100));
         const thanh_tien_ch = Math.round(row.price * (1 + row.vat / 100));

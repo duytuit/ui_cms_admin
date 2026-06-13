@@ -370,7 +370,6 @@ useEffect(() => {
         const sup = suppliers.find((x: any) => x.id === row.supplier_detail_id);
         const _user = employees.find((x: any) => x.user_id === row.updated_by);
         const _typeKH = TypeDebitDKKH.find((x: any) => x.value === row.type);
-        const _data = JSON.parse(row.data);
         const total_purchase = row.purchase_price + row.purchase_com;
         const thanh_tien_dv = Math.round(total_purchase * (1 + row.purchase_vat / 100));
         const thanh_tien_ch = Math.round(row.purchase_price * (1 + row.purchase_vat / 100));

@@ -161,8 +161,7 @@ export default function UpdatePhieuChiNCC({debits, supplierDetailId, onClose}: {
                             <Column field="supplierAbb" header="Tên nhà cung cấp"/>
                             <Column header="Số file"
                             body={(row: any) =>{
-                                let data = JSON.parse(row.data);
-                                return data?.fileNumber
+                                return row?.file_number || "không file"
                             }}/>
                             <Column  header="Mã điều xe" 
                             body={(row: any) =>{

@@ -170,13 +170,12 @@ export default function ListKyCongNoKH() {
     if (!data?.data || !dataBill?.data) return;
     handleParamUrl(paramsPaginator);
     const mapped = (data?.data || []).map((row: any) => {
-      const _data = JSON.parse(row.data);
       const total_price = row.price + row.price_com;
       const thanh_tien_dv = Math.round(total_price * (1 + row.vat / 100));
       const thanh_tien_ch = Math.round(row.price * (1 + row.vat / 100));
       return {
         ...row,
-          fileNumber: _data?.fileNumber || "không file",
+          fileNumber: row?.file_number || "không file",
           thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 || row.type === 8) ? thanh_tien_dv : 0,
           thanhtien_ch: (row.type === 2 || row.type === 3 || row.type === 6) ? thanh_tien_ch : 0,
       };
@@ -288,13 +287,12 @@ export default function ListKyCongNoKH() {
           if (res.status === 200) {
               if(res.data.status){
                   const mapped = (res.data.data?.data || []).map((row: any) => {
-                    const _data = JSON.parse(row.data);
                     const total_price = row.price + row.price_com;
                     const thanh_tien_dv = Math.round(total_price * (1 + row.vat / 100));
                     const thanh_tien_ch = Math.round(row.price * (1 + row.vat / 100));
                     return {
                       ...row,
-                        fileNumber: _data?.fileNumber || "không file",
+                        fileNumber: row?.file_number || "không file",
                         thanhtien_dv: (row.type === 0 || row.type === 1 || row.type === 4 || row.type === 5 || row.type === 8) ? thanh_tien_dv : 0,
                         thanhtien_ch: (row.type === 2 || row.type === 3 || row.type === 6) ? thanh_tien_ch : 0,
                     };
