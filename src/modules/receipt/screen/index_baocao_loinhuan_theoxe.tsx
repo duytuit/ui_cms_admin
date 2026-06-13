@@ -10,6 +10,7 @@ import { Splitter } from "primereact/splitter";
 import { FilterMatchMode } from "primereact/api";
 import { useListBaoCaoLoiNhuanTheoXe } from "modules/Debit/service";
 import { useListIncomeExpenseWithState } from "modules/categories/service";
+import { DataTable } from "components/uiCore";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -178,7 +179,7 @@ export default function ListLoiNhuanTheoXe() {
                 overflow: "hidden",
               }}
             >
-              <DataTableClient
+              <DataTable
                 rowHover
                 value={displayData}
                 currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
@@ -190,6 +191,7 @@ export default function ListLoiNhuanTheoXe() {
                 onFilter={(e: any) => setFilters(e.filters)}
                 className={classNames("Custom-DataTableClient")}
                 scrollable
+                showGridlines
                 scrollHeight="flex"
                 style={{ flex: 1 }}
                 tableStyle={{ minWidth: "2000px" }} // ép bảng rộng hơn để có scroll ngang
@@ -198,6 +200,7 @@ export default function ListLoiNhuanTheoXe() {
                   field="number_code"
                   header="Tên Xe"
                   filter
+                  frozen alignFrozen="left" 
                   showFilterMenu={false}
                   filterMatchMode="contains"
                 />
@@ -384,7 +387,7 @@ export default function ListLoiNhuanTheoXe() {
                   showFilterMenu={false}
                   filterMatchMode="contains"
                 />
-              </DataTableClient>
+              </DataTable>
             </div>
           </Splitter>
         </div>
