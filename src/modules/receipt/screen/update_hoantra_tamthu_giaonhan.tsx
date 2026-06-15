@@ -121,7 +121,7 @@ export default function UpdateHoanTraTamThuGiaoNhan({debits, onClose}: {debits: 
                             <Column field="customerAbb" header="Tên khách hàng"/>
                             <Column header="Số file"
                             body={(row: any) =>{
-                                return row?.file_number;
+                                return row?.file_number || "không file"
                             }}/>
                             <Column field="name" header="Nội dung"/>
                             <Column  header="Phí Cược" 

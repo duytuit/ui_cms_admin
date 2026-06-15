@@ -170,7 +170,6 @@ export default function ListKyCongNoKH() {
     if (!data?.data || !dataBill?.data) return;
     handleParamUrl(paramsPaginator);
     const mapped = (data?.data || []).map((row: any) => {
-      //const _data = JSON.parse(row.data);
       const total_price = row.price + row.price_com;
       const thanh_tien_dv = Math.round(total_price * (1 + row.vat / 100));
       const thanh_tien_ch = Math.round(row.price * (1 + row.vat / 100));
@@ -288,7 +287,6 @@ export default function ListKyCongNoKH() {
           if (res.status === 200) {
               if(res.data.status){
                   const mapped = (res.data.data?.data || []).map((row: any) => {
-                    //const _data = JSON.parse(row.data);
                     const total_price = row.price + row.price_com;
                     const thanh_tien_dv = Math.round(total_price * (1 + row.vat / 100));
                     const thanh_tien_ch = Math.round(row.price * (1 + row.vat / 100));

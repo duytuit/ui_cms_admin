@@ -159,7 +159,7 @@ export default function UpdatePhieuThuLaiXe({debits, onClose}: {debits: any, onC
                             <Column field="customerAbb" header="Tên khách hàng"/>
                             <Column header="Số file"
                             body={(row: any) =>{
-                                return row?.file_number || '';
+                                return row?.file_number || "không file"
                             }}/>
                             <Column field="name" header="Nội dung"/>
                             <Column  header="Cước" 

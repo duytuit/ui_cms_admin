@@ -178,7 +178,6 @@ useEffect(() => {
         const _user = employees.find((x: any) => x.user_id === row.updated_by);
         const _laixe = employees.find((x: any) => x.id === row.employee_driver_id);
         const _typeKH = TypeDebitDKKH.find((x: any) => x.value === row.type);
-        //const _data = JSON.parse(row.data);
         const thanh_tien = Math.round(row.driver_fee);
         return {
             ...row,
