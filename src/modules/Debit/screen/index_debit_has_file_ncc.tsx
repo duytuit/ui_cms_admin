@@ -434,8 +434,7 @@ export default function ListDebitHasFileNCC() {
                                     value={selectedDetail}
                                    >
                                       <Column body={(row: any) =>{
-                                          let data = JSON.parse(row.debit_data);
-                                          return data?.fileNumber
+                                          return row?.file_number || '';
                                       }} header="Số file" />
                                       <Column field="debit_name" header="Chi phí" />
                                       <Column field="debit_type"  body={(row: any) => typeDebit.find((x:any) => x.type === row.debit_type)?.name || ""} header="Loại chi phí" />

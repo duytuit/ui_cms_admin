@@ -241,11 +241,7 @@ export default function UpdateDoiTruCongNo() {
     };
   useEffect(() => {
            const mapped = (debitDoiTruKH?.data || []).map((row: any) => {
-                  let _fileNumber='';
-                  if(row.data){
-                      const data = JSON.parse(row.data)
-                      _fileNumber = data?.fileNumber
-                  }
+                  let _fileNumber=row?.file_number || '';
                   const total_price = row.price + row.price_com;
                   const thanh_tien_dv = Math.round(total_price * (1 + row.vat / 100));
                   const thanh_tien_ch = Math.round(row.price * (1 + row.vat / 100));
@@ -267,11 +263,7 @@ export default function UpdateDoiTruCongNo() {
             });
             setDisplayDataKH(mapped);
             const mappedNCC = (debitDoiTruNCC?.data || []).map((row: any) => {
-                let _fileNumber='';
-                if(row.data){
-                    const data = JSON.parse(row.data)
-                    _fileNumber = data?.fileNumber
-                }
+                let _fileNumber=row?.file_number || '';
                 const total_purchase = row.purchase_price + row.purchase_com;
                 const thanh_tien_dv = Math.round(total_purchase * (1 + row.purchase_vat / 100));
                 const thanh_tien_ch = Math.round(row.purchase_price * (1 + row.purchase_vat / 100));

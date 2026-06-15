@@ -221,6 +221,10 @@ export const typeDebit = [
    {
      type:11,
      name:"Phí chi hộ đầu kỳ NCC"
+   },
+   {
+     type:12,
+     name:"Phí khác NCC"
    }
 ];
 export const TypeDebitDKKH = [

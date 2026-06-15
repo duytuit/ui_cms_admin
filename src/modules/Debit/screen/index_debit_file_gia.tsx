@@ -17,7 +17,7 @@ import UpdateFileGia from "./update_debit_file_gia";
 import UpdateVATFileGia from "./update_vat_file_gia";
 import UpdateXuatHoaDon from "./update_xuat_hoadon";
 import { FilterMatchMode } from "primereact/api";
-import { ExportXuatHoaDon } from "modules/ContractFile/api";
+import { ExportChiTietFileGia, ExportXuatHoaDon } from "modules/ContractFile/api";
 import { useDispatch } from "react-redux";
 import { showToast } from "redux/features/toast";
 
@@ -54,6 +54,31 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFil
         _setSelectedRows([])
         refreshHasFileGia?.(); 
     };
+    async function ExcelChiTietFileGia() {
+
+    const params = {
+      fromDate: _paramsPaginator.fromDate,
+      toDate: _paramsPaginator.toDate,
+      StorageId: _paramsPaginator.StorageId,
+    };
+
+    const respo = await ExportChiTietFileGia(
+      Helper.convertObjectToQueryString(params)
+    );
+
+    const blob = new Blob([respo.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "chi_tiet_file_gia.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url); // ✅ tránh leak memory
+  }
    async function ExportHoaDonKH() {
     if (!Array.isArray(selected) || selected.length === 0) {
       dispatch(
@@ -131,6 +156,11 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFil
               label: 'Xuất chi tiết hóa đơn + bill',
               icon: "pi pi-file-export",
               command: () => ExportHoaDonHasBillKH()
+          },
+          {
+              label: 'Xuất chi tiết file giá',
+              icon: "pi pi-file-export",
+              command: () => ExcelChiTietFileGia()
           }
       ];
     return (
