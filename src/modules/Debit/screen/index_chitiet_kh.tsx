@@ -15,7 +15,7 @@ import { Row } from "primereact/row";
 import UpdatePhieuThuKH from "modules/receipt/screen/update_phieuthu_kh";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { ExportXuatHoaDon } from "modules/ContractFile/api";
+import { ExportXuatHoaDon, ExportXuatHoaDonKHInDebitAsync } from "modules/ContractFile/api";
 import { showToast } from "redux/features/toast";
 import { useDispatch } from "react-redux";
 
@@ -92,7 +92,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
     link?.parentNode?.removeChild(link);  
   }
    async function ExportHoaDonKH() {
-      const respo = await ExportXuatHoaDon(
+      const respo = await ExportXuatHoaDonKHInDebitAsync(
         Helper.convertObjectToQueryString(_paramsPaginator)
       );
   

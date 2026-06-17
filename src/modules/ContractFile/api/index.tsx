@@ -2,6 +2,7 @@ import { getData, getDataV3, postData } from "lib/request";
 
 export const listContractFile = async (params: any) => await getData("ContractFile", params);
 export const ExportXuatHoaDon = async (params: any) => await getDataV3("ContractFile/excel/xuathoadon", params);
+export const ExportXuatHoaDonKHInDebitAsync = async (params: any) => await getDataV3("ContractFile/excel/GetObjectXuatHoaDonKHInDebitAsync", params);
 export const ExportChiTietFileGia = async (params: any) => await getDataV3("ContractFile/excel/chitietfilegia", params);
 export const listContractFileNotDispatch = async (params: any) => await getData("ContractFile/getFileNotDispatch", params);
 export const listContractFileNotService = async (params: any) => await getData("ContractFile/getFileNotService", params);
