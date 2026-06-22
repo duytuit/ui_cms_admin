@@ -14,7 +14,7 @@ import { Splitter, SplitterPanel } from "primereact/splitter";
 import { useListContractFile, useListContractFileNotDispatch, useListContractFileWithState } from "modules/ContractFile/service";
 import UpdateDebitDispatchFile from "./update_dispatch";
 import { useListBaoCaoNhatKyDieuXeAsync, useListDebitDispatch } from "../service";
-import { deleteDebit, exportDieuXe } from "../api";
+import { deleteDebit, exportBaoCaoNhatKyDieuXeAsync, exportDieuXe } from "../api";
 import UpdateDebitDispatchFileCustom from "./update_dispatch_custom";
 import { FilterMatchMode, FilterService } from "primereact/api";
 import UpdateGiayChiLaiXe from "modules/receipt/screen/update_giay_chilaixe";
@@ -83,23 +83,24 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,refreshDebitDispatch }: 
       toDate: filter.toDate,
     }));
   }, [filter]);
-    async function ExportExcelDieuXe(){
-      const respo = await exportDieuXe(Helper.convertObjectToQueryString(_paramsPaginator));
+    async function ExportExcelChiTietCacLoaiPhi(){
+      const respo = await exportBaoCaoNhatKyDieuXeAsync(Helper.convertObjectToQueryString(_paramsPaginator));
       const url = window.URL.createObjectURL(new Blob([respo.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'dieu_xe_chi_tiet_kh.xlsx'); // or any other extension
+      link.setAttribute('download', 'chi_tiet_cac_loai_phi.xlsx'); // or any other extension
       document.body.appendChild(link);
       link.click();
       link?.parentNode?.removeChild(link);  
     }
   const items = [
         {
-            label: 'Điều xe chi tiết',
+            label: 'Xuất Excel chi tiết các loại phí',
             icon: "pi pi-file-export",
-            command: () => ExportExcelDieuXe()
+            command: () => ExportExcelChiTietCacLoaiPhi()
         }
     ];
+
   return (
     <>
     <GridForm
@@ -108,6 +109,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,refreshDebitDispatch }: 
       filter={filter}
       setFilter={setFilter}
       className="lg:col-9"
+       MenuItems={items}
     >
       <div className="col-2">
         <MyCalendar

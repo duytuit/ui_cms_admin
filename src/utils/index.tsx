@@ -227,6 +227,46 @@ export const typeDebit = [
      name:"Phí khác NCC"
    }
 ];
+export const TypeIncomeExpense = [
+  { value: 1, label: "Thu hoàn ứng giao nhận" },
+  { value: 2, label: "Thu hoàn ứng lái xe" },
+  { value: 3, label: "Thu khác" },
+  { value: 4, label: "Thu tạm ứng khách hàng" },
+  { value: 5, label: "Thu cược" },
+  { value: 6, label: "Thu tạm ứng" },
+  { value: 7, label: "Bán hàng" },
+  { value: 8, label: "Vay ngân hàng" },
+  { value: 9, label: "Chi hoàn ứng giao nhận" },
+  { value: 10, label: "Chi tạm ứng lái xe" },
+  { value: 11, label: "Chi hộ khách hàng" },
+  { value: 12, label: "Chi phí kinh doanh" },
+  { value: 13, label: "Chi khác" },
+  { value: 14, label: "Chi tạm ứng tiền cho nhà cung cấp" },
+  { value: 15, label: "Chi tạm ứng giao nhận" },
+  { value: 16, label: "Phí sửa chữa" },
+  { value: 17, label: "Phí dầu DO" },
+  { value: 18, label: "Cước đường bộ" },
+  { value: 19, label: "Phí khác" },
+  { value: 20, label: "Phí lãi vay" },
+  { value: 21, label: "Trả lương nhân viên" },
+  { value: 22, label: "Trích lương nhân viên" },
+  { value: 23, label: "Chi hoàn ứng giao nhận" },
+  { value: 24, label: "Thu khách hàng" },
+  { value: 25, label: "Chi nhà cung cấp" },
+  { value: 26, label: "Chi chuyển tiền nội bộ" },
+  { value: 27, label: "Thu chuyển tiền nội bộ" },
+  { value: 28, label: "Thu giao nhận" },
+  { value: 29, label: "Thu lái xe" },
+  { value: 30, label: "Thu hoàn trả phiếu tạm thu giao nhận" },
+  { value: 31, label: "Thu đối trừ khách hàng" },
+  { value: 32, label: "Chi đối trừ nhà cung cấp" },
+  { value: 33, label: "Số dư tài khoản" },
+  { value: 34, label: "Phí bảo hiểm xã hội" },
+  { value: 35, label: "Phí gửi xe" },
+  { value: 36, label: "Doanh thu khác" },
+  { value: 37, label: "Trả bảo hiểm xã hội" },
+  { value: 38, label: "Phí đi đường của lái xe" }
+];
 export const TypeDebitDKKH = [
    {
      value:5,

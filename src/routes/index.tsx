@@ -98,6 +98,7 @@ import ListChiPhiChung from "modules/Depreciation/screen/index_cpc";
 import ListChiPhiTraTruoc from "modules/Depreciation/screen/index_cptt";
 import ListLoiNhuanTheoXe from "modules/receipt/screen/index_baocao_loinhuan_theoxe";
 import BaoCaoNhatKy from "modules/Debit/screen/index_baocao_nhatky";
+import BaoCaoChiTietThuChi from "modules/receipt/screen/index_chitiet_thu_chi";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -190,6 +191,7 @@ const publicRoutes = [
   { path: "/salary/SalaryByDate", component: PrintPayrollTable,  layout: null, public: true  },
   // Receipt 
   { path: "/receipt/list", component: ListReceipt, layout: 'ListReceipt' },
+  { path: "/receipt/BaoCaoChiTietThuChi", component: BaoCaoChiTietThuChi, layout: 'BaoCaoChiTietThuChi' },
   { path: "/receipt/ListReceiptThu", component: ListReceiptThu, layout: 'ListReceiptThu' },
   { path: "/receipt/ListReceiptChi", component: ListReceiptChi, layout: 'ListReceiptChi' },
   { path: "/receipt/listChiPhiGiaoNhan", component: ListChiPhiGiaoNhan, layout: 'ListChiPhiGiaoNhan' },

@@ -1,9 +1,11 @@
-import { getData, postData } from "lib/request";
+import { getData, getDataV3, postData } from "lib/request";
 
 export const listReceipt = (params:any) => getData("receipt", params);
+export const ExportExcelChiTietThuChi = async (params: any) => await getDataV3("receipt/excel/chitietthuchi", params);
 export const listReceiptThu = (params:any) => getData("receipt/phieuthu", params);
 export const listReceiptChi = (params:any) => getData("receipt/phieuchi", params);
 export const listReceiptUngTienLaiXe = (params:any) => getData("receipt/GetUngTienCuaLaiXeAsync", params);
+export const listChiTietThuChi = (params:any) => getData("receipt/chitietthuchi", params);
 export const GetObjectBaoCaoDoanhThuAsync = (params:any) => getData("Debit/GetObjectBaoCaoDoanhThuAsync", params);
 export const GetBaoCaoLuuChuyenTienTeAsync = (params:any) => getData("receipt/GetBaoCaoLuuChuyenTienTeAsync", params);
 export const GetSoDuDauKyAsync = (params:any) => getData("receipt/GetSoDuDauKyAsync", params);

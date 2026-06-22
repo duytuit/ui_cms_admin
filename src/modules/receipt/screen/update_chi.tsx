@@ -2,7 +2,7 @@
 import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
-import { Panel, RadioButton } from "components/uiCore";
+import { Button, Checkbox, Column, DataTable, Panel, RadioButton } from "components/uiCore";
 import { showToast } from "redux/features/toast";
 import { formOfPayment, listToast, refreshObject, TypeDoiTuong, VatDebit } from "utils";
 import { showReceipt, addReceiptChiNoiBo, updateReceiptChiNoiBo } from "../api";
@@ -16,12 +16,15 @@ import { useListEmployeeWithState } from "modules/employee/service";
 import { useListPartnerDetail } from "modules/partner/service";
 import { useListBankWithState, useListFundCategoryWithState, useListExpenseWithState } from "modules/categories/service";
 import { DropDownTree } from "components/common/DropDownTree";
+import { useListVehicleWithState } from "modules/VehicleDispatch/service";
 export default function UpdateReceiptChi() {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [employeeInfo, setEmployeeInfo] = useState<any>({});
   const [bankSelect, setBankSelect] = useState<any>({});
   const [doiTuongOptions, setDoiTuongOptions] = useState<any>([]);
+  const [listProduct, setListProduct] = useState<any[]>([]);
+  const [newProduct, setNewProduct] = useState<any>({vehicleId:0, amount: "", note: "",allocation:0,bill:"" });
   const [infos, setInfos] = useState<any>({vat:0,object:0,objectId:0,accountingDate:Helper.toDayString(),formOfPayment:1 });
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -29,10 +32,15 @@ export default function UpdateReceiptChi() {
     e.preventDefault();
     infos.typeReceipt = 8
     infos.prefixCode = "PC"
+    infos.listProduct = listProduct
     let info = {
-      ...infos, amount: parseInt(infos.amount.replace(/\D/g, ""), 10),thanhtien: parseInt(infos.thanhtien.replace(/\D/g, ""), 10), status: infos.status ? 0 : 1,
+      ...infos, 
+      // amount: parseInt(infos.amount.replace(/\D/g, ""), 10),
+      // thanhtien: parseInt(infos.thanhtien.replace(/\D/g, ""), 10), 
+      status: infos.status ? 0 : 1,
      data:JSON.stringify(infos)
     };
+    console.log(infos);
     setLoading(true);
     fetchDataSubmit(info);
   };
@@ -78,6 +86,14 @@ export default function UpdateReceiptChi() {
          );
      }
   };
+   const { data: vehicles } = useListVehicleWithState({});
+   const vehiclesOptions = useMemo(() => {
+    if (!Array.isArray(vehicles)) return [];
+    return vehicles.map((x: any) => ({
+      label: `${x?.number_code ?? "(không tên)"}`,
+      value: x.id,
+    }));
+  }, [vehicles]);
    const { data: DMQuy } = useListFundCategoryWithState({type:1});
    const DMQuyOptions = useMemo(() => {
        if (!Array.isArray(DMQuy)) return [];
@@ -163,9 +179,7 @@ export default function UpdateReceiptChi() {
             GetBank(detail.bankId)
             const _nguoitao = employees.find((x: any) => x.user_id === detail.updatedBy);
             setEmployeeInfo(_nguoitao);
-            detail.amount = Helper.formatCurrency(detail.receiptDetails[0].amount.toString())
-            detail.vat = detail.receiptDetails[0].vat
-            detail.thanhtien =Helper.formatCurrency((detail.receiptDetails[0].amount + (detail.receiptDetails[0].amount * detail.receiptDetails[0].vat/100)).toString())
+            setListProduct(detail.receiptDetails || []);
              if(detail.object === 0){
                 setDoiTuongOptions(partnerOptions)
               }else if(detail.object === 1){
@@ -297,13 +311,12 @@ export default function UpdateReceiptChi() {
                       required
                     />
                   </div>
-                   <div className="field col-4">
+                   {/* <div className="field col-4">
                     <InputForm className="w-full"
                       id="Amount"
                       value={infos.amount}
                       onChange={(e: any) =>
                          {
-                           setInfos({ ...infos, amount: Helper.formatCurrency(e.target.value )})
                             const amount = parseInt(e.target.value.replace(/\D/g, "") || "0", 10);
                             const vat = parseInt(infos.vat || 0, 10);
                             const thanhtien = parseInt((amount + (amount * vat) / 100).toString());
@@ -324,9 +337,8 @@ export default function UpdateReceiptChi() {
                       className="w-full p-inputtext-sm"
                       onChange={(e: any) =>
                           {
-                             setInfos({ ...infos, vat: e.value })
                               const amount = parseInt(infos.amount.replace(/\D/g, "") || "0", 10);
-                              const vat = parseInt(infos.vat || 0, 10);
+                              const vat = parseInt(e.value || 0, 10);
                               const thanhtien = parseInt((amount + (amount * vat) / 100).toString());
                              setInfos({ ...infos, vat: e.value, thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                           }
@@ -351,7 +363,7 @@ export default function UpdateReceiptChi() {
                       }
                       label="Số hóa đơn"
                     />
-                  </div>
+                  </div> */}
                    <div className="field col-12">
                     <InputForm className="w-full"
                       id="note"
@@ -406,6 +418,255 @@ export default function UpdateReceiptChi() {
               </div>
             </div>
           </Panel>
+           <Panel header="Chi tiết phiếu chi">
+            <div className="formgrid grid">
+              <div className="field col-3">
+                <InputForm
+                  className="w-full"
+                  id="note"
+                  value={newProduct.note}
+                  onChange={(e: any) =>
+                    setNewProduct({ ...newProduct, note: e.target.value })
+                  }
+                  label="Diễn giải"
+                />
+              </div>
+               <div className="field col-3">
+                <InputForm
+                  className="w-full"
+                  id="amount"
+                  value={newProduct.amount}
+                  onChange={(e: any) =>
+                    setNewProduct({
+                      ...newProduct,
+                      amount: Helper.formatCurrency(e.target.value),
+                    })
+                  }
+                  label="Số tiền"
+                />
+              </div>
+              <div className="field col-3">
+                 <Dropdown
+                    filter
+                    showClear
+                    value={newProduct.vehicleId}
+                    optionValue="value"
+                    optionLabel="label"
+                    options={vehiclesOptions}
+                    label="Tên xe"
+                    className="w-full p-inputtext-sm"
+                    onChange={(e: any) =>
+                       {
+                          const selected = e.value; // Đây là value (ví dụ: 123)
+                          const option = vehiclesOptions.find((x: any) => x.value === selected);
+                            setNewProduct({ ...newProduct, vehicleId: selected, vehicle_info: {
+                            id: selected,
+                            name: option ? option.label : ''
+                          } })  
+                        }
+                    }
+                  />
+              </div>
+              <div className="field col-3">
+                <Button
+                  type="button"
+                  className="w-full p-button-normal"
+                  label="Thêm"
+                  severity="success"
+                  raised
+                  onClick={() => {
+                    if (!newProduct.note || !newProduct.amount)
+                      return dispatch(showToast({ ...listToast[2], detail: "Nhập đủ thông tin mua hàng" }));
+
+                    // convert price về số khi push
+                    const numericPrice = parseInt(newProduct.amount.replace(/\D/g, ""), 10);
+
+                    setListProduct([
+                      ...listProduct,
+                      { ...newProduct, amount: numericPrice,note:newProduct.note,vehicleId:newProduct.vehicleId,vehicleName:newProduct.vehicle_info?.name || "" },
+                    ]);
+
+                    // reset input
+                    setNewProduct({vehicleId:0, note: "", amount: "",allocation:0,bill:""});
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="child-table">
+              <DataTable rowHover value={listProduct}>
+                <Column field="note" header="Diễn giải" />
+                <Column
+                  field="amount"
+                  header="Số tiền"
+                  body={(row: any) => {
+                   return ( <Input
+                      className="w-full input-sm"
+                      value={Helper.formatCurrency((row.amount || 0).toString())}
+                      onChange={(e: any) => {
+                        const updated = [...listProduct];
+                        const rowData = { ...updated.find((item) => item === row) };
+                        // ✅ Chuyển price về số nguyên, loại bỏ ký tự không phải số
+                        const rawPrice =
+                          typeof e.target.value === "string"
+                            ? parseInt(e.target.value.replace(/\D/g, ""), 10) || 0
+                            : Number(e.target.value) || 0;
+                        rowData.amount = rawPrice;
+                          // ✅ Tính thành tiền mới nếu có VAT
+                        const vat = Number(rowData.vat) || 0;
+                        rowData.thanhTien = Math.round(rawPrice * (1 + vat / 100));
+                        const index = updated.findIndex((item) => item === row);
+                        updated[index] = rowData;
+                        setListProduct(updated);
+                      }}
+                    />
+                    );
+                  }}
+                  footer={Helper.formatCurrency(
+                    listProduct
+                      .reduce((sum, item) => sum + (item.amount || 0), 0)
+                      .toString()
+                  )}
+                  footerStyle={{ fontWeight: "bold" }}
+                />
+                 <Column
+                  header="VAT"
+                  body={(_: any, opt: any) => (
+                    <Dropdown
+                      value={listProduct[opt.rowIndex].vat || 0}
+                      options={VatDebit}
+                      optionValue="vat"
+                      optionLabel="name"
+                      className="p-inputtext-sm p-dropdown-sm"
+                      onChange={(e: any) => {
+                        const vatValue = Number(e.value) || 0;
+                        const updated = [...listProduct];
+                        const row = { ...updated[opt.rowIndex] };
+                        // ✅ Chuyển price về số nguyên, loại bỏ ký tự không phải số
+                        const rawPrice =
+                          typeof row.amount === "string"
+                            ? parseInt(row.amount.replace(/\D/g, ""), 10) || 0
+                            : Number(row.amount) || 0;
+                        // ✅ Nếu có quantity thì nhân thêm, mặc định là 1
+                        const qty = Number(row.quantity) || 1;
+                        // ✅ Tính thành tiền (price * qty * (1 + vat/100))
+                        const thanhTien = Math.round(rawPrice * qty * (1 + vatValue / 100));
+                        updated[opt.rowIndex] = {
+                          ...row,
+                          vat: vatValue,
+                          thanhTien: thanhTien
+                        };
+                        setListProduct(updated);
+                      }}
+                      required
+                    />
+                  )}
+                />
+
+               <Column
+                  field="thanhTien"
+                  header="Thành tiền"
+                  body={(_: any, opt: any) => {
+                    const row = listProduct[opt.rowIndex];
+                    // Chuyển amount về số thực, giữ decimal
+                    const amount = typeof row.amount === "string"
+                      ? parseFloat(row.amount.replace(/[^0-9.]/g, "")) || 0
+                      : Number(row.amount) || 0;
+                    const vat = Number(row.vat) || 0;
+                    // Tính thành tiền
+                    const thanhTien = Math.round(amount * (1 + vat / 100));
+                    // ✅ Cập nhật luôn vào state
+                    if (row.thanhTien !== thanhTien) {
+                      const updated = [...listProduct];
+                      updated[opt.rowIndex] = { ...row, thanhTien };
+                      setListProduct(updated);
+                    }
+                    return Helper.formatCurrency(thanhTien.toString());
+                  }}
+                  footer={Helper.formatCurrency(
+                    listProduct
+                      .reduce((sum, item) => {
+                        const amount = typeof item.amount === "string"
+                          ? parseFloat(item.amount.replace(/[^0-9.]/g, "")) || 0
+                          : Number(item.amount) || 0;
+
+                        const vat = Number(item.vat) || 0;
+                        return Math.round(sum + amount * (1 + vat / 100));
+                      }, 0)
+                      .toString()
+                  )}
+                  footerStyle={{ fontWeight: "bold" }}
+                />
+                <Column field="bill" header="Số hóa đơn" 
+                 body={(_: any, opt: any) => (
+                    <Input
+                      className="w-full input-sm"
+                      value={listProduct[opt.rowIndex].bill || ""}
+                      onChange={(e: any) => {
+                        const updated = [...listProduct];
+                        updated[opt.rowIndex] = {
+                          ...updated[opt.rowIndex],
+                          bill: e.target.value,
+                        };
+                        setListProduct(updated);
+                      }}
+                    />
+                  )}
+                />
+                <Column field="vehicleName" header="Tên xe" />
+                <Column field="allocation" header="Là chi phí phân bổ" 
+                  body={(row: any) => {
+                    return(
+                      <Checkbox
+                        className="p-checkbox-sm"
+                        checked={row.allocation === 1}
+                        onChange={(e: any) => {
+                          const updated = [...listProduct];
+                          const rowData = { ...updated.find((item) => item === row) };
+                          rowData.allocation = e.checked ? 1 : 0;
+                          const index = updated.findIndex((item) => item === row);
+                          updated[index] = rowData;
+                          setListProduct(updated);
+                        }}
+                        onClick={(e: any) => e.stopPropagation()}
+                      />
+                    );
+                  }}  
+                />
+                <Column
+                  header="Thao tác"
+                  body={(_: any, opt: any) => (
+                    <Button
+                      type='button'
+                      icon="pi pi-trash"
+                      severity="danger"
+                      text
+                      onClick={() =>
+                        setListProduct(listProduct.filter((_, i) => i !== opt.rowIndex))
+                      }
+                    />
+                  )}
+                />
+              </DataTable>
+            </div>
+          </Panel>
+           <div className="field mt-4">
+            <InputForm
+              className="w-64"
+              id="total_thanhtien"
+              value={Helper.formatCurrency((listProduct
+                .reduce((sum, item) => {
+                  const thanhTien = typeof item.thanhTien === "string"
+                    ? parseFloat(item.thanhTien.replace(/[^0-9.]/g, "")) || 0
+                    : Number(item.thanhTien) || 0;
+                  return Math.round(sum + thanhTien);
+                }, 0))
+                .toString()
+              )}
+              label="Tổng cộng"
+              readOnly // ✅ làm input chỉ đọc
+            />
+          </div>
         </div>
       </AddForm>
     </>

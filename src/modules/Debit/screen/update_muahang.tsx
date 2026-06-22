@@ -80,23 +80,12 @@ export default function UpdateMuaHang() {
          );
      }
   };
-  const { data: partnerDetails } = useListPartnerDetail({
-    params: { status: 1 },
-    debounce: 500,
-  });
   const { data: partnerVenderDetails } = useListPartnerDetail({
     params: { status: 2 },
     debounce: 500,
   });
   const { data: employees } = useListEmployeeWithState({});
   const { data: vehicles } = useListVehicleWithState({});
-  const partnerOptions = useMemo(() => {
-    if (!Array.isArray(partnerDetails?.data)) return [];
-    return partnerDetails.data.map((x: any) => ({
-      label: x?.partners?.abbreviation ?? "(không tên)",
-      value: x.id,
-    }));
-  }, [partnerDetails]);
   
   const partnerVenderOptions = useMemo(() => {
     if (!Array.isArray(partnerVenderDetails?.data)) return [];

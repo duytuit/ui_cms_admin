@@ -574,6 +574,17 @@ export const sidebarModel = [{
               status: 1,
               category_id: 1,
               sort: 1,
+            },
+          {
+              id: 1,
+              name: 'Báo cáo chi tiết thu chi',
+              route: '/receipt/BaoCaoChiTietThuChi',
+              created_at: '2023-05-29 14:14:02',
+              updated_at: null,
+              deleted_at: null,
+              status: 1,
+              category_id: 1,
+              sort: 1,
             }
         ]
       },

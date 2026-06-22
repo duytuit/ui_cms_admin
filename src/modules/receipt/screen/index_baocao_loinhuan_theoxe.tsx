@@ -78,6 +78,9 @@ export default function ListLoiNhuanTheoXe() {
     debounce: 500,
   });
   const { data: DMExpense } = useListIncomeExpenseWithState({}); 
+  const safeReduce = (arr: any[], field: string) =>
+  arr?.reduce((acc: number, curr: any) => acc + (curr?.[field] || 0), 0) || 0;
+
   // ✅ Client-side pagination
   useEffect(() => {
     if (!data) return;
@@ -121,29 +124,28 @@ export default function ListLoiNhuanTheoXe() {
       };
     });
   
+    
+    const doanhSo =
+      safeReduce(data?.[3]?.data?.loinhuan_banhang, "total_price") +
+      safeReduce(data?.[3]?.data?.loinhuan_com, "total_price_com") +
+      safeReduce(data?.[3]?.data?.loinhuan_phikhac, "total_price") +
+      safeReduce(data?.[3]?.data?.loinhuan_thu, "total_amount");
+
+    const chiPhi =
+      safeReduce(data?.[3]?.data?.loinhuan_muahang, "total_purchase_price") +
+      safeReduce(data?.[3]?.data?.loinhuan_com, "total_purchase_com") +
+      safeReduce(data?.[3]?.data?.loinhuan_phikhac, "total_purchase_price") +
+      safeReduce(data?.[3]?.data?.loinhuan_chi, "total_amount");
+
     const loinhuandoanhthukhac = [
       {
         number_code: "Thu nhập thu khác",
-        totalCost: 
-        data[3]?.data.loinhuan_banhang.reduce((acc: number, curr: any) => acc + curr.total_price, 0) + 
-        data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_price_com, 0) + 
-        data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_price, 0), // doanh số
-        phiDau: 
-        data[3]?.data.loinhuan_muahang.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0)+ 
-        data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) + 
-        data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0 ,// phí mua hàng
-        tongChiPhi: data[3]?.data.loinhuan_muahang.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0)+ 
-        data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) + 
-        data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0,
-        loiNhuan: 
-        (data[3]?.data.loinhuan_banhang.reduce((acc: number, curr: any) => acc + curr.total_price, 0) + 
-        data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_price_com, 0) + 
-        data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_price, 0)) - 
-        (data[3]?.data.loinhuan_muahang.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0)+ 
-        data[3]?.data.loinhuan_com.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) +
-        data[3]?.data.loinhuan_phikhac.reduce((acc: number, curr: any) => acc + curr.total_purchase_price, 0) || 0),
-      }
-    ]
+        totalCost: doanhSo || 0,
+        phiDau: chiPhi || 0,
+        tongChiPhi: chiPhi || 0,
+        loiNhuan: (doanhSo || 0) - (chiPhi || 0),
+      },
+    ];
     const loinhuanhaiquan = [
       {
         number_code: "Thu nhập từ khai quan",
