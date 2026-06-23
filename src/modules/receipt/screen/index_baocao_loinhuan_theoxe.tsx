@@ -117,10 +117,10 @@ export default function ListLoiNhuanTheoXe() {
       return {
         ...row,
         number_code: "Thu nhập gọi xe ngoài",
-        totalCost: row.total_price,
+        totalCost: row.total_price + row.total_driver_fee,
         phiDau : row.total_purchase_price || 0,
         tongChiPhi: row.total_purchase_price || 0,
-        loiNhuan: row.total_price - (row.total_purchase_price || 0),
+        loiNhuan: (row.total_price + row.total_driver_fee) - (row.total_purchase_price || 0),
       };
     });
   
@@ -128,6 +128,8 @@ export default function ListLoiNhuanTheoXe() {
     const doanhSo =
       safeReduce(data?.[3]?.data?.loinhuan_banhang, "total_price") +
       safeReduce(data?.[3]?.data?.loinhuan_com, "total_price_com") +
+      safeReduce(data?.[3]?.data?.loinhuan_banhang_laixe, "total_price") +
+      safeReduce(data?.[3]?.data?.loinhuan_banhang_laixe, "total_driver_fee") +
       safeReduce(data?.[3]?.data?.loinhuan_phikhac, "total_price") +
       safeReduce(data?.[3]?.data?.loinhuan_thu, "total_amount");
 
