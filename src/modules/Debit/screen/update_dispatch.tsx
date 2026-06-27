@@ -370,6 +370,7 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                     setInfos({ ...infos, purchasePrice: e.target.value })
                   }
                   label="Cước mua"
+                  disabled={infos.isExternalDriver == 0 ? true : false}
                 />
               </div>
                <div className="field col-8">
@@ -398,7 +399,11 @@ export default function UpdateDebitDispatchFile({ id, onClose , type }: { id: an
                   options={typeVehicle}
                   onChange={(e: any) =>
                     {
-                        setInfos({ ...infos, isExternalDriver: e.target.value })
+                         if(e.target.value == 0){
+                            setInfos({ ...infos, isExternalDriver: e.target.value, purchasePrice:0})
+                         }else{
+                            setInfos({ ...infos, isExternalDriver: e.target.value})
+                         }
                     }
                   }
                   label="Loại xe"

@@ -128,8 +128,6 @@ export default function ListLoiNhuanTheoXe() {
     const doanhSo =
       safeReduce(data?.[3]?.data?.loinhuan_banhang, "total_price") +
       safeReduce(data?.[3]?.data?.loinhuan_com, "total_price_com") +
-      safeReduce(data?.[3]?.data?.loinhuan_banhang_laixe, "total_price") +
-      safeReduce(data?.[3]?.data?.loinhuan_banhang_laixe, "total_driver_fee") +
       safeReduce(data?.[3]?.data?.loinhuan_phikhac, "total_price") +
       safeReduce(data?.[3]?.data?.loinhuan_thu, "total_amount");
 

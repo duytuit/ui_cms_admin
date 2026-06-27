@@ -1,21 +1,22 @@
 
 import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, refreshObject, typeDepreciation } from "utils";
 import { useDispatch } from "react-redux";
-import { CategoryEnum } from "utils/type.enum";
-import { Button, Checkbox, Column, DataTable, Dropdown, Panel } from "components/uiCore";
+import { Button, Column, DataTable, Panel } from "components/uiCore";
 import { addDepreciation, showDepreciation, updateDepreciation } from "../api";
 import { Helper } from "utils/helper";
+import { Dropdown } from "components/common/ListForm";
+import { useListVehicleWithState } from "modules/VehicleDispatch/service";
 export default function UpdateDepreciation() {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
     const type = searchParams.get("type");
     const [loading, setLoading] = useState(false);
     const [productTaiSan, setProductTaiSan] = useState<any[]>([]);
-    const [newTaiSan, setNewTaiSan] = useState<any>({CodeNumber:"", Name: "", OriginalCost: 0,UsefulLife:0,MonthlyDepreciation:0,Note:"" });
+    const [newTaiSan, setNewTaiSan] = useState<any>({CodeNumber:"", Name: "", OriginalCost: "",UsefulLife:"",MonthlyDepreciation:"",Note:"",vehicleId:'',vehicle_info:{}});
     const [infos, setInfos] = useState<any>({isExternalDriver:0});
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -30,6 +31,14 @@ export default function UpdateDepreciation() {
       setLoading(true);
       fetchDataSubmit(info);
     };
+      const { data: vehicles } = useListVehicleWithState({});
+       const vehiclesOptions = useMemo(() => {
+        if (!Array.isArray(vehicles)) return [];
+        return vehicles.map((x: any) => ({
+          label: `${x?.number_code ?? "(không tên)"}`,
+          value: x.id,
+        }));
+      }, [vehicles]);
      async function fetchDataSubmit(info:any) {
       if (info.id) {
           const response = await updateDepreciation(info);
@@ -98,7 +107,7 @@ export default function UpdateDepreciation() {
            <div className="field">
                <Panel header="Chi tiết khấu hao">
             <div className="formgrid grid">
-              <div className="field col-1">
+              <div className="field col-2">
                 <InputForm
                   className="w-full"
                   id="CodeNumber"
@@ -119,6 +128,28 @@ export default function UpdateDepreciation() {
                   }
                   label="Tên khấu hao"
                 />
+              </div>
+               <div className="field col-2">
+                <Dropdown
+                    filter
+                    showClear
+                    value={newTaiSan.vehicleId}
+                    optionValue="value"
+                    optionLabel="label"
+                    options={vehiclesOptions}
+                    label="Tên xe"
+                    className="w-full p-inputtext-sm"
+                    onChange={(e: any) =>
+                      {
+                          const selected = e.value; // Đây là value (ví dụ: 123)
+                          const option = vehiclesOptions.find((x: any) => x.value === selected);
+                            setNewTaiSan({ ...newTaiSan, vehicleId: selected, vehicle_info: {
+                            id: selected,
+                            name: option ? option.label : ''
+                          } })  
+                        }
+                    }
+                  />
               </div>
               <div className="field col-2">
                 <InputForm
@@ -152,7 +183,7 @@ export default function UpdateDepreciation() {
                   label="Khấu hao hàng tháng"
                 />
               </div>
-               <div className="field col-2">
+               <div className="field col-10">
                 <InputForm
                   className="w-full"
                   id="Note"
@@ -163,7 +194,7 @@ export default function UpdateDepreciation() {
                   label="Ghi chú"
                 />
               </div>
-              <div className="field col-1">
+              <div className="field col-2">
                 <Button
                   type="button"
                   className="w-full p-button-normal"
@@ -187,6 +218,7 @@ export default function UpdateDepreciation() {
               <DataTable rowHover value={productTaiSan}>
                 <Column field="CodeNumber" header="Mã khấu hao" />
                 <Column field="Name" header="Tên khấu hao" />
+                <Column field="vehicle_info.name" header="Tên xe" />
                 <Column field="OriginalCost" body={(rowData: any) => Helper.formatCurrency(rowData.OriginalCost.toString())} header="Giá trị gốc" />
                 <Column field="UsefulLife" header="Thời gian sử dụng" />
                 <Column field="MonthlyDepreciation" body={(rowData: any) => Helper.formatCurrency(rowData.MonthlyDepreciation.toString())}  header="Khấu hao hàng tháng" />

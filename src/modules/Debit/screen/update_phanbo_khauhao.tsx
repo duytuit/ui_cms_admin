@@ -7,32 +7,20 @@ import { useDispatch } from "react-redux";
 import { Dropdown, Input } from "components/common/ListForm";
 import { Panel } from "components/uiCore";
 import { Helper } from "utils/helper";
-import { MyCalendar } from "components/common/MyCalendar";
-import { classNames } from "primereact/utils";
-import { addBill } from "modules/bill/api";
 import { updateDepreciationAllocation } from "modules/Depreciation/api";
 export default function UpdatePhanBoKhauHao({ type, onClose }: {  type: number, onClose: () => void }) {
   const [loading, setLoading] = useState(false);
   const [dataCycleName, setDataCycleName] = useState<any[]>([]);
  const [infos, setInfos] = useState<any>({
-  accountingDate: Helper.toDayString(),
-  expiryDate: null,
+  accountingDate:Helper.getLastDayOfCycleYMD(Helper.getCurrentMonthCycle()),
   note: `Khấu hao ${typeDepreciation.find((t: any) => t.type === type || '')?.name} kỳ ${Helper.getCurrentMonthCycle()}`,
-  cycleName: null,
-  type: type
+  cycleName: Helper.getCurrentMonthCycle(),
+  type: type,
+  expiryDate:  Helper.getLastDayOfCycleDMY(Helper.getCurrentMonthCycle()),
 });
   const dispatch = useDispatch();
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    // if (debit_ids.length === 0 && type == 1) {
-    //   dispatch(showToast({ ...listToast[2], detail: "Chưa có chi tiết công nợ" }));
-    //   return;
-    // }
-    // infos.id = type == 1 ? 0 : bill.id;
-    // infos.DebitIds = debit_ids;
-    // infos.expiryDate = Helper.formatYMDLocal(infos.expiryDate);
-    // infos.customerDetailId = customerSelect?.customer_detail_id;
-    console.log('info', infos);
     setLoading(true);
     fetchDataSubmit(infos);
   };
@@ -58,16 +46,6 @@ export default function UpdatePhanBoKhauHao({ type, onClose }: {  type: number, 
 useEffect(() => {
   const monthlyCycles = Helper.getMonthlyCycles();
   setDataCycleName(monthlyCycles);
-
-  const accountingDate = infos.accountingDate ?? Helper.toDayString();
-  const expiryDate = new Date(accountingDate);
-
-
-  setInfos((prev:any) => ({
-    ...prev,
-    cycleName: Helper.getCurrentMonthCycle(),
-    expiryDate,
-  }));
 }, []);
 
   return (
@@ -83,7 +61,7 @@ useEffect(() => {
             AddName="Lưu"
         >
            <div className="field">
-                <Panel header="Thông tin"  style={{ height: '400px' }}>
+                <Panel header="Thông tin">
                       <div className="flex justify-content-center">
                         <div style={{ backgroundColor: "#f8f9fa" }} className="card col-12">
                             <div className="field grid">
@@ -101,9 +79,9 @@ useEffect(() => {
                                     className="p-inputtext-sm"
                                     onChange={(e: any) =>
                                      {
-                                        console.log( e.target.value);
                                         const note = `Khấu hao ${typeDepreciation.find((t: any) => t.type === type || '')?.name} kỳ ${e.target.value}`; 
-                                        setInfos({ ...infos, cycleName: e.target.value, note })
+                                        const accountingDate = Helper.getLastDayOfCycleYMD(e.target.value);
+                                        setInfos({ ...infos, cycleName: e.target.value, note, accountingDate, expiryDate: Helper.getLastDayOfCycleDMY(e.target.value) })
                                      }
                                     }
                                     required
@@ -118,7 +96,7 @@ useEffect(() => {
                                 Ngày lập
                               </label>
                               <div className="col-12 md:col-9">
-                                 <MyCalendar dateFormat="dd/mm/yy"
+                                 {/* <MyCalendar dateFormat="dd/mm/yy"
                                     value={Helper.formatDMYLocal(infos.accountingDate ? infos.accountingDate : '')} // truyền nguyên ISO string
                                     onChange={(e: any) => {
                                       const accountingDate = e;
@@ -131,7 +109,8 @@ useEffect(() => {
                                       
                                     }}
                                     className={classNames("w-full", "p-inputtext", "input-form-sm")} 
-                                  />
+                                  /> */}
+                                  <label className="p-inputtext-sm">{infos.expiryDate}</label>
                               </div>
                             </div>
                              <div className="field grid">

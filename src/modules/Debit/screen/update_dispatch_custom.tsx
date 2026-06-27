@@ -344,6 +344,7 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                     setInfos({ ...infos, purchasePrice: Helper.formatCurrency(e.target.value) })
                   }
                   label="Cước mua"
+                  disabled={infos.isExternalDriver == 0 ? true : false}
                 />
               </div>
                <div className="field col-8">
@@ -372,7 +373,11 @@ export default function UpdateDebitDispatchFileCustom({ onClose }: { onClose: ()
                   options={typeVehicle}
                   onChange={(e: any) =>
                     {
-                        setInfos({ ...infos, isExternalDriver: e.target.value })
+                        if(e.target.value == 0){
+                           setInfos({ ...infos, isExternalDriver: e.target.value, purchasePrice:0})
+                        }else{
+                           setInfos({ ...infos, isExternalDriver: e.target.value})
+                        }
                     }
                   }
                   label="Loại xe"

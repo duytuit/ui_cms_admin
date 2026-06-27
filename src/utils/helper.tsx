@@ -321,6 +321,49 @@ export class Helper {
     const yyyy = now.getFullYear();
     return `${mm}${yyyy}`;
   };
+  static getLastDayOfCurrentMonth = () => {
+    const now = new Date();
+
+    const lastDay = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0
+    );
+
+    const dd = String(lastDay.getDate()).padStart(2, "0");
+    const mm = String(lastDay.getMonth() + 1).padStart(2, "0");
+    const yyyy = lastDay.getFullYear();
+
+    return `${dd}-${mm}-${yyyy}`;
+  };
+  static getLastDayOfCycleDMY = (cycle : string) => {
+  // cycle dạng MMYYYY, ví dụ: 032026
+  const month = parseInt(cycle.substring(0, 2), 10);
+  const year = parseInt(cycle.substring(2), 10);
+
+  // ngày cuối tháng
+  const lastDay = new Date(year, month, 0);
+
+  const dd = String(lastDay.getDate()).padStart(2, "0");
+  const mm = String(lastDay.getMonth() + 1).padStart(2, "0");
+  const yyyy = lastDay.getFullYear();
+
+  return `${dd}/${mm}/${yyyy}`;
+};
+  static getLastDayOfCycleYMD = (cycle : string) => {
+  // cycle dạng MMYYYY, ví dụ: 032026
+  const month = parseInt(cycle.substring(0, 2), 10);
+  const year = parseInt(cycle.substring(2), 10);
+
+  // ngày cuối tháng
+  const lastDay = new Date(year, month, 0);
+
+  const dd = String(lastDay.getDate()).padStart(2, "0");
+  const mm = String(lastDay.getMonth() + 1).padStart(2, "0");
+  const yyyy = lastDay.getFullYear();
+
+  return `${yyyy}-${mm}-${dd}`;
+};
   static findBreadcrumb(
     items: any[],
     pathname: string,

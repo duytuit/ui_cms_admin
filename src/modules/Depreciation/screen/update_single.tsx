@@ -1,7 +1,7 @@
 
 import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
 import { listToast, refreshObject } from "utils";
 import { useDispatch } from "react-redux";
@@ -9,6 +9,8 @@ import { CategoryEnum } from "utils/type.enum";
 import { InputSwitch, Panel } from "components/uiCore";
 import { addDepreciation, showDepreciation, updateDepreciation } from "../api";
 import { Helper } from "utils/helper";
+import { Dropdown } from "components/common/ListForm";
+import { useListVehicleWithState } from "modules/VehicleDispatch/service";
 export default function UpdateSingleDepreciation() {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
@@ -17,6 +19,14 @@ export default function UpdateSingleDepreciation() {
     const [infos, setInfos] = useState<any>({type:CategoryEnum.country,isExternalDriver:0,  status: 0});
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { data: vehicles } = useListVehicleWithState({});
+    const vehiclesOptions = useMemo(() => {
+    if (!Array.isArray(vehicles)) return [];
+    return vehicles.map((x: any) => ({
+      label: `${x?.number_code ?? "(không tên)"}`,
+      value: x.id,
+    }));
+  }, [vehicles]);
     const handleSubmit = (e:any) => {
         e.preventDefault();
         let info = {
@@ -137,6 +147,36 @@ export default function UpdateSingleDepreciation() {
                         label="Tên Khấu Hao"
                         required
                       />
+                    </div>
+                  </div>
+                  <div className="field grid">
+                    <label
+                      htmlFor="name"
+                      className="col-12 mb-2 md:col-3 md:mb-0"
+                    >
+                      Tên Xe
+                    </label>
+                    <div className="col-12 md:col-9">
+                        <Dropdown
+                          filter
+                          showClear
+                          value={infos.vehicleId}
+                          optionValue="value"
+                          optionLabel="label"
+                          options={vehiclesOptions}
+                          label="Tên xe"
+                          className="w-full p-inputtext-sm"
+                          onChange={(e: any) =>
+                            {
+                                const selected = e.value; // Đây là value (ví dụ: 123)
+                                const option = vehiclesOptions.find((x: any) => x.value === selected);
+                                  setInfos({ ...infos, vehicleId: selected, vehicle_info: {
+                                  id: selected,
+                                  name: option ? option.label : ''
+                                } })  
+                            }
+                          }
+                        />
                     </div>
                   </div>
                   <div className="field grid">

@@ -677,17 +677,17 @@ export const sidebarModel = [{
             category_id: 1,
             sort: 1,
           },
-           {
-            id: 1,
-            name: 'Chi Phí Trả Trước',
-            route: '/depreciation/ListChiPhiTraTruoc',
-            created_at: '2023-05-29 14:14:02',
-            updated_at: null,
-            deleted_at: null,
-            status: 1,
-            category_id: 1,
-            sort: 1,
-          }
+          //  {
+          //   id: 1,
+          //   name: 'Chi Phí Trả Trước',
+          //   route: '/depreciation/ListChiPhiTraTruoc',
+          //   created_at: '2023-05-29 14:14:02',
+          //   updated_at: null,
+          //   deleted_at: null,
+          //   status: 1,
+          //   category_id: 1,
+          //   sort: 1,
+          // }
         ]
       },
       {
