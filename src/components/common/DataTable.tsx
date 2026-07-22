@@ -120,7 +120,7 @@ export const StatusPartnerBody = (rowData:any, actions:any ,_status:number) => {
     return <InputSwitch checked={checked} onChange={confirm} />
 };
 
-export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, openDialogAdd?:any,duplicated?:any, handleUndo?:any, openDialogEdit?:any) => {
+export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPaginator?:any, setParamsPaginator?:any, openDialogAdd?:any,duplicated?:any, handleUndo?:any, openDialogEdit?:any ,params?:any) => {
     const dispatch = useDispatch();
     const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
     async function accept() {
@@ -154,7 +154,7 @@ export const ActionBody = (rowData:any, editRoute:any, actions?:any, paramsPagin
 
     return (
         <React.Fragment>
-            {editRoute && <Link to={editRoute + '/' + rowData?.id}>
+            {editRoute && <Link to={actions?.params ? `${editRoute}/${rowData?.id}?${new URLSearchParams(actions.params).toString()}` : `${editRoute}/${rowData?.id}`} >
                 <Button icon="pi pi-eye" rounded outlined className="mr-2" />
             </Link>}
             {duplicated && <Button onClick={e => duplicated(rowData?.id)}

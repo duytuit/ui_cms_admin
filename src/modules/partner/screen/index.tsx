@@ -28,7 +28,8 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             filter={filter}
             setFilter={setFilter}
             className="lg:col-9"
-             add="/partner/add"
+            add="/partner/add"
+            addOne="/partner/UpdateImportPartner"
         >
         </GridForm>
     );

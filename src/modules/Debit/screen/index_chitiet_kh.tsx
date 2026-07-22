@@ -109,6 +109,24 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
       link.remove();
       window.URL.revokeObjectURL(url); // ✅ tránh leak memory
     }
+    async function ExportHoaDonKHVer1() {
+      const respo = await ExportXuatHoaDonKHInDebitAsync(
+        Helper.convertObjectToQueryString({..._paramsPaginator, version: 1})
+      );
+  
+      const blob = new Blob([respo.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+  
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "hoa_don_kh.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url); // ✅ tránh leak memory
+    }
  const items = [
         {
             label: 'Công nợ chi tiết',
@@ -124,6 +142,11 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refresh,_setS
             label: 'Xuất chi tiết hóa đơn',
             icon: "pi pi-file-export",
             command: () => ExportHoaDonKH()
+        },
+        {
+            label: 'Xuất chi tiết hóa đơn 1',
+            icon: "pi pi-file-export",
+            command: () => ExportHoaDonKHVer1()
         }
     ];
   return (

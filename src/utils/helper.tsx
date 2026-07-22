@@ -336,6 +336,36 @@ export class Helper {
 
     return `${dd}-${mm}-${yyyy}`;
   };
+   static getLastDayOfCurrentMonthYMD = () => {
+    const now = new Date();
+
+    const lastDay = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0
+    );
+
+    const dd = String(lastDay.getDate()).padStart(2, "0");
+    const mm = String(lastDay.getMonth() + 1).padStart(2, "0");
+    const yyyy = lastDay.getFullYear();
+
+    return `${yyyy}-${mm}-${dd}`;
+  };
+ static getFirstDayOfCurrentMonthYMD = () => {
+  const now = new Date();
+
+  const firstDay = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    1
+  );
+
+  const dd = String(firstDay.getDate()).padStart(2, "0");
+  const mm = String(firstDay.getMonth() + 1).padStart(2, "0");
+  const yyyy = firstDay.getFullYear();
+
+  return `${yyyy}-${mm}-${dd}`;
+};
   static getLastDayOfCycleDMY = (cycle : string) => {
   // cycle dạng MMYYYY, ví dụ: 032026
   const month = parseInt(cycle.substring(0, 2), 10);

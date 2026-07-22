@@ -6,6 +6,9 @@ import { useSearchParams } from 'react-router-dom';
 import { listByUserIdStorage, listStorage } from 'modules/storage/api';
 import { listPermission } from 'modules/permission/api';
 import { setPermission } from 'redux/features/permission';
+import { infoEmployeeByStore } from 'modules/employee/api';
+import { setEmployeeInfo } from 'redux/features/user';
+import { useDispatch } from 'react-redux';
 export const sidebarModel = [{
     items: [
       {
@@ -771,17 +774,6 @@ export const sidebarModel = [{
           },
           {
             id: 1,
-            name: 'Danh sách quỹ',
-            route: '/page-two',
-            created_at: '2023-05-29 14:14:02',
-            updated_at: null,
-            deleted_at: null,
-            status: 1,
-            category_id: 1,
-            sort: 1,
-          },
-          {
-            id: 1,
             name: 'Bộ phận',
             route: '/department/list',
             created_at: '2023-05-29 14:14:02',
@@ -951,7 +943,7 @@ export default function AppSidebar() {
   const [selectedCity, setSelectedCity] = useState<any>(null);
   const [data, setData] = useState<any[]>([]);
   const [permission, setPermission] = useState<any[]>([]);
-
+  const dispatch = useDispatch();
   const employeeInfo = localStorage.getItem("employeeInfo")
     ? JSON.parse(localStorage.getItem("employeeInfo") || "{}")
     : null;
@@ -990,7 +982,7 @@ export default function AppSidebar() {
   // =========================
   // 2) Set default project
   // =========================
-  const applyDefaultProject = (projects: any[]) => {
+  const applyDefaultProject = async (projects: any[]) => {
     if (!projects?.length) return;
 
     const localProject = JSON.parse(localStorage.getItem("project") || "{}");
@@ -999,7 +991,10 @@ export default function AppSidebar() {
     let selected = localProject && projectIds.includes(localProject.projectId)
       ? localProject
       : projects[0];
-
+    const emp = await infoEmployeeByStore({UserId: employeeInfo.user_id, StoreId: selected.projectId });
+      if (emp?.data?.data) {
+        dispatch(setEmployeeInfo(emp.data.data));
+      }
     localStorage.setItem("project", JSON.stringify(selected));
     setSelectedCity(selected);
     setSearchParams({ projectId: selected.projectId });
@@ -1025,22 +1020,24 @@ export default function AppSidebar() {
   useEffect(() => {
     const run = async () => {
       if (!employeeInfo?.user_id) return;
-
       const projects = await fetchProject(employeeInfo.user_id);
-      applyDefaultProject(projects);
+      await applyDefaultProject(projects);
       await getPermission(employeeInfo.user_id);
     };
-
     run();
   }, []);
 
   // =========================
   // On change project
   // =========================
-  const onChange = (event: any) => {
+  const onChange = async (event: any) => {
     setSelectedCity(event.value);
     localStorage.setItem("project", JSON.stringify(event.value));
     setSearchParams({ projectId: event.value.projectId });
+    const emp = await infoEmployeeByStore({UserId: employeeInfo.user_id, StoreId: event.value.projectId });
+    if (emp?.data?.data) {
+      dispatch(setEmployeeInfo(emp.data.data));
+    }
     window.location.reload();
   };
 

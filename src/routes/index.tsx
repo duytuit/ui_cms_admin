@@ -99,6 +99,7 @@ import ListChiPhiTraTruoc from "modules/Depreciation/screen/index_cptt";
 import ListLoiNhuanTheoXe from "modules/receipt/screen/index_baocao_loinhuan_theoxe";
 import BaoCaoNhatKy from "modules/Debit/screen/index_baocao_nhatky";
 import BaoCaoChiTietThuChi from "modules/receipt/screen/index_chitiet_thu_chi";
+import UpdateImportPartner from "modules/partner/screen/import/updateImport";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -152,6 +153,7 @@ const publicRoutes = [
    // partner 
   { path: "/partner/list", component: ListPartner, layout: 'ListPartner' },
   { path: "/partner/add", component: UpdatePartner, layout: 'UpdatePartner' },
+  { path: "/partner/UpdateImportPartner", component: UpdateImportPartner, layout: 'UpdateImportPartner' },
   { path: "/partner/detail/:id", component: UpdatePartner, layout: 'UpdatePartner' },
   // ContractFile 
   { path: "/ContractFile/list", component: ListContractFile, layout: 'ListContractFile' },

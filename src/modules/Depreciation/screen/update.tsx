@@ -10,13 +10,17 @@ import { addDepreciation, showDepreciation, updateDepreciation } from "../api";
 import { Helper } from "utils/helper";
 import { Dropdown } from "components/common/ListForm";
 import { useListVehicleWithState } from "modules/VehicleDispatch/service";
+import { MyCalendar } from "components/common/MyCalendar";
+import { classNames } from "primereact/utils";
 export default function UpdateDepreciation() {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
     const type = searchParams.get("type");
     const [loading, setLoading] = useState(false);
     const [productTaiSan, setProductTaiSan] = useState<any[]>([]);
-    const [newTaiSan, setNewTaiSan] = useState<any>({CodeNumber:"", Name: "", OriginalCost: "",UsefulLife:"",MonthlyDepreciation:"",Note:"",vehicleId:'',vehicle_info:{}});
+    const [newTaiSan, setNewTaiSan] = useState<any>({CodeNumber:"", Name: "", OriginalCost: "",
+       createDate: Helper.toDayString(),
+      UsefulLife:"",MonthlyDepreciation:"",Note:"",vehicleId:null,vehicle_info:{}});
     const [infos, setInfos] = useState<any>({isExternalDriver:0});
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -108,6 +112,13 @@ export default function UpdateDepreciation() {
                <Panel header="Chi tiết khấu hao">
             <div className="formgrid grid">
               <div className="field col-2">
+                <MyCalendar dateFormat="dd/mm/yy"
+                  value={Helper.formatDMYLocal(newTaiSan.createDate ? newTaiSan.createDate : '')} // truyền nguyên ISO string
+                  onChange={(e: any) =>
+                    setInfos({ ...newTaiSan, createDate: e })}
+                  className={classNames("w-full", "p-inputtext", "input-form-sm")} />
+              </div>
+              <div className="field col-2">
                 <InputForm
                   className="w-full"
                   id="CodeNumber"
@@ -183,7 +194,7 @@ export default function UpdateDepreciation() {
                   label="Khấu hao hàng tháng"
                 />
               </div>
-               <div className="field col-10">
+               <div className="field col-8">
                 <InputForm
                   className="w-full"
                   id="Note"
@@ -208,7 +219,9 @@ export default function UpdateDepreciation() {
                     newTaiSan.MonthlyDepreciation = Number(newTaiSan.MonthlyDepreciation.toString().replaceAll(".", ""));
                     newTaiSan.UsefulLife = Number(newTaiSan.UsefulLife);
                     setProductTaiSan([...productTaiSan, newTaiSan]);
-                    setNewTaiSan({CodeNumber:"", Name: "", OriginalCost: 0,UsefulLife:0,MonthlyDepreciation:0,Note:"" }); 
+                    setNewTaiSan({
+                      createDate: Helper.toDayString(),
+                      CodeNumber:"", Name: "", OriginalCost: 0,UsefulLife:0,MonthlyDepreciation:0,Note:"",vehicleId:null,vehicle_info:{}}); 
                   }}
                 />
               </div>
@@ -216,6 +229,7 @@ export default function UpdateDepreciation() {
 
             <div className="child-table">
               <DataTable rowHover value={productTaiSan}>
+                <Column field="createDate" header="Ngày khấu hao" />
                 <Column field="CodeNumber" header="Mã khấu hao" />
                 <Column field="Name" header="Tên khấu hao" />
                 <Column field="vehicle_info.name" header="Tên xe" />

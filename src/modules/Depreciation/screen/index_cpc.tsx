@@ -1,39 +1,36 @@
-import { useEffect, useMemo, useState } from "react";
-import { ActionBody, Column, TimeBody, DataTableClient, DateBody, ActionBodyWithIds } from "components/common/DataTable";
-import { Dropdown, GridForm, Input } from "components/common/ListForm";
+import { useEffect, useState } from "react";
+import { ActionBody, Column, TimeBody, DataTableClient, DateBody } from "components/common/DataTable";
+import { GridForm } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { CategoryEnum } from "utils/type.enum";
 import { classNames } from "primereact/utils";
 import { useListDepreciation, useListDepreciationAllocation } from "../service";
 import { Splitter, SplitterPanel } from "primereact/splitter";
-import { Checkbox, DataTable, Dialog, InputSwitch } from "components/uiCore";
-import { delMultiDebit } from "modules/Debit/api";
+import { DataTable, Dialog, InputSwitch } from "components/uiCore";
 import { Helper } from "utils/helper";
 import UpdatePhanBoKhauHao from "modules/Debit/screen/update_phanbo_khauhao";
 import { useListEmployeeWithState } from "modules/employee/service";
 import { deleteDepreciation, deleteDepreciationAllocation, getDepreciationAllocationDetailByDepreciationAllocationId } from "../api";
+import { MyCalendar } from "components/common/MyCalendar";
+import { useListVehicleWithState } from "modules/VehicleDispatch/service";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator,_refresh,_refreshAllocation}: any) => {
-    const [filter, setFilter] = useState({ name: "" ,cycleName:Helper.getCurrentMonthCycle()});
+    const [filter, setFilter] = useState({
+        fromDate: Helper.getFirstDayOfCurrentMonthYMD(),
+        toDate: Helper.getLastDayOfCurrentMonthYMD(),
+    });
     const [visible, setVisible] = useState(false);
     const [dataCycleName, setDataCycleName] = useState<any[]>([]);
-    const cycleOptions = useMemo(() => {
-      return dataCycleName.map(cycle => ({
-        label: `Tháng ${cycle.slice(0, 2)}/${cycle.slice(2)}`,
-        value: cycle,
-      }));
-    }, [dataCycleName]);
     useEffect(() => {
         // Mỗi khi filter thay đổi => cập nhật params
         const monthlyCycles = Helper.getMonthlyCycles();
         setDataCycleName(monthlyCycles);
         _setParamsPaginator((prev: any) => ({
             ...prev,
-            keyword: filter.name,
-            cycleName: filter.cycleName,
+            fromDate: filter.fromDate,
+            toDate: filter.toDate,
         }));
-    }, [filter.name, filter.cycleName]);
+    }, [filter]);
     const openDialogAdd = (e:any) => {
        setVisible(true)
     };
@@ -55,19 +52,21 @@ const Header = ({ _setParamsPaginator, _paramsPaginator,_refresh,_refreshAllocat
                 openDialogAdd={openDialogAdd}
                 openDialogAddName="Phân bổ khấu hao"
             >
-            <div className="col-6">
-             <Dropdown
-                value={filter.cycleName}
-                options={cycleOptions}
-                label="Kỳ phân bổ khấu hao"
-                className="p-inputtext-sm"
-                onChange={(e: any) =>
-                    {
-                    console.log( e.target.value);
-                    setFilter({ ...filter, cycleName: e.target.value })
-                    }
-                }
-                />
+             <div className="col-2">
+            <MyCalendar
+                dateFormat="dd/mm/yy"
+                value={filter.fromDate}
+                onChange={(e: any) => setFilter({ ...filter, fromDate: e })}
+                className={classNames("w-full", "p-inputtext", "input-sm")}
+            />
+            </div>
+            <div className="col-2">
+            <MyCalendar
+                dateFormat="dd/mm/yy"
+                value={filter.toDate}
+                onChange={(e: any) => setFilter({ ...filter, toDate: e })}
+                className={classNames("w-full", "p-inputtext", "input-sm")}
+            />
             </div>
             </GridForm>
             <Dialog
@@ -94,6 +93,7 @@ export default function ListChiPhiChung() {
     const [first, setFirst] = useState(0);
     const [rows, setRows] = useState(20);
     const { data: employees } = useListEmployeeWithState({});
+    const { data: vehicles } = useListVehicleWithState({});
     const [paramsPaginator, setParamsPaginator] = useState({
         pageNum: 1,
         pageSize: 20,
@@ -117,10 +117,12 @@ export default function ListChiPhiChung() {
          const mapped = (data?.data || []).map((row: any) => {
                     const _employee = employees.find((x: any) => x.user_id === row.created_by);
                     const _fullname = `${_employee?.last_name ?? ""} ${ _employee?.first_name ?? ""}`.trim();
+                    const _vehicle = vehicles.find((x: any) => x.id === row.vehicle_id);
                     return {
                         ...row,
                         remaining_value: (row.original_cost || 0) - (row.total_depreciation || 0),  
                         userName: _fullname,
+                        number_code: _vehicle ? _vehicle.number_code : '',
                     };
                 });
         setDisplayData(mapped);
@@ -190,7 +192,7 @@ export default function ListChiPhiChung() {
                                 return ActionBody(
                                         e,
                                         "/Depreciation/detail",
-                                        { route: "/Depreciation/delete", action: deleteDepreciation },
+                                        { route: "/Depreciation/delete", action: deleteDepreciation,params: {type: 3}},
                                         paramsPaginator,
                                         setParamsPaginator
                                     );
@@ -198,7 +200,7 @@ export default function ListChiPhiChung() {
                                 return ActionBody(
                                         e,
                                         "/Depreciation/detail",
-                                        null,
+                                        { route: null, action: null,params: {type: 3}},
                                         paramsPaginator,
                                         setParamsPaginator
                                     );
@@ -211,8 +213,10 @@ export default function ListChiPhiChung() {
                                 </>
                             )
                         }}/>
+                         <Column header="Ngày khấu hao" field="create_date" body={(e: any) => DateBody(e.create_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="code_number" header="Mã chi phí" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="name" header="Tên chi phí" filter showFilterMenu={false} filterMatchMode="contains" />
+                        <Column field="number_code" header="Tên xe" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="original_cost" header="Nguyên giá" body={(e: any) => Helper.formatCurrency((e.original_cost || 0).toString())} filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="useful_life" header="Thời gian sử dụng" filter showFilterMenu={false} filterMatchMode="contains" />
                         <Column field="monthly_depreciation" header="Giá trị khấu hao tháng" body={(e: any) => Helper.formatCurrency((e.monthly_depreciation || 0).toString())} filter showFilterMenu={false} filterMatchMode="contains" />
@@ -271,6 +275,7 @@ export default function ListChiPhiChung() {
                                     );
                                     }}
                                 />
+                                <Column header="Ngày hạch toán" field="accounting_date" body={(e: any) => DateBody(e.accounting_date)} filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="cycle_name" header="Kỳ khấu hao" body={(e: any) => e.cycle_name} filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="note" header="Diễn giải" filter showFilterMenu={false} filterMatchMode="contains" />
                                 <Column field="total_depreciation" header="Tổng tiền" body={(e: any) => Helper.formatCurrency((e.total_depreciation || 0).toString())} filter showFilterMenu={false} filterMatchMode="contains" />

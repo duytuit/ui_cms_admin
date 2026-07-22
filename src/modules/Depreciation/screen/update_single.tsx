@@ -11,12 +11,14 @@ import { addDepreciation, showDepreciation, updateDepreciation } from "../api";
 import { Helper } from "utils/helper";
 import { Dropdown } from "components/common/ListForm";
 import { useListVehicleWithState } from "modules/VehicleDispatch/service";
+import { MyCalendar } from "components/common/MyCalendar";
+import { classNames } from "primereact/utils";
 export default function UpdateSingleDepreciation() {
     const { id } = useParams();
     const [searchParams] = useSearchParams();
     const type = searchParams.get("type");
     const [loading, setLoading] = useState(false);
-    const [infos, setInfos] = useState<any>({type:CategoryEnum.country,isExternalDriver:0,  status: 0});
+    const [infos, setInfos] = useState<any>({});
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { data: vehicles } = useListVehicleWithState({});
@@ -109,6 +111,21 @@ export default function UpdateSingleDepreciation() {
                   style={{ backgroundColor: "#f8f9fa" }}
                   className="card col-6"
                 >
+                  <div className="field grid">
+                    <label
+                      htmlFor="codeNumber"
+                      className="col-12 mb-2 md:col-3 md:mb-0"
+                    >
+                      Ngày khấu hao
+                    </label>
+                    <div className="col-12 md:col-9">
+                       <MyCalendar dateFormat="dd/mm/yy"
+                        value={Helper.formatDMYLocal(infos.createDate ? infos.createDate : '')} // truyền nguyên ISO string
+                        onChange={(e: any) =>
+                          setInfos({ ...infos, createDate: e })}
+                        className={classNames("w-full", "p-inputtext", "input-form-sm")} />
+                    </div>
+                  </div>
                   <div className="field grid">
                     <label
                       htmlFor="codeNumber"

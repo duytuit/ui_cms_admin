@@ -17,8 +17,8 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
   const [filter, setFilter] = useState({
     name: "",
     customerDetailId: "",
-    fromDate: Helper.lastWeekString(),
-    toDate: Helper.toDayString(),
+    fromDate: Helper.getFirstDayOfCurrentMonthYMD(),
+    toDate: Helper.getLastDayOfCurrentMonthYMD(),
   });
   useEffect(() => {
     // Mỗi khi filter thay đổi => cập nhật params
@@ -94,9 +94,19 @@ export default function ListLoiNhuanTheoXe() {
       // 34: trích BHXH
       // 35: phí gửi xe
       // 38: phí đi đường lái xe
+    const allCost = (data[0]?.data?.debit_theoxe || []).reduce(
+      (total: number, row: any) => {
+        const totalCost =
+          (row.total_price || 0) +
+          (row.total_driver_fee || 0);
+        return total + totalCost;
+      },
+      0
+    );
     let baocaoloinhuan = (data[0]?.data?.debit_theoxe || []).map((row: any) => {
       const totalCost = row.total_price + row.total_driver_fee;
       const listPhi =(data[0]?.data?.chi_theoxe || []).filter((item: any) => item.vehicle_id === row.id);
+      const khauHaoXe =(data[0]?.data?.khauhao_theoxe || []).find((item: any) => item.id === row.id);
       return {
         ...row,
         totalCost,
@@ -110,7 +120,10 @@ export default function ListLoiNhuanTheoXe() {
         phiGuiXe : listPhi?.reduce((sum: number, p: any) => p.income_expense_category_id === 35 ? sum + (p.amount ? parseFloat(p.amount.toString()) : 0) : sum, 0) || 0,
         phiDiDuongLaiXe : listPhi?.reduce((sum: number, p: any) => p.income_expense_category_id === 38 ? sum + (p.amount ? parseFloat(p.amount.toString()) : 0) : sum, 0) || 0,
         tongChiPhi: listPhi?.reduce((sum: number, p: any) => sum + (p.amount ? parseFloat(p.amount.toString()) : 0), 0) || 0, 
+        khauHao: khauHaoXe?.total_monthly_depreciation,
         loiNhuan: totalCost - (listPhi?.reduce((sum: number, p: any) => sum + (p.amount ? parseFloat(p.amount.toString()) : 0), 0) || 0),
+        tySuatLoiNhuan: ( ((totalCost - (listPhi?.reduce( (sum: number, p: any) => sum + (p.amount ? parseFloat(p.amount.toString()) : 0), 0 ) || 0) ) / allCost) * 100 ).toFixed(1),
+        loiNhuanChuaKH: totalCost - (listPhi?.reduce((sum: number, p: any) => sum + (p.amount ? parseFloat(p.amount.toString()) : 0), 0) || 0),
       };
     });
     const loinhuanxengoai = (data[1]?.data || []).map((row: any) => {
@@ -137,12 +150,16 @@ export default function ListLoiNhuanTheoXe() {
       safeReduce(data?.[3]?.data?.loinhuan_phikhac, "total_purchase_price") +
       safeReduce(data?.[3]?.data?.loinhuan_chi, "total_amount");
 
+    const khauhaochung =
+      safeReduce(data?.[3]?.data?.khauhao_chung, "total_monthly_depreciation");
+
     const loinhuandoanhthukhac = [
       {
         number_code: "Thu nhập thu khác",
         totalCost: doanhSo || 0,
         phiDau: chiPhi || 0,
         tongChiPhi: chiPhi || 0,
+        khauHao:khauhaochung || 0,
         loiNhuan: (doanhSo || 0) - (chiPhi || 0),
       },
     ];
@@ -363,18 +380,24 @@ export default function ListLoiNhuanTheoXe() {
                     return Helper.formatCurrency(tongChiPhi.toString());
                   }}
                   footer={getSumColumn("tongChiPhi")}
-                  footerStyle={{ fontWeight: "bold" }}
+                  footerStyle={{ fontWeight: "bold",textAlign: "right" }}
                   style={{ textAlign: "right" }}
                   filter
                   showFilterMenu={false}
                   filterMatchMode="contains"
                 />
                 <Column
-                  field="listEmployee"
                   header="Khấu hao/chi phí phân bổ"
-                  filter
-                  showFilterMenu={false}
-                  filterMatchMode="contains"
+                   body={(rowData: any) => {
+                    const khauHao = rowData.khauHao || 0;
+                    return Helper.formatCurrency(khauHao.toString());
+                  }}
+                   footer={getSumColumn("khauHao")}
+                   footerStyle={{ fontWeight: "bold",textAlign: "right" }}
+                   style={{ textAlign: "right" }}
+                   filter
+                   showFilterMenu={false}
+                   filterMatchMode="contains"
                 />
                 <Column
                   field="loiNhuan"
@@ -391,15 +414,24 @@ export default function ListLoiNhuanTheoXe() {
                   filterMatchMode="contains"
                 />
                 <Column
-                  field="listEmployee"
                   header="Tỷ suất lợi nhuận"
+                   body={(rowData: any) => {
+                    return rowData.tySuatLoiNhuan
+                  }}
+                   style={{ textAlign: "center" }}
                   filter
                   showFilterMenu={false}
                   filterMatchMode="contains"
                 />
                 <Column
-                  field="listEmployee"
                   header="Lợi nhuận chưa tính khấu hao"
+                  body={(rowData: any) => {
+                    const loiNhuanChuaKH = rowData.loiNhuanChuaKH || 0;
+                    return Helper.formatCurrency(loiNhuanChuaKH.toString());
+                  }}
+                  footer={getSumColumn("loiNhuanChuaKH")}
+                  footerStyle={{ fontWeight: "bold",textAlign: "right" }}
+                   style={{ textAlign: "right" }}
                   filter
                   showFilterMenu={false}
                   filterMatchMode="contains"
