@@ -142,7 +142,7 @@ export default function UpdateSalary() {
     const { data:nghiPhepNV, loading: loadingNghiPhepNV } = useListFormRequest({ params: {...paramsPaginator,employeeId: paramsPaginator.employeeDriverId}});
     const handleSubmit = (e:any) => {
         e.preventDefault();
-        if (!infos.employeeId || infos.employeeId <= 0) {
+        if (!paramsPaginator.employeeDriverId || paramsPaginator.employeeDriverId <= 0) {
           dispatch(showToast({ ...listToast[2], detail: "Vui lòng chọn nhân viên" }));
           return;
         }
