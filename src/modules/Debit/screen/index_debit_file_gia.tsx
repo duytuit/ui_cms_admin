@@ -20,6 +20,9 @@ import { FilterMatchMode } from "primereact/api";
 import { ExportChiTietFileGia, ExportXuatHoaDon } from "modules/ContractFile/api";
 import { useDispatch } from "react-redux";
 import { showToast } from "redux/features/toast";
+import {
+  ExportXuatHoaDonKHInDebitAsync,
+} from "modules/ContractFile/api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFileGia,_setSelectedRows}: any) => {
@@ -112,6 +115,40 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFil
     link.remove();
     window.URL.revokeObjectURL(url); // ✅ tránh leak memory
   }
+  async function ExportHoaDonKHVer1() {
+      if (!Array.isArray(selected) || selected.length === 0) {
+        dispatch(
+          showToast({
+            ...listToast[2],
+            detail: "Chưa chọn file giá",
+          }),
+        );
+        return;
+      }
+
+      const params = {
+        ..._paramsPaginator,
+        FileInfoIds: selected.map(Number), // ✅ đảm bảo number[]
+        version: 1
+      };
+
+      const respo = await ExportXuatHoaDonKHInDebitAsync(
+        Helper.convertObjectToQueryString(params),
+      );
+
+      const blob = new Blob([respo.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "hoa_don_kh_ver1.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url); // ✅ tránh leak memory
+    }
    async function ExportHoaDonHasBillKH() {
     if (!Array.isArray(selected) || selected.length === 0) {
       dispatch(
@@ -147,22 +184,27 @@ const Header = ({ _setParamsPaginator, _paramsPaginator ,selected ,refreshHasFil
     window.URL.revokeObjectURL(url); // ✅ tránh leak memory
   }
     const items = [
-          {
-              label: 'Xuất chi tiết hóa đơn',
-              icon: "pi pi-file-export",
-              command: () => ExportHoaDonKH()
-          },
-          {
-              label: 'Xuất chi tiết hóa đơn + bill',
-              icon: "pi pi-file-export",
-              command: () => ExportHoaDonHasBillKH()
-          },
-          {
-              label: 'Xuất chi tiết file giá',
-              icon: "pi pi-file-export",
-              command: () => ExcelChiTietFileGia()
-          }
-      ];
+      {
+        label: "Xuất chi tiết hóa đơn",
+        icon: "pi pi-file-export",
+        command: () => ExportHoaDonKH(),
+      },
+      {
+        label: "Xuất chi tiết hóa đơn 1",
+        icon: "pi pi-file-export",
+        command: () => ExportHoaDonKHVer1(),
+      },
+      {
+        label: "Xuất chi tiết hóa đơn + bill",
+        icon: "pi pi-file-export",
+        command: () => ExportHoaDonHasBillKH(),
+      },
+      {
+        label: "Xuất chi tiết file giá",
+        icon: "pi pi-file-export",
+        command: () => ExcelChiTietFileGia(),
+      },
+    ];
     return (
       <>
        <GridForm
