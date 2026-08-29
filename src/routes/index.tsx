@@ -100,6 +100,8 @@ import ListLoiNhuanTheoXe from "modules/receipt/screen/index_baocao_loinhuan_the
 import BaoCaoNhatKy from "modules/Debit/screen/index_baocao_nhatky";
 import BaoCaoChiTietThuChi from "modules/receipt/screen/index_chitiet_thu_chi";
 import UpdateImportPartner from "modules/partner/screen/import/updateImport";
+import ListWork from "modules/work/screen";
+import UpdateWork from "modules/work/screen/update";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -191,6 +193,10 @@ const publicRoutes = [
   { path: "/salary/detail/:id", component: UpdateSalary, layout: 'UpdateSalary' },
   { path: "/salary/SalaryByCycleName", component: PrintPayrollTable,  layout: null, public: true  },
   { path: "/salary/SalaryByDate", component: PrintPayrollTable,  layout: null, public: true  },
+   // Work 
+  { path: "/work/list", component: ListWork, layout: 'ListWork' },
+  { path: "/work/add", component: UpdateWork, layout: 'UpdateWork' },
+  { path: "/work/detail/:id", component: UpdateWork, layout: 'UpdateWork' },
   // Receipt 
   { path: "/receipt/list", component: ListReceipt, layout: 'ListReceipt' },
   { path: "/receipt/BaoCaoChiTietThuChi", component: BaoCaoChiTietThuChi, layout: 'BaoCaoChiTietThuChi' },

@@ -171,6 +171,31 @@ export const sidebarModel = [{
           },
         ]
       },
+       {
+        id: 1,
+        name: 'Công việc',
+        created_at: '2023-05-29 14:14:02',
+        updated_at: null,
+        deleted_at: null,
+        status: 1,
+        category_id: 1,
+        sort: 1,
+        icon: 'pi pi-home',
+        admin:false,
+        items: [
+          {
+            id: 1,
+            name: 'Theo dõi công việc',
+            route: '/work/list',
+            created_at: '2023-05-29 14:14:02',
+            updated_at: null,
+            deleted_at: null,
+            status: 1,
+            category_id: 1,
+            sort: 1,
+          }
+        ]
+      },
       {
         id: 1,
         name: 'Giao nhận',
