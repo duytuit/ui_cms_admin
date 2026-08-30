@@ -95,6 +95,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
         <MyCalendar
           dateFormat="dd/mm/yy"
           value={filter.fromDate}
+          label="Từ ngày"
           onChange={(e: any) => setFilter({ ...filter, fromDate: e })}
           className={classNames("w-full", "p-inputtext", "input-sm")}
         />
@@ -103,6 +104,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
         <MyCalendar
           dateFormat="dd/mm/yy"
           value={filter.toDate}
+          label="Đến ngày"
           onChange={(e: any) => setFilter({ ...filter, toDate: e })}
           className={classNames("w-full", "p-inputtext", "input-sm")}
         />

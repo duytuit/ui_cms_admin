@@ -6,6 +6,7 @@ interface CalendarProps {
   onChange?: (date: string | null) => void;
   dateFormat?: string;
   className?: string;
+  label?: string;
 }
 
 export const MyCalendar = ({
@@ -13,12 +14,15 @@ export const MyCalendar = ({
   onChange,
   dateFormat = "dd/mm/yyyy",
   className = "",
+  label,
 }: CalendarProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(
     value ? new Date(value) : null
   );
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const inputId = label || "my-calendar-input";
+  const hasValue = Boolean(selectedDate);
 
   useEffect(() => {
     setSelectedDate(value ? new Date(value) : null);
@@ -60,19 +64,49 @@ export const MyCalendar = ({
 
   return (
     <>
-      <input
-        ref={inputRef}
-        value={formatDate(selectedDate)}
-        readOnly
-        onClick={() => setOpen(true)}
-        className={className}
-      />
+      <span
+        className="p-float-label"
+        style={{ display: "block", position: "relative" }}
+      >
+        <input
+          id={inputId}
+          ref={inputRef}
+          value={formatDate(selectedDate)}
+          readOnly
+          onClick={() => setOpen(true)}
+          placeholder=" "
+          className={className}
+          style={{ paddingRight: label ? 28 : undefined }}
+        />
+        {label && (
+          <label
+            htmlFor={inputId}
+            style={{
+              left: 10,
+              top: hasValue ? "-0.01rem" : "70%",
+              transform: hasValue ? "translateY(0)" : "translateY(-50%)",
+              fontSize: hasValue ? 12 : 14,
+              background: "#fff",
+              padding: "0 4px",
+              color: "#6b7280",
+            }}
+          >
+            {label}
+          </label>
+        )}
         <span
-          style={{ marginLeft: -25, cursor: "pointer" }}
+          style={{
+            position: "absolute",
+            right: 8,
+            top: "50%",
+            transform: "translateY(-50%)",
+            cursor: "pointer",
+          }}
           onClick={() => setOpen(true)}
         >
           📅
         </span>
+      </span>
       {open &&
         createPortal(
           <CalendarPopup
@@ -81,7 +115,7 @@ export const MyCalendar = ({
             onSelect={handleSelect}
             onClose={() => setOpen(false)}
           />,
-          document.body
+          document.body,
         )}
     </>
   );
@@ -108,6 +142,12 @@ const CalendarPopup = ({
   const [year, setYear] = useState(
     selectedDate?.getFullYear() ?? today.getFullYear()
   );
+
+  const changeMonth = (direction: number) => {
+    const nextDate = new Date(year, month + direction, 1);
+    setYear(nextDate.getFullYear());
+    setMonth(nextDate.getMonth());
+  };
 
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const [placement, setPlacement] = useState<"top" | "bottom">("bottom");
@@ -229,11 +269,16 @@ const CalendarPopup = ({
 
       {/* header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5, gap: 5 }}>
-        <button onClick={() => setMonth((m) => (m === 0 ? 11 : m - 1))}>
+        <button type="button" onClick={() => changeMonth(-1)}>
           {"<"}
         </button>
 
-        <select value={month} onChange={(e) => setMonth(+e.target.value)}>
+        <select value={month} onChange={(e) => {
+          const nextMonth = Number(e.target.value);
+          const nextDate = new Date(year, nextMonth, 1);
+          setYear(nextDate.getFullYear());
+          setMonth(nextDate.getMonth());
+        }}>
           {Array.from({ length: 12 }).map((_, i) => (
             <option key={i} value={i}>
               {i + 1}
@@ -241,13 +286,13 @@ const CalendarPopup = ({
           ))}
         </select>
 
-        <select value={year} onChange={(e) => setYear(+e.target.value)}>
+        <select value={year} onChange={(e) => setYear(Number(e.target.value))}>
           {Array.from({ length: 201 }, (_, i) => 1900 + i).map((y) => (
             <option key={y}>{y}</option>
           ))}
         </select>
 
-        <button onClick={() => setMonth((m) => (m === 11 ? 0 : m + 1))}>
+        <button type="button" onClick={() => changeMonth(1)}>
           {">"}
         </button>
       </div>
