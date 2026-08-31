@@ -353,8 +353,7 @@ export default function UpdateWork() {
         route={Number(id) ? "/work/update" : "/work/create"}
       >
         <div className="field">
-          <div className="flex justify-content-between align-items-center mb-3">
-            <h4 className="m-0">Danh sách công việc</h4>
+          <div className="flex justify-content-end align-items-center mb-3">
             <Button
               type="button"
               label="Thêm công việc"
@@ -367,10 +366,15 @@ export default function UpdateWork() {
           </div>
 
           {infos.congviec?.map((workItem: any, workIndex: number) => (
-            <div key={workIndex} className="surface-card border-1 border-200 border-round-xl p-3 p-md-4 mb-3 shadow-1">
+            <div
+              key={workIndex}
+              className="surface-card border-1 border-200 border-round-xl p-3 p-md-4 mb-3 shadow-1"
+            >
               <div className="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-2 mb-3">
                 <div>
-                  <div className="text-xs text-500 uppercase font-medium mb-1">Nhóm công việc</div>
+                  <div className="text-xs text-500 uppercase font-medium mb-1">
+                    Nhóm công việc
+                  </div>
                   <h5 className="m-0">Công việc {workIndex + 1}</h5>
                 </div>
 
@@ -386,48 +390,63 @@ export default function UpdateWork() {
                   />
                 )}
               </div>
+              <div className="grid">
+                <div className="col-8">
+                  <div className="formgrid grid">
+                    <div className="field col-12">
+                      <InputForm
+                        className="w-full"
+                        id={`tieude-${workIndex}`}
+                        value={workItem.tieude || ""}
+                        onChange={(e: any) =>
+                          updateWorkInfo(workIndex, "tieude", e.target.value)
+                        }
+                        label="Tiêu đề công việc"
+                        required
+                      />
+                    </div>
+                    <div className="field col-4">
+                      <InputForm
+                        className="w-full"
+                        id={`laplai-${workIndex}`}
+                        value={workItem.laplai ?? 1}
+                        onChange={(e: any) =>
+                          updateWorkInfo(
+                            workIndex,
+                            "laplai",
+                            Number(e.target.value || 1),
+                          )
+                        }
+                        label="Lặp lại"
+                        type="number"
+                      />
+                    </div>
 
-              <div className="formgrid grid gap-3">
-                <div className="field col-12 mb-0">
-                  <InputForm
-                    className="w-full"
-                    id={`tieude-${workIndex}`}
-                    value={workItem.tieude || ""}
-                    onChange={(e: any) => updateWorkInfo(workIndex, "tieude", e.target.value)}
-                    label="Tiêu đề công việc"
-                    required
-                  />
+                    <div className="field col-4">
+                      <DateTimeField
+                        label="Thời gian lặp"
+                        value={workItem.thoigianlap || ""}
+                        onChange={(value) =>
+                          updateWorkInfo(workIndex, "thoigianlap", value)
+                        }
+                      />
+                    </div>
+
+                    <div className="field col-4">
+                      <DateTimeField
+                        label="Kết thúc"
+                        value={workItem.thoigianketthuclap || ""}
+                        onChange={(value) =>
+                          updateWorkInfo(workIndex, "thoigianketthuclap", value)
+                        }
+                      />
+                    </div>
+                  </div>
                 </div>
-
-                <div className="field col-12 md:col-4 mb-0">
-                  <InputForm
-                    className="w-full"
-                    id={`laplai-${workIndex}`}
-                    value={workItem.laplai ?? 1}
-                    onChange={(e: any) => updateWorkInfo(workIndex, "laplai", Number(e.target.value || 1))}
-                    label="Lặp lại"
-                    type="number"
-                  />
-                </div>
-
-                <div className="field col-12 md:col-4 mb-0">
-                  <DateTimeField
-                    label="Thời gian lặp"
-                    value={workItem.thoigianlap || ""}
-                    onChange={(value) => updateWorkInfo(workIndex, "thoigianlap", value)}
-                  />
-                </div>
-
-                <div className="field col-12 md:col-4 mb-0">
-                  <DateTimeField
-                    label="Kết thúc"
-                    value={workItem.thoigianketthuclap || ""}
-                    onChange={(value) => updateWorkInfo(workIndex, "thoigianketthuclap", value)}
-                  />
-                </div>
-
-                <div className="field col-12 mb-0">
-                  {renderWorkFileList(workItem, workIndex)}
+                <div className="col-4">
+                  <div className="field col-12">
+                    {renderWorkFileList(workItem, workIndex)}
+                  </div>
                 </div>
               </div>
 
@@ -449,114 +468,183 @@ export default function UpdateWork() {
                   className="overflow-x-auto pb-2"
                   style={{ scrollbarWidth: "thin" }}
                 >
-                  <div className="flex gap-3 align-items-stretch" style={{ minWidth: "max-content" }}>
-                    {workItem.chitiet?.map((detail: any, detailIndex: number) => (
-                      <div
-                        key={detailIndex}
-                        className="surface-50 border-round-xl p-3 border-1 border-200"
-                        style={{ width: "420px", minWidth: "420px", flexShrink: 0 }}
-                      >
-                        <div className="flex justify-content-between align-items-center mb-3">
-                          <div className="font-medium text-900">Chi tiết {detailIndex + 1}</div>
-                          {workItem.chitiet.length > 1 && (
-                            <Button
-                              type="button"
-                              label="Xóa chi tiết"
-                              icon="pi pi-trash"
-                              severity="danger"
-                              size="small"
-                              text
-                              onClick={() => removeDetail(workIndex, detailIndex)}
-                            />
-                          )}
-                        </div>
-
-                        <div className="formgrid grid gap-3">
-                          <div className="field col-12 mb-0">
-                            <InputForm
-                              className="w-full"
-                              id={`tencongviec-${workIndex}-${detailIndex}`}
-                              value={detail.tencongviec || ""}
-                              onChange={(e: any) => updateDetail(workIndex, detailIndex, "tencongviec", e.target.value)}
-                              label="Tên công việc"
-                              required
-                            />
-                          </div>
-
-                          <div className="field col-12 mb-0">
-                            <DateTimeField
-                              label="Hạn hoàn thành"
-                              value={detail.hanhoanthanh || ""}
-                              onChange={(value) => updateDetail(workIndex, detailIndex, "hanhoanthanh", value)}
-                            />
-                          </div>
-
-                          <div className="field col-12 mb-0">
-                            <InputTextareaForm
-                              id={`motacongviec-${workIndex}-${detailIndex}`}
-                              value={detail.motacongviec || ""}
-                              onChange={(e: any) => updateDetail(workIndex, detailIndex, "motacongviec", e.target.value)}
-                              label="Mô tả công việc"
-                              className="w-full"
-                            />
-                          </div>
-
-                          <div className="field col-12 mb-0">
-                            <label className="block text-900 font-medium mb-2">Người phụ trách</label>
-                            <MultiSelect
-                              value={detail.nguoiphutrach || []}
-                              onChange={(e: any) => updateDetail(workIndex, detailIndex, "nguoiphutrach", e.value)}
-                              options={assigneeOptions}
-                              optionLabel="label"
-                              optionValue="value"
-                              label="Người phụ trách"
-                              className="w-full"
-                            />
-                          </div>
-
-                          <div className="field col-12 mb-0">
-                            <div className="flex justify-content-between align-items-center mb-2">
-                              <label className="block text-900 font-medium">Checklist</label>
+                  <div
+                    className="flex gap-3 align-items-stretch"
+                    style={{ minWidth: "max-content" }}
+                  >
+                    {workItem.chitiet?.map(
+                      (detail: any, detailIndex: number) => (
+                        <div
+                          key={detailIndex}
+                          className="surface-50 border-round-xl p-3 border-1 border-200"
+                          style={{
+                            width: "420px",
+                            minWidth: "420px",
+                            flexShrink: 0,
+                          }}
+                        >
+                          <div className="flex justify-content-between align-items-center mb-3">
+                            <div className="font-medium text-900">
+                              Chi tiết {detailIndex + 1}
+                            </div>
+                            {workItem.chitiet.length > 1 && (
                               <Button
                                 type="button"
-                                label="Thêm mục"
-                                icon="pi pi-plus"
-                                severity="secondary"
+                                label="Xóa chi tiết"
+                                icon="pi pi-trash"
+                                severity="danger"
                                 size="small"
-                                outlined
-                                onClick={() => addChecklistItem(workIndex, detailIndex)}
+                                text
+                                onClick={() =>
+                                  removeDetail(workIndex, detailIndex)
+                                }
+                              />
+                            )}
+                          </div>
+
+                          <div className="formgrid grid gap-3">
+                            <div className="field col-12 mb-0">
+                              <InputForm
+                                className="w-full"
+                                id={`tencongviec-${workIndex}-${detailIndex}`}
+                                value={detail.tencongviec || ""}
+                                onChange={(e: any) =>
+                                  updateDetail(
+                                    workIndex,
+                                    detailIndex,
+                                    "tencongviec",
+                                    e.target.value,
+                                  )
+                                }
+                                label="Tên công việc"
+                                required
                               />
                             </div>
 
-                            {(detail.checklist || [""]).map((item: string, checklistIndex: number) => (
-                              <div key={checklistIndex} className="flex align-items-center gap-2 mb-2 w-full">
-                                <InputForm
-                                  className="w-full flex-1"
-                                  id={`checklist-${workIndex}-${detailIndex}-${checklistIndex}`}
-                                  value={item}
-                                  onChange={(e: any) => updateChecklistItem(workIndex, detailIndex, checklistIndex, e.target.value)}
-                                  label={`Checklist ${checklistIndex + 1}`}
+                            <div className="field col-12 mb-0">
+                              <DateTimeField
+                                label="Hạn hoàn thành"
+                                value={detail.hanhoanthanh || ""}
+                                onChange={(value) =>
+                                  updateDetail(
+                                    workIndex,
+                                    detailIndex,
+                                    "hanhoanthanh",
+                                    value,
+                                  )
+                                }
+                              />
+                            </div>
+
+                            <div className="field col-12 mb-0">
+                              <InputTextareaForm
+                                id={`motacongviec-${workIndex}-${detailIndex}`}
+                                value={detail.motacongviec || ""}
+                                onChange={(e: any) =>
+                                  updateDetail(
+                                    workIndex,
+                                    detailIndex,
+                                    "motacongviec",
+                                    e.target.value,
+                                  )
+                                }
+                                label="Mô tả công việc"
+                                className="w-full"
+                              />
+                            </div>
+
+                            <div className="field col-12 mb-0">
+                              <label className="block text-900 font-medium mb-2">
+                                Người phụ trách
+                              </label>
+                              <MultiSelect
+                                value={detail.nguoiphutrach || []}
+                                onChange={(e: any) =>
+                                  updateDetail(
+                                    workIndex,
+                                    detailIndex,
+                                    "nguoiphutrach",
+                                    e.value,
+                                  )
+                                }
+                                options={assigneeOptions}
+                                optionLabel="label"
+                                optionValue="value"
+                                label="Người phụ trách"
+                                className="w-full"
+                              />
+                            </div>
+
+                            <div className="field col-12 mb-0">
+                              <div className="flex justify-content-between align-items-center mb-2">
+                                <label className="block text-900 font-medium">
+                                  Checklist
+                                </label>
+                                <Button
+                                  type="button"
+                                  label="Thêm mục"
+                                  icon="pi pi-plus"
+                                  severity="secondary"
+                                  size="small"
+                                  outlined
+                                  onClick={() =>
+                                    addChecklistItem(workIndex, detailIndex)
+                                  }
                                 />
-                                {detail.checklist.length > 1 && (
-                                  <Button
-                                    type="button"
-                                    icon="pi pi-trash"
-                                    severity="danger"
-                                    text
-                                    rounded
-                                    onClick={() => removeChecklistItem(workIndex, detailIndex, checklistIndex)}
-                                  />
-                                )}
                               </div>
-                            ))}
+
+                              {(detail.checklist || [""]).map(
+                                (item: string, checklistIndex: number) => (
+                                  <div
+                                    key={checklistIndex}
+                                    className="flex align-items-center gap-2 mb-2 w-full"
+                                  >
+                                    <div style={{ flex: "0 0 90%" }}>
+                                      <InputForm
+                                        className="w-full"
+                                        id={`checklist-${workIndex}-${detailIndex}-${checklistIndex}`}
+                                        value={item}
+                                        onChange={(e: any) =>
+                                          updateChecklistItem(
+                                            workIndex,
+                                            detailIndex,
+                                            checklistIndex,
+                                            e.target.value,
+                                          )
+                                        }
+                                        label={`Checklist ${checklistIndex + 1}`}
+                                      />
+                                    </div>
+
+                                    {detail.checklist.length > 1 && (
+                                      <div style={{ flex: "1" }}>
+                                        <Button
+                                          type="button"
+                                          icon="pi pi-trash"
+                                          severity="danger"
+                                          text
+                                          rounded
+                                          onClick={() =>
+                                            removeChecklistItem(
+                                              workIndex,
+                                              detailIndex,
+                                              checklistIndex,
+                                            )
+                                          }
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+                                ),
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 </div>
               </div>
-
             </div>
           ))}
         </div>

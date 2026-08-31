@@ -21,10 +21,10 @@ export const CalendarForm = (props:any) => {
 export const InputTextareaForm = (props:any) => {
     const { id, label, className, ...inputprop } = props;
     return (
-        <div className="flex mb-6">
-            <label htmlFor={id} className="block text-900 font-medium w-4 mr-2">{label ? label : 'Mô tả'}</label>
+        <span className="p-float-label w-full mb-6">
             <InputTextarea autoResize id={id} rows={6} cols={30} className={classNames("w-full", className)} {...inputprop} />
-        </div>
+            <label htmlFor={id} className="label-sm">{label ? label : 'Mô tả'}</label>
+        </span>
     )
 };
 
