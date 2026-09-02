@@ -12,22 +12,6 @@ import { FilterMatchMode } from "primereact/api";
 import { MyCalendar } from "components/common/MyCalendar";
 import { useNavigate } from "react-router-dom";
 
-const getProgressValue = (row: any) => {
-    const rawValue = Number(row?.progress ?? row?.tiendo ?? row?.completion ?? row?.progressPercent ?? row?.percent ?? 0);
-    if (Number.isFinite(rawValue)) return Math.max(0, Math.min(100, rawValue));
-
-    const total = Array.isArray(row?.congviec) ? row.congviec.length : 0;
-    const done = Array.isArray(row?.congviec)
-        ? row.congviec.filter((item: any) => {
-            const value = Number(item?.progress ?? item?.tiendo ?? item?.completion ?? item?.percent ?? 0);
-            const status = String(item?.status ?? item?.trangthai ?? "").toLowerCase();
-            return value >= 100 || status.includes("hoan") || status.includes("done") || status.includes("complete");
-        }).length
-        : 0;
-
-    return total ? Math.round((done / total) * 100) : 0;
-};
-
 const getStatusInfo = (row: any, progress: number) => {
     const statusValue = String(row?.status ?? row?.trangthai ?? row?.statusName ?? row?.state ?? "").toLowerCase();
 
@@ -53,33 +37,6 @@ const getInitials = (name: string) => {
     return initials.join("") || "A";
 };
 
-const getWorkAssignees = (row: any) => {
-    const assignees = [
-        ...(Array.isArray(row?.assignees) ? row.assignees : []),
-        ...((row?.congviec || []).flatMap((item: any) => (Array.isArray(item?.assignees) ? item.assignees : []))),
-    ];
-
-    const unique: any[] = [];
-    assignees.forEach((person: any) => {
-        const key = person?.name || person?.ten || person?.id;
-        if (!key || unique.some((item) => (item?.name || item?.ten || item?.id) === key)) return;
-        unique.push(person);
-    });
-
-    return unique;
-};
-
-const getWorkDeadline = (row: any) => {
-    const values = [
-        row?.hanHoanThanh,
-        row?.deadline,
-        row?.hanhoanthanh,
-        ...(row?.congviec || []).map((item: any) => item?.hanHoanThanh || item?.deadline || item?.hanhoanthanh),
-    ];
-
-    return values.find((value) => Boolean(value)) || "-";
-};
-
 const getChecklistPreview = (row: any) => {
     const items = (row?.congviec || []).flatMap((item: any) => Array.isArray(item?.checklist) ? item.checklist : []);
     return items.length ? items : ["Chưa có checklist"];
@@ -102,7 +59,7 @@ const sampleWorks = [
           { name: "Trần Thị B" },
           { name: "Lê Văn C" },
         ],
-        checklist: ["Lên wireframe", "Thiết kế form", "Review nội dung"],
+        checklist: ["Lên wireframe", "Thiết kế form", "Review nội dung","Lên wireframe", "Thiết kế form", "Review nội dung"],
       },
     ],
   },
@@ -280,16 +237,16 @@ export default function ListWork() {
         keyword: "",
     });
 
-    const { data, loading } = useListWork({
-        params: paramsPaginator,
-        debounce: 500,
-    });
+    // const { data, loading } = useListWork({
+    //     params: paramsPaginator,
+    //     debounce: 500,
+    // });
 
     useEffect(() => {
         handleParamUrl(paramsPaginator);
-        const source = Array.isArray(data?.data) && data.data.length > 0 ? data.data : sampleWorks;
+        const source = sampleWorks;
         setDisplayData(source.map((row: any) => ({ ...row })));
-    }, [first, rows, data, paramsPaginator]);
+    }, [first, rows, paramsPaginator]);
 
     return (
         <div className="card">
@@ -301,7 +258,7 @@ export default function ListWork() {
                             rowHover
                             value={displayData}
                             currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
-                            loading={loading}
+                            loading={false}
                             dataKey="id"
                             title="Công việc"
                             filterDisplay="row"
@@ -343,6 +300,11 @@ export default function ListWork() {
                                                             : 0;
                                                         const detailStatus = getStatusInfo(item, normalizedProgress);
                                                         const detailAssignees = Array.isArray(item?.assignees) ? item.assignees : [];
+                                                        const checklistCount = Array.isArray(item?.checklist) ? item.checklist.length : 0;
+                                                        const checklistDone = checklistCount
+                                                            ? Math.max(0, Math.min(checklistCount, Math.round((normalizedProgress / 100) * checklistCount)))
+                                                            : 0;
+                                                        const progressSteps = checklistCount > 0 ? Array.from({ length: checklistCount }, (_, idx) => idx < checklistDone) : Array.from({ length: 4 }, (_, idx) => idx < Math.round(normalizedProgress / 25));
 
                                                         return (
                                                             <div
@@ -354,21 +316,40 @@ export default function ListWork() {
                                                                     padding: "10px",
                                                                 }}
                                                             >
-                                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px", gap: "8px" }}>
+                                                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "8px", gap: "8px" }}>
                                                                     <div style={{ fontWeight: 700, color: "#0f172a" }}>
                                                                         {item.name || item.tencongviec || `Chi tiết ${index + 1}`}
                                                                     </div>
-                                                                    <span
-                                                                        className="px-2 py-1 border-round-md text-xs font-medium"
-                                                                        style={{
-                                                                            background: detailStatus.bg,
-                                                                            color: detailStatus.text,
-                                                                            border: `1px solid ${detailStatus.color}33`,
-                                                                            whiteSpace: "nowrap",
-                                                                        }}
-                                                                    >
-                                                                        {detailStatus.label}
-                                                                    </span>
+                                                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                                                        <span
+                                                                            className="px-2 py-1 border-round-md text-xs font-medium"
+                                                                            style={{
+                                                                                background: detailStatus.bg,
+                                                                                color: detailStatus.text,
+                                                                                border: `1px solid ${detailStatus.color}33`,
+                                                                                whiteSpace: "nowrap",
+                                                                            }}
+                                                                        >
+                                                                            {detailStatus.label}
+                                                                        </span>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => navigate(`/work/updateDetail/${row?.id ?? item?.id ?? index + 1}`)}
+                                                                            style={{
+                                                                                border: "none",
+                                                                                background: "#2563eb",
+                                                                                color: "#fff",
+                                                                                borderRadius: "8px",
+                                                                                padding: "6px 10px",
+                                                                                cursor: "pointer",
+                                                                                fontWeight: 600,
+                                                                                fontSize: "11px",
+                                                                                lineHeight: 1.2,
+                                                                            }}
+                                                                        >
+                                                                            Xem chi tiết
+                                                                        </button>
+                                                                    </div>
                                                                 </div>
 
                                                                 <div style={{ display: "grid", gridTemplateColumns: "1.1fr 1.1fr 1fr", gap: "10px" }}>
@@ -384,9 +365,25 @@ export default function ListWork() {
                                                                     <div>
                                                                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
                                                                             <span style={{ fontSize: "10px", color: "#64748b", fontWeight: 600 }}>Tiến độ</span>
-                                                                            <span style={{ fontSize: "11px", color: "#0f172a", fontWeight: 700 }}>{normalizedProgress}%</span>
                                                                         </div>
-                                                                        <ProgressBar value={normalizedProgress} showValue={false} style={{ height: "8px", borderRadius: "999px" }} />
+                                                                        <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.max(1, progressSteps.length)}, minmax(0, 1fr))`, gap: "4px", marginBottom: "4px" }}>
+                                                                            {progressSteps.map((active, stepIndex) => (
+                                                                                <div
+                                                                                    key={`${item.name || item.tencongviec || index}-${stepIndex}`}
+                                                                                    style={{
+                                                                                        height: "8px",
+                                                                                        borderRadius: "999px",
+                                                                                        background: active ? ["#93c5fd", "#60a5fa", "#3b82f6", "#2563eb"][stepIndex % 4] : "#e2e8f0",
+                                                                                        border: "1px solid rgba(148, 163, 184, 0.25)",
+                                                                                    }}
+                                                                                />
+                                                                            ))}
+                                                                        </div>
+                                                                        <div style={{ display: "grid", gridTemplateColumns: `repeat(${progressSteps.length}, minmax(0, 1fr))`, fontSize: "9px", color: "#64748b", textAlign: "center" }}>
+                                                                            {progressSteps.map((_, stepIndex) => (
+                                                                                <span key={`label-${stepIndex}`}>{stepIndex + 1}</span>
+                                                                            ))}
+                                                                        </div>
                                                                     </div>
 
                                                                     <div>
@@ -435,14 +432,16 @@ export default function ListWork() {
                                                                                 </div>
                                                                             )}
                                                                         </div>
+                                                                        
                                                                     </div>
                                                                 </div>
 
                                                                 {Array.isArray(item?.checklist) && item.checklist.length > 0 && (
                                                                     <div style={{ marginTop: "8px", fontSize: "11px", color: "#475569" }}>
-                                                                        <span style={{ fontWeight: 700, color: "#334155" }}>Checklist:</span> {item.checklist.slice(0, 3).join(" • ")}
+                                                                        <span style={{ fontWeight: 700, color: "#334155" }}>Checklist:</span> {item.checklist.join(" • ")}
                                                                     </div>
                                                                 )}
+                                                                
                                                             </div>
                                                         );
                                                     })}
@@ -451,29 +450,6 @@ export default function ListWork() {
                                         </div>
                                     );
                                 }}
-                                style={{ width: "700px" }}
-                            />
-
-                            <Column
-                                header="Xem chi tiết"
-                                body={(row: any) => (
-                                    <button
-                                        type="button"
-                                        onClick={() => navigate(`/work/detail/${row.id}`)}
-                                        style={{
-                                            border: "none",
-                                            background: "#2563eb",
-                                            color: "#fff",
-                                            borderRadius: "8px",
-                                            padding: "8px 12px",
-                                            cursor: "pointer",
-                                            fontWeight: 600,
-                                        }}
-                                    >
-                                        Xem chi tiết
-                                    </button>
-                                )}
-                                style={{ width: "70px" }}
                             />
                         </DataTableClient>
                     </div>

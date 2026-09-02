@@ -1,11 +1,11 @@
 
 import { AddForm, InputForm, InputTextareaForm } from "components/common/AddForm";
-import { MultiSelect } from "components/common/ListForm";
+import { Dropdown, MultiSelect } from "components/common/ListForm";
 import { DateTimeField } from "components/common/DateTimeField";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { showToast } from "redux/features/toast";
-import { listToast, refreshObject } from "utils";
+import { listToast, refreshObject, typeWork } from "utils";
 import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { Panel } from "components/uiCore";
@@ -41,7 +41,7 @@ const createEmptyDetail = () => ({
 
 const createEmptyWork = () => ({
   tieude: "",
-  laplai: 1,
+  loaicongviec: 0,
   thoigianlap: "",
   thoigianketthuclap: "",
   fileList: [createEmptyFileItem()],
@@ -67,50 +67,71 @@ export default function UpdateWork() {
   };
 
   const renderWorkFileList = (workItem: any, workIndex: number) => (
-    <div className="surface-100 border-round-xl p-3">
+    <div className="surface-50 border-round-xl p-3 border-1 border-200">
       <div className="flex justify-content-between align-items-center mb-3">
         <span className="font-medium text-900">Tài liệu đính kèm</span>
-        <Button
-          type="button"
-          label="Thêm file"
-          icon="pi pi-plus"
-          severity="secondary"
-          size="small"
-          outlined
-          onClick={() => addFileListItem(workIndex)}
-        />
       </div>
 
-      {(workItem.fileList || [createEmptyFileItem()]).map((fileItem: any, fileIndex: number) => (
-        <div key={fileIndex} className="flex align-items-center gap-2 mb-2"> 
-          <input
-            type="file"
-            className="w-full p-2 border-1 border-300 border-round-md bg-white"
-            onChange={async (e: any) => {
-              const selectedFile = e.target.files?.[0];
-              if (!selectedFile) return;
-              await uploadWorkFile(workIndex, fileIndex, selectedFile);
-              e.target.value = "";
-            }}
-          />
-
-          {fileItem.externalLink && (
-            <>
-              <span className="text-sm text-600 max-w-20rem white-space-nowrap overflow-hidden text-overflow-ellipsis">
-                {fileItem.fileName || "file"}
-              </span>
-              <Button
-                type="button"
-                icon="pi pi-trash"
-                severity="danger"
-                text
-                rounded
-                onClick={() => removeFileListItem(workIndex, fileIndex)}
+      {(workItem.fileList || [createEmptyFileItem()]).map(
+        (fileItem: any, fileIndex: number) => (
+          <div
+            key={fileIndex}
+            className="flex flex-column md:flex-row align-items-stretch md:align-items-center gap-2 mb-2"
+          >
+            {/* Upload */}
+             {!fileItem.externalLink && (<div className="relative w-full md:w-7" style={{ maxWidth: "28%" }}>
+              <input
+                type="file"
+                className="absolute opacity-0 w-full h-full cursor-pointer"
+                style={{top: 0, left: 0, zIndex: 2}}
+                onChange={async (e: any) => {
+                  const selectedFile = e.target.files?.[0];
+                  if (!selectedFile) return;
+                  await uploadWorkFile(workIndex, fileIndex, selectedFile);
+                  e.target.value = "";
+                }}
               />
-            </>
-          )}
-        </div>
-      ))}
+
+              <div className="flex align-items-center justify-content-center gap-2 p-2 border-1 border-300 border-round-md bg-white cursor-pointer w-full">
+                <Button
+                  type="button"
+                  label="Chọn file"
+                  icon="pi pi-upload"
+                  size="small"
+                  severity="secondary"
+                  outlined
+                />
+              </div>
+            </div>
+            )}
+            {/* File name */}
+            {fileItem.externalLink && (
+              <div className="flex align-items-center flex-1 min-w-0">
+                 {/* Xem file */}
+                <a
+                  href={fileItem.externalLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary underline white-space-nowrap overflow-hidden text-overflow-ellipsis"
+                  title="Click để xem file"
+                >
+                  {fileItem.fileName || "file"}
+                </a>
+                <Button
+                  type="button"
+                  icon="pi pi-trash"
+                  severity="danger"
+                  text
+                  rounded
+                  tooltip="Xóa"
+                  className="ml-auto flex-shrink-0"
+                  onClick={() => removeFileListItem(workIndex, fileIndex)}
+                />
+              </div>
+            )}
+          </div>
+        ),
+      )}
     </div>
   );
 
@@ -253,13 +274,13 @@ export default function UpdateWork() {
 
   const uploadWorkFile = async (workIndex: number, fileIndex: number, file: File) => {
     try {
-      const response = await uploadFile("system/upload/create", { files: [file] });
-      const uploaded = response?.data?.data?.[0];
-      if (!uploaded) return;
+      // const response = await uploadFile("system/upload/create", { files: [file] });
+      // const uploaded = response?.data?.data?.[0];
+      // if (!uploaded) return;
 
-      const externalLink = uploaded.externalLink || uploaded.url || "";
-      updateFileList(workIndex, fileIndex, "fileName", file.name);
-      updateFileList(workIndex, fileIndex, "externalLink", externalLink);
+      // const externalLink = uploaded.externalLink || uploaded.url || "";
+      updateFileList(workIndex, fileIndex, "fileName", "abc.pdf"); // Replace with actual uploaded file name
+      updateFileList(workIndex, fileIndex, "externalLink", 'https://example.com/abc.pdf'); // Replace with actual uploaded link
       addFileListItem(workIndex);
     } catch (error) {
       dispatch(showToast({ ...listToast[2], detail: "Tải file thất bại" }));
@@ -270,8 +291,8 @@ export default function UpdateWork() {
     e.preventDefault();
     const info = { ...infos };
     console.log("jobForm", info);
-    setLoading(true);
-    fetchDataSubmit(info);
+    // setLoading(true);
+    // fetchDataSubmit(info);
   };
 
   async function fetchDataSubmit(info: any) {
@@ -391,8 +412,8 @@ export default function UpdateWork() {
                 )}
               </div>
               <div className="grid">
-                <div className="col-8">
-                  <div className="formgrid grid">
+                <div className="col-12 lg:col-8">
+                  <div className="formgrid grid surface-50 border-round-xl border-1 border-200 p-3">
                     <div className="field col-12">
                       <InputForm
                         className="w-full"
@@ -405,46 +426,47 @@ export default function UpdateWork() {
                         required
                       />
                     </div>
-                    <div className="field col-4">
-                      <InputForm
-                        className="w-full"
-                        id={`laplai-${workIndex}`}
-                        value={workItem.laplai ?? 1}
-                        onChange={(e: any) =>
-                          updateWorkInfo(
-                            workIndex,
-                            "laplai",
-                            Number(e.target.value || 1),
-                          )
-                        }
-                        label="Lặp lại"
-                        type="number"
-                      />
+                    <div className="field col-12 lg:col-4">
+                       <Dropdown
+                          value={workItem.loaicongviec || 0}
+                          optionValue="value"
+                          optionLabel="label"
+                          options={typeWork}
+                          label="Loại công việc"
+                          className="w-full p-inputtext-sm"
+                          onChange={(e:any) =>
+                            updateWorkInfo(workIndex, "loaicongviec", e.value)
+                          }
+                        />
                     </div>
 
-                    <div className="field col-4">
-                      <DateTimeField
-                        label="Thời gian lặp"
-                        value={workItem.thoigianlap || ""}
-                        onChange={(value) =>
-                          updateWorkInfo(workIndex, "thoigianlap", value)
-                        }
-                      />
-                    </div>
+                     { workItem.loaicongviec == 1 && (
+                      <>
+                          <div className="field col-12 lg:col-4">
+                            <DateTimeField
+                              label="Thời gian lặp"
+                              value={workItem.thoigianlap || ""}
+                              onChange={(value) =>
+                                updateWorkInfo(workIndex, "thoigianlap", value)
+                              }
+                            />
+                          </div>
 
-                    <div className="field col-4">
-                      <DateTimeField
-                        label="Kết thúc"
-                        value={workItem.thoigianketthuclap || ""}
-                        onChange={(value) =>
-                          updateWorkInfo(workIndex, "thoigianketthuclap", value)
-                        }
-                      />
-                    </div>
+                          <div className="field col-12 lg:col-4">
+                            <DateTimeField
+                              label="Kết thúc"
+                              value={workItem.thoigianketthuclap || ""}
+                              onChange={(value) =>
+                                updateWorkInfo(workIndex, "thoigianketthuclap", value)
+                              }
+                            />
+                          </div>
+                      </>
+                     )}
                   </div>
                 </div>
-                <div className="col-4">
-                  <div className="field col-12">
+                <div className="col-12 lg:col-4">
+                  <div className="field">
                     {renderWorkFileList(workItem, workIndex)}
                   </div>
                 </div>

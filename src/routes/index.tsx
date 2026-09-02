@@ -102,6 +102,7 @@ import BaoCaoChiTietThuChi from "modules/receipt/screen/index_chitiet_thu_chi";
 import UpdateImportPartner from "modules/partner/screen/import/updateImport";
 import ListWork from "modules/work/screen";
 import UpdateWork from "modules/work/screen/update";
+import UpdateDetailWork from "modules/work/screen/updateDetail";
 const publicRoutes = [
   { path: "/", component: DashBoard, layout: 'DashBoard' },
   { path: "/auth/login", component: Login, layout: null, public: true },
@@ -197,6 +198,7 @@ const publicRoutes = [
   { path: "/work/list", component: ListWork, layout: 'ListWork' },
   { path: "/work/add", component: UpdateWork, layout: 'UpdateWork' },
   { path: "/work/detail/:id", component: UpdateWork, layout: 'UpdateWork' },
+  { path: "/work/updateDetail/:id", component: UpdateDetailWork, layout: 'UpdateDetailWork' },
   // Receipt 
   { path: "/receipt/list", component: ListReceipt, layout: 'ListReceipt' },
   { path: "/receipt/BaoCaoChiTietThuChi", component: BaoCaoChiTietThuChi, layout: 'BaoCaoChiTietThuChi' },

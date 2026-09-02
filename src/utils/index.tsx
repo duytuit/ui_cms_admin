@@ -173,6 +173,16 @@ export const typeVehicle = [
      name:"Xe ngoài"
    }
 ];
+export const typeWork = [
+   {
+     value:0,
+     label:"Công việc thường"
+   },
+    {
+     value:1,
+     label:"Lặp lại theo ngày"
+   }
+];
 export const typeDebit = [
    {
      type:0,
