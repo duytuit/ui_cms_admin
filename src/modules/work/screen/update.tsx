@@ -3,9 +3,9 @@ import { AddForm, InputForm, InputTextareaForm } from "components/common/AddForm
 import { Dropdown, MultiSelect } from "components/common/ListForm";
 import { DateTimeField } from "components/common/DateTimeField";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { showToast } from "redux/features/toast";
-import { listToast, refreshObject, typeWork } from "utils";
+import { groupWork, listToast, refreshObject, typeWork } from "utils";
 import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
 import { Panel } from "components/uiCore";
@@ -15,14 +15,7 @@ import { MyCalendar } from "components/common/MyCalendar";
 import { Button } from "primereact/button";
 import { classNames } from "primereact/utils";
 import { uploadFile } from "lib/request";
-
-const assigneeOptions = [
-  { label: "Nguyễn Văn A", value: 1 },
-  { label: "Trần Thị B", value: 2 },
-  { label: "Lê Văn C", value: 3 },
-  { label: "Phạm Thị D", value: 4 },
-  { label: "Hoàng Văn E", value: 5 },
-];
+import { useListEmployeeWithState } from "modules/employee/service";
 
 const createEmptyChecklist = () => [""];
 
@@ -35,15 +28,16 @@ const createEmptyDetail = () => ({
   tencongviec: "",
   motacongviec: "",
   nguoiphutrach: [],
-  hanhoanthanh: "",
+  hanhoanthanh: null,
   checklist: createEmptyChecklist(),
 });
 
 const createEmptyWork = () => ({
   tieude: "",
   loaicongviec: 0,
-  thoigianlap: "",
-  thoigianketthuclap: "",
+  nhomcongviec: false,
+  thoigianlap: null,
+  thoigianketthuclap:  null,
   fileList: [createEmptyFileItem()],
   chitiet: [createEmptyDetail()],
 });
@@ -56,7 +50,17 @@ export default function UpdateWork() {
   const [infos, setInfos] = useState<any>(createEmptyWorkList());
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const { data: employees } = useListEmployeeWithState({
+     params: { keyword: "abc" },
+     debounce: 500,
+   });
+  const employeeOptions = useMemo(() => {
+    if (!Array.isArray(employees)) return [];
+    return employees.map((x: any,index:number) => ({
+      label: `${index+1}.${x.last_name ?? ""} ${x.first_name ?? ""}`.trim(),
+      value: x.id,
+    }));
+  }, [employees]);
   const updateWorkInfo = (workIndex: number, field: string, value: any) => {
     setInfos((prev: any) => ({
       ...prev,
@@ -274,13 +278,12 @@ export default function UpdateWork() {
 
   const uploadWorkFile = async (workIndex: number, fileIndex: number, file: File) => {
     try {
-      // const response = await uploadFile("system/upload/create", { files: [file] });
-      // const uploaded = response?.data?.data?.[0];
-      // if (!uploaded) return;
-
-      // const externalLink = uploaded.externalLink || uploaded.url || "";
-      updateFileList(workIndex, fileIndex, "fileName", "abc.pdf"); // Replace with actual uploaded file name
-      updateFileList(workIndex, fileIndex, "externalLink", 'https://example.com/abc.pdf'); // Replace with actual uploaded link
+      const response = await uploadFile("upload/single", { files: file });
+      const uploaded = response?.data;
+      console.log("Uploaded file:", response?.data);
+      if (!uploaded) return;
+      updateFileList(workIndex, fileIndex, "fileName", uploaded.fileName); // Replace with actual uploaded file name
+      updateFileList(workIndex, fileIndex, "externalLink", uploaded.path); // Replace with actual uploaded link
       addFileListItem(workIndex);
     } catch (error) {
       dispatch(showToast({ ...listToast[2], detail: "Tải file thất bại" }));
@@ -291,8 +294,8 @@ export default function UpdateWork() {
     e.preventDefault();
     const info = { ...infos };
     console.log("jobForm", info);
-    // setLoading(true);
-    // fetchDataSubmit(info);
+    setLoading(true);
+    fetchDataSubmit(info);
   };
 
   async function fetchDataSubmit(info: any) {
@@ -302,7 +305,7 @@ export default function UpdateWork() {
       if (response.status === 200) {
         if (response.data.status) {
           dispatch(showToast({ ...listToast[0], detail: response.data.message }));
-          navigate("/work/list");
+          //navigate("/work/list");
         } else {
           dispatch(showToast({ ...listToast[2], detail: response.data.message }));
         }
@@ -393,9 +396,6 @@ export default function UpdateWork() {
             >
               <div className="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-2 mb-3">
                 <div>
-                  <div className="text-xs text-500 uppercase font-medium mb-1">
-                    Nhóm công việc
-                  </div>
                   <h5 className="m-0">Công việc {workIndex + 1}</h5>
                 </div>
 
@@ -434,8 +434,13 @@ export default function UpdateWork() {
                           options={typeWork}
                           label="Loại công việc"
                           className="w-full p-inputtext-sm"
-                          onChange={(e:any) =>
+                          onChange={(e:any) =>{
                             updateWorkInfo(workIndex, "loaicongviec", e.value)
+                            if(e.value == 0) {
+                              updateWorkInfo(workIndex, "thoigianlap", null)
+                              updateWorkInfo(workIndex, "thoigianketthuclap", null)
+                            }
+                          }
                           }
                         />
                     </div>
@@ -449,6 +454,7 @@ export default function UpdateWork() {
                               onChange={(value) =>
                                 updateWorkInfo(workIndex, "thoigianlap", value)
                               }
+                              {...(workItem.loaicongviec == 1 && { required: true })}
                             />
                           </div>
 
@@ -459,6 +465,7 @@ export default function UpdateWork() {
                               onChange={(value) =>
                                 updateWorkInfo(workIndex, "thoigianketthuclap", value)
                               }
+                              {...(workItem.loaicongviec == 1 && { required: true })}
                             />
                           </div>
                       </>
@@ -475,15 +482,28 @@ export default function UpdateWork() {
               <div className="mt-4">
                 <div className="flex justify-content-between align-items-center mb-3">
                   <h5 className="m-0">Chi tiết công việc</h5>
-                  <Button
-                    type="button"
-                    label="Thêm chi tiết"
-                    icon="pi pi-plus"
-                    severity="success"
-                    size="small"
-                    raised
-                    onClick={() => addDetail(workIndex)}
-                  />
+                  <div className="flex gap-2"> 
+                        <Dropdown
+                          value={workItem.nhomcongviec === true ? 1 : 0}
+                          optionValue="value"
+                          optionLabel="label"
+                          options={groupWork}
+                          label="Nhóm công việc"
+                          className="w-full p-inputtext-sm"
+                          onChange={(e:any) =>
+                            updateWorkInfo(workIndex, "nhomcongviec", e.value === 1 ? true : false)
+                          }
+                        />
+                       <Button
+                        type="button"
+                        label="Thêm chi tiết"
+                        icon="pi pi-plus"
+                        severity="success"
+                        size="small"
+                        raised
+                        onClick={() => addDetail(workIndex)}
+                      />
+                  </div>
                 </div>
 
                 <div
@@ -547,6 +567,7 @@ export default function UpdateWork() {
                               <DateTimeField
                                 label="Hạn hoàn thành"
                                 value={detail.hanhoanthanh || ""}
+                                required
                                 onChange={(value) =>
                                   updateDetail(
                                     workIndex,
@@ -589,7 +610,7 @@ export default function UpdateWork() {
                                     e.value,
                                   )
                                 }
-                                options={assigneeOptions}
+                                options={employeeOptions}
                                 optionLabel="label"
                                 optionValue="value"
                                 label="Người phụ trách"

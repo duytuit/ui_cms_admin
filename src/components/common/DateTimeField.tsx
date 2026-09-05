@@ -7,10 +7,10 @@ const formatDateTimeDisplay = (value?: string | null) => {
   const trimmed = value.trim();
   if (!trimmed) return "";
 
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(trimmed)) {
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2})?$/.test(trimmed)) {
     const [date, time] = trimmed.split("T");
     const [year, month, day] = date.split("-");
-    return `${day}/${month}/${year} ${time}`;
+    return `${day}/${month}/${year} ${time.slice(0, 5)}`;
   }
 
   if (/^\d{2}\/\d{2}\/\d{4}\s\d{2}:\d{2}$/.test(trimmed)) {
@@ -45,7 +45,7 @@ const parseDisplayDateTime = (value?: string | null) => {
 
   const matched = trimmed.match(/^\s*(\d{1,2})\/(\d{1,2})\/(\d{4})\s*(\d{1,2})?:?(\d{2})?\s*$/);
   if (!matched) {
-    const iso = trimmed.match(/^\s*(\d{4})-(\d{1,2})-(\d{1,2})[T\s](\d{1,2}):?(\d{2})?\s*$/);
+    const iso = trimmed.match(/^\s*(\d{4})-(\d{1,2})-(\d{1,2})[T\s](\d{1,2}):?(\d{2})?(?::\d{2})?\s*$/);
     if (!iso) return null;
 
     const [, year, month, day, hour, minute] = iso;
@@ -59,22 +59,27 @@ const parseDisplayDateTime = (value?: string | null) => {
 };
 
 const formatDateFromDate = (date: Date) => {
-  const d = String(date.getDate()).padStart(2, "0");
+  const y = String(date.getFullYear()).padStart(4, "0");
   const m = String(date.getMonth() + 1).padStart(2, "0");
-  const y = date.getFullYear();
+  const d = String(date.getDate()).padStart(2, "0");
   const hh = String(date.getHours()).padStart(2, "0");
   const mm = String(date.getMinutes()).padStart(2, "0");
-  return `${d}/${m}/${y} ${hh}:${mm}`;
+  return `${y}-${m}-${d}T${hh}:${mm}:00`;
 };
+
+const isCompleteManualDateTime = (value: string) =>
+  /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}$/.test(value);
 
 export const DateTimeField = ({
   label,
   value,
   onChange,
+  required = false,
 }: {
   label: string;
   value?: string;
   onChange: (value: string) => void;
+  required?: boolean;
 }) => {
   const [text, setText] = useState(formatDateTimeDisplay(value));
   const [open, setOpen] = useState(false);
@@ -145,13 +150,19 @@ export const DateTimeField = ({
           inputMode="numeric"
           autoComplete="off"
           maxLength={16}
+          required={required}
           value={text}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           onChange={(e) => {
             const nextValue = formatManualDateTime(e.target.value);
             setText(nextValue);
-            onChange(nextValue);
+            if (!nextValue) {
+              onChange("");
+            } else if (isCompleteManualDateTime(nextValue)) {
+              const parsed = parseDisplayDateTime(nextValue);
+              if (parsed) onChange(formatDateFromDate(parsed));
+            }
           }}
           placeholder=" "
           className={classNames(

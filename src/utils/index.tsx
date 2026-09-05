@@ -183,6 +183,16 @@ export const typeWork = [
      label:"Lặp lại theo ngày"
    }
 ];
+export const groupWork = [
+   {
+     value:0,
+     label:"Làm tuần tự"
+   },
+   {
+     value:1,
+     label:"Làm đồng thời"
+   }
+];
 export const typeDebit = [
    {
      type:0,
