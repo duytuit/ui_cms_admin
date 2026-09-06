@@ -1,365 +1,414 @@
 
-import { AddForm, InputForm, InputTextareaForm } from "components/common/AddForm";
-import { Dropdown, MultiSelect } from "components/common/ListForm";
-import { DateTimeField } from "components/common/DateTimeField";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { type ChangeEvent, useEffect, useRef, useState } from "react";
-import { showToast } from "redux/features/toast";
-import { listToast, refreshObject, typeWork } from "utils";
-import { useDispatch } from "react-redux";
 import { CategoryEnum } from "utils/type.enum";
-import { Panel } from "components/uiCore";
-import { addWork, showWork, updateWork } from "../api";
-import { Helper } from "utils/helper";
-import { MyCalendar } from "components/common/MyCalendar";
-import { Button } from "primereact/button";
-import { classNames } from "primereact/utils";
 import { uploadFile } from "lib/request";
+import {
+  addWorkComment,
+  addWorkDetail,
+  ChangeStatusWorkDetail,
+  deleteWorkComment,
+  deleteWorkDetail,
+  updateWork,
+  showWork,
+  updateAttachment,
+} from "../api";
+import { useListEmployeeWithState } from "modules/employee/service";
 
-const createEmptyChecklist = () => [""];
-
-const createEmptyFileItem = () => ({
-  fileName: "",
-  externalLink: "",
-});
-
-const createEmptyDetail = () => ({
-  tencongviec: "",
-  motacongviec: "",
-  nguoiphutrach: [],
-  hanhoanthanh: "",
-  checklist: createEmptyChecklist(),
-});
-
-const createEmptyWork = () => ({
-  tieude: "",
-  loaicongviec: 0,
-  thoigianlap: "",
-  thoigianketthuclap: "",
-  fileList: [createEmptyFileItem()],
-  chitiet: [createEmptyDetail()],
-});
-
-const createEmptyWorkList = () => ({ congviec: [createEmptyWork()] });
-
-const randomFrom = <T,>(items: T[]) => items[Math.floor(Math.random() * items.length)];
-
-const sampleWorkDetail = {
-  id: Date.now(),
-  title: randomFrom([
-    "Thiết kế phần mềm asa",
-    "Thiết kế phần mềm quản lý",
-    "Thiết kế phần mềm CRM",
-    "Thiết kế hệ thống nội bộ",
-  ]),
-  customerName: randomFrom(["Công ty A", "Công ty B", "Công ty C", "Công ty D"]),
-  congviec: [
-    {
-      name: "Thiết kế giao diện công việc",
-      status: "Đang thực hiện",
-      accounting_date: "2026-08-30",
-      hanHoanThanh: "2026-09-10",
-      progress: 70,
-      assignees: [
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-      ],
-      checklist: [
-        "Lên wireframe",
-        "Thiết kế form",
-        "Review nội dung",
-        "Lên wireframe",
-        "Thiết kế form",
-        "Review nội dung",
-      ],
-    },
-    {
-      name: "Thiết kế giao diện công việc",
-      status: "Đang thực hiện",
-      accounting_date: "2026-08-30",
-      hanHoanThanh: "2026-09-10",
-      progress: 70,
-      assignees: [
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-      ],
-      checklist: [
-        "Lên wireframe",
-        "Thiết kế form",
-        "Review nội dung",
-        "Lên wireframe",
-        "Thiết kế form",
-        "Review nội dung",
-      ],
-    },
-    {
-      name: "Thiết kế giao diện công việc",
-      status: "Đang thực hiện",
-      accounting_date: "2026-08-30",
-      hanHoanThanh: "2026-09-10",
-      progress: 70,
-      assignees: [
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-      ],
-      checklist: [
-        "Lên wireframe",
-        "Thiết kế form",
-        "Review nội dung",
-        "Lên wireframe",
-        "Thiết kế form",
-        "Review nội dung",
-      ],
-    },
-     {
-      name: "Thiết kế giao diện công việc",
-      status: "Đang thực hiện",
-      accounting_date: "2026-08-30",
-      hanHoanThanh: "2026-09-10",
-      progress: 70,
-      assignees: [
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-        { name: randomFrom(["Nguyễn Văn A", "Trần Thị B", "Lê Văn C"]) },
-      ],
-      checklist: [
-        "Lên wireframe",
-        "Thiết kế form",
-        "Review nội dung",
-        "Lên wireframe",
-        "Thiết kế form",
-        "Review nội dung",
-      ],
-    },
-  ],
+const parseJson = <T,>(value: T | string | null | undefined, fallback: T): T => {
+  if (typeof value !== "string") return value ?? fallback;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return fallback;
+  }
 };
 
+const formatDate = (value: string | null | undefined) =>
+  value ? new Date(value).toLocaleString("vi-VN") : "Chưa cập nhật";
+
+const getWorkStatus = (status: number | undefined) => {
+  if (status === 1) return "COMPLETED";
+  if (status === 2) return "IN PROGRESS";
+  return "PENDING";
+};
+
+
+const getEmployeeName = (employee: any) => {
+  const fullName = [employee?.first_name, employee?.last_name].filter(Boolean).join(" ");
+  return fullName || employee?.name || employee?.code || (employee?.id != null ? `ID ${employee.id}` : "");
+};
+
+type ChecklistItem = { id: number; label: string; done: boolean; status: string };
+type ReplyItem = { id: number; author: string; authorId?: number | string; time: string; message: string };
+type CommentItem = { id: number; author: string; authorId?: number | string; time: string; message: string; replies: ReplyItem[] };
+type HistoryItem = { id: number; title: string; detail: string; time: string };
+type AttachmentItem = { id: number; name: string; meta: string; externalLink?: string };
+
+const mapChecklist = (work: any): ChecklistItem[] =>
+  (work?.workDetails || []).map((item: any) => ({
+    id: item.id,
+    label: item.name,
+    done: Boolean(item.checked),
+    status: item.checked ? "COMPLETED" : "PENDING",
+  }));
+
 export default function UpdateDetailWork() {
+  const employeeInfo = localStorage.getItem('employeeInfo') ? JSON.parse(localStorage.getItem('employeeInfo') || '{}') : null;
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
-  const [infos, setInfos] = useState<any>({
-    ...createEmptyWorkList(),
-    title: sampleWorkDetail.title,
-    customerName: sampleWorkDetail.customerName,
-    congviec: sampleWorkDetail.congviec,
-  });
-  const dispatch = useDispatch();
+  const [workData, setWorkData] = useState<any>(null);
+  const [activeWork, setActiveWork] = useState<any>(null);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"comments" | "history">("comments");
   const [newChecklist, setNewChecklist] = useState("");
   const [commentText, setCommentText] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const [checklist, setChecklist] = useState(
-    (sampleWorkDetail.congviec?.[0]?.checklist || []).map((item, index) => ({
-      id: index + 1,
-      label: item,
-      done: index < 2,
-      status: index < 2 ? "COMPLETED" : "PENDING",
-    }))
-  );
-
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      author: "Admin System",
-      time: "2 hours ago",
-      message: `Bản đầu tiên của dự án "${sampleWorkDetail.title}" đã được tạo và đang được kiểm tra bởi đội thiết kế UI.`,
-      replies: [] as Array<{ id: number; author: string; time: string; message: string }>,
+  const { data: employees } = useListEmployeeWithState({});
+  const employeeById = (Array.isArray(employees) ? employees : []).reduce(
+    (result: Record<string, any>, employee: any) => {
+      if (employee?.id != null) result[String(employee.id)] = employee;
+      if (employee?.user_id != null) result[String(employee.user_id)] = employee;
+      return result;
     },
-  ]);
+  {});
+  const employeeNameById = (employeeId: number | string | null | undefined) =>
+    employeeId == null
+      ? "Chưa xác định"
+      : employeeById[String(employeeId)]
+        ? getEmployeeName(employeeById[String(employeeId)])
+        : `ID ${employeeId}`;
+  const currentEmployeeId = employeeInfo?.id ?? employeeInfo?.user_id;
+  const currentEmployeeName = currentEmployeeId != null
+    ? employeeNameById(currentEmployeeId)
+    : getEmployeeName(employeeInfo) || "Người dùng hiện tại";
+  const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
+
+  const [comments, setComments] = useState<CommentItem[]>([]);
   const [replyText, setReplyText] = useState<Record<number, string>>({});
+  const [history, setHistory] = useState<HistoryItem[]>([]);
 
-  const [history, setHistory] = useState([
-    { id: 1, title: "Task created", detail: `Tạo công việc: ${sampleWorkDetail.title}`, time: "Today 09:20" },
-    { id: 2, title: "Checklist updated", detail: "Đã hoàn thành bước lên wireframe và thiết kế form", time: "Today 10:10" },
-    { id: 3, title: "Assignee changed", detail: "Owner assigned to Nguyễn Văn A", time: "Today 11:05" },
-  ]);
+  const [attachments, setAttachments] = useState<AttachmentItem[]>([]);
 
-  const [attachments, setAttachments] = useState([
-    { id: 1, name: `${sampleWorkDetail.title}.pdf`, meta: "2.4 MB • Today 09:41 AM" },
-    { id: 2, name: "Wireframe_Design.fig", meta: "1.3 MB • Yesterday" },
-  ]);
+  const childWorkId = searchParams.get("childId") || searchParams.get("childWorkId");
+  const routeWork =
+    (childWorkId && workData?.childWorks?.find((work: any) => String(work.id) === childWorkId)) || workData || null;
+  const selectedWork = activeWork || routeWork;
+  const selectedWorkName = selectedWork?.name || "Chi tiết công việc";
+  const selectedWorkStatus = getWorkStatus(selectedWork?.status);
+  const selectedWorkDetails =
+    selectedWork?.workDetails?.length || childWorkId
+      ? selectedWork?.workDetails || []
+      : (workData?.childWorks || []).flatMap((work: any) => work.workDetails || []);
+  const selectedAssignees = parseJson<number[]>(selectedWork?.assigneeIds, []).map((assigneeId) => ({
+    id: assigneeId,
+    name: employeeNameById(assigneeId),
+  }));
 
-  const workflow =
-    sampleWorkDetail.congviec?.map((item: any, index: number) => ({
-      id: index + 1,
+  const workflow: Array<{ id: number; label: string; owner: string; status: string; work: any }> =
+    (workData?.childWorks || []).map((item: any, index: number) => ({
+      id: item.id,
       label: `Giai đoạn ${index + 1}: ${item.name || "Công việc"}`,
-      owner: item.assignees?.[0]?.name || "Nguyễn Văn A",
-      status: index === 0 ? "COMPLETED" : index === 1 ? "IN PROGRESS" : "PENDING",
+      owner: parseJson<number[]>(item.assigneeIds, [])
+        .map((assigneeId) => employeeNameById(assigneeId))
+        .join(", ") || "Chưa phân công",
+      status: getWorkStatus(item.status),
+      work: item,
     })) ?? [];
+
+  const selectWork = (work: any) => {
+    setActiveWork(work);
+    setChecklist(mapChecklist(work));
+  };
+
+  const updateSelectedWorkDetails = (details: any[]) => {
+    setChecklist(mapChecklist({ workDetails: details }));
+    setActiveWork((prev: any) => (prev ? { ...prev, workDetails: details } : prev));
+    setWorkData((prev: any) => {
+      if (!prev) return prev;
+      if (!childWorkId) return { ...prev, workDetails: details };
+      return {
+        ...prev,
+        childWorks: (prev.childWorks || []).map((work: any) =>
+          String(work.id) === childWorkId ? { ...work, workDetails: details } : work
+        ),
+      };
+    });
+  };
 
   const completedCount = checklist.filter((item) => item.done).length;
   const progressPercent = checklist.length ? (completedCount / checklist.length) * 100 : 0;
 
-  const toggleChecklist = (id: number) => {
-    setChecklist((prev) =>
-      prev.map((item) => {
-        if (item.id !== id) return item;
-        const isDone = !item.done;
-        return {
-          ...item,
-          done: isDone,
-          status: isDone ? "COMPLETED" : "PENDING",
-        };
-      })
-    );
+  const toggleChecklist = async (item: ChecklistItem) => {
+    const checked = !item.done;
+    try {
+      await ChangeStatusWorkDetail({
+        id: item.id,
+        checked,
+        status: checked ? 1 : 0,
+      });
+      const details = (selectedWork?.workDetails || []).map((detail: any) =>
+        detail.id === item.id ? { ...detail, checked } : detail
+      );
+      updateSelectedWorkDetails(details);
+    } catch {
+      return;
+    }
   };
 
-  const addChecklistItem = () => {
+  const addChecklistItem = async () => {
     if (!newChecklist.trim()) return;
-    setChecklist((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        label: newChecklist.trim(),
-        done: false,
-        status: "PENDING",
-      },
-    ]);
-    setNewChecklist("");
+    try {
+      const name = newChecklist.trim();
+      const response = await addWorkDetail({
+        workId: selectedWork?.id || id,
+        name,
+        description: null,
+        storageId: selectedWork?.storageId || workData?.storageId,
+        checked: false,
+      });
+      const createdDetail = response?.data?.data || {};
+      const details = [
+        ...(selectedWork?.workDetails || []),
+        {
+          ...createdDetail,
+          id: createdDetail.id || Date.now(),
+          name: createdDetail.name || name,
+          checked: Boolean(createdDetail.checked),
+        },
+      ];
+      updateSelectedWorkDetails(details);
+      setNewChecklist("");
+    } catch {
+      return;
+    }
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!commentText.trim()) return;
-    setComments((prev) => [
-      {
-        id: Date.now(),
-        author: "Huyen Phan",
-        time: "Just now",
-        message: commentText.trim(),
-        replies: [],
-      },
-      ...prev,
-    ]);
-    setCommentText("");
+    try {
+      const content = commentText.trim();
+      const response = await addWorkComment({
+        type: 0,
+        model: "work",
+        modelId: Number(id),
+        parentId: null,
+        storageId: workData?.storageId,
+        content,
+      });
+      const createdComment = response?.data?.data || {};
+
+      setComments((prev) => [
+        {
+          id: createdComment.id || Date.now(),
+          author: currentEmployeeName,
+          authorId: currentEmployeeId,
+          time: formatDate(createdComment.createdAt) === "Chưa cập nhật" ? "Vừa xong" : formatDate(createdComment.createdAt),
+          message: createdComment.content || content,
+          replies: [],
+        },
+        ...prev,
+      ]);
+      setCommentText("");
+    } catch {
+      return;
+    }
   };
 
-  const handleAddReply = (commentId: number) => {
+  const handleAddReply = async (commentId: number) => {
     const value = (replyText[commentId] || "").trim();
     if (!value) return;
 
-    setComments((prev) =>
-      prev.map((comment) =>
-        comment.id === commentId
-          ? {
-              ...comment,
-              replies: [
-                ...(comment.replies || []),
-                {
-                  id: Date.now(),
-                  author: "Huyen Phan",
-                  time: "Just now",
-                  message: value,
-                },
-              ],
-            }
-          : comment
-      )
-    );
-    setReplyText((prev) => ({ ...prev, [commentId]: "" }));
+    try {
+      const response = await addWorkComment({
+        type: 0,
+        model: "work",
+        modelId: Number(id),
+        parentId: commentId,
+        storageId: workData?.storageId,
+        content: value,
+      });
+      const createdReply = response?.data?.data || {};
+
+      setComments((prev) =>
+        prev.map((comment) =>
+          comment.id === commentId
+            ? {
+                ...comment,
+                replies: [
+                  ...(comment.replies || []),
+                  {
+                    id: createdReply.id || Date.now(),
+                    author: currentEmployeeName,
+                    authorId: currentEmployeeId,
+                    time: formatDate(createdReply.createdAt) === "Chưa cập nhật" ? "Vừa xong" : formatDate(createdReply.createdAt),
+                    message: createdReply.content || value,
+                  },
+                ],
+              }
+            : comment
+        )
+      );
+      setReplyText((prev) => ({ ...prev, [commentId]: "" }));
+    } catch {
+      return;
+    }
   };
 
-  const removeChecklistItem = (id: number) => {
-    setChecklist((prev) => {
-      const next = prev.filter((item) => item.id !== id);
-      return next.length ? next : [];
-    });
+  const removeChecklistItem = async (detailId: number) => {
+    try {
+      await deleteWorkDetail({ id: detailId });
+      updateSelectedWorkDetails((selectedWork?.workDetails || []).filter((item: any) => item.id !== detailId));
+    } catch {
+      return;
+    }
   };
 
-  const removeComment = (commentId: number) => {
-    setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+  const removeComment = async (commentId: number) => {
+    try {
+      await deleteWorkComment({ id: commentId });
+      setComments((prev) => prev.filter((comment) => comment.id !== commentId));
+    } catch {
+      return;
+    }
   };
 
-  const removeReply = (commentId: number, replyId: number) => {
-    setComments((prev) =>
-      prev.map((comment) =>
-        comment.id === commentId
-          ? {
-              ...comment,
-              replies: (comment.replies || []).filter((reply) => reply.id !== replyId),
-            }
-          : comment
-      )
-    );
+  const removeReply = async (commentId: number, replyId: number) => {
+    try {
+      await deleteWorkComment({ id: replyId });
+      setComments((prev) =>
+        prev.map((comment) =>
+          comment.id === commentId
+            ? {
+                ...comment,
+                replies: (comment.replies || []).filter((reply) => reply.id !== replyId),
+              }
+            : comment
+        )
+      );
+    } catch {
+      return;
+    }
   };
 
   const removeAttachment = (attachmentId: number) => {
-    setAttachments((prev) => prev.filter((file) => file.id !== attachmentId));
+    const nextAttachments = attachments.filter((file) => file.id !== attachmentId);
+    updateAttachments(nextAttachments);
   };
 
-  const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const updateAttachments = async (nextAttachments: AttachmentItem[]) => {
+    if (!workData?.id) return;
+    try {
+      await updateAttachment({
+        id: workData.id,
+        attachments: 
+          nextAttachments.map((file) => ({
+            FileName: file.name,
+            ExternalLink: file.externalLink || file.meta || "",
+          }))
+      });
+      setAttachments(nextAttachments);
+      setActiveWork((prev: any) => (prev ? { ...prev, attachments: JSON.stringify(nextAttachments) } : prev));
+    } catch {
+      return;
+    }
+  };
+
+  const handleFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || !files.length) return;
 
-    const uploaded = Array.from(files).map((file, index) => ({
-      id: Date.now() + index,
-      name: file.name,
-      meta: `${(file.size / 1024 / 1024).toFixed(1)} MB • Just now`,
-    }));
-
-    setAttachments((prev) => [...uploaded, ...prev]);
-    event.target.value = "";
-  };
-
-  const updateFileList = (workIndex: number, fileIndex: number, field: string, value: any) => {
-    setInfos((prev: any) => ({
-      ...prev,
-      congviec: prev.congviec.map((work: any, workPos: number) => {
-        if (workPos !== workIndex) return work;
-        const nextFileList = (work.fileList || [createEmptyFileItem()]).map((fileItem: any, idx: number) =>
-          idx === fileIndex ? { ...fileItem, [field]: value } : fileItem
-        );
-        return { ...work, fileList: nextFileList };
-      }),
-    }));
-  };
-
-  const addFileListItem = (workIndex: number) => {
-    setInfos((prev: any) => ({
-      ...prev,
-      congviec: prev.congviec.map((work: any, workPos: number) =>
-        workPos === workIndex ? { ...work, fileList: [...(work.fileList || []), createEmptyFileItem()] } : work
-      ),
-    }));
-  };
-
-  const removeFileListItem = (workIndex: number, fileIndex: number) => {
-    setInfos((prev: any) => ({
-      ...prev,
-      congviec: prev.congviec.map((work: any, workPos: number) => {
-        if (workPos !== workIndex) return work;
-        const nextFileList = (work.fileList || []).filter((_: any, idx: number) => idx !== fileIndex);
-        return { ...work, fileList: nextFileList.length ? nextFileList : [createEmptyFileItem()] };
-      }),
-    }));
-  };
-
-  const uploadWorkFile = async (workIndex: number, fileIndex: number, file: File) => {
     try {
-      updateFileList(workIndex, fileIndex, "fileName", file.name);
-      updateFileList(workIndex, fileIndex, "externalLink", 'https://example.com/' + encodeURIComponent(file.name));
-      addFileListItem(workIndex);
-    } catch (error) {
-      dispatch(showToast({ ...listToast[2], detail: "Tải file thất bại" }));
+      const uploadedFiles = await Promise.all(
+        Array.from(files).map(async (file) => {
+          const response = await uploadFile("upload/single", { files: file });
+          const uploaded = response?.data || {};
+          const externalLink = uploaded.fullPath || uploaded.url || uploaded.path || uploaded.filePath || "";
+          return {
+            id: Date.now() + file.lastModified,
+            name: uploaded.fileName || file.name,
+            meta: `${(file.size / 1024 / 1024).toFixed(1)} MB • Vừa tải lên`,
+            externalLink,
+          };
+        })
+      );
+      await updateAttachments([...uploadedFiles, ...attachments]);
+    } catch {
+      return;
+    } finally {
+      event.target.value = "";
     }
   };
 
   useEffect(() => {
     if (id) {
+      setLoading(true);
+      showWork({ id, type: CategoryEnum.country })
+        .then((res) => {
+          const detail = res.data.data;
+          if (!detail) return;
+
+          setWorkData(detail);
+          const selected =
+            (childWorkId && detail.childWorks?.find((work: any) => String(work.id) === childWorkId)) || detail;
+          setActiveWork(selected);
+
+          setChecklist(mapChecklist(selected));
+
+          const apiComments = detail.comments || [];
+          setComments(
+            apiComments
+              .filter((comment: any) => !comment.parentId)
+              .map((comment: any) => ({
+                id: comment.id,
+                author: `ID ${comment.createdBy}`,
+                authorId: comment.createdBy,
+                time: formatDate(comment.createdAt),
+                message: comment.content,
+                replies: apiComments
+                  .filter((reply: any) => reply.parentId === comment.id)
+                  .map((reply: any) => ({
+                    id: reply.id,
+                    author: `ID ${reply.createdBy}`,
+                    authorId: reply.createdBy,
+                    time: formatDate(reply.createdAt),
+                    message: reply.content,
+                  })),
+              }))
+          );
+          setHistory(
+            (detail.histories || []).map((item: any) => ({
+              id: item.id,
+              title: item.content,
+              detail: item.action ? `Thao tác #${item.action}` : "",
+              time: formatDate(item.createdAt),
+            }))
+          );
+          const apiAttachments = parseJson<Array<{ FileName?: string; ExternalLink?: string }>>(detail.attachments, []);
+          setAttachments(
+            apiAttachments
+              .filter((file) => file.FileName || file.ExternalLink)
+              .map((file, index) => ({
+                id: index + 1,
+                name: file.FileName || file.ExternalLink || "Tệp đính kèm",
+                meta: file.ExternalLink || "",
+                externalLink: file.ExternalLink || "",
+              }))
+          );
+        })
+        .catch(() => undefined)
+        .finally(() => setLoading(false));
     }
-  }, [id]);
+  }, [id, childWorkId]);
 
   return (
     <div>
       <div className="surface-card border-round-xl border-1 border-200 p-3 p-md-4 shadow-1">
         <div className="flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-          <div className="text-3xl font-bold text-900">{sampleWorkDetail.title}</div>
+          <div className="text-3xl font-bold text-900">{loading ? "Đang tải..." : selectedWorkName}</div>
           <div className="flex align-items-center gap-2">
-            <span className="px-2 py-1 border-round-md text-xs font-medium bg-blue-50 text-blue-700 border-1 border-blue-200">{sampleWorkDetail.congviec?.[0]?.status || "IN PROGRESS"}</span>
+            <span className="px-2 py-1 border-round-md text-xs font-medium bg-blue-50 text-blue-700 border-1 border-blue-200">{selectedWorkStatus}</span>
             <button className="p-button p-button-sm p-button-outlined">Edit</button>
             <button
               className="p-button p-button-sm p-button-outlined p-button-secondary"
@@ -376,11 +425,11 @@ export default function UpdateDetailWork() {
               <section className="surface-50 border-round-xl border-1 border-200 p-3">
                 <div className="text-lg font-semibold mb-3">Mô tả</div>
                 <div className="surface-card border-round-lg border-1 border-200 p-3 text-700 line-height-3">
-                  <p className="mt-0 mb-3">{sampleWorkDetail.title} cho khách hàng {sampleWorkDetail.customerName}. Nhiệm vụ hiện đang được thực hiện theo checklist đã chia nhỏ để dễ kiểm soát tiến độ và review.</p>
+                  <p className="mt-0 mb-3">{selectedWork?.description || "Chưa có mô tả cho công việc này."}</p>
                   <p className="mt-0 mb-2">Các bước chính:</p>
                   <ul className="mt-0 mb-0 pl-4">
-                    {(sampleWorkDetail.congviec?.[0]?.checklist || []).map((item, index) => (
-                      <li key={`${item}-${index}`}>{item}</li>
+                    {selectedWorkDetails.map((item: any) => (
+                      <li key={item.id}>{item.name}</li>
                     ))}
                   </ul>
                 </div>
@@ -391,7 +440,7 @@ export default function UpdateDetailWork() {
                   <div className="col-12 md:col-6">
                     <div className="text-400 text-xs font-semibold mb-2">Người phụ trách</div>
                     <div className="flex flex-column gap-2">
-                      {(sampleWorkDetail.congviec?.[0]?.assignees || []).map((assignee: any, index: number) => (
+                      {selectedAssignees.map((assignee: any, index: number) => (
                         <div key={`${assignee?.name || "assignee"}-${index}`} className="flex align-items-center gap-2">
                           <div className="w-2rem h-2rem border-circle bg-blue-100 text-blue-700 flex align-items-center justify-content-center font-bold text-xs">
                             {(assignee?.name || "A").slice(0, 2).toUpperCase()}
@@ -414,12 +463,12 @@ export default function UpdateDetailWork() {
 
                       <div>
                         <div className="text-400 text-xs font-semibold mb-2">Dự án</div>
-                        <div className="font-semibold">{sampleWorkDetail.customerName}</div>
+                        <div className="font-semibold">{workData?.name}</div>
                       </div>
 
                       <div>
                         <div className="text-400 text-xs font-semibold mb-2">Hạn hoàn thành</div>
-                        <div className="font-semibold">{sampleWorkDetail.congviec?.[0]?.hanHoanThanh || "2026-09-10"}</div>
+                        <div className="font-semibold">{formatDate(selectedWork?.dueDate)}</div>
                       </div>
                     </div>
                   </div>
@@ -450,10 +499,17 @@ export default function UpdateDetailWork() {
                       </div>
 
                       <div
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => selectWork(step.work)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") selectWork(step.work);
+                        }}
                         className="flex-1 flex justify-content-between align-items-center gap-3 px-3 py-2 border-1 border-round-lg"
                         style={{
                           background: step.status === "COMPLETED" ? "#f0fdf4" : step.status === "IN PROGRESS" ? "#eff6ff" : "#f8fafc",
                           borderColor: "#e5e7eb",
+                          cursor: "pointer",
                         }}
                       >
                         <div>
@@ -514,11 +570,11 @@ export default function UpdateDetailWork() {
                         <div key={comment.id} className="surface-50 border-1 border-200 border-round-lg p-3">
                           <div className="flex gap-2">
                             <div className="w-2rem h-2rem flex-shrink-0 border-circle bg-blue-100 text-blue-700 flex align-items-center justify-content-center font-bold text-xs">
-                              {comment.author.slice(0, 2).toUpperCase()}
+                              {(comment.authorId ? employeeNameById(comment.authorId) : comment.author).slice(0, 2).toUpperCase()}
                             </div>
                             <div className="flex-1">
                               <div className="flex align-items-center gap-2 mb-1">
-                                <span className="font-semibold">{comment.author}</span>
+                                <span className="font-semibold">{comment.authorId ? employeeNameById(comment.authorId) : comment.author}</span>
                                 <span className="text-500 text-xs">{comment.time}</span>
                               </div>
                               <div className="text-700 line-height-3">{comment.message}</div>
@@ -539,11 +595,11 @@ export default function UpdateDetailWork() {
                               {(comment.replies || []).map((reply) => (
                                 <div key={reply.id} className="flex gap-2 p-2 border-1 border-200 border-round-md bg-white">
                                   <div className="w-2rem h-2rem flex-shrink-0 border-circle bg-green-100 text-green-700 flex align-items-center justify-content-center font-bold text-xs">
-                                    {reply.author.slice(0, 2).toUpperCase()}
+                                    {(reply.authorId ? employeeNameById(reply.authorId) : reply.author).slice(0, 2).toUpperCase()}
                                   </div>
                                   <div className="flex-1">
                                     <div className="flex align-items-center gap-2 mb-1">
-                                      <span className="font-semibold text-sm">{reply.author}</span>
+                                      <span className="font-semibold text-sm">{reply.authorId ? employeeNameById(reply.authorId) : reply.author}</span>
                                       <span className="text-500 text-xs">{reply.time}</span>
                                     </div>
                                     <div className="text-700 text-sm line-height-3">{reply.message}</div>
@@ -632,7 +688,7 @@ export default function UpdateDetailWork() {
                           borderColor: "#e5e7eb",
                         }}
                       >
-                        <input type="checkbox" checked={item.done} onChange={() => toggleChecklist(item.id)} style={{ accentColor: "#22c55e" }} />
+                        <input type="checkbox" checked={item.done} onChange={() => toggleChecklist(item)} style={{ accentColor: "#22c55e" }} />
                         <span className="flex-1" style={{ textDecoration: item.done ? "line-through" : "none", color: item.done ? "#166534" : "#374151" }}>
                           {item.label}
                         </span>
@@ -682,6 +738,18 @@ export default function UpdateDetailWork() {
                         <div className="font-semibold text-sm white-space-nowrap overflow-hidden text-overflow-ellipsis">{file.name}</div>
                         <div className="text-500 text-xs">{file.meta}</div>
                       </div>
+                      {file.externalLink && (
+                        <a
+                          href={file.externalLink}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-button p-button-icon p-button-text p-button-sm"
+                          aria-label={`Tải ${file.name}`}
+                          title="Tải file"
+                        >
+                          <i className="pi pi-download" />
+                        </a>
+                      )}
                       <button
                         type="button"
                         className="p-button p-button-icon p-button-text p-button-danger p-button-sm"

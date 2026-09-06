@@ -283,7 +283,7 @@ export default function UpdateWork() {
       console.log("Uploaded file:", response?.data);
       if (!uploaded) return;
       updateFileList(workIndex, fileIndex, "fileName", uploaded.fileName); // Replace with actual uploaded file name
-      updateFileList(workIndex, fileIndex, "externalLink", uploaded.path); // Replace with actual uploaded link
+      updateFileList(workIndex, fileIndex, "externalLink", uploaded.fullPath); // Replace with actual uploaded link
       addFileListItem(workIndex);
     } catch (error) {
       dispatch(showToast({ ...listToast[2], detail: "Tải file thất bại" }));

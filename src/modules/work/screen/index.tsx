@@ -2,18 +2,26 @@ import { useEffect, useState } from "react";
 import { Column, DataTableClient } from "components/common/DataTable";
 import { GridForm, Dropdown, Input } from "components/common/ListForm";
 import { useHandleParamUrl } from "hooks/useHandleParamUrl";
-import { CategoryEnum } from "utils/type.enum";
 import { classNames } from "primereact/utils";
+import { deleteWork } from "../api";
 import { useListWork } from "../service";
 import { Splitter } from "primereact/splitter";
 import { Helper } from "utils/helper";
-import { Checkbox, ProgressBar } from "components/uiCore";
 import { FilterMatchMode } from "primereact/api";
 import { MyCalendar } from "components/common/MyCalendar";
 import { useNavigate } from "react-router-dom";
+import { useListEmployeeWithState } from "modules/employee/service";
 
 const getStatusInfo = (row: any, progress: number) => {
     const statusValue = String(row?.status ?? row?.trangthai ?? row?.statusName ?? row?.state ?? "").toLowerCase();
+
+    if (Number(row?.status) === 1) {
+        return { label: "Đang thực hiện", color: "#2563eb", bg: "#dbeafe", text: "#1d4ed8" };
+    }
+
+    if (Number(row?.status) === 0) {
+        return { label: "Chưa bắt đầu", color: "#f59e0b", bg: "#fef3c7", text: "#92400e" };
+    }
 
     if (progress >= 100 || statusValue.includes("hoan") || statusValue.includes("done") || statusValue.includes("complete")) {
         return { label: "Hoàn thành", color: "#16a34a", bg: "#dcfce7", text: "#166534" };
@@ -37,119 +45,69 @@ const getInitials = (name: string) => {
     return initials.join("") || "A";
 };
 
-const getChecklistPreview = (row: any) => {
-    const items = (row?.congviec || []).flatMap((item: any) => Array.isArray(item?.checklist) ? item.checklist : []);
-    return items.length ? items : ["Chưa có checklist"];
+const parseJsonArray = (value: any) => {
+    if (Array.isArray(value)) return value;
+    if (typeof value !== "string" || !value.trim()) return [];
+
+    try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
 };
 
-const sampleWorks = [
-  {
-    id: 1,
-    title: "Thiết kế phần mềm asa",
-    customerName: "Công ty A",
-    congviec: [
-      {
-        name: "Thiết kế giao diện công việc",
-        status: "Đang thực hiện",
-        accounting_date: "2026-08-30",
-        hanHoanThanh: "2026-09-10",
-        progress: 70,
-        assignees: [
-          { name: "Nguyễn Văn A" },
-          { name: "Trần Thị B" },
-          { name: "Lê Văn C" },
-        ],
-        checklist: ["Lên wireframe", "Thiết kế form", "Review nội dung","Lên wireframe", "Thiết kế form", "Review nội dung"],
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Cập nhật tài liệu hợp đồng",
-    customerName: "Công ty B",
-    congviec: [
-      {
-        name: "Kiểm tra hợp đồng",
-        status: "Hoàn thành",
-        accounting_date: "2026-08-26",
-        hanHoanThanh: "2026-08-30",
-        progress: 100,
-        assignees: [{ name: "Phạm Thị D" }, { name: "Hoàng Văn E" }],
-        checklist: ["Đọc hợp đồng", "Kiểm tra điều khoản", "Phê duyệt"],
-      },
-      {
-        name: "Đính kèm file",
-        status: "Hoàn thành",
-        accounting_date: "2026-08-27",
-        hanHoanThanh: "2026-08-31",
-        progress: 100,
-        assignees: [{ name: "Phạm Thị D" }],
-        checklist: ["Tải file", "Xác minh tài liệu", "Lưu trữ"],
-      },
-    ],
-  },
-  {
-    id: 3,
-    title: "Phân tích yêu cầu khách hàng",
-    customerName: "Công ty C",
-    congviec: [
-      {
-        name: "Thu thập yêu cầu",
-        status: "Chưa bắt đầu",
-        accounting_date: "2026-08-27",
-        hanHoanThanh: "2026-09-12",
-        progress: 0,
-        assignees: [{ name: "Vũ Thị F" }, { name: "Đặng Văn G" }],
-        checklist: ["Gặp khách hàng", "Ghi nhận yêu cầu", "Xác nhận scope"],
-      },
-      {
-        name: "Phân loại dữ liệu",
-        status: "Chưa bắt đầu",
-        accounting_date: "2026-08-28",
-        hanHoanThanh: "2026-09-14",
-        progress: 0,
-        assignees: [{ name: "Ngô Thị H" }],
-        checklist: ["Nhóm dữ liệu", "Phân nhóm chức năng", "Đánh giá ưu tiên"],
-      },
-    ],
-  },
-  {
-    id: 4,
-    title: "Kiểm thử và deploy",
-    customerName: "Công ty D",
-    congviec: [
-      {
-        name: "Test chức năng",
-        status: "Hoàn thành",
-        accounting_date: "2026-08-28",
-        hanHoanThanh: "2026-09-01",
-        progress: 100,
-        assignees: [{ name: "Mai Văn K" }],
-        checklist: ["Kiểm tra login", "Test form", "Gửi báo cáo"],
-      },
-      {
-        name: "Deploy QA",
-        status: "Đang thực hiện",
-        accounting_date: "2026-08-30",
-        hanHoanThanh: "2026-09-02",
-        progress: 80,
-        assignees: [{ name: "Lý Thị M" }, { name: "Mai Văn K" }],
-        checklist: ["Build ứng dụng", "Deploy môi trường QA", "Kiểm tra lỗi"],
-      },
-      {
-        name: "Backup dữ liệu",
-        status: "Đang thực hiện",
-        accounting_date: "2026-08-29",
-        hanHoanThanh: "2026-09-03",
-        progress: 60,
-        assignees: [{ name: "Lý Thị M" }],
-        checklist: ["Lấy snapshot", "Nén dữ liệu", "Xác nhận backup"],
-      },
-    ],
-  },
-];
+const normalizeChecklist = (details: any[]) => details.map((item: any) => ({
+    ...item,
+    label: item?.name || item?.label || "Checklist",
+    checked: Boolean(item?.checked),
+}));
 
-const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
+const getEmployeeName = (employee: any) => {
+    const fullName = [employee?.first_name, employee?.last_name].filter(Boolean).join(" ");
+    return fullName || employee?.code || `ID ${employee?.id}`;
+};
+
+const mapWorkTree = (items: any[], employees: any[] = []) => {
+    const employeeById = employees.reduce((result: Record<string, any>, employee: any) => {
+        result[String(employee?.id)] = employee;
+        return result;
+    }, {});
+    const byParent = items.reduce((result: Record<string, any[]>, item: any) => {
+        const parentId = item?.parent_id == null ? "root" : String(item.parent_id);
+        result[parentId] = [...(result[parentId] || []), item];
+        return result;
+    }, {});
+
+    const toDetail = (item: any): any => {
+        const checklist = normalizeChecklist(Array.isArray(item?.work_details) ? item.work_details : []);
+        const assigneeIds = parseJsonArray(item?.assignee_ids);
+
+        return {
+            ...item,
+            name: item?.name || "Công việc",
+            deadline: Helper.formatDMY(item?.due_date),
+            checklist,
+            assignees: assigneeIds.map((id: any) => {
+                const employee = employeeById[String(id)];
+                return {
+                    id,
+                    name: employee ? getEmployeeName(employee) : `ID ${id}`,
+                    code: employee?.code,
+                };
+            }),
+            children: (byParent[String(item?.id)] || []).map(toDetail),
+        };
+    };
+
+    return (byParent.root || []).map((item: any) => ({
+        ...item,
+        title: item?.name || "Công việc",
+        congviec: (byParent[String(item?.id)] || []).map(toDetail),
+    }));
+};
+
+const Header = ({ _setParamsPaginator, _paramsPaginator, employeeOptions }: any) => {
     const [filter, setFilter] = useState({ name: "", customerDetailId: "", fromDate: Helper.lastWeekString(), toDate: Helper.toDayString() });
 
     useEffect(() => {
@@ -205,7 +163,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
             filter
             showClear
             value={filter.customerDetailId}
-            options={[]}
+            options={employeeOptions}
             onChange={(e: any) =>
               setFilter({ ...filter, customerDetailId: e.target.value })
             }
@@ -222,35 +180,53 @@ export default function ListWork() {
     const { handleParamUrl } = useHandleParamUrl();
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [displayData, setDisplayData] = useState<any[]>([]);
-    const [first, setFirst] = useState(0);
-    const [rows, setRows] = useState(20);
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
-
+    const { data: employees } = useListEmployeeWithState({
+        params: { keyword: "abc" },
+        debounce: 500,
+    });
+    const employeeOptions = (Array.isArray(employees) ? employees : []).map((employee: any) => ({
+        label: `${getEmployeeName(employee)}${employee?.code ? ` - ${employee.code}` : ""}`,
+        value: employee?.id,
+    }));
     const [paramsPaginator, setParamsPaginator] = useState({
         pageNum: 1,
         pageSize: 20,
         first: 0,
-        render: false,
-        type: CategoryEnum.country,
         keyword: "",
     });
 
-    // const { data, loading } = useListWork({
-    //     params: paramsPaginator,
-    //     debounce: 500,
-    // });
+    const { data, loading, refresh } = useListWork({
+        params: paramsPaginator,
+        debounce: 500,
+    });
+
+    const handleDeleteWork = async (workId: number | string | undefined) => {
+        if (workId == null || !window.confirm("Bạn có chắc muốn xóa công việc này không?")) return;
+
+        try {
+            await deleteWork({ id: workId });
+            await refresh();
+        } catch {
+            return;
+        }
+    };
 
     useEffect(() => {
+        if (!data) return;
         handleParamUrl(paramsPaginator);
-        const source = sampleWorks;
-        setDisplayData(source.map((row: any) => ({ ...row })));
-    }, [first, rows, paramsPaginator]);
+        setDisplayData(mapWorkTree(Array.isArray(data) ? data : data?.data || [], employees));
+    }, [data, employees, paramsPaginator]);
 
     return (
         <div className="card">
-            <Header _paramsPaginator={paramsPaginator} _setParamsPaginator={setParamsPaginator} />
+            <Header
+                _paramsPaginator={paramsPaginator}
+                _setParamsPaginator={setParamsPaginator}
+                employeeOptions={employeeOptions}
+            />
             <div style={{ height: "calc(100vh - 8rem)" }}>
                 <Splitter style={{ height: "100%", width: "100%" }}>
                     <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
@@ -258,7 +234,7 @@ export default function ListWork() {
                             rowHover
                             value={displayData}
                             currentPageReportTemplate="Tổng số: {totalRecords} bản ghi"
-                            loading={false}
+                            loading={loading}
                             dataKey="id"
                             title="Công việc"
                             filterDisplay="row"
@@ -275,7 +251,6 @@ export default function ListWork() {
                                 header="Nội dung công việc"
                                 body={(row: any) => {
                                     const details = row?.congviec || [];
-                                    const checklist = getChecklistPreview(row);
 
                                     return (
                                         <div style={{ minWidth: "520px" }}>
@@ -294,16 +269,18 @@ export default function ListWork() {
 
                                                 <div style={{ display: "grid", gap: "8px" }}>
                                                     {details.map((item: any, index: number) => {
-                                                        const detailProgress = Number(item?.progress ?? item?.tiendo ?? item?.completion ?? 0);
+                                                        const checklistItems = Array.isArray(item?.checklist) ? item.checklist : [];
+                                                        const checkedCount = checklistItems.filter((check: any) => check?.checked).length;
+                                                        const detailProgress = checklistItems.length
+                                                            ? (checkedCount / checklistItems.length) * 100
+                                                            : Number(item?.progress ?? item?.tiendo ?? item?.completion ?? 0);
                                                         const normalizedProgress = Number.isFinite(detailProgress)
                                                             ? Math.max(0, Math.min(100, detailProgress))
                                                             : 0;
                                                         const detailStatus = getStatusInfo(item, normalizedProgress);
                                                         const detailAssignees = Array.isArray(item?.assignees) ? item.assignees : [];
-                                                        const checklistCount = Array.isArray(item?.checklist) ? item.checklist.length : 0;
-                                                        const checklistDone = checklistCount
-                                                            ? Math.max(0, Math.min(checklistCount, Math.round((normalizedProgress / 100) * checklistCount)))
-                                                            : 0;
+                                                        const checklistCount = checklistItems.length;
+                                                        const checklistDone = checklistCount ? checkedCount : 0;
                                                         const progressSteps = checklistCount > 0 ? Array.from({ length: checklistCount }, (_, idx) => idx < checklistDone) : Array.from({ length: 4 }, (_, idx) => idx < Math.round(normalizedProgress / 25));
 
                                                         return (
@@ -332,9 +309,26 @@ export default function ListWork() {
                                                                         >
                                                                             {detailStatus.label}
                                                                         </span>
+                                                                         <button
+                                                                            type="button"
+                                                                            onClick={() => handleDeleteWork(item?.id)}
+                                                                            style={{
+                                                                                border: "none",
+                                                                                background: "#f87171",
+                                                                                color: "#fff",
+                                                                                borderRadius: "8px",
+                                                                                padding: "6px 10px",
+                                                                                cursor: "pointer",
+                                                                                fontWeight: 600,
+                                                                                fontSize: "11px",
+                                                                                lineHeight: 1.2,
+                                                                            }}
+                                                                        >
+                                                                            Xóa
+                                                                        </button>
                                                                         <button
                                                                             type="button"
-                                                                            onClick={() => navigate(`/work/updateDetail/${row?.id ?? item?.id ?? index + 1}`)}
+                                                                            onClick={() => navigate(`/work/updateDetail/${row?.id}?childId=${item?.id}`)}
                                                                             style={{
                                                                                 border: "none",
                                                                                 background: "#2563eb",
@@ -436,9 +430,14 @@ export default function ListWork() {
                                                                     </div>
                                                                 </div>
 
-                                                                {Array.isArray(item?.checklist) && item.checklist.length > 0 && (
+                                                                {checklistItems.length > 0 && (
                                                                     <div style={{ marginTop: "8px", fontSize: "11px", color: "#475569" }}>
-                                                                        <span style={{ fontWeight: 700, color: "#334155" }}>Checklist:</span> {item.checklist.join(" • ")}
+                                                                        <span style={{ fontWeight: 700, color: "#334155" }}>Checklist ({checkedCount}/{checklistCount}):</span>{" "}
+                                                                        {checklistItems.map((check: any, checkIndex: number) => (
+                                                                            <span key={check?.id ?? checkIndex} style={{ marginRight: "8px", color: check?.checked ? "#16a34a" : "#475569" }}>
+                                                                                {check?.checked ? "✓" : "○"} {check?.label || check?.name}
+                                                                            </span>
+                                                                        ))}
                                                                     </div>
                                                                 )}
                                                                 
