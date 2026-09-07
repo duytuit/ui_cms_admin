@@ -162,7 +162,7 @@ export default function UpdateDetailWork() {
     try {
       const name = newChecklist.trim();
       const response = await addWorkDetail({
-        workId: selectedWork?.id || id,
+        workId: workData?.id || id,
         name,
         description: null,
         storageId: selectedWork?.storageId || workData?.storageId,

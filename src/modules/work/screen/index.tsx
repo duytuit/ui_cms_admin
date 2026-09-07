@@ -86,7 +86,7 @@ const mapWorkTree = (items: any[], employees: any[] = []) => {
         return {
             ...item,
             name: item?.name || "Công việc",
-            deadline: Helper.formatDMY(item?.due_date),
+            deadline: Helper.formatDate(item?.due_date),
             checklist,
             assignees: assigneeIds.map((id: any) => {
                 const employee = employeeById[String(id)];

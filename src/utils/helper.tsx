@@ -200,6 +200,9 @@ export class Helper {
 
     return `${day}-${m}-${y}`;
   };
+  static formatDate = (value: string | null | undefined) =>
+  value ? new Date(value).toLocaleString("vi-VN") : "Chưa cập nhật";
+
   static formatYMDLocal = (d?: Date | string | null) => {
     if (!d) return "";
 
