@@ -381,12 +381,15 @@ export default function UpdateDetailWork() {
               }))
           );
           setHistory(
-            (detail.histories || []).map((item: any) => ({
-              id: item.id,
-              title: item.content,
-              detail: item.action ? `Thao tác #${item.action}` : "",
-              time: formatDate(item.createdAt),
-            }))
+            (detail.histories || []).map((item: any) => {
+              const _emp = employees.find((employee: any) => employee.user_id === item.createdBy);
+              return {
+                id: item.id,
+                title: item.title || "Hoạt động",
+                detail: _emp ? `Thao tác: ${getEmployeeName(_emp)}` : `Thao tác #${item.action}` || "",
+                time: formatDate(item.createdAt),
+              };
+            })
           );
           const apiAttachments = parseJson<Array<{ FileName?: string; ExternalLink?: string }>>(detail.attachments, []);
           setAttachments(
