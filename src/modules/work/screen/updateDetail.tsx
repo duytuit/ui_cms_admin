@@ -385,7 +385,7 @@ export default function UpdateDetailWork() {
               const _emp = employees.find((employee: any) => employee.user_id === item.createdBy);
               return {
                 id: item.id,
-                title: item.title || "Hoạt động",
+                title: item.content,
                 detail: _emp ? `Bởi: ${getEmployeeName(_emp)}` : `#${item.action}` || "",
                 time: formatDate(item.createdAt),
               };
