@@ -348,8 +348,11 @@ export default function UpdateDetailWork() {
         .then((res) => {
           const detail = res.data.data;
           if (!detail) return;
-
-          setWorkData(detail);
+          const _emp = employees.find((employee: any) => employee.id === detail.createdBy);
+          setWorkData({
+            ...detail,
+            createdBy: _emp ? getEmployeeName(_emp) : `ID ${detail.createdBy}`,
+          });
           const selected =
             (childWorkId && detail.childWorks?.find((work: any) => String(work.id) === childWorkId)) || detail;
           setActiveWork(selected);
@@ -457,7 +460,7 @@ export default function UpdateDetailWork() {
                         <div className="text-400 text-xs font-semibold mb-2">Người tạo</div>
                         <div className="flex align-items-center gap-2">
                           <div className="w-2rem h-2rem border-circle bg-yellow-100 text-yellow-700 flex align-items-center justify-content-center font-bold text-xs">AD</div>
-                          <span className="font-semibold">Admin System</span>
+                          <span className="font-semibold">{workData?.createdBy}</span>
                         </div>
                       </div>
 
