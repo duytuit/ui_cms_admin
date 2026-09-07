@@ -386,7 +386,7 @@ export default function UpdateDetailWork() {
               return {
                 id: item.id,
                 title: item.title || "Hoạt động",
-                detail: _emp ? `Thao tác: ${getEmployeeName(_emp)}` : `Thao tác #${item.action}` || "",
+                detail: _emp ? `Bởi: ${getEmployeeName(_emp)}` : `#${item.action}` || "",
                 time: formatDate(item.createdAt),
               };
             })
