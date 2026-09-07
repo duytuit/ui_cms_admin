@@ -348,10 +348,10 @@ export default function UpdateDetailWork() {
         .then((res) => {
           const detail = res.data.data;
           if (!detail) return;
-          const _emp = employees.find((employee: any) => employee.id === detail.createdBy);
+          const _emp = employees.find((employee: any) => employee.user_id === detail.createdBy);
           setWorkData({
             ...detail,
-            createdBy: _emp ? getEmployeeName(_emp) : `ID ${detail.createdBy}`,
+            createdByFull: _emp ? getEmployeeName(_emp) : `ID ${detail.createdBy}`,
           });
           const selected =
             (childWorkId && detail.childWorks?.find((work: any) => String(work.id) === childWorkId)) || detail;
@@ -365,7 +365,7 @@ export default function UpdateDetailWork() {
               .filter((comment: any) => !comment.parentId)
               .map((comment: any) => ({
                 id: comment.id,
-                author: `ID ${comment.createdBy}`,
+                author: workData?.createdByFull || `ID ${comment.createdBy}`,
                 authorId: comment.createdBy,
                 time: formatDate(comment.createdAt),
                 message: comment.content,
@@ -373,7 +373,7 @@ export default function UpdateDetailWork() {
                   .filter((reply: any) => reply.parentId === comment.id)
                   .map((reply: any) => ({
                     id: reply.id,
-                    author: `ID ${reply.createdBy}`,
+                    author: workData?.createdByFull || `ID ${reply.createdBy}`,
                     authorId: reply.createdBy,
                     time: formatDate(reply.createdAt),
                     message: reply.content,
@@ -403,7 +403,7 @@ export default function UpdateDetailWork() {
         .catch(() => undefined)
         .finally(() => setLoading(false));
     }
-  }, [id, childWorkId]);
+  }, [id,employees, childWorkId]);
 
   return (
     <div>
@@ -460,7 +460,7 @@ export default function UpdateDetailWork() {
                         <div className="text-400 text-xs font-semibold mb-2">Người tạo</div>
                         <div className="flex align-items-center gap-2">
                           <div className="w-2rem h-2rem border-circle bg-yellow-100 text-yellow-700 flex align-items-center justify-content-center font-bold text-xs">AD</div>
-                          <span className="font-semibold">{workData?.createdBy}</span>
+                          <span className="font-semibold">{workData?.createdByFull}</span>
                         </div>
                       </div>
 
