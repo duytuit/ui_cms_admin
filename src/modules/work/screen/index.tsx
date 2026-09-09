@@ -108,7 +108,7 @@ const mapWorkTree = (items: any[], employees: any[] = []) => {
 };
 
 const Header = ({ _setParamsPaginator, _paramsPaginator, employeeOptions }: any) => {
-    const [filter, setFilter] = useState({ name: "", customerDetailId: "", fromDate: Helper.lastWeekString(), toDate: Helper.toDayString() });
+    const [filter, setFilter] = useState({ name: "", AssigneeId: "", fromDate: Helper.lastWeekString(), toDate: Helper.toDayString() });
 
     useEffect(() => {
         _setParamsPaginator((prev: any) => ({
@@ -116,7 +116,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, employeeOptions }: any)
             keyword: filter.name,
             fromDate: filter.fromDate,
             toDate: filter.toDate,
-            customerDetailId: filter.customerDetailId,
+            AssigneeId: filter.AssigneeId,
         }));
     }, [filter]);
 
@@ -162,10 +162,10 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, employeeOptions }: any)
           <Dropdown
             filter
             showClear
-            value={filter.customerDetailId}
+            value={filter.AssigneeId}
             options={employeeOptions}
             onChange={(e: any) =>
-              setFilter({ ...filter, customerDetailId: e.target.value })
+              setFilter({ ...filter, AssigneeId: e.target.value })
             }
             label="Người phụ trách"
             className={classNames("dropdown-input-sm", "p-dropdown-sm")}
@@ -178,10 +178,10 @@ const Header = ({ _setParamsPaginator, _paramsPaginator, employeeOptions }: any)
 export default function ListWork() {
     const navigate = useNavigate();
     const { handleParamUrl } = useHandleParamUrl();
-    const [selectedRows, setSelectedRows] = useState<any[]>([]);
     const [displayData, setDisplayData] = useState<any[]>([]);
     const [filters, setFilters] = useState({
         global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+        name: { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
     const { data: employees } = useListEmployeeWithState({
         params: { keyword: "abc" },
@@ -249,6 +249,8 @@ export default function ListWork() {
 
                             <Column
                                 header="Nội dung công việc"
+                                field="name"
+                                filter showFilterMenu={false} filterMatchMode="contains"
                                 body={(row: any) => {
                                     const details = row?.congviec || [];
 
