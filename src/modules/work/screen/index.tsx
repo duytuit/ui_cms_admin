@@ -300,7 +300,7 @@ export default function ListWork() {
                                                                         {item.name || item.tencongviec || `Chi tiết ${index + 1}`}
                                                                     </div>
                                                                     <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                                                        <span
+                                                                        {/* <span
                                                                             className="px-2 py-1 border-round-md text-xs font-medium"
                                                                             style={{
                                                                                 background: detailStatus.bg,
@@ -310,7 +310,7 @@ export default function ListWork() {
                                                                             }}
                                                                         >
                                                                             {detailStatus.label}
-                                                                        </span>
+                                                                        </span> */}
                                                                          <button
                                                                             type="button"
                                                                             onClick={() => handleDeleteWork(item?.id)}
