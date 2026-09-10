@@ -176,7 +176,7 @@ export const typeVehicle = [
 export const typeWork = [
    {
      value:0,
-     label:"Công việc thường"
+     label:"Dự án thường"
    },
     {
      value:1,

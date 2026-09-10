@@ -370,7 +370,7 @@ export default function UpdateWork() {
         className="w-full"
         style={{ margin: "0 auto" }}
         checkId={infos.id}
-        title="công việc"
+        title="dự án"
         loading={loading}
         onSubmit={handleSubmit}
         routeList="/work/list"
@@ -380,7 +380,7 @@ export default function UpdateWork() {
           <div className="flex justify-content-end align-items-center mb-3">
             <Button
               type="button"
-              label="Thêm công việc"
+              label="Thêm dự án"
               icon="pi pi-plus"
               severity="success"
               size="small"
@@ -396,13 +396,13 @@ export default function UpdateWork() {
             >
               <div className="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-2 mb-3">
                 <div>
-                  <h5 className="m-0">Công việc {workIndex + 1}</h5>
+                  <h5 className="m-0">Dự án {workIndex + 1}</h5>
                 </div>
 
                 {infos.congviec.length > 1 && (
                   <Button
                     type="button"
-                    label="Xóa công việc"
+                    label="Xóa dự án"
                     icon="pi pi-trash"
                     severity="danger"
                     size="small"
@@ -422,7 +422,7 @@ export default function UpdateWork() {
                         onChange={(e: any) =>
                           updateWorkInfo(workIndex, "tieude", e.target.value)
                         }
-                        label="Tiêu đề công việc"
+                        label="Tiêu đề dự án"
                         required
                       />
                     </div>
@@ -432,7 +432,7 @@ export default function UpdateWork() {
                           optionValue="value"
                           optionLabel="label"
                           options={typeWork}
-                          label="Loại công việc"
+                          label="Loại dự án"
                           className="w-full p-inputtext-sm"
                           onChange={(e:any) =>{
                             updateWorkInfo(workIndex, "loaicongviec", e.value)

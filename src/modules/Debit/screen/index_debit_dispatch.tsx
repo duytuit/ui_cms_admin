@@ -203,6 +203,7 @@ export default function ListCreateDispatch() {
       purchase_price: { value: null, matchMode: 'custom_numeric' },
       supplierName:  { value: null, matchMode: FilterMatchMode.CONTAINS },
       supplierAbb: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      note: { value: null, matchMode: FilterMatchMode.CONTAINS },
      });
   const { data, loading, error, refresh } = useListContractFileNotDispatch({params: paramsPaginator,debounce: 500,});
   const { data: debitDispatch, refresh:refreshDebitDispatch  } = useListDebitDispatch({params: {...paramsPaginator}, debounce: 500,});
