@@ -1,3 +1,4 @@
+import { parseReceiptAmount, receiptTotal } from "./receiptAmount";
 
 import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
@@ -29,9 +30,15 @@ export default function UpdateReceiptChiGiaoNhan() {
   const navigate = useNavigate();
   const handleSubmit = (e: any) => {
     e.preventDefault();
-    let info = {
-      ...infos, amount: parseInt(infos.amount.replace(/\D/g, ""), 10),thanhtien: parseInt(infos.thanhtien.replace(/\D/g, ""), 10), status: infos.status ? 0 : 1,
-     data:JSON.stringify(infos)
+    const receipt = {
+      ...infos,
+      amount: parseReceiptAmount(infos.amount),
+      thanhtien: receiptTotal(infos.amount, infos.vat),
+    };
+    const info = {
+      ...receipt,
+      status: infos.status ? 0 : 1,
+      data: JSON.stringify(receipt),
     };
     setLoading(true);
     fetchDataSubmit(info);
@@ -167,7 +174,7 @@ useEffect(() => {
             setEmployeeInfo(_nguoitao);
             detail.amount = Helper.formatCurrency(detail.receiptDetails[0].amount.toString())
             detail.vat = detail.receiptDetails[0].vat
-            detail.thanhtien =Helper.formatCurrency((detail.receiptDetails[0].amount + (detail.receiptDetails[0].amount * detail.receiptDetails[0].vat/100)).toString())
+            detail.thanhtien =Helper.formatCurrency(receiptTotal(detail.receiptDetails[0].amount, detail.receiptDetails[0].vat).toString())
             let info = {
               ...detail, status: detail.status === 0 ? true : false,
             };
@@ -286,8 +293,7 @@ useEffect(() => {
                       value={infos.amount}
                       onChange={(e: any) =>
                          {
-                           setInfos({ ...infos, amount: Helper.formatCurrency(e.target.value )})
-                           const thanhtien  = parseInt(e.target.value.replace(/\D/g, ""),10) + ( infos.vat ? ( parseInt(e.target.value.replace(/\D/g, ""),10) * infos.vat ) / 100 : 0  );
+                           const thanhtien = receiptTotal(e.target.value, infos.vat);
                            setInfos({ ...infos, amount: Helper.formatCurrency(e.target.value ), thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                          }
                       }
@@ -305,8 +311,7 @@ useEffect(() => {
                       className="w-full p-inputtext-sm"
                       onChange={(e: any) =>
                           {
-                             setInfos({ ...infos, vat: e.value })
-                             const thanhtien  = parseInt( infos.amount.replace(/\D/g, ""),10) + ( e.value ? ( parseInt( infos.amount.replace(/\D/g, ""),10) * e.value ) / 100 : 0  );
+                             const thanhtien = receiptTotal(infos.amount, e.value);
                              setInfos({ ...infos, vat: e.value, thanhtien : Helper.formatCurrency(thanhtien.toString()) })
                           }
                       }

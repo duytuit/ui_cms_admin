@@ -1,3 +1,4 @@
+import { parseReceiptAmount, receiptTotal } from "./receiptAmount";
 
 import { AddForm, InputForm } from "components/common/AddForm";
 import { useNavigate, useParams } from "react-router-dom";
@@ -32,7 +33,10 @@ export default function UpdateReceiptChi() {
     e.preventDefault();
     infos.typeReceipt = 8
     infos.prefixCode = "PC"
-    infos.listProduct = listProduct
+    infos.listProduct = listProduct.map(row => ({
+      ...row, amount: parseReceiptAmount(row.amount),
+      vat: Number(row.vat) || 0, thanhTien: receiptTotal(row.amount, row.vat),
+    }))
     let info = {
       ...infos, 
       // amount: parseInt(infos.amount.replace(/\D/g, ""), 10),
@@ -179,7 +183,10 @@ export default function UpdateReceiptChi() {
             GetBank(detail.bankId)
             const _nguoitao = employees.find((x: any) => x.user_id === detail.updatedBy);
             setEmployeeInfo(_nguoitao);
-            setListProduct(detail.receiptDetails || []);
+            setListProduct((detail.receiptDetails || []).map((row: any) => ({
+              ...row, amount: parseReceiptAmount(row.amount),
+              thanhTien: receiptTotal(row.amount, row.vat),
+            })));
              if(detail.object === 0){
                 setDoiTuongOptions(partnerOptions)
               }else if(detail.object === 1){
@@ -542,15 +549,7 @@ export default function UpdateReceiptChi() {
                         const vatValue = Number(e.value) || 0;
                         const updated = [...listProduct];
                         const row = { ...updated[opt.rowIndex] };
-                        // ✅ Chuyển price về số nguyên, loại bỏ ký tự không phải số
-                        const rawPrice =
-                          typeof row.amount === "string"
-                            ? parseInt(row.amount.replace(/\D/g, ""), 10) || 0
-                            : Number(row.amount) || 0;
-                        // ✅ Nếu có quantity thì nhân thêm, mặc định là 1
-                        const qty = Number(row.quantity) || 1;
-                        // ✅ Tính thành tiền (price * qty * (1 + vat/100))
-                        const thanhTien = Math.round(rawPrice * qty * (1 + vatValue / 100));
+                        const thanhTien = receiptTotal(row.amount, vatValue);
                         updated[opt.rowIndex] = {
                           ...row,
                           vat: vatValue,
@@ -568,30 +567,13 @@ export default function UpdateReceiptChi() {
                   header="Thành tiền"
                   body={(_: any, opt: any) => {
                     const row = listProduct[opt.rowIndex];
-                    // Chuyển amount về số thực, giữ decimal
-                    const amount = typeof row.amount === "string"
-                      ? parseFloat(row.amount.replace(/[^0-9.]/g, "")) || 0
-                      : Number(row.amount) || 0;
-                    const vat = Number(row.vat) || 0;
-                    // Tính thành tiền
-                    const thanhTien = Math.round(amount * (1 + vat / 100));
-                    // ✅ Cập nhật luôn vào state
-                    if (row.thanhTien !== thanhTien) {
-                      const updated = [...listProduct];
-                      updated[opt.rowIndex] = { ...row, thanhTien };
-                      setListProduct(updated);
-                    }
+                    const thanhTien = receiptTotal(row.amount, row.vat);
                     return Helper.formatCurrency(thanhTien.toString());
                   }}
                   footer={Helper.formatCurrency(
                     listProduct
                       .reduce((sum, item) => {
-                        const amount = typeof item.amount === "string"
-                          ? parseFloat(item.amount.replace(/[^0-9.]/g, "")) || 0
-                          : Number(item.amount) || 0;
-
-                        const vat = Number(item.vat) || 0;
-                        return Math.round(sum + amount * (1 + vat / 100));
+                        return sum + receiptTotal(item.amount, item.vat);
                       }, 0)
                       .toString()
                   )}
@@ -656,10 +638,7 @@ export default function UpdateReceiptChi() {
               id="total_thanhtien"
               value={Helper.formatCurrency((listProduct
                 .reduce((sum, item) => {
-                  const thanhTien = typeof item.thanhTien === "string"
-                    ? parseFloat(item.thanhTien.replace(/[^0-9.]/g, "")) || 0
-                    : Number(item.thanhTien) || 0;
-                  return Math.round(sum + thanhTien);
+                  return sum + receiptTotal(item.amount, item.vat);
                 }, 0))
                 .toString()
               )}
