@@ -10,6 +10,7 @@ import { useListDebitCongNoTongHopKH } from "../service";
 import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import { Splitter } from "primereact/splitter";
+import moment from "moment";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -397,7 +398,7 @@ const applyFilters = (rows: any[]) => {
         <ColumnGroup>
             <Row>
                 <Column rowSpan={2} />
-                <Column header="Thông Tin" headerClassName="my-title-center" />
+                <Column header="Thông Tin" headerClassName="my-title-center" colSpan={2} />
                 <Column header="Đầu kỳ" headerClassName="my-title-center" colSpan={2} />
                 <Column header="Trong kỳ" headerClassName="my-title-center" colSpan={2} />
                 <Column header="Thanh toán" headerClassName="my-title-center" colSpan={2} />
@@ -405,6 +406,7 @@ const applyFilters = (rows: any[]) => {
             </Row>
             <Row>
                 <Column header="Khách hàng" />
+                <Column header="Nợ quá hạn" />
                 <Column header="Phí DVDK" headerClassName="my-title-center"/>
                 <Column header="Phí CHDK" headerClassName="my-title-center"/>
                 <Column header="Phí DVTK" headerClassName="my-title-center"/>
@@ -418,6 +420,7 @@ const applyFilters = (rows: any[]) => {
              <Row>
                 <Column />
                 <Column header={customerAbbHeader} headerClassName="my-title-center"/>
+                <Column />
                 <Column />
                 <Column />
                 <Column header={dvtkHeader}/>
@@ -456,6 +459,16 @@ const applyFilters = (rows: any[]) => {
                     tableStyle={{ minWidth: "1600px" }} // ép bảng rộng hơn để có scroll ngang
                   >
                     <Column field="abbreviation"  filter showFilterMenu={false} filterMatchMode="contains" />
+                    <Column
+                      field="OldestUnpaidDebtDate"
+                      body={(row: any) => {
+                        const oldestUnpaidDebtDate =
+                          row.OldestUnpaidDebtDate ?? row.oldestUnpaidDebtDate;
+                        if (!oldestUnpaidDebtDate) return "";
+                        const date = moment(oldestUnpaidDebtDate);
+                        return date.isValid() ? date.format("DD/MM/YYYY") : "";
+                      }}
+                    />
                     <Column field="dvdk"  
                       body={(row: any) =>{
                           return Helper.formatCurrency(row.dvdk.toString());
