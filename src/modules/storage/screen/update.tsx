@@ -105,6 +105,44 @@ const UpdateStorages = () => {
             </div>
             <div className="field grid">
               <label
+                htmlFor="taxCode"
+                className="col-12 mb-2 md:col-3 md:mb-0"
+              >
+                Mã số thuế
+              </label>
+              <div className="col-12 md:col-9">
+                <InputForm
+                  className="w-full"
+                  id="taxCode"
+                  value={infos.taxCode}
+                  onChange={(e: any) =>
+                    setInfos({ ...infos, taxCode: e.target.value })
+                  }
+                  label="Mã số thuế"
+                />
+              </div>
+            </div>
+            <div className="field grid">
+              <label
+                htmlFor="address"
+                className="col-12 mb-2 md:col-3 md:mb-0"
+              >
+                Địa chỉ
+              </label>
+              <div className="col-12 md:col-9">
+                <InputForm
+                  className="w-full"
+                  id="address"
+                  value={infos.address}
+                  onChange={(e: any) =>
+                    setInfos({ ...infos, address: e.target.value })
+                  }
+                  label="Địa chỉ"
+                />
+              </div>
+            </div>
+            <div className="field grid">
+              <label
                 htmlFor="remark"
                 className="col-12 mb-3 md:col-3 md:mb-0"
               >
