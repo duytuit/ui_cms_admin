@@ -11,6 +11,7 @@ import { ColumnGroup } from "primereact/columngroup";
 import { Row } from "primereact/row";
 import { Splitter } from "primereact/splitter";
 import moment from "moment";
+import { exportDebitTongHopKH } from "../api";
 
 // ✅ Component Header lọc dữ liệu
 const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
@@ -40,6 +41,28 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
     }));
   }, [filter]);
 
+  async function ExportExcelCongNoTongHopKH() {
+    const respo = await exportDebitTongHopKH(
+      Helper.convertObjectToQueryString(_paramsPaginator)
+    );
+    const url = window.URL.createObjectURL(new Blob([respo.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "cong_no_tong_hop_kh.xlsx");
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode?.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }
+
+  const items = [
+    {
+      label: "Công nợ tổng hợp khách hàng",
+      icon: "pi pi-file-export",
+      command: () => ExportExcelCongNoTongHopKH(),
+    },
+  ];
+
   return (
     <GridForm
       paramsPaginator={_paramsPaginator}
@@ -47,6 +70,7 @@ const Header = ({ _setParamsPaginator, _paramsPaginator }: any) => {
       filter={filter}
       setFilter={setFilter}
       className="lg:col-9"
+      MenuItems={items}
     >
       <div className="col-2">Ngày phiếu thu</div>
       <div className="col-2">

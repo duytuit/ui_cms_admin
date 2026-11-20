@@ -76,6 +76,8 @@ export const showWithIds = async (params: any) => await postData("Debit/showWith
 export const exportDieuXe = async (params: any) => await getDataV3("Debit/excel/dieuxe", params);
 export const exportDebitKH = async (params: any) => await getDataV3("Debit/excel/congnokh", params);
 export const exportDebitNCC = async (params: any) => await getDataV3("Debit/excel/congnoncc_v1", params);
+export const exportDebitTongHopNCC = async (params: any) => await getDataV3("Debit/excel/congnotonghopncc", params);
+export const exportDebitTongHopKH = async (params: any) => await getDataV3("Debit/excel/congnotonghopkh", params);
 export const exportDebitKHVer1 = async (params: any) => await getDataV3("Debit/excel/congnokh_v1", params);
 export const exportBaoCaoNhatKyDieuXeAsync = async (params: any) => await getDataV3("Debit/excel/exportBaoCaoNhatKyDieuXeAsync", params);
 export const listDebitDoiTruNCC = async (params: any) => await getData("Debit/congnodoitruncc", params);
